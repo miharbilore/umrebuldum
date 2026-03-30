@@ -44,6 +44,17 @@ export async function GET(req: Request) {
             take: 100,
         });
 
+        // Map to frontend expected format + Double Entry info
+        const formattedTransactions = transactions.map(tx => ({
+            id: tx.id,
+            amount: tx.amount,
+            type: tx.entryType,
+            reason: tx.reasonCode || "-",
+            relatedId: tx.referenceId,
+            counterpartyId: tx.counterpartyId,
+            createdAt: tx.createdAt
+        }));
+
         return NextResponse.json({
             user: {
                 id: user.id,
@@ -56,7 +67,7 @@ export async function GET(req: Request) {
                 mutedUntil: user.mutedUntil,
             },
             balance: user.tokenBalance,
-            transactions,
+            transactions: formattedTransactions,
         });
     } catch (error) {
         console.error("Admin credits GET error:", error);

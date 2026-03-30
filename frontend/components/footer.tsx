@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 export function Footer() {
@@ -9,8 +10,8 @@ export function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-                <span className="text-2xl font-bold text-primary-foreground">U</span>
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-400 shadow-sm shrink-0">
+                <span className="text-xl font-bold text-black font-serif">U</span>
               </div>
               <span className="text-2xl font-bold tracking-tight text-card">
                 Umrebuldum
@@ -24,14 +25,14 @@ export function Footer() {
                 href="tel:+908501234567"
                 className="flex items-center gap-3 text-lg text-card/70 transition-colors hover:text-card"
               >
-                <Phone className="h-5 w-5" />
+                <Phone className="h-5 w-5 text-yellow-500" />
                 0850 123 45 67
               </a>
               <a
                 href="mailto:info@umrebuldum.com"
                 className="flex items-center gap-3 text-lg text-card/70 transition-colors hover:text-card"
               >
-                <Mail className="h-5 w-5" />
+                <Mail className="h-5 w-5 text-yellow-500" />
                 info@umrebuldum.com
               </a>
             </div>
@@ -47,6 +48,23 @@ export function Footer() {
                   className="text-lg text-card/70 transition-colors hover:text-card"
                 >
                   Tüm Turlar
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/umre-rehber.html"
+                  className="text-lg text-card/70 transition-colors hover:text-card"
+                >
+                  Umre Gezi Rehberi
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/rehber"
+                  className="text-lg text-primary/90 font-medium transition-colors hover:text-primary flex items-center gap-2"
+                >
+                  <span>Umre Rehberi Hub</span>
+                  <span className="px-1.5 py-0.5 rounded bg-primary/20 text-xs font-bold text-primary">YENİ</span>
                 </Link>
               </li>
               <li>

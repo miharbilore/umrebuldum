@@ -46,7 +46,7 @@ export async function checkChatRateLimits(
 ): Promise<{ allowed: true } | RateLimitResult> {
     // ── Tier 1: burst ──────────────────────────────────────────────────────
     const burstKey = `chat:burst:${senderId}:${conversationId}`;
-    const burst = rateLimit(burstKey, BURST_WINDOW_MS, BURST_MAX);
+    const burst = await rateLimit(burstKey, BURST_WINDOW_MS, BURST_MAX);
     if (!burst.success) {
         return {
             allowed: false,

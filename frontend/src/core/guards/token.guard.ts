@@ -62,7 +62,7 @@ export async function requireTokens(
     }
 
     // ── 2. Daily cap ────────────────────────────────────────────────
-    const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREE;
+    const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREEMIUM;
     const capMap: Partial<Record<TokenAction, number>> = {
         OFFER_SEND: caps.offers,
         DEMAND_UNLOCK: caps.unlocks,

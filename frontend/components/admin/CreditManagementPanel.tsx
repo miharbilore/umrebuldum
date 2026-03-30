@@ -12,6 +12,7 @@ interface CreditTx {
     type: string;
     reason: string;
     relatedId: string | null;
+    counterpartyId?: string;
     createdAt: string;
 }
 
@@ -227,6 +228,7 @@ export default function CreditManagementPanel() {
                                         <tr>
                                             <th className="px-4 py-3 text-left font-medium">Tarih</th>
                                             <th className="px-4 py-3 text-left font-medium">Tip</th>
+                                            <th className="px-4 py-3 text-left font-medium">Hedef Hesap</th>
                                             <th className="px-4 py-3 text-left font-medium">Miktar</th>
                                             <th className="px-4 py-3 text-left font-medium">Sebep</th>
                                             <th className="px-4 py-3 text-right font-medium">İşlem</th>
@@ -242,6 +244,9 @@ export default function CreditManagementPanel() {
                                                     <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-300">
                                                         {tx.type}
                                                     </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-gray-400 text-xs font-mono truncate max-w-[120px]" title={tx.counterpartyId}>
+                                                    {tx.counterpartyId || '-'}
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <span className={`flex items-center gap-1 font-medium ${tx.amount > 0 ? 'text-emerald-400' : 'text-red-400'

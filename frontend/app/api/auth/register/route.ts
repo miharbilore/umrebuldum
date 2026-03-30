@@ -30,13 +30,13 @@ export async function POST(req: Request) {
         try {
             body = JSON.parse(bodyText);
         } catch (e) {
-            AuthRateLimit.recordFailure(ip);
+            await AuthRateLimit.recordFailure(ip);
             console.error("JSON parse error:", e);
             return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
         }
 
         const rawEmail = body?.email;
-        const lockout = AuthRateLimit.checkLockout(ip, rawEmail);
+        const lockout = await AuthRateLimit.checkLockout(ip, rawEmail);
         if (!lockout.allowed) {
             return NextResponse.json({ error: lockout.reason || "Too many attempts" }, { status: 429 });
         }
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         const validation = registerSchema.safeParse(body);
 
         if (!validation.success) {
-            AuthRateLimit.recordFailure(ip, rawEmail);
+            await AuthRateLimit.recordFailure(ip, rawEmail);
             console.error("Validation failed:", JSON.stringify(validation.error.format()));
             return NextResponse.json(
                 { error: "Geçersiz veriler", details: validation.error.format() },
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         });
 
         if (existingUser) {
-            AuthRateLimit.recordFailure(ip, email);
+            await AuthRateLimit.recordFailure(ip, email);
             console.log("User exists:", email);
             return NextResponse.json(
                 { error: "Bu e-posta adresi zaten kullanımda" },
@@ -136,10 +136,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Veritabanı kayıt hatası", details: dbError }, { status: 500 });
         }
 
-        // ─── INVARIANT: Every user MUST have at least 1 ledger entry ─────
         // This guarantees: SUM(ledger) == tokenBalance for all users.
         // Empty ledger state is IMPOSSIBLE after this point.
-        const initialTokens = (role === 'GUIDE' || role === 'ORGANIZATION') ? 30 : 0;
+        const initialTokens = (role === 'GUIDE' || role === 'ORGANIZATION') ? 15 : 0;
 
         try {
             console.log("Granting initial tokens...");
@@ -179,7 +178,7 @@ export async function POST(req: Request) {
         }
 
         // Clear tracking on successful registration
-        AuthRateLimit.recordSuccess(ip, email);
+        await AuthRateLimit.recordSuccess(ip, email);
 
         return NextResponse.json({ success: true, email });
 

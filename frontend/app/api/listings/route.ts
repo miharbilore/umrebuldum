@@ -13,7 +13,11 @@ import { spendToken } from "@/src/modules/tokens";
 import { TOKEN_COSTS } from "@/lib/package-system";
 
 
-export async function GET(req: Request) {
+import { withErrorHandler } from "@/lib/errors/api-handler";
+import { AppError } from "@/lib/errors/AppError";
+import { ERROR_CODES } from "@/lib/errors/error-codes";
+
+export const GET = withErrorHandler(async (req: Request) => {
     try {
         const { searchParams } = new URL(req.url);
         const guideId = searchParams.get('guideId');
@@ -24,10 +28,13 @@ export async function GET(req: Request) {
         const minPrice = searchParams.get('minPrice');
         const maxPrice = searchParams.get('maxPrice');
         const isIdentityVerifiedFilter = searchParams.get('isIdentityVerified');
+        const page = parseInt(searchParams.get('page') || '1', 10);
+        const limit = parseInt(searchParams.get('limit') || '20', 10);
+        const skip = (page - 1) * limit;
 
         const now = new Date();
 
-        // Build where clause — query-level expiration filter
+        // Build where clause — query-level filters
         let where: Prisma.GuideListingWhereInput = {
             active: true,
             approvalStatus: 'APPROVED',
@@ -44,8 +51,34 @@ export async function GET(req: Request) {
             where.guide = { user: { isIdentityVerified: true } };
         }
 
+        if (isIdentityVerifiedFilter === 'true') {
+            where.guide = { user: { isIdentityVerified: true } };
+        }
+
+        // Price mapping (Push Down to DB schema 'price' column)
+        if (minPrice || maxPrice) {
+            where.price = {};
+            if (minPrice) where.price.gte = parseFloat(minPrice);
+            if (maxPrice) where.price.lte = parseFloat(maxPrice);
+        }
+
+        // Date range mapping (Push down)
+        if (minDate || maxDate) {
+            if (minDate) where.endDate = { gte: new Date(minDate) };
+            if (maxDate) where.startDate = { lte: new Date(maxDate) };
+        } else if (searchDate) {
+            const parsedDate = new Date(searchDate);
+            where.startDate = { lte: parsedDate };
+            where.endDate = { gte: parsedDate };
+        }
+
+        // Get total count for pagination metadata
+        const totalCount = await prisma.guideListing.count({ where });
+
         let listings = await prisma.guideListing.findMany({
             where,
+            take: limit,
+            skip: skip,
             select: {
                 // ── Core listing fields ──────────────────────────
                 id: true,
@@ -107,40 +140,12 @@ export async function GET(req: Request) {
             ]
         });
 
-        // Date range filtering
-        if (minDate || maxDate) {
-            listings = listings.filter(l => {
-                const lStart = l.startDate.getTime();
-                const lEnd = l.departureDateEnd ? l.departureDateEnd.getTime() : lStart;
-
-                const searchMin = minDate ? new Date(minDate).getTime() : -Infinity;
-                const searchMax = maxDate ? new Date(maxDate).getTime() : Infinity;
-
-                return lStart <= searchMax && lEnd >= searchMin;
-            });
-        } else if (searchDate) {
-            listings = listings.filter(l => {
-                const start = l.startDate.toISOString().split('T')[0];
-                const end = l.endDate.toISOString().split('T')[0];
-                return searchDate >= start && searchDate <= end;
-            });
-        }
-
-        // Price filtering
-        if (minPrice || maxPrice) {
-            const min = minPrice ? parseFloat(minPrice) : 0;
-            const max = maxPrice ? parseFloat(maxPrice) : Infinity;
-            listings = listings.filter(l => {
-                const prices = [l.pricingQuad, l.pricingTriple, l.pricingDouble].filter(p => p > 0);
-                const price = prices.length > 0 ? Math.min(...prices) : (l.price || 0);
-                return price >= min && price <= max;
-            });
-        }
+        // Filters explicitly removed: They are now handled efficiently at DB layer (SQL)
 
         // Enrich with guide profile data
-        const enrichedListings = listings.map(l => {
+        const enrichedListings = await Promise.all(listings.map(async l => {
             const profile = l.guide;
-            const showPhone = profile ? PackageSystem.isPhoneVisible(profile.package) : false;
+            const showPhone = profile ? await PackageSystem.isPhoneVisible(profile.package) : false;
 
             return {
                 id: l.id,
@@ -195,7 +200,7 @@ export async function GET(req: Request) {
                     package: profile.package || "FREEMIUM"
                 } : null
             };
-        });
+        }));
 
         // Calculate ranking scores and sort
         const scoredListings = enrichedListings.map(l => ({
@@ -225,14 +230,23 @@ export async function GET(req: Request) {
 
         scoredListings.sort((a, b) => (b._score || 0) - (a._score || 0));
 
-        return NextResponse.json(scoredListings);
+        return NextResponse.json({
+            data: scoredListings,
+            metadata: {
+                totalCount,
+                page,
+                limit,
+                totalPages: Math.ceil(totalCount / limit)
+            }
+        });
     } catch (error) {
         console.error("Fetch listings error:", error);
-        return NextResponse.json({ error: safeErrorMessage(error, "Failed to fetch listings") }, { status: 500 });
+        console.error("Fetch listings error:", error);
+        throw new AppError("Failed to fetch listings", ERROR_CODES.INTERNAL_ERROR, 500);
     }
-}
+});
 
-export async function POST(req: Request) {
+export const POST = withErrorHandler(async (req: Request) => {
     try {
         const session = await auth();
         const guard = requireSupply(session);
@@ -259,11 +273,15 @@ export async function POST(req: Request) {
         } = body;
 
         // Validation
-        if (!title || !departureCityId) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-        if (!legalConsent) return NextResponse.json({ error: "Yasal sorumluluk beyanı zorunludur." }, { status: 400 });
+        if (!title || !departureCityId) {
+            throw new AppError("Eksik alanlar mevcut.", ERROR_CODES.INVALID_QUERY, 400);
+        }
+        if (!legalConsent) {
+            throw new AppError("Yasal sorumluluk beyanı zorunludur.", ERROR_CODES.INVALID_QUERY, 400);
+        }
 
         // Rate limit: 5 listings per 5 minutes
-        const rl = rateLimit(`listing:${session!.user.email}`, 300_000, 5);
+        const rl = await rateLimit(`listing:${session!.user.email}`, 300_000, 5);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }
@@ -329,7 +347,7 @@ export async function POST(req: Request) {
             }, { status: 403 });
         }
         // Check package limits (business layer — may be more restrictive)
-        if (!PackageSystem.canCreateListing(profile.package, currentListingsCount)) {
+        if (!(await PackageSystem.canCreateListing(profile.package, currentListingsCount))) {
             return NextResponse.json({
                 error: "Limit Reached",
                 message: "Paket limitinize ulaştınız. Daha fazla tur eklemek için paketinizi yükseltin.",
@@ -443,6 +461,7 @@ export async function POST(req: Request) {
 
     } catch (error) {
         console.error("Create listing error:", error);
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+        console.error("Create listing error:", error);
+        throw new AppError(safeErrorMessage(error), ERROR_CODES.INTERNAL_ERROR, 500);
     }
-}
+});

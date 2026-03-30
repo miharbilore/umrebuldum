@@ -163,7 +163,10 @@ export default function RequestDetailPage() {
                                     </div>
 
                                     {canChat && (
-                                        <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700 h-12 text-lg">
+                                        <Button
+                                            onClick={() => router.push("/dashboard/messages")}
+                                            className="w-full gap-2 bg-blue-600 hover:bg-blue-700 h-12 text-lg"
+                                        >
                                             <MessageSquare className="w-5 h-5" />
                                             Mesaj Gönder
                                         </Button>

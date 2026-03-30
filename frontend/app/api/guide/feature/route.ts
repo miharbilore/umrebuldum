@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         if (!listingId) return NextResponse.json({ error: "Missing listingId" }, { status: 400 });
 
         // Rate limit: 3 feature requests per minute
-        const rl = rateLimit(`feature:${session!.user.email}`, 60_000, 3);
+        const rl = await rateLimit(`feature:${session!.user.email}`, 60_000, 3);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }

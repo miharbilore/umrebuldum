@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const values = [
     {
         icon: Shield,
-        title: "Şeffaflık",
+        title: "Güven",
         description: "Misafirlerimizin en doğru kararı vermelerine yardımcı olmak için tarafsız bir platform sunuyoruz.",
     },
     {

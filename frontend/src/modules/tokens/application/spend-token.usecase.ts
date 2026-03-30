@@ -71,7 +71,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                 // If another transaction inserted this key concurrently,
                 // SERIALIZABLE will detect the conflict and retry.
                 const existing = await tx.tokenTransaction.findUnique({
-                    where: { idempotencyKey: generatedKey },
+                    where: { idempotencyKey: `${generatedKey}_debit` },
                 });
                 if (existing) {
                     // The original code had a redundant `user` fetch here.
@@ -95,7 +95,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                 const [balanceRow] = await tx.$queryRaw<[{ balance: number }]>`
                     SELECT COALESCE(SUM(amount), 0) AS balance
                     FROM token_ledger_entries
-                    WHERE userId = ${input.userId}
+                    WHERE accountId = ${input.userId}
                     FOR UPDATE
                 `;
                 const currentBalance = Number(balanceRow.balance);
@@ -115,7 +115,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                 // These rows are implicitly locked by the earlier FOR UPDATE on the table.
                 const expiringBatches = await tx.tokenTransaction.findMany({
                     where: {
-                        userId: input.userId,
+                        accountId: input.userId,
                         remainingAmount: { gt: 0 },
                     },
                     orderBy: { expiresAt: "asc" },
@@ -141,15 +141,29 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                 // reasonCode: business action string (for analytics)
                 // referenceId: contextual ID (listingId, requestId, etc.)
                 // idempotencyKey: unique constraint prevents duplicates
-                await tx.tokenTransaction.create({
-                    data: {
-                        userId: input.userId,
-                        entryType: LedgerEntryType.CONSUME,
-                        amount: -cost,
-                        reasonCode: `${input.action}: ${input.reason}`,
-                        referenceId: input.relatedId || null,
-                        idempotencyKey: generatedKey,
-                    },
+                await tx.tokenTransaction.createMany({
+                    data: [
+                        {
+                            userId: input.userId, // Link to real user
+                            accountId: input.userId, // Debit Account
+                            counterpartyId: "SYSTEM_BURN",
+                            entryType: LedgerEntryType.CONSUME,
+                            amount: -cost,
+                            reasonCode: `${input.action}: ${input.reason}`,
+                            referenceId: input.relatedId || null,
+                            idempotencyKey: `${generatedKey}_debit`,
+                        },
+                        {
+                            userId: null, // System account has no human user
+                            accountId: "SYSTEM_BURN", // Credit Account
+                            counterpartyId: input.userId,
+                            entryType: LedgerEntryType.CONSUME,
+                            amount: cost, // Positive balance added to burn reserve
+                            reasonCode: `${input.action}: ${input.reason}`,
+                            referenceId: input.relatedId || null,
+                            idempotencyKey: `${generatedKey}_credit`,
+                        }
+                    ]
                 });
 
                 // ── STEP 5 (WRITE₂): Cached balance sync ───────────────

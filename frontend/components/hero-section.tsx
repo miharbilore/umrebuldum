@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
+import { MagneticButton } from "@/components/ui/magnetic-button";
 
 export function HeroSection() {
   const router = useRouter();
@@ -73,13 +74,12 @@ export function HeroSection() {
           <div className="flex justify-center gap-4">
             {/* Show only if User or Not Logged In */}
             {(!session || session.user.role === 'USER') && (
-              <Button
-                size="lg"
-                className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg px-8 py-6 rounded-full shadow-xl transition-all hover:scale-105 border-0 ring-offset-2 ring-amber-500/50"
+              <MagneticButton
+                className="inline-flex items-center justify-center whitespace-nowrap bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg px-8 py-6 rounded-full shadow-xl transition-all hover:scale-105 border-0 ring-offset-2 ring-amber-500/50"
                 onClick={() => router.push("/request")}
               >
                 ✨ Teklif Al (Hızlı)
-              </Button>
+              </MagneticButton>
             )}
             {/* Show Dashboard link for Guides/Orgs */}
             {session && (session.user.role === 'GUIDE' || session.user.role === 'ORGANIZATION') && (

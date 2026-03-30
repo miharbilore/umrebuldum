@@ -83,13 +83,12 @@ function getSuggestedPlan(
     isCorp: boolean,
 ): PackageType | null {
     // Already max plan
-    if (current === "LEGEND" || current === "CORP_ENTERPRISE") return null;
+    if (current === "PRO" || current === "BUSINESS_PLUS") return null;
 
     // Corporate users → corporate upgrade path
     if (isCorp) {
-        if (current === "CORP_PRO") return "CORP_ENTERPRISE";
-        if (current === "CORP_BASIC") return "CORP_PRO";
-        return "CORP_BASIC";
+        if (current === "BUSINESS") return "BUSINESS_PLUS";
+        return "BUSINESS";
     }
 
     // Guide upgrade paths by context
@@ -100,30 +99,31 @@ function getSuggestedPlan(
         case "FIRST_WEEK_NUDGE":
         case "INACTIVE_NUDGE":
             // Gentlest push: next tier up
-            if (current === "FREE") return "STARTER";
-            if (current === "STARTER") return "PRO";
-            return "LEGEND";
+            if (current === "FREEMIUM") return "PREMIUM";
+            if (current === "PREMIUM") return "PLUS";
+            return "PRO";
 
         case "BOOST_TIER_BLOCKED":
         case "BOOST_CAP_HIT":
-            // Boost-focused: jump to PRO minimum
-            if (current === "FREE" || current === "STARTER") return "PRO";
-            return "LEGEND";
+            // Boost-focused: jump to PLUS minimum
+            if (current === "FREEMIUM" || current === "PREMIUM") return "PLUS";
+            return "PRO";
 
         case "LISTING_CAP_HIT":
-            // Listings: PRO has 5 (same as LEGEND)
-            if (current === "FREE") return "STARTER";
+            // Listings: PLUS has 5, PRO has 15
+            if (current === "FREEMIUM") return "PREMIUM";
+            if (current === "PREMIUM") return "PLUS";
             return "PRO";
 
         case "PHONE_HIDDEN":
-            // Phone visibility starts at PRO
-            if (current === "FREE" || current === "STARTER") return "PRO";
+            // Phone visibility starts at PREMIUM
+            if (current === "FREEMIUM") return "PREMIUM";
             return null;
 
         default:
-            if (current === "FREE") return "STARTER";
-            if (current === "STARTER") return "PRO";
-            return "LEGEND";
+            if (current === "FREEMIUM") return "PREMIUM";
+            if (current === "PREMIUM") return "PLUS";
+            return "PRO";
     }
 }
 

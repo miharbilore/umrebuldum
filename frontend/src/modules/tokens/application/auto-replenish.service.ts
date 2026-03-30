@@ -83,7 +83,7 @@ export async function configureAutoReplenish(
         select: { packageType: true },
     });
     if (!user) return { ok: false, error: "User not found" };
-    if (user.packageType === "FREE") {
+    if (user.packageType === "FREEMIUM") {
         return { ok: false, error: "Auto-replenish requires a paid plan" };
     }
 

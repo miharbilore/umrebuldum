@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
         // Rate limit: 10 interests per minute per guide
         const user = session!.user;
-        const rl = rateLimit(`interest:${user.email}`, 60_000, 10);
+        const rl = await rateLimit(`interest:${user.email}`, 60_000, 10);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }

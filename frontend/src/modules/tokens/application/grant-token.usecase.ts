@@ -49,7 +49,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
             prisma.$transaction(async (tx) => {
                 // ── (1) Idempotency check INSIDE the transaction ──────────
                 const existing = await tx.tokenTransaction.findUnique({
-                    where: { idempotencyKey: input.idempotencyKey },
+                    where: { idempotencyKey: `${input.idempotencyKey}_credit` },
                 });
                 if (existing) {
                     const user = await tx.user.findUnique({
@@ -79,18 +79,34 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
                 }
                 const remainingAmount = expiresAt ? input.amount : null;
 
-                // ── (4) Create immutable ledger entry ─────────────────────
-                await tx.tokenTransaction.create({
-                    data: {
-                        userId: input.userId,
-                        entryType: entryTypeMap[input.type] || LedgerEntryType.ADJUSTMENT,
-                        amount: input.amount,
-                        referenceId: input.relatedId || null,
-                        idempotencyKey: input.idempotencyKey,
-                        reasonCode: input.reason,
-                        expiresAt,
-                        remainingAmount,
-                    },
+                // ── (4) Create immutable double-entry ledger ───────────────
+                const entryTypeVal = entryTypeMap[input.type] || LedgerEntryType.ADJUSTMENT;
+                
+                await tx.tokenTransaction.createMany({
+                    data: [
+                        { // Row 1 (Debit SYSTEM_TREASURY)
+                            userId: null, 
+                            accountId: "SYSTEM_TREASURY",
+                            counterpartyId: input.userId,
+                            entryType: entryTypeVal,
+                            amount: -input.amount,
+                            referenceId: input.relatedId || null,
+                            idempotencyKey: `${input.idempotencyKey}_debit`,
+                            reasonCode: input.reason,
+                        },
+                        { // Row 2 (Credit USER)
+                            userId: input.userId,
+                            accountId: input.userId,
+                            counterpartyId: "SYSTEM_TREASURY",
+                            entryType: entryTypeVal,
+                            amount: input.amount,
+                            referenceId: input.relatedId || null,
+                            idempotencyKey: `${input.idempotencyKey}_credit`,
+                            reasonCode: input.reason,
+                            expiresAt,
+                            remainingAmount,
+                        }
+                    ]
                 });
 
                 // ── (4) Update cached balance ─────────────────────────────

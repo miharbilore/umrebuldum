@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Download, Loader2, Lock, Star } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 
 // Templates
 import { POSTER_TEMPLATES } from '@/components/dashboard/poster-templates/registry';
@@ -39,13 +39,12 @@ const TEMPLATE_COMPONENTS: Record<string, React.FC<any>> = {
 
 // Map package ranks to determine access
 const PACKAGE_RANK: Record<string, number> = {
-    "FREE": 0,
-    "STARTER": 1,
+    "FREEMIUM": 0,
+    "PREMIUM": 1,
+    "PLUS": 1,
     "PRO": 2,
-    "LEGEND": 3,
-    "CORP_BASIC": 10,
-    "CORP_PRO": 11,
-    "CORP_ENTERPRISE": 12,
+    "BUSINESS": 10,
+    "BUSINESS_PLUS": 11,
 };
 
 export interface PosterData {
@@ -113,23 +112,22 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
 
         try {
             // Wait for any fonts/images to load (basic delay)
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 400));
 
-            const canvas = await html2canvas(previewRef.current, {
-                scale,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: null, // Transparent background if rounded corners
-                logging: false,
+            // Use html-to-image to bypass modern CSS unsupported issues (e.g. lab() or oklch colors)
+            const dataUrl = await htmlToImage.toPng(previewRef.current, {
+                pixelRatio: scale,
+                backgroundColor: 'transparent',
+                style: { transform: 'scale(1)', transformOrigin: 'top left' } // Ensure no scaling bugs from parent
             });
 
             const link = document.createElement('a');
             link.download = `umre-afis-${selectedTemplateId}-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.href = dataUrl;
             link.click();
         } catch (err) {
-            console.error("Canvas export failed", err);
-            alert("Afiş oluşturulurken bir hata oluştu. Lütfen farklı bir görsel ile deneyin.");
+            console.error("Image export failed", err);
+            alert("Afiş oluşturulurken bir hata oluştu. Lütfen farklı bir görsel veya şablon ile deneyin.");
         } finally {
             setGenerating(false);
         }
@@ -151,7 +149,7 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
                     {/* Template Selection */}
                     <div className="space-y-3">
                         <Label className="text-sm font-bold text-slate-700">Şablon Seçimi</Label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 pb-2">
                             {POSTER_TEMPLATES.map((tpl) => {
                                 const locked = isTemplateLocked(tpl.requiredTier);
                                 const active = selectedTemplateId === tpl.id;
@@ -284,20 +282,39 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
                 </div>
 
                 <div className="p-4 border-t bg-white">
-                    <Button
-                        onClick={handleDownload}
-                        disabled={generating}
-                        className="w-full h-12 text-md shadow-lg"
-                        size="lg"
-                    >
-                        {generating ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Download className="w-5 h-5 mr-2" />}
-                        Afişi İndir ({limits.posterQuality} Kalite)
-                    </Button>
-                    {limits.watermark && (
-                        <div className="text-center text-xs text-amber-600 mt-2 font-medium">
-                            Ücretsiz paketlerde filigran eklenir. Premium paketlere geçerek filigranı kaldırabilirsiniz.
-                        </div>
-                    )}
+                    {(() => {
+                        const currentTpl = POSTER_TEMPLATES.find(t => t.id === selectedTemplateId);
+                        const isLocked = isTemplateLocked(currentTpl?.requiredTier || "PRO");
+
+                        return (
+                            <>
+                                <Button
+                                    onClick={handleDownload}
+                                    disabled={generating || !limits.canCreatePoster || isLocked}
+                                    className="w-full h-12 text-md shadow-lg"
+                                    size="lg"
+                                >
+                                    {generating ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : (isLocked || !limits.canCreatePoster ? <Lock className="w-5 h-5 mr-2" /> : <Download className="w-5 h-5 mr-2" />)}
+                                    {isLocked || !limits.canCreatePoster ? "Paketinizi Yükseltin" : `Afişi İndir (${limits.posterQuality} Kalite)`}
+                                </Button>
+                                {!limits.canCreatePoster && (
+                                    <div className="text-center text-xs text-red-600 mt-2 font-medium">
+                                        Mevcut (Ücretsiz) paketiniz afiş oluşturmaya izin vermiyor.
+                                    </div>
+                                )}
+                                {limits.canCreatePoster && isLocked && (
+                                    <div className="text-center text-xs text-amber-600 mt-2 font-medium">
+                                        Bu tasarımı kullanabilmek için en az <strong>{currentTpl?.requiredTier}</strong> paketi gereklidir.
+                                    </div>
+                                )}
+                                {limits.canCreatePoster && !isLocked && limits.watermark && (
+                                    <div className="text-center text-xs text-amber-600 mt-2 font-medium">
+                                        Ücretsiz/Başlangıç paketlerinde filigran eklenir. Premium'da filigran kalkar.
+                                    </div>
+                                )}
+                            </>
+                        );
+                    })()}
                 </div>
             </div>
 
@@ -327,6 +344,13 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
                                     id="poster-template-root"
                                     showWatermark={limits.watermark}
                                 />
+                            )}
+                            {/* Global Frame Overlay */}
+                            {data.frameStyle !== 'frame-none' && (
+                                <div className={`absolute inset-0 pointer-events-none z-40 ${data.frameStyle === 'frame-modern' ? 'border-[24px] border-white m-8 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]' :
+                                    data.frameStyle === 'frame-gold' ? 'border-[16px] border-double border-[#d4af37] m-8 rounded-[40px] opacity-80' :
+                                        data.frameStyle === 'frame-classic' ? 'border-[32px] border-[#1a1814]/5 m-6 mix-blend-multiply' : ''
+                                    }`} />
                             )}
                         </div>
                     </div>

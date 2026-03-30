@@ -1,205 +1,66 @@
-import { Metadata } from "next"
-import Link from "next/link"
+import { Metadata } from "next";
+import { ListChecks, AlertTriangle, Building2, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "İlan Yayınlama Şartları | Umrebuldum",
-    description:
-        "Umrebuldum platformunda ilan yayınlamak için uyulması gereken kurallar, içerik politikaları ve onay süreci.",
-}
+    description: "Organizatörlerin ve acentelerin Umrebuldum platformunda ilan yayınlarken uyması gereken şeffaflık kuralları.",
+};
 
 export default function ListingTermsPage() {
     return (
-        <div className="container py-12 md:py-16 lg:py-20 max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight">İlan Yayınlama Şartları</h1>
-                <p className="text-xl text-muted-foreground">
-                    Platformumuzda ilan yayınlamak için uymanız gereken kurallar ve politikalar.
+        <div className="container py-16 md:py-24 max-w-4xl mx-auto space-y-12">
+            <div className="text-center space-y-6">
+                <div className="mx-auto w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-2xl flex items-center justify-center mb-6">
+                    <ListChecks className="w-8 h-8" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                    İlan Yayınlama Şartları
+                </h1>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    Kullanıcılarımızın doğru karar vermesini sağlamak adına, platformda ilan verecek olan
+                    tüm acentelerin uyması gereken katı standartlar.
                 </p>
             </div>
 
-            <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-sm text-muted-foreground">Son Güncelleme: 28 Şubat 2026</p>
-
-                <h2>1. Genel İlkeler</h2>
+            <div className="prose prose-gray dark:prose-invert max-w-none bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-8 md:p-12 rounded-3xl mt-12">
+                <h2>1. Onaylı Acente Olma Şartı</h2>
                 <p>
-                    UmreBuldum platformunda ilan yayınlamak, belirli şartlar ve standartlara uyumu gerektirir.
-                    Bu şartlar, platformumuzun güvenilirliğini korumak, kullanıcılarımıza kaliteli hizmet
-                    sunulmasını sağlamak ve yasal yükümlülükleri yerine getirmek amacıyla belirlenmiştir.
+                    Umrebuldum, sahtekarlıkların ve mağduriyetlerin önüne geçmek maksadıyla yalnızca T.C. Kültür ve Turizm Bakanlığı'na ve <strong>TÜRSAB</strong>'a kayıtlı, lisanslı "A Grubu Seyahat Acenteleri"ne ilan yayınlama yetkisi verir.
                 </p>
-
-                <h2>2. İlan Yayınlama Yetkililiği</h2>
-                <p>Platformumuzda ilan yayınlayabilmek için aşağıdaki şartların karşılanması gerekir:</p>
-
-                <h3>2.1. Acenteler İçin</h3>
-                <ul>
-                    <li><strong>Platform Doğrulaması:</strong> UmreBuldum&apos;un platform doğrulama sürecinden geçilmiş olmalıdır.</li>
-                    <li><strong>Vergi Kaydı:</strong> Geçerli vergi levhası ve ticaret sicil kaydı bulunmalıdır.</li>
-                </ul>
-
-                <h3>2.2. Rehberler İçin</h3>
-                <ul>
-                    <li><strong>Platform Kaydı:</strong> Temel doğrulama süreci tamamlanmış olmalıdır.</li>
-                </ul>
-
-                <h2>3. İlan İçerik Politikası</h2>
-                <p>İlanlar aşağıdaki standartlara uygun hazırlanmalıdır:</p>
-
-                <h3>3.1. Zorunlu Bilgiler</h3>
-                <p>Her ilan aşağıdaki bilgileri içermelidir:</p>
-                <ul>
-                    <li>Turun başlangıç ve bitiş tarihleri</li>
-                    <li>Kalkış noktası (şehir)</li>
-                    <li>Konaklama detayları (otel adı, yıldız sayısı, Harem-i Şerif&apos;e mesafe)</li>
-                    <li>Tura dahil olan hizmetler (uçak bileti, vize, transfer, rehberlik vb.)</li>
-                    <li>Tura dahil olmayan hizmetler</li>
-                    <li><strong>Fiyat bilgisi (SAR — Suudi Arabistan Riyali cinsinden)</strong></li>
-                    <li>Kontenjan bilgisi</li>
-                    <li>İptal ve iade koşulları</li>
-                </ul>
-
-                <h3>3.2. Fiyatlandırma Kuralları</h3>
-                <ul>
-                    <li>Fiyatlar <strong>SAR (Suudi Arabistan Riyali)</strong> cinsinden belirtilmelidir.</li>
-                    <li>Fiyatlar, tüm vergiler ve zorunlu ücretler dahil olarak gösterilmelidir.</li>
-                    <li>Gizli ücret veya ek masraf olmamalıdır.</li>
-                    <li>Kişi başı fiyat açıkça belirtilmelidir.</li>
-                    <li>İndirimli fiyatlar, gerçek bir indirim yansıtmalıdır; yanıltıcı indirim uygulaması yasaktır.</li>
-                </ul>
-
-                <h3>3.3. Görsel ve Medya Kuralları</h3>
-                <ul>
-                    <li>İlan görselleri gerçek ve güncel olmalıdır.</li>
-                    <li>Stok fotoğraf kullanılmaması önerilir; kullanılacaksa belirtilmelidir.</li>
-                    <li>Yanıltıcı veya aşırı düzenlenmiş görseller kullanılamaz.</li>
-                    <li>Görsellerin çözünürlüğü en az 800x600 piksel olmalıdır.</li>
-                    <li>Telif hakkı ihlali oluşturacak görseller kullanılamaz.</li>
-                </ul>
-
-                <h2>4. Yasaklı İçerikler</h2>
-                <p>Aşağıdaki içerikler kesinlikle yasaktır:</p>
-                <ul>
-                    <li>Yanıltıcı veya gerçeğe aykırı bilgiler</li>
-                    <li>Sahte indirim veya kampanya bilgileri</li>
-                    <li>Rakip acenteleri kötüleyen ifadeler</li>
-                    <li>Siyasi içerik veya propaganda</li>
-                    <li>Dini hassasiyetleri zedeleyecek içerikler</li>
-                    <li>Yasal olmayan hizmet teklifleri</li>
-                    <li>Kişisel iletişim bilgileri ile platform dışına yönlendirme</li>
-                    <li>Spam veya tekrarlayan ilan paylaşımı</li>
-                </ul>
-
-                <h2>5. İlan Onay Süreci</h2>
-                <p>İlanlar yayınlanmadan önce aşağıdaki süreçten geçer:</p>
-                <ol>
-                    <li><strong>İlan Oluşturma:</strong> Acente/rehber gerekli bilgileri doldurur ve ilanı gönderir.</li>
-                    <li><strong>Otomatik Kontrol:</strong> Sistem, zorunlu alanları ve format uyumluluğunu kontrol eder.</li>
-                    <li><strong>Manuel İnceleme:</strong> Ekibimiz içerik politikasına uygunluğu değerlendirir.</li>
-                    <li><strong>Onay/Red:</strong> İlan onaylanarak yayınlanır veya düzeltme talepleri ile birlikte reddedilir.</li>
-                </ol>
-                <p>
-                    Onay süreci genellikle <strong>24 saat</strong> içinde tamamlanır. Yoğun dönemlerde bu
-                    süre 48 saate kadar uzayabilir.
-                </p>
-
-                <h2>6. İlan Güncelleme ve Düzenleme</h2>
-                <ul>
-                    <li>İlanlar, acente/rehber paneli üzerinden güncellenebilir.</li>
-                    <li>Fiyat ve tarih değişiklikleri anlık olarak yansır.</li>
-                    <li>İçerik değişiklikleri yeniden onay sürecinden geçebilir.</li>
-                    <li>Geçmiş fiyat değişiklikleri şeffaflık amacıyla kaydedilir.</li>
-                </ul>
-
-                <h2>7. İlan Kaldırma ve Askıya Alma</h2>
-                <p>UmreBuldum aşağıdaki durumlarda ilanları kaldırma veya askıya alma hakkını saklı tutar:</p>
-                <ul>
-                    <li>İçerik politikası ihlali</li>
-                    <li>Kullanıcı şikâyetleri (doğrulanmış)</li>
-                    <li>Sahte veya yanıltıcı bilgi tespiti</li>
-                    <li>Acente/rehber belge süresinin dolması</li>
-                    <li>Tekrarlayan kural ihlalleri</li>
-                    <li>Yasal makamlardan gelen talepler</li>
-                </ul>
-
-                <h2>8. Sıralama ve Görünürlük</h2>
-                <p>
-                    İlanların platformdaki sıralaması, birden fazla faktörün değerlendirildiği bir algoritma ile
-                    belirlenir:
-                </p>
-                <ul>
-                    <li>Kullanıcı puanları ve değerlendirmeler</li>
-                    <li>İlan kalitesi ve içerik tamamlılığı</li>
-                    <li>Acente güvenilirlik skoru</li>
-                    <li>Dönüşüm oranları</li>
-                    <li>İlan güncelliği</li>
-                </ul>
-                <p>
-                    <em>Not: UmreBuldum, &quot;öne çıkarma&quot; veya &quot;sponsorlu ilan&quot; gibi ücretli sıralama
-                        avantajı sunmamaktadır. Tüm ilanlar eşit koşullarda değerlendirilir.</em>
-                </p>
-
-                <h2>9. Kredi Sistemi</h2>
-                <p>
-                    İlan yayınlama ve belirli platform özelliklerinin kullanımı, UmreBuldum kredi sistemi
-                    kapsamında değerlendirilir. Kredi harcama ve kazanma kuralları{" "}
-                    <Link href="/terms" className="text-primary hover:underline">Kullanım Koşulları</Link>&apos;nda
-                    detaylı olarak açıklanmıştır.
-                </p>
-
-                <h2>10. Yaptırımlar</h2>
-                <p>Kural ihlallerinde kademeli yaptırımlar uygulanır:</p>
-                <div className="overflow-x-auto">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>İhlal Seviyesi</th>
-                                <th>Yaptırım</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>İlk İhlal</td>
-                                <td>Yazılı uyarı + ilan düzeltme talebi</td>
-                            </tr>
-                            <tr>
-                                <td>İkinci İhlal</td>
-                                <td>İlan kaldırma + 7 gün ilan yayınlama yasağı</td>
-                            </tr>
-                            <tr>
-                                <td>Üçüncü İhlal</td>
-                                <td>İlan kaldırma + 30 gün ilan yayınlama yasağı</td>
-                            </tr>
-                            <tr>
-                                <td>Ağır İhlal</td>
-                                <td>Hesap kalıcı olarak kapatılır</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-950 rounded-xl not-prose my-6">
+                    <Building2 className="w-6 h-6 text-indigo-500 mt-1 shrink-0" />
+                    <div>
+                        <p className="text-sm font-medium">Bireysel kişi veya gruplar ("çantacı" tabir edilen lisanssız kişiler) platformda katiyen mağaza açamaz ve tur satışı ilanları listeleyemezler.</p>
+                    </div>
                 </div>
 
-                <h2>11. İletişim</h2>
+                <h2>2. Şeffaf Fiyatlandırma Politikası</h2>
                 <p>
-                    İlan yayınlama şartları hakkında sorularınız için{" "}
-                    <a href="mailto:ilan@umrebuldum.com" className="text-primary hover:underline">ilan@umrebuldum.com</a>{" "}
-                    adresinden veya{" "}
-                    <Link href="/contact" className="text-primary hover:underline">İletişim sayfamızdan</Link>{" "}
-                    bize ulaşabilirsiniz.
+                    Listelenen kümülatif fiyat, yolcunun ödeyeceği <strong>Net/Toplam Fiyat</strong> olmak zorundadır.
+                </p>
+                <ul>
+                    <li>İlan başlığında ve etiketlerde "600$'dan başlayan fiyatlarla" gibi aldatıcı pazarlama ifadelerine yer verilemez ancak fiyat, oda (4 kişilik, 3 kişilik, 2 kişilik vb.) bazında farklılık gösteriyorsa bu durum Varyant fiyatlarıyla net şekilde yansıtılmalıdır.</li>
+                    <li>Vize, uçak biletleri ve havalimanı vergileri gibi gizli veya zorunlu ek maliyetler var ise fiyata dahil edilmek ZORUNDADIR. Yolcudan sonradan "sigorta bedeli", "rehberlik harcı" vb. talep edilecekse bu ilan detayında açıkça beyan edilmelidir.</li>
+                </ul>
+
+                <h2>3. Medya ve Materyal Kuralları</h2>
+                <p>İlan kapak fotoğrafları (Posterleri) ve galeri görselleri aşağıdaki kurallara bağlıdır:</p>
+                <ul>
+                    <li>Stok fotoğraf kullanımından ziyade (özellikle kalınacak olan Mekke ve Medine otellerini) acentenin bizzat çektiği veya otelin resmi güncel fotoğrafları sisteme yüklenmelidir.</li>
+                    <li>Otel Kabe'ye/Harameyn'e 2 km uzaklıkta olduğu halde fotoğraflarda "Sıfır Mesafe" algısı yaratacak perspektif oyunlarının kullanımı tespiti halinde ilanın kalıcı silinmesine sebep olur.</li>
+                    <li>Sistem tarafından sağlanan Otomatik Poster Oluşturucu araçlarının kullanımı tavsiye edilir.</li>
+                </ul>
+
+                <h2>4. Tarih ve İptal Garantisi</h2>
+                <p>
+                    Yayınlanan turların gidiş ve dönüş tarihleri, havayolu firmasından uçuşların onaylanmış olduğu durumlarda "Kesin Kalkışlı" etiketiyle yayınlanmalıdır. Tarihte oynama yapılma ihtimali varsa ("Planlanan") olarak belirtilmelidir.
                 </p>
 
-                <div className="mt-8 rounded-lg border bg-muted/50 p-6">
-                    <h3 className="text-lg font-semibold mb-2">İlgili Belgeler</h3>
-                    <ul className="space-y-1 list-none pl-0">
-                        <li>
-                            <Link href="/terms" className="text-primary hover:underline">→ Kullanım Koşulları</Link>
-                        </li>
-                        <li>
-                            <Link href="/privacy" className="text-primary hover:underline">→ Gizlilik Politikası</Link>
-                        </li>
-                        <li>
-                            <Link href="/refund-policy" className="text-primary hover:underline">→ İade ve İptal Politikası</Link>
-                        </li>
-                    </ul>
+                <div className="flex bg-red-50 dark:bg-red-950/20 text-red-800 dark:text-red-400 p-4 rounded-xl mt-8 not-prose gap-4 items-start border border-red-100 dark:border-red-900/50">
+                    <AlertTriangle className="w-6 h-6 shrink-0 mt-0.5" />
+                    <p className="m-0 text-sm">Umrebuldum idari heyeti; eksik bilgi, sahte görsel veya yolcuları yanıltmaya yönelik herhangi manipülatif bir veriye rastlaması halinde bildirim yapmaksızın mağazayı platformdan uzaklaştırma ve mevcut bakiyelere (token) tedbir koyma hakkını saklı tutar.</p>
                 </div>
             </div>
         </div>
-    )
+    );
 }

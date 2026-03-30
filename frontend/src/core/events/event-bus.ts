@@ -1,10 +1,11 @@
-// ─── In-Memory Event Bus ────────────────────────────────────────────────
-// Decoupled event system for domain events.
-// Today: in-memory. Tomorrow: RabbitMQ / Redis Streams / SQS.
+import { safeInngestSend } from "@/lib/inngest/safeSend";
+import { inngest } from "@/src/inngest/client";
+
+// ─── Event Bus (Inngest Adapter) ────────────────────────────────────────
+// Replaces the old in-memory event bus with robust serverless background jobs.
 //
 // Usage:
 //   EventBus.emit("OFFER_CREATED", { offerId, guideId, demandId });
-//   EventBus.on("OFFER_CREATED", async (data) => { ... });
 
 export type EventName =
     | "OFFER_CREATED"
@@ -17,6 +18,7 @@ export type EventName =
     | "LISTING_BOOSTED"
     | "DEMAND_CREATED"
     | "DEMAND_EXPIRED"
+    | "DEMAND_UNLOCKED" // Added for pay-per-lead
     | "TOKEN_SPENT"
     | "TOKEN_GRANTED"
     | "TOKEN_RENEWED"
@@ -27,75 +29,51 @@ export type EventName =
     | "PLAN_FROZEN"
     | "IDENTITY_APPROVED"
     | "IDENTITY_REVOKED"
-    // Auto-replenish events
+    | "MESSAGE_RECEIVED"
     | "AUTO_REPLENISH_CONFIGURED"
     | "AUTO_REPLENISH_SUCCESS"
     | "AUTO_REPLENISH_ALERT"
     | "AUTO_REPLENISH_SUSPENDED"
-    // Advanced monetization events
-    | "DYNAMIC_PRICE_APPLIED"
-    | "CREDIT_LINE_DRAWN"
-    | "CREDIT_LINE_REPAID"
-    | "PERFORMANCE_TIER_CHANGED";
+    | "PAYMENT_COMPLETED"
+    | "NOTIFICATION_CREATE"
+    | "REVIEW_APPROVED";
 
-type EventHandler<T = any> = (data: T) => Promise<void>;
+/**
+ * @deprecated The old InMemoryEventBus class. Handlers here exist only for backwards compatibility or tests.
+ * All real emissions should now go to Inngest.
+ */
+class DeprecatedInMemoryEventBus {
+    private handlers = new Map<string, Function[]>();
 
-class InMemoryEventBus {
-    private handlers = new Map<string, EventHandler[]>();
-
-    /**
-     * Subscribe to an event.
-     */
-    on<T = any>(event: EventName, handler: EventHandler<T>): void {
+    on<T = any>(event: EventName, handler: (data: T) => Promise<void>): void {
         const existing = this.handlers.get(event) || [];
-        existing.push(handler as EventHandler);
+        existing.push(handler);
         this.handlers.set(event, existing);
     }
 
-    /**
-     * Remove a handler.
-     */
-    off(event: EventName, handler: EventHandler): void {
+    off(event: EventName, handler: Function): void {
         const existing = this.handlers.get(event) || [];
-        this.handlers.set(
-            event,
-            existing.filter((h) => h !== handler),
-        );
+        this.handlers.set(event, existing.filter((h) => h !== handler));
     }
 
     /**
-     * Emit an event. All handlers run concurrently.
-     * Errors are caught and logged — they never break the caller.
+     * @description Sends the event to Inngest for queue processing.
      */
     async emit<T = any>(event: EventName, data: T): Promise<void> {
+        // Dispatch to Inngest for robust background processing
+        await safeInngestSend(inngest, {
+            name: `event/${event}`,
+            data,
+        });
+
+        // For local tests or un-migrated listeners, we keep this alive.
         const handlers = this.handlers.get(event) || [];
         if (handlers.length === 0) return;
 
-        const results = await Promise.allSettled(
-            handlers.map((handler) => handler(data)),
-        );
-
-        for (const result of results) {
-            if (result.status === "rejected") {
-                console.error(`[EventBus] Handler failed for ${event}:`, result.reason);
-            }
-        }
-    }
-
-    /**
-     * Get registered event count (for debugging).
-     */
-    listenerCount(event: EventName): number {
-        return (this.handlers.get(event) || []).length;
-    }
-
-    /**
-     * Clear all handlers (for testing).
-     */
-    clear(): void {
-        this.handlers.clear();
+        Promise.allSettled(handlers.map((handler) => handler(data))).catch(console.error);
     }
 }
 
 // Singleton
-export const EventBus = new InMemoryEventBus();
+export const EventBus = new DeprecatedInMemoryEventBus();
+

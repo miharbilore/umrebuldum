@@ -13,9 +13,9 @@ interface PricingTableProps {
     onUpgrade?: (tier: TierType) => void;
 }
 
-export function PricingTable({ currentTier = TIERS.FREE, onUpgrade }: PricingTableProps) {
+export function PricingTable({ currentTier = TIERS.FREEMIUM, onUpgrade }: PricingTableProps) {
     const plans = [
-        TIER_DISPLAY_CONFIG.free,
+        TIER_DISPLAY_CONFIG.freemium,
         TIER_DISPLAY_CONFIG.plus,
         TIER_DISPLAY_CONFIG.pro
     ];
@@ -52,7 +52,7 @@ export function PricingTable({ currentTier = TIERS.FREE, onUpgrade }: PricingTab
                         </div>
 
                         <ul className="space-y-3 mb-8">
-                            {plan.features.map((feature, i) => (
+                            {plan.features.map((feature: string, i: number) => (
                                 <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                                     <Check className={`w-5 h-5 flex-shrink-0 ${isPopular ? 'text-purple-600' : 'text-green-600'}`} />
                                     <span>{feature}</span>

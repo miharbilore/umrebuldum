@@ -7,8 +7,8 @@
 export type UserRole = "FREEMIUM" | "GUIDE" | "CORPORATE" | "ADMIN" | "BANNED";
 
 export type PackageType =
-    | "FREE" | "STARTER" | "PRO" | "LEGEND"
-    | "CORP_BASIC" | "CORP_PRO" | "CORP_ENTERPRISE";
+    | "FREEMIUM" | "PREMIUM" | "PLUS" | "PRO"
+    | "BUSINESS" | "BUSINESS_PLUS";
 
 export type ListingType = "GUIDE_PROFILE" | "CORPORATE_TOUR";
 export type ListingStatus = "ACTIVE" | "EXPIRED" | "ARCHIVED" | "PENDING" | "REJECTED";

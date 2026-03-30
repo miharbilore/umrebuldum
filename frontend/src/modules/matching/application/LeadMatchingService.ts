@@ -126,19 +126,19 @@ export class LeadMatchingService {
         });
 
         return candidates.filter(guide => {
-            const pkg = guide.packageType || "FREE";
+            const pkg = guide.packageType || "FREEMIUM";
             const perf = (guide.performanceTier as any)?.tier || "BRONZE";
             const slaHours = 999; // SLA metrics would come from a separate query
 
             switch (wave) {
                 case 1:
                     // Wave 1: Vanguard (Top Tiers, Gold+, < 2h SLA)
-                    return ["LEGEND", "CORP_PRO", "CORP_ENTERPRISE"].includes(pkg) &&
+                    return ["PRO", "BUSINESS", "BUSINESS_PLUS"].includes(pkg) &&
                         ["GOLD", "PLATINUM"].includes(perf) &&
                         slaHours <= 2.0;
                 case 2:
                     // Wave 2: Core (Pro+, Silver+, < 12h SLA)
-                    return ["LEGEND", "CORP_PRO", "CORP_ENTERPRISE", "PRO", "CORP_BASIC"].includes(pkg) &&
+                    return ["PRO", "PLUS", "PREMIUM", "BUSINESS", "BUSINESS_PLUS"].includes(pkg) &&
                         ["SILVER", "GOLD", "PLATINUM"].includes(perf) &&
                         slaHours <= 12.0;
                 case 3:

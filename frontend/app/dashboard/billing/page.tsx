@@ -4,6 +4,7 @@
 import { CreditBalance } from "@/components/guide-dashboard/credit-balance";
 import { CreditPackages } from "@/components/dashboard/credit-packages";
 import { AutoReplenishSettings } from "@/components/dashboard/auto-replenish-settings";
+import { SavedCards } from "@/components/dashboard/SavedCards";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
@@ -36,6 +37,11 @@ function BillingContent() {
             </div>
 
             <div className="mb-10">
+                <h2 className="text-xl font-semibold mb-4">Kayıtlı Kartlarım</h2>
+                <SavedCards />
+            </div>
+
+            <div className="mb-10">
                 <h2 className="text-xl font-semibold mb-4">Otomatik Yükleme Ayarları</h2>
                 <AutoReplenishSettings />
             </div>
@@ -55,3 +61,4 @@ export default function BillingPage() {
         </Suspense>
     );
 }
+

@@ -53,7 +53,7 @@ const GUIDE_WEIGHTS = {
     PACKAGE_LEGEND: 400,
     PACKAGE_PRO: 250,
     PACKAGE_STARTER: 100,
-    PACKAGE_FREE: 0,
+    PACKAGE_FREEMIUM: 0,
     IDENTITY_VERIFIED: 300,
     RESPONSE_TIME_FAST: 200,     // < 1 hour
     RESPONSE_TIME_MED: 100,      // < 6 hours
@@ -104,11 +104,13 @@ export function scoreGuideListing(listing: ListingInput, guide: GuideInput): num
     const now = Date.now();
 
     // ── 1. Package tier ───────────────────────────────────────────
-    let packageScore: number = GUIDE_WEIGHTS.PACKAGE_FREE;
+    let packageScore: number = GUIDE_WEIGHTS.PACKAGE_FREEMIUM;
     switch (guide.packageType) {
-        case "LEGEND": packageScore = GUIDE_WEIGHTS.PACKAGE_LEGEND; break;
+        case "BUSINESS_PLUS": packageScore = GUIDE_WEIGHTS.PACKAGE_LEGEND; break;
+        case "BUSINESS": packageScore = GUIDE_WEIGHTS.PACKAGE_LEGEND; break;
         case "PRO": packageScore = GUIDE_WEIGHTS.PACKAGE_PRO; break;
-        case "STARTER": packageScore = GUIDE_WEIGHTS.PACKAGE_STARTER; break;
+        case "PLUS": packageScore = GUIDE_WEIGHTS.PACKAGE_STARTER; break;
+        case "PREMIUM": packageScore = GUIDE_WEIGHTS.PACKAGE_STARTER; break;
     }
 
     // ── 2. Identity badge ──────────────────────────────────────────

@@ -5,6 +5,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
+import NewsletterPopup from "@/components/NewsletterPopup";
+import HybridChatbot from "@/components/HybridChatbot";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -58,7 +60,9 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+import { Toaster } from 'sonner';
 import { auth } from "@/lib/auth";
+import { SmoothScrollProvider } from "@/components/providers/smooth-scroll";
 
 export default async function RootLayout({
   children,
@@ -75,13 +79,19 @@ export default async function RootLayout({
   return (
     <html lang="tr" suppressHydrationWarning>
       <body className={`${inter.className} font-sans antialiased flex flex-col min-h-screen`}>
-        <Providers session={session}>
-          <Header />
-          <main className="flex-1 bg-gray-50">{children}</main>
-          <Footer />
-          <Analytics />
-        </Providers>
+        <SmoothScrollProvider>
+          <Providers session={session}>
+            <Header />
+            <main className="flex-1 bg-gray-50">{children}</main>
+            <Footer />
+            <NewsletterPopup />
+            <HybridChatbot />
+            <Analytics />
+            <Toaster position="top-right" richColors closeButton />
+          </Providers>
+        </SmoothScrollProvider>
       </body>
     </html>
   );
 }
+

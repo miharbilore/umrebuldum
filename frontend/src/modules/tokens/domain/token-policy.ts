@@ -38,7 +38,7 @@ export class TokenPolicy {
      * Returns Infinity if no cap applies.
      */
     static getDailyCap(packageType: string, action: TokenAction): number {
-        const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREE;
+        const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREEMIUM;
         const map: Partial<Record<TokenAction, number>> = {
             OFFER_SEND: caps.offers,
             DEMAND_UNLOCK: caps.unlocks,
@@ -85,7 +85,7 @@ export class TokenPolicy {
      * Calculate new balance after monthly renewal with soft cap.
      */
     static calculateRenewal(currentBalance: number, packageType: string): number {
-        const limits = PACKAGE_LIMITS[packageType as PackageType] || PACKAGE_LIMITS.FREE;
+        const limits = PACKAGE_LIMITS[packageType as PackageType] || PACKAGE_LIMITS.FREEMIUM;
         return Math.min(currentBalance + limits.monthlyTokens, limits.softCap);
     }
 
@@ -93,7 +93,7 @@ export class TokenPolicy {
      * Calculate initial grant for new users.
      */
     static getInitialGrant(packageType: string): number {
-        const limits = PACKAGE_LIMITS[packageType as PackageType] || PACKAGE_LIMITS.FREE;
+        const limits = PACKAGE_LIMITS[packageType as PackageType] || PACKAGE_LIMITS.FREEMIUM;
         return limits.initialTokens;
     }
 }

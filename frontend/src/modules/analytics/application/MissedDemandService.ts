@@ -1,10 +1,10 @@
 // ─── Missed Demand Service (Capacity Gap Engine) ──────────────────────────
-// Powers the "Missed Demand" widget on the FREE tier dashboard.
+// Powers the "Missed Demand" widget on the FREEMIUM tier dashboard.
 // Calculates how many active leads/searches an agency missed because
-// they are limited to 1 city listing by the FREE plan.
+// they are limited to 1 city listing by the FREEMIUM plan.
 
 import { prisma } from '@/lib/prisma';
-import { PackageSystem } from '@/lib/package-system';
+import { PackageSystem, PLAN_PRICES_TRY } from '@/lib/package-system';
 
 export class MissedDemandService {
 
@@ -19,11 +19,11 @@ export class MissedDemandService {
             select: { packageType: true }
         });
 
-        const pkg = user?.packageType || "FREE";
-        const maxListingsAllowed = PackageSystem.getLimits(pkg).maxListings;
+        const pkg = user?.packageType || "FREEMIUM";
+        const maxListingsAllowed = (await PackageSystem.getLimits(pkg)).maxListings;
 
-        // If they have 10+ limits (Corp), the Capacity Gap angle isn't as relevant.
-        // We primarily use this to upsell FREE (1) -> STARTER (3) -> PRO (5)
+        // If they have 10+ limits (BUSINESS or BUSINESS_PLUS), the Capacity Gap angle isn't as relevant.
+        // We primarily use this to upsell FREE (1) -> PLUS (2) -> PRO (3)
         if (maxListingsAllowed >= 10) return null;
 
         // 2. Find their active service cities
@@ -42,7 +42,7 @@ export class MissedDemandService {
             where: {
                 createdAt: { gte: oneWeekAgo },
                 departureCity: { notIn: activeCities }, // Cities they DO NOT serve
-                status: "open"
+                status: "open",
             },
             _count: { id: true },
             orderBy: { _count: { id: 'desc' } },
@@ -61,18 +61,18 @@ export class MissedDemandService {
         let upgradePrice = 0;
         let newListingLimit = 0;
 
-        if (pkg === "FREE") {
-            upgradeTarget = "STARTER";
-            upgradePrice = 299;
-            newListingLimit = 3;
-        } else if (pkg === "STARTER") {
+        if (pkg === "FREEMIUM") {
+            upgradeTarget = "PREMIUM";
+            upgradePrice = PLAN_PRICES_TRY["PREMIUM"];
+            newListingLimit = (await PackageSystem.getLimits("PLUS")).maxListings;
+        } else if (pkg === "PLUS") {
             upgradeTarget = "PRO";
-            upgradePrice = 699;
-            newListingLimit = 5;
+            upgradePrice = PLAN_PRICES_TRY["PRO"];
+            newListingLimit = (await PackageSystem.getLimits("PRO")).maxListings;
         } else {
-            upgradeTarget = "LEGEND";
-            upgradePrice = 1499;
-            newListingLimit = 5; // Has other benefits
+            upgradeTarget = "PRO";
+            upgradePrice = PLAN_PRICES_TRY["PRO"];
+            newListingLimit = (await PackageSystem.getLimits("PRO")).maxListings;
         }
 
         return {

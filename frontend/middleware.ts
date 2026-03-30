@@ -8,6 +8,7 @@ export default auth((req) => {
     const isLoggedIn = !!req.auth
     const { nextUrl } = req
     const user = req.auth?.user
+    const role = user?.role;
 
     // ── Path constants ──
     const onboardingPath = "/onboarding"
@@ -21,15 +22,30 @@ export default auth((req) => {
         "/", "/login", "/register", "/about", "/contact", "/faq",
         "/terms", "/privacy", "/help", "/kvkk", "/cookies",
         "/listing-terms", "/refund-policy", "/consent",
-        "/auth/verify"
+        "/auth/verify", "/forgot-password", "/reset-password"
     ];
     const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
     const isPublicBrowsing = nextUrl.pathname.startsWith("/tours") || nextUrl.pathname.startsWith("/listings/");
     const isAuthRoute = nextUrl.pathname === loginPath;
     const isOnboardingRoute = nextUrl.pathname === onboardingPath;
 
-    // 1. Always allow: API auth, other API, static assets
-    if (isApiAuthRoute || isApiRoute || isStaticAsset) {
+    // 1. API route protection block
+    if (isApiRoute) {
+        // Protect /api/admin/* natively BEFORE granting 'return null' bypass to all APIs
+        if (nextUrl.pathname.startsWith('/api/admin')) {
+            if (!isLoggedIn || role !== 'ADMIN') {
+                return new NextResponse(
+                    JSON.stringify({ error: "Forbidden: Admin access required", code: "FORBIDDEN" }),
+                    { status: 403, headers: { 'content-type': 'application/json' } }
+                );
+            }
+        }
+        // Allow all other APIs (NextAuth will handle their specific protection individually)
+        return null;
+    }
+
+    // Always allow API auth and static assets
+    if (isApiAuthRoute || isStaticAsset) {
         return null;
     }
 
@@ -53,8 +69,7 @@ export default auth((req) => {
         }
 
         // ── SCENARIO B: Has role (fully onboarded) ──
-        const role = user?.role;
-
+        
         // Block onboarding page → go to correct dashboard
         if (isOnboardingRoute) {
             if (role === "ADMIN") return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
@@ -74,7 +89,11 @@ export default auth((req) => {
         }
 
         // /dashboard/* → USER, GUIDE, ORGANIZATION (not ADMIN — admin has /admin/*)
+        // Exception: /dashboard/settings is allowed for ADMIN (password change)
         if (nextUrl.pathname.startsWith("/dashboard") && role === "ADMIN") {
+            if (nextUrl.pathname === "/dashboard/settings") {
+                return null; // Allow admin to access settings
+            }
             return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
         }
 

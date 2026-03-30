@@ -45,17 +45,17 @@ export async function POST(req: Request) {
         }
 
         // Package requirement: must have at least 1 paid packageType
-        if (user.packageType === "FREE") {
+        if (user.packageType === "FREEMIUM") {
             return NextResponse.json({
                 error: "Diyanet rozeti için en az bir ücretli paket gereklidir",
                 code: "PACKAGE_REQUIRED",
             }, { status: 403 });
         }
 
-        // Diyanet eligibility check
-        if (!PackageSystem.isIdentityVerificationEligible(user.packageType)) {
-            return NextResponse.json({
-                error: "Mevcut paketiniz Diyanet rozeti başvurusunu desteklemiyor",
+        // Identity verification eligibility (must be PLUS or higher usually)
+        if (!(await PackageSystem.isIdentityVerificationEligible(user.packageType))) {
+            return NextResponse.json(
+                {error: "Mevcut paketiniz Diyanet rozeti başvurusunu desteklemiyor",
             }, { status: 403 });
         }
 

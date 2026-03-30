@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
 import {
     Shield, FileText, Users, CreditCard, Ban, ClipboardList,
-    Menu, X, ChevronRight
+    Menu, X, ChevronRight, Mail, MessageSquare, Star
 } from 'lucide-react';
 
 import PendingListingsPanel from '@/components/admin/PendingListingsPanel';
@@ -13,26 +14,42 @@ import AllListingsPanel from '@/components/admin/AllListingsPanel';
 import UserRequestsPanel from '@/components/admin/UserRequestsPanel';
 import CreditManagementPanel from '@/components/admin/CreditManagementPanel';
 import BanPanel from '@/components/admin/BanPanel';
-import AdminMessagesPanel from '@/app/admin/messages/page'; // We will move the page content to a component or import it directly
+import AdminMessagesPanel from '@/components/admin/AdminMessagesPanel';
 import AuditLogPanel from '@/components/admin/AuditLogPanel';
+import NewsletterPanel from '@/components/admin/NewsletterPanel';
+import ChatbotAdminPanel from '@/components/admin/ChatbotAdminPanel';
+import GuideApprovalPanel from '@/components/admin/GuideApprovalPanel';
+import LedgerPanel from '@/components/admin/LedgerPanel';
+import PendingReviewsPanel from '@/components/admin/PendingReviewsPanel';
+// import ChatModerationPanel from '@/components/admin/ChatModerationPanel'; // We'll stub this or use a placeholder for now.
 
 const tabs = [
     { id: 'all-listings', label: 'Tüm İlanlar', icon: ClipboardList, desc: 'Tüm İlanları Yönet' },
-    { id: 'listings', label: 'Bekleyen İlanlar', icon: FileText, desc: 'Pending Listings' },
-    { id: 'requests', label: 'Kullanıcı Talepleri', icon: Users, desc: 'User Requests' },
-    { id: 'credits', label: 'Kredi Yönetimi', icon: CreditCard, desc: 'Credits' },
+    { id: 'listings', label: 'Bekleyen İlanlar', icon: FileText, desc: 'Pending Listings', badgeKey: 'pendingListings' },
+    { id: 'guide-approvals', label: 'Rehber Onayları', icon: Shield, desc: 'Bekleyen Kimlik Doğrulamaları' },
+    { id: 'reviews', label: 'Yorum Moderasyonu', icon: Star, desc: 'Bekleyen Değerlendirmeler', badgeKey: 'pendingReviews' },
+    { id: 'requests', label: 'Kullanıcı Talepleri', icon: Users, desc: 'User Requests', badgeKey: 'pendingRequests' },
+    { id: 'credits', label: 'Bakiye Paneli', icon: CreditCard, desc: 'Müşteri Kredileri' },
+    { id: 'ledger', label: 'Mali Defter (Ledger)', icon: FileText, desc: 'Double-Entry Kasa İzleme' },
     { id: 'ban', label: 'Ban Paneli', icon: Ban, desc: 'Ban Users' },
-    { id: 'messages', label: 'Mesaj Moderasyonu', icon: ClipboardList, desc: 'Message Moderation' }, // Replaced Audit icon or added new? Using ClipboardList for messages temporarily or find another
+    { id: 'newsletter', label: 'Bülten Yönetimi', icon: Mail, desc: 'Bülten Aboneleri' },
+    { id: 'chatbot', label: 'Chatbot Kalıpları', icon: MessageSquare, desc: 'Otomatik Cevaplar' },
+    { id: 'contact-messages', label: 'İletişim Mesajları', icon: Mail, desc: 'İletişim Formundan Gelen Mesajlar', badgeKey: 'unreadMessages' },
+    { id: 'messages', label: 'Mesaj Moderasyonu', icon: MessageSquare, desc: 'Kullanıcı Sohbetleri / Şikayetler' },
     { id: 'audit', label: 'İşlem Geçmişi', icon: ClipboardList, desc: 'Audit Logs' },
 ] as const;
 
 type TabId = typeof tabs[number]['id'];
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export default function AdminDashboardPage() {
     const [activeTab, setActiveTab] = useState<TabId>('all-listings');
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data: session, status } = useSession();
     const router = useRouter();
+
+    const { data: counts } = useSWR('/api/admin/counts', fetcher, { refreshInterval: 30000 });
 
     if (status === 'loading') {
         return (
@@ -84,6 +101,8 @@ export default function AdminDashboardPage() {
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
+                                const badgeCount = (tab as any).badgeKey && counts ? counts[(tab as any).badgeKey as keyof typeof counts] : 0;
+
                                 return (
                                     <button
                                         key={tab.id}
@@ -95,7 +114,12 @@ export default function AdminDashboardPage() {
                                     >
                                         <Icon className="w-5 h-5 flex-shrink-0" />
                                         <span>{tab.label}</span>
-                                        {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                                        {badgeCount > 0 && (
+                                            <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                                {badgeCount}
+                                            </span>
+                                        )}
+                                        {isActive && badgeCount === 0 && <ChevronRight className="w-4 h-4 ml-auto" />}
                                     </button>
                                 );
                             })}
@@ -121,6 +145,8 @@ export default function AdminDashboardPage() {
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
+                        const badgeCount = (tab as any).badgeKey && counts ? counts[(tab as any).badgeKey as keyof typeof counts] : 0;
+
                         return (
                             <button
                                 key={tab.id}
@@ -132,7 +158,12 @@ export default function AdminDashboardPage() {
                             >
                                 <Icon className="w-5 h-5 flex-shrink-0" />
                                 <span>{tab.label}</span>
-                                {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                                {badgeCount > 0 && (
+                                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                        {badgeCount}
+                                    </span>
+                                )}
+                                {isActive && badgeCount === 0 && <ChevronRight className="w-4 h-4 ml-auto" />}
                             </button>
                         );
                     })}
@@ -160,18 +191,32 @@ export default function AdminDashboardPage() {
                         <span className="text-gray-300">{activeTabData.label}</span>
                     </div>
                     <h1 className="text-xl font-bold text-white">{activeTabData.label}</h1>
-                    <p className="text-sm text-gray-500 mt-0.5">{activeTabData.desc}</p>
+                    <p className="text-gray-400 mt-1 max-w-xl">{activeTabData.desc}</p>
                 </div>
 
                 {/* Panel Content */}
                 <div className="p-6">
-                    {activeTab === 'all-listings' && <AllListingsPanel />}
-                    {activeTab === 'listings' && <PendingListingsPanel />}
-                    {activeTab === 'requests' && <UserRequestsPanel />}
-                    {activeTab === 'credits' && <CreditManagementPanel />}
-                    {activeTab === 'ban' && <BanPanel />}
-                    {activeTab === 'messages' && <AdminMessagesPanel />}
-                    {activeTab === 'audit' && <AuditLogPanel />}
+                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 relative min-h-[500px]">
+                        {activeTab === 'all-listings' && <AllListingsPanel />}
+                        {activeTab === 'listings' && <PendingListingsPanel />}
+                        {activeTab === 'guide-approvals' && <GuideApprovalPanel />}
+                        {activeTab === 'reviews' && <PendingReviewsPanel />}
+                        {activeTab === 'requests' && <UserRequestsPanel />}
+                        {activeTab === 'credits' && <CreditManagementPanel />}
+                        {activeTab === 'ledger' && <LedgerPanel />}
+                        {activeTab === 'ban' && <BanPanel />}
+                        {activeTab === 'contact-messages' && <AdminMessagesPanel />}
+                        {activeTab === 'messages' && (
+                            <div className="text-center py-12">
+                                <MessageSquare className="w-12 h-12 text-gray-700 mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-gray-300">Mesaj Moderasyonu Yapım Aşamasında</h3>
+                                <p className="text-gray-500 mt-2">Bu özellik P3 aşamasında eklenecektir.</p>
+                            </div>
+                        )}
+                        {activeTab === 'audit' && <AuditLogPanel />}
+                        {activeTab === 'newsletter' && <NewsletterPanel />}
+                        {activeTab === 'chatbot' && <ChatbotAdminPanel />}
+                    </div>
                 </div>
             </main>
         </div>

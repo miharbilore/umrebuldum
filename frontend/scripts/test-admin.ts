@@ -32,7 +32,7 @@ async function runAdminTests() {
                 fullName: "Admin Guide",
                 phone: "000",
                 city: "Mekke",
-                package: "STARTER",
+                package: "PLUS",
                 tokens: 0
             }
         });

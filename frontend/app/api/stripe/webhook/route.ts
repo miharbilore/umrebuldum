@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { withSerializableRetry } from "@/lib/with-retry";
-import { grantToken } from "@/src/modules/tokens/application/grant-token.usecase";
+import { EventBus } from "@/src/core/events/event-bus";
 
 if (!process.env.STRIPE_SECRET_KEY) {
     console.error("CRITICAL: STRIPE_SECRET_KEY is not defined. Payments will fail.");
@@ -78,19 +78,38 @@ export async function POST(req: Request) {
                     console.warn(`Session ${session.id}: no pending TX to settle. Already processed?`);
                     return;
                 }
+
+                const packageId = metadata?.packageId;
+                if (packageId) {
+                    const dbPackage = await tx.creditPackage.findUnique({
+                        where: { id: packageId }
+                    });
+
+                    if (dbPackage) {
+                        await tx.user.updateMany({
+                            where: { id: userId },
+                            data: { packageType: packageId as any }
+                        });
+                        // We use updateMany here too in case guide/organization profile doesn't strictly exist or fails
+                        await tx.guideProfile.updateMany({
+                            where: { userId },
+                            data: { package: packageId }
+                        });
+                        console.log(`[Webhook] User ${userId} upgraded to ${packageId} (${dbPackage.name})`);
+                    }
+                }
             }, { isolationLevel: "Serializable", timeout: 15_000 }));
 
-            // Step 3: Grant tokens via unified ledger (has its own atomic transaction)
-            await grantToken({
+            // Step 3: Token assignment shifted to Inngest for fault tolerance
+            await EventBus.emit("PAYMENT_COMPLETED", {
+                transactionId: session.id,
                 userId,
                 amount: credits,
-                type: "PURCHASE",
-                reason: `Stripe purchase: ${credits} tokens (session ${session.id})`,
-                relatedId: session.id,
-                idempotencyKey: `stripe:${session.id}`,
+                packageId: metadata?.packageId || null,
+                provider: "stripe",
             });
 
-            console.log(`[Webhook] Tokens granted: ${credits} to ${userId} (${session.id})`);
+            console.log(`[Webhook] PAYMENT_COMPLETED event dispatched for session ${session.id}`);
 
         } catch (err: any) {
             // P2002 on webhookEvent.create → duplicate event delivery → safe to skip

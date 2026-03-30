@@ -55,8 +55,8 @@ async function runPosterTest() {
     console.log('PASS: Assuming the components compile, React UI testing (Cypress/Playwright) is required for full validation.');
     console.log('However, we can verify that `PackageSystem.getPosterQuality` correctly returns limits.');
 
-    const freeQuality = PackageSystem.getPosterQuality('FREE');
-    const proQuality = PackageSystem.getPosterQuality('PRO');
+    const freeQuality = await PackageSystem.getPosterQuality('FREE');
+    const proQuality = await PackageSystem.getPosterQuality('PRO');
     console.log(`PASS: FREE user poster quality: ${freeQuality}`);
     console.log(`PASS: PRO user poster quality: ${proQuality}`);
     console.log(`Expected LOW for FREE, HIGH for PRO -> ${freeQuality === 'LOW' && proQuality === 'HIGH' ? 'PASS' : 'FAIL'}`);

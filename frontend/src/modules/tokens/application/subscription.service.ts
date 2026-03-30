@@ -68,8 +68,8 @@ export async function upgradePlan(
     }
 
     // Calculate token difference
-    const oldLimits = PACKAGE_LIMITS[user.packageType as PackageType] || PACKAGE_LIMITS.FREE;
-    const newLimits = PACKAGE_LIMITS[targetPlan] || PACKAGE_LIMITS.FREE;
+    const oldLimits = PACKAGE_LIMITS[user.packageType as PackageType] || PACKAGE_LIMITS.FREEMIUM;
+    const newLimits = PACKAGE_LIMITS[targetPlan] || PACKAGE_LIMITS.FREEMIUM;
     const tokenDelta = Math.max(0, newLimits.initialTokens - oldLimits.initialTokens);
 
     // Calculate expiry
@@ -195,7 +195,7 @@ export async function freezePlan(
     });
 
     if (!user) throw new Error("User not found");
-    if (user.packageType === "FREE") {
+    if (user.packageType === "FREEMIUM") {
         return { ok: false, freezeUntil: new Date(), error: "Free plan cannot be frozen" };
     }
     if (user.planFreezeUntil && user.planFreezeUntil > new Date()) {

@@ -57,13 +57,13 @@ export function UserMenu() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link href="/dashboard" className="cursor-pointer">
+                    <Link href={session.user.role === "ADMIN" ? "/admin/dashboard" : "/dashboard"} className="cursor-pointer">
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         <span>Panelim</span>
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link href="/dashboard/settings" className="cursor-pointer">
+                    <Link href={session.user.role === "ADMIN" ? "/admin/settings" : "/dashboard/settings"} className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Ayarlar</span>
                     </Link>

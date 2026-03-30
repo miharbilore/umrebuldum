@@ -26,6 +26,9 @@ model User {
   verificationExpiry DateTime?
   isVerified         Boolean   @default(false)
   contactConsent     Boolean   @default(false)
+  twoFactorSecret    String?
+  isTwoFactorEnabled Boolean   @default(false)
+  twoFactorRecoveryCodes Json? // JSON array of hashed one-time backup codes
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -44,7 +47,7 @@ model User {
   // --- Token Account (unified balance) ---
   tokenBalance       Int       @default(0) @map("availableBalance")
   // lockedBalance removed — was unused
-  packageType        String    @default("FREE")
+  packageType        String    @default("FREEMIUM")
   packageExpiry      DateTime?
   lastPlanChangeAt   DateTime? // Cooldown enforcement
   planFreezeUntil    DateTime? // "Paket dondurma" freeze
@@ -70,6 +73,8 @@ model User {
   autoReplenish        AutoReplenishConfig?
   creditLine           EnterpriseCreditLine?
   performanceTier      PerformanceTier?
+  savedCards           SavedCard[]
+  notifications        Notification[]
 
   @@map("users")
 }
@@ -131,8 +136,13 @@ model GuideProfile {
   credits            Int       @default(0)
   // trustScore DEPRECATED — use User.trustScore (single source of truth)
   trustScore         Int       @default(50) @map("trustScore_legacy")
+  
+  // ─── Ratings & Reviews Caching ─────────────────────────────────────
+  averageRating      Float     @default(0)
+  reviewCount        Int       @default(0)
+
   completedTrips     Int       @default(0)
-  package            String    @default("FREEMIUM") // "FREEMIUM" | "PREMIUM" | "PROFESSIONAL" | "LEGEND"
+  package            String    @default("FREEMIUM") // "FREEMIUM" | "PREMIUM" | "PLUS" | "PRO"
   packageExpiry      DateTime?
   tokens             Int       @default(0)
   createdAt          DateTime  @default(now())
@@ -223,6 +233,9 @@ model GuideListing {
 
   @@index([guideId])
   @@index([approvalStatus, active])
+  @@index([departureCityId])
+  @@index([price])
+  @@index([startDate, endDate])
   @@map("guide_listings")
 }
 
@@ -238,6 +251,22 @@ model TourDay {
 
   @@index([listingId])
   @@map("tour_days")
+}
+
+// ─── Contact Messages ───────────────────────────────────────────────────
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String   @db.Text
+  status    String   @default("NEW") // "NEW" | "READ" | "REPLIED" | "ARCHIVED"
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_messages")
 }
 
 model UmrahRequest {
@@ -268,6 +297,8 @@ model UmrahRequest {
 
   @@index([userEmail])
   @@index([status])
+  @@index([departureCity])
+  @@index([budget])
   @@map("umrah_requests")
 }
 
@@ -389,30 +420,76 @@ model ModerationLog {
 }
 
 model CreditPackage {
-  id       String @id @default(cuid())
-  name     String
-  credits  Int
-  priceTRY Float
+  id           String @id @default(cuid())
+  name         String
+  slug         String @default("")       // base tier slug: FREEMIUM, PREMIUM, PLUS, PRO, BUSINESS, BUSINESS_PLUS
+  credits      Int
+  priceTRY     Float
+  monthlyPrice Float  @default(0)        // aylık baz fiyat (indirim hesabı için)
+  billingPeriod Int   @default(1)        // 1, 3, veya 12 ay
+  roleTarget   String @default("GUIDE")  // "GUIDE" veya "ORGANIZATION"
+  sortOrder    Int    @default(0)
+  features     Json   @default("{}")
 
+  @@unique([slug, billingPeriod, roleTarget])
   @@map("credit_packages")
 }
 
+model Coupon {
+  id              String    @id @default(cuid())
+  code            String    @unique
+  discountPercent Int
+  maxUses         Int       @default(100)
+  usedCount       Int       @default(0)
+  expiresAt       DateTime
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  @@index([code])
+  @@map("coupons")
+}
+
 model Transaction {
-  id        String   @id @default(cuid())
-  userId    String
-  role      String
-  credits   Int
-  amountTRY Float
-  provider  String   @default("stripe")
-  status    String   @default("pending") // "pending" | "completed"
-  sessionId String? // Stripe Session ID
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  role        String
+  credits     Int
+  amountTRY   Float
+  provider    String   @default("stripe")  // "stripe" | "paytr"
+  status      String   @default("pending") // "pending" | "completed" | "failed" | "refunded"
+  sessionId   String?  // Stripe Session ID or PayTR merchant_oid
+  providerRef String?  // PayTR merchant_oid or Stripe payment_intent
+  metadata    Json?    // Provider-specific extra data
+  createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([sessionId])
+  @@index([providerRef])
   @@map("transactions")
+}
+
+// ─── Saved Cards (Tokenized — no raw card data stored) ──────────────────
+
+model SavedCard {
+  id          String   @id @default(cuid())
+  userId      String
+  provider    String   // "stripe" | "paytr"
+  cardToken   String   // Stripe: paymentMethodId, PayTR: ctoken
+  userToken   String?  // PayTR: utoken (user-level token)
+  last4       String   // Last 4 digits: "4242"
+  brand       String   // "visa" | "mastercard" | "troy" | "amex"
+  expiryMonth Int
+  expiryYear  Int
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardToken])
+  @@index([userId])
+  @@map("saved_cards")
 }
 
 // ÔöÇÔöÇÔöÇ Credit Ledger (Source of Truth) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
@@ -477,20 +554,22 @@ enum LedgerEntryType {
 
 model TokenTransaction {
   id              String          @id @default(cuid())
-  userId          String
+  userId          String?         // Links to real user if applicable
+  accountId       String          @default("LEGACY_MIGRATION") // e.g. "USR_xxx" or "SYSTEM_BURN" or "SYSTEM_TREASURY"
+  counterpartyId  String          @default("LEGACY_MIGRATION") // The other side of this double-entry leg
   entryType       LedgerEntryType
-  amount          Int // Negative for CONSUME
-  referenceId     String? // demandId, listingId, stripeSessionId
+  amount          Int             // Negative for CONSUME/OUT, Positive for PURCHASE/IN
+  referenceId     String?         // demandId, listingId, stripeSessionId
   idempotencyKey  String          @unique
   adminId         String?
   reasonCode      String?
-  expiresAt       DateTime? // Null = never expires (subscription). Set for purchased/promo tokens.
-  remainingAmount Int? // Tracks partially consumed batches (FIFO). Null = fully consumed.
+  expiresAt       DateTime?       // Set for purchased/promo tokens.
+  remainingAmount Int?            // Tracks partially consumed batches.
   createdAt       DateTime        @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+  @@index([accountId])
   @@index([userId, createdAt])
   @@index([idempotencyKey])
   @@map("token_ledger_entries")
@@ -943,4 +1022,46 @@ model SeoLandingPage {
 
   @@index([pageType])
   @@map("seo_landing_pages")
+}
+
+// ─── Newsletter & Chatbot ──────────────────────────────────────────────────
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
+}
+
+model ChatbotTemplate {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  isActive  Boolean  @default(true)
+  order     Int      @default(0) // Determines ordering of pre-defined questions
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chatbot_templates")
+}
+
+// ─── Notifications ──────────────────────────────────────────────────────
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   @default("IN_APP") // "SMS" | "EMAIL" | "IN_APP"
+  title       String
+  message     String   @db.Text
+  isRead      Boolean  @default(false)
+  referenceId String?  
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
 }

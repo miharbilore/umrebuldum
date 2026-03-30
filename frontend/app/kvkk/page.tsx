@@ -1,184 +1,72 @@
-import { Metadata } from "next"
-import Link from "next/link"
+import { Metadata } from "next";
+import { Shield, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
     title: "KVKK Aydınlatma Metni | Umrebuldum",
-    description:
-        "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında kişisel verilerinizin toplanma, işlenme ve aktarılma süreçleri hakkında bilgilendirme.",
-}
+    description: "6698 Sayılı Kişisel Verilerin Korunması Kanunu uyarınca aydınlatma metnimiz.",
+};
 
-export default function KVKKPage() {
+export default function KvkkPage() {
     return (
-        <div className="container py-12 md:py-16 lg:py-20 max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight">
-                    Kişisel Verilerin Korunması ve İşlenmesi Politikası (KVKK)
+        <div className="container py-16 md:py-24 max-w-4xl mx-auto space-y-12">
+            <div className="text-center space-y-6">
+                <div className="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl flex items-center justify-center mb-6">
+                    <Shield className="w-8 h-8" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                    KVKK Aydınlatma Metni
                 </h1>
-                <p className="text-xl text-muted-foreground">
-                    6698 sayılı Kanun kapsamında kişisel verileriniz hakkında bilgilendirme.
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                    6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamındaki haklarınız ve veri işleme politikamız.
                 </p>
             </div>
 
             <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-sm text-muted-foreground">Son Güncelleme: 28 Şubat 2026</p>
-
-                <h2>1. Veri Sorumlusu</h2>
-                <p>
-                    UmreBuldum (&quot;Platform&quot;, &quot;Şirket&quot;, &quot;Biz&quot;) olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu
-                    (&quot;KVKK&quot;) kapsamında veri sorumlusu sıfatıyla, kişisel verilerinizi aşağıda açıklanan amaçlar
-                    doğrultusunda; hukuka ve dürüstlük kurallarına uygun bir şekilde işlemekte, saklamakta ve aktarmaktayız.
-                </p>
-
-                <h2>2. İşlenen Kişisel Veriler</h2>
-                <p>Platformumuz aracılığıyla aşağıdaki kişisel verileriniz işlenebilmektedir:</p>
-                <div className="overflow-x-auto">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Veri Kategorisi</th>
-                                <th>Örnek Veriler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Kimlik Bilgileri</strong></td>
-                                <td>Ad, soyad</td>
-                            </tr>
-                            <tr>
-                                <td><strong>İletişim Bilgileri</strong></td>
-                                <td>E-posta adresi, telefon numarası, şehir</td>
-                            </tr>
-                            <tr>
-                                <td><strong>İşlem Güvenliği</strong></td>
-                                <td>IP adresi, şifre (hashlenmiş), giriş-çıkış logları, cihaz bilgileri</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Kullanıcı İşlem Bilgileri</strong></td>
-                                <td>Umre talepleri, mesajlaşma içerikleri, arama geçmişi, favori turlar</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Finansal Bilgiler</strong></td>
-                                <td>Kredi kullanım geçmişi, satın alma kayıtları (ödeme bilgileri tarafımızca saklanmaz)</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-gray-800">
+                    <p className="text-sm m-0">
+                        Umrebuldum olarak kişisel verilerinizin güvenliğine en üst düzeyde önem veriyoruz. Bu sorumluluk bilinciyle, hizmetlerimizden faydalanan siz değerli misafirlerimizin, işbirliği içinde olduğumuz acentelerin ve diğer 3. tarafların kişisel verilerini Türkiye Cumhuriyeti <strong>6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK")</strong> ve ilgili hukuki mevzuata sıkı surette bağlı kalarak işliyor ve koruyoruz.
+                    </p>
                 </div>
 
-                <h2>3. Kişisel Verilerin İşlenme Amaçları</h2>
-                <p>Kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:</p>
-                <ul>
-                    <li>Üyelik kaydının oluşturulması ve hesap yönetiminin sağlanması</li>
-                    <li>Umre turu arama, karşılaştırma ve talep oluşturma hizmetlerinin sunulması</li>
-                    <li>Acente ve rehberlerle güvenli iletişim ortamının sağlanması</li>
-                    <li>Talep, şikâyet ve önerilerin alınması ve yanıtlanması</li>
-                    <li>Platform güvenliğinin sağlanması ve dolandırıcılık faaliyetlerinin önlenmesi</li>
-                    <li>Yasal yükümlülüklerin (5651 sayılı Kanun, KVKK vb.) yerine getirilmesi</li>
-                    <li>Hizmet kalitesinin artırılması için anonim istatistik ve analiz yapılması</li>
-                    <li>Kullanıcı deneyiminin kişiselleştirilmesi</li>
-                </ul>
-
-                <h2>4. Kişisel Verilerin Aktarılması</h2>
+                <h2>1. Veri Sorumlusunun Kimliği</h2>
                 <p>
-                    Kişisel verileriniz, yukarıda belirtilen amaçların gerçekleştirilmesi doğrultusunda ve kanunun
-                    öngördüğü sınırlar dahilinde aşağıdaki taraflara aktarılabilir:
-                </p>
-                <ul>
-                    <li><strong>Yetkili kamu kurum ve kuruluşlarına</strong> — yasal yükümlülükler kapsamında</li>
-                    <li><strong>İş ortaklarına</strong> — sunucu, e-posta ve analiz hizmet sağlayıcılarına (Vercel, Supabase vb.)</li>
-                    <li><strong>Acente ve rehberlere</strong> — açık rızanız doğrultusunda, talep oluşturduğunuz tur/rehberle iletişim amacıyla</li>
-                    <li><strong>Hukuki danışmanlara ve denetçilere</strong> — hukuki uyuşmazlıkların çözümü amacıyla</li>
-                </ul>
-                <p>
-                    Verileriniz, yurt dışında bulunan sunucularda (ABD, AB) işlenebilir. Bu durumda KVKK&apos;nın 9. maddesi
-                    kapsamındaki güvenlik tedbirleri alınmaktadır.
+                    KVKK uyarınca, Umrebuldum sitesi olarak "Veri Sorumlusu" sıfatıyla,
+                    kişisel verilerinizi aşağıda açıklanan amaçlar kapsamında; hukuka ve dürüstlük kurallarına uygun bir şekilde, veri boyutunda bağlantılı, meşru, ölçülü bir biçimde işlemekte ve muhafaza etmekteyiz.
                 </p>
 
-                <h2>5. Kişisel Veri Toplamanın Yöntemi ve Hukuki Sebebi</h2>
+                <h2>2. İşlenen Kişisel Verileriniz ve Hukuki Sebebi</h2>
                 <p>
-                    Kişisel verileriniz, platformumuz üzerinden elektronik ortamda (web sitesi formları, API çağrıları)
-                    otomatik veya kısmen otomatik yollarla toplanmaktadır.
-                </p>
-                <p>Verilerinizin işlenmesinin hukuki sebepleri:</p>
-                <ul>
-                    <li>Açık rızanız (KVKK m. 5/1)</li>
-                    <li>Sözleşmenin kurulması veya ifası ile doğrudan ilgili olması (KVKK m. 5/2-c)</li>
-                    <li>Veri sorumlusunun hukuki yükümlülüğünü yerine getirmesi (KVKK m. 5/2-ç)</li>
-                    <li>Meşru menfaatimiz için veri işlenmesinin zorunlu olması (KVKK m. 5/2-f)</li>
-                </ul>
-
-                <h2>6. Kişisel Verilerin Saklanma Süresi</h2>
-                <p>
-                    Kişisel verileriniz, işlenme amaçlarının gerektirdiği süre boyunca ve her halükarda yasal saklama
-                    sürelerinin sona ermesine kadar saklanmaktadır. Hesap silme talebiniz üzerine, yasal zorunluluklar
-                    hariç olmak üzere verileriniz 30 gün içinde silinir veya anonim hale getirilir.
-                </p>
-
-                <h2>7. Veri Güvenliği Tedbirleri</h2>
-                <p>Platformumuzda alınan başlıca güvenlik tedbirleri:</p>
-                <ul>
-                    <li>SSL/TLS şifreleme ile veri iletimi</li>
-                    <li>Şifrelerin bcrypt algoritması ile hashlenmiş olarak saklanması</li>
-                    <li>Rate limiting ve brute force koruması</li>
-                    <li>Düzenli güvenlik denetimleri ve güncellemeler</li>
-                    <li>Erişim kontrolü ve yetkilendirme mekanizmaları</li>
-                </ul>
-
-                <h2>8. Veri Sahibinin Hakları (KVKK m.11)</h2>
-                <p>KVKK&apos;nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:</p>
-                <ul>
-                    <li>Kişisel veri işlenip işlenmediğini öğrenme</li>
-                    <li>Kişisel verileri işlenmişse buna ilişkin bilgi talep etme</li>
-                    <li>Kişisel verilerin işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme</li>
-                    <li>Yurt içinde veya yurt dışında kişisel verilerin aktarıldığı üçüncü kişileri bilme</li>
-                    <li>Kişisel verilerin eksik veya yanlış işlenmiş olması hâlinde düzeltilmesini isteme</li>
-                    <li>KVKK m.7 kapsamında kişisel verilerin silinmesini veya yok edilmesini isteme</li>
-                    <li>Düzeltme, silme veya yok etme işlemlerinin aktarılan üçüncü kişilere bildirilmesini isteme</li>
-                    <li>İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonuç doğmasına itiraz etme</li>
-                    <li>Kanuna aykırı olarak işlenmesi sebebiyle zarara uğramanız hâlinde zararın giderilmesini talep etme</li>
-                </ul>
-
-                <h2>9. Başvuru Yöntemi</h2>
-                <p>
-                    Yukarıda belirtilen haklarınızı kullanmak için aşağıdaki yöntemlerle bize başvurabilirsiniz:
+                    Tarafımızca, sizinle olan sözleşmesel veya hukuki ilişkimiz çerçevesinde;
                 </p>
                 <ul>
-                    <li>
-                        <strong>E-posta:</strong>{" "}
-                        <a href="mailto:kvkk@umrebuldum.com" className="text-primary hover:underline">
-                            kvkk@umrebuldum.com
-                        </a>
-                    </li>
-                    <li>
-                        <strong>İletişim Formu:</strong>{" "}
-                        <Link href="/contact" className="text-primary hover:underline">
-                            İletişim sayfamız
-                        </Link>{" "}
-                        üzerinden
-                    </li>
+                    <li><strong>Kimlik Verileriniz:</strong> Adınız, soyadınız, TC kimlik numaranız (ödeme/fatura durumunda). Hukuki sebep: "Sözleşmenin İfası" ve "Kanunlarda Açıkça Öngörülmesi".</li>
+                    <li><strong>İletişim Verileriniz:</strong> Telefon numaranız, e-posta adresiniz, fatura ve posta adresiniz. Hukuki sebep: "Sözleşmenin İfası" ve "Meşru Menfaatlerimiz".</li>
+                    <li><strong>İşlem Güvenliği Verileriniz:</strong> Web sitesi şifreniz, IP adresi kayıtları, Çerez (Cookie) verileriniz, oturum kimliği gibi erişim cüzdanı verileriniz. Hukuki sebep: "Veri Sorumlusunun Hukuki Yükümlülüğü (5651 Sayılı Kanun)".</li>
+                    <li><strong>Finansal Veriler(Sadece VIP Acenteleri İçin):</strong> Kredi kartı tahsilatları ödeme altyapısı iyzico/PayTR arayüzünden doğrudan gerçekleşir. Kredi kartı numaranız, CVC kodunuz sunucularımızda KESİNLİKLE saklanmaz!</li>
                 </ul>
+
+                <h2>3. Acenteler ("Veri İşleyen") İle Veri Paylaşımı</h2>
                 <p>
-                    Başvurularınız, talebin niteliğine göre en kısa sürede ve en geç 30 (otuz) gün içinde
-                    ücretsiz olarak sonuçlandırılacaktır.
+                    Platformumuz üzerinden bir tur için <strong>"Teklif İste"</strong> butonuna bastığınızda, o tur yetkili acenteye ("Veri İşleyen"), iletişim kurabilmesi (WhatsApp vb.) ve siparişin detaylarını netleştirebilmesi adına "Ad, Soyad, Telefon Numarası" verileriniz iletilir. Acenteler, bu verileri yalnızca bahsi geçen rezervasyon konusu için işleme ve ardından güvenli şekilde yasal saklama sürelerine riayet ederek muhafaza/imaha etmekle yükümlüdür.
                 </p>
 
-                <div className="mt-8 rounded-lg border bg-muted/50 p-6">
-                    <h3 className="text-lg font-semibold mb-2">İlgili Politikalar</h3>
-                    <ul className="space-y-1 list-none pl-0">
-                        <li>
-                            <Link href="/privacy" className="text-primary hover:underline">→ Gizlilik Politikası</Link>
-                        </li>
-                        <li>
-                            <Link href="/cookies" className="text-primary hover:underline">→ Çerez Politikası</Link>
-                        </li>
-                        <li>
-                            <Link href="/consent" className="text-primary hover:underline">→ Açık Rıza Metni</Link>
-                        </li>
-                        <li>
-                            <Link href="/terms" className="text-primary hover:underline">→ Kullanım Koşulları</Link>
-                        </li>
-                    </ul>
+                <h2>4. İlgili Kişinin (Veri Sahibinin) Hakları (KVKK Madde 11)</h2>
+                <p>KVKK'nın 11. maddesi uyarınca veri sahipleri (ilgili kişiler) aşağıdaki haklara sahiptir:</p>
+                <ul>
+                    <li>Kişisel veri işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme,</li>
+                    <li>Kişisel verilerin işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme,</li>
+                    <li>Yurt içinde veya yurt dışında kişisel verilerin aktarıldığı üçüncü kişileri bilme,</li>
+                    <li>Eksik/yanlış işleme varsa düzeltilmesini isteme (Profil alanından bizzat düzeltilebilir),</li>
+                    <li>Kişisel verilerin silinmesini ("Unutulma Hakkı") isteme.</li>
+                </ul>
+
+                <div className="mt-8 border-t border-gray-200 dark:border-gray-800 pt-8">
+                    <h3 className="flex items-center gap-2 font-bold mb-4">
+                        <FileText className="w-5 h-5" /> Başvuru Yöntemi
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Yukarıda sayılan haklarınızı kullanmak dahilinde, taleplerinizi kimliğinizi ispat edici belgeler ile yazılı ve ıslak imzalı olarak sirket adresimize iletebilir veya <strong>kvkk@umrebuldum.com</strong> adresine e-posta vasıtasıyla ileterek haklarınızı kullanabilirsiniz.</p>
                 </div>
             </div>
         </div>
-    )
+    );
 }

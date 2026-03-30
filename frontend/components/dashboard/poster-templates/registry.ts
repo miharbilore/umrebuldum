@@ -4,7 +4,7 @@ export interface TemplateConfig {
     id: string;
     name: string;
     description: string;
-    requiredTier: "FREE" | "STARTER" | "PRO" | "LEGEND" | "CORP_BASIC" | "CORP_PRO" | "CORP_ENTERPRISE";
+    requiredTier: "FREEMIUM" | "PLUS" | "PRO" | "PREMIUM" | "BUSINESS" | "BUSINESS_PLUS";
     thumbnail: string;
     // We can also require specific features like 'watermark: false' or 'posterQuality: "HIGH"'
     minQuality: "LOW" | "NORMAL" | "HIGH";
@@ -15,7 +15,7 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-01-classic",
         name: "Klasik Umre",
         description: "Standart, temiz ve her pakete uygun tasarım.",
-        requiredTier: "FREE",
+        requiredTier: "PLUS",
         minQuality: "LOW",
         thumbnail: "/templates/tpl-01.jpg",
     },
@@ -23,7 +23,7 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-02-modern",
         name: "Modern Minimal",
         description: "Daha ferah ve modern görünüm.",
-        requiredTier: "FREE",
+        requiredTier: "PLUS",
         minQuality: "LOW",
         thumbnail: "/templates/tpl-02.jpg",
     },
@@ -31,7 +31,8 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-03-elegant",
         name: "Zarif Kabe",
         description: "Karanlık tema ve altın rengi detaylar.",
-        requiredTier: "STARTER",
+        // "Zarif Kabe"
+        requiredTier: "PLUS",
         minQuality: "NORMAL",
         thumbnail: "/templates/tpl-03.jpg",
     },
@@ -47,7 +48,8 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-05-luxury",
         name: "Lüks Medine",
         description: "Legend paketine özel beyaz ve altın lüks tasarım.",
-        requiredTier: "LEGEND",
+        // "Lüks Medine"
+        requiredTier: "PRO",
         minQuality: "HIGH",
         thumbnail: "/templates/tpl-05.jpg",
     },
@@ -63,7 +65,8 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-07-rose",
         name: "Huzur Gülü",
         description: "Aydınlık, ferah ve modern pembe tonlu minimal şablon.",
-        requiredTier: "STARTER",
+        // "Huzur Gülü"
+        requiredTier: "PLUS",
         minQuality: "NORMAL",
         thumbnail: "/templates/tpl-07.jpg",
     },
@@ -87,7 +90,8 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-10-darkmatic",
         name: "Karanlık Minimal",
         description: "Enfes gece şablonu; modern, ultra-minimalist",
-        requiredTier: "LEGEND",
+        // "Karanlık Minimal"
+        requiredTier: "PRO",
         minQuality: "HIGH",
         thumbnail: "/templates/tpl-10.jpg",
     }

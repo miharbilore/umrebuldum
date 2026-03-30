@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 import { Menu, X, Phone, User, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession, signOut } from "next-auth/react";
@@ -13,13 +14,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChevronDown, Map, BookOpen, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserMenu } from "@/components/user-menu";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/" });
@@ -40,8 +47,8 @@ export function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-            <span className="text-2xl font-bold text-primary-foreground">U</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-400 shadow-sm shrink-0">
+            <span className="text-xl font-bold text-black font-serif">U</span>
           </div>
           <span className="text-2xl font-bold tracking-tight text-foreground">
             Umrebuldum
@@ -56,6 +63,63 @@ export function Header() {
           >
             Umre Turları
           </Link>
+          <Link
+            href="/umre-rehber.html"
+            className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary flex items-center gap-1"
+          >
+            Umre Gezi Rehberi
+          </Link>
+          
+          {/* Umre Rehberi Dropdown */}
+          {mounted ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-primary focus:outline-none data-[state=open]:text-primary">
+                Umre Rehberi
+                <ChevronDown className="h-4 w-4 opacity-50 transition-transform duration-200" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl border border-border/50 shadow-xl bg-card">
+                <div className="mb-2 px-2 py-1.5 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-foreground/80">Kapsamlı Rehber Hub</span>
+                  <Link href="/rehber" className="text-xs text-primary font-medium hover:underline">Hepsini Gör</Link>
+                </div>
+                <DropdownMenuSeparator className="mb-2" />
+                <DropdownMenuItem asChild className="mb-1 rounded-lg cursor-pointer focus:bg-emerald-50 focus:text-emerald-700">
+                  <Link href="/umre-rehber.html" className="flex flex-col gap-1 w-full p-2">
+                    <div className="flex items-center gap-2 font-medium">
+                      <Map className="h-4 w-4 text-emerald-600" />
+                      Haritalı Gezi Rehberi
+                      <span className="ml-auto flex h-4 items-center justify-center rounded-full bg-emerald-100 px-1.5 text-[9px] font-bold text-emerald-700">YENİ</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground ml-6">Tüm harita üzerinden keşfedin</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="mb-1 rounded-lg cursor-pointer focus:bg-amber-50 focus:text-amber-700">
+                  <Link href="/sanal-tur" className="flex flex-col gap-1 w-full p-2">
+                    <div className="flex items-center gap-2 font-medium">
+                      <BookOpen className="h-4 w-4 text-amber-600" />
+                      Sanal Tur & Siyer
+                    </div>
+                    <span className="text-xs text-muted-foreground ml-6">Mekanların detaylı tarihçesi</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="rounded-lg cursor-pointer focus:bg-blue-50 focus:text-blue-700">
+                  <Link href="/yasam-rehberi" className="flex flex-col gap-1 w-full p-2">
+                    <div className="flex items-center gap-2 font-medium">
+                      <Sparkles className="h-4 w-4 text-blue-600" />
+                      Yaşam Rehberi
+                    </div>
+                    <span className="text-xs text-muted-foreground ml-6">Pratik yaşam ipuçları</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-1 text-sm font-medium text-foreground/80">
+              Umre Rehberi
+              <ChevronDown className="h-4 w-4 opacity-50 transition-transform duration-200" />
+            </div>
+          )}
+
           <Link
             href="/about"
             className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
@@ -81,13 +145,13 @@ export function Header() {
           </a>
 
           {/* Teklif Al - Only for USERS or Guests */}
-          {(!session || session.user.role === 'USER') && (
+          {mounted && (!session || session.user.role === 'USER') && (
             <Button asChild variant="outline" className="hidden lg:flex mr-2">
               <Link href="/request">Teklif Al</Link>
             </Button>
           )}
 
-          {!isLoading && (
+          {mounted ? (
             <>
               {session?.user ? (
                 <UserMenu />
@@ -102,6 +166,11 @@ export function Header() {
                 </div>
               )}
             </>
+          ) : (
+             <div className="flex items-center gap-2">
+                <div className="h-9 w-20 bg-muted rounded-md animate-pulse"></div>
+                <div className="h-9 w-20 bg-muted rounded-md animate-pulse"></div>
+             </div>
           )}
         </div>
 
@@ -145,6 +214,46 @@ export function Header() {
             >
               Umre Turları
             </Link>
+            <Link
+              href="/umre-rehber.html"
+              className="rounded-xl px-5 py-3 text-lg font-medium text-foreground transition-colors hover:bg-secondary flex items-center gap-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Umre Gezi Rehberi
+            </Link>
+            <div className="px-5 py-2">
+              <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Umre Rehberi Merkezi</div>
+              <div className="flex flex-col gap-1 pl-2 border-l-2 border-primary/20">
+                <Link
+                  href="/rehber"
+                  className="rounded-lg px-3 py-2 text-base font-medium text-primary hover:bg-primary/10 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  📍 Ana Rehber Sayfası
+                </Link>
+                <Link
+                  href="/umre-rehber.html"
+                  className="rounded-lg px-3 py-2 text-base font-medium text-foreground hover:bg-secondary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  🗺️ Haritalı Gezi Rehberi <span className="ml-2 inline-flex px-1.5 py-0.5 rounded bg-emerald-100 text-[10px] font-bold text-emerald-700">YENİ</span>
+                </Link>
+                <Link
+                  href="/sanal-tur"
+                  className="rounded-lg px-3 py-2 text-base font-medium text-foreground hover:bg-secondary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  🕋 Sanal Tur & Siyer
+                </Link>
+                <Link
+                  href="/yasam-rehberi"
+                  className="rounded-lg px-3 py-2 text-base font-medium text-foreground hover:bg-secondary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  💡 Yaşam Rehberi
+                </Link>
+              </div>
+            </div>
             <Link
               href="/about"
               className="rounded-xl px-5 py-3 text-lg font-medium text-foreground transition-colors hover:bg-secondary"

@@ -108,7 +108,7 @@ export async function PATCH(req: Request) {
             }
 
             // Verify user still has a paid packageType
-            if (application.user.packageType === "FREE") {
+            if (application.user.packageType === "FREEMIUM") {
                 return NextResponse.json({
                     error: "User no longer has a paid packageType. Cannot approve.",
                 }, { status: 400 });

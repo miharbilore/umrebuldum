@@ -9,6 +9,11 @@ import { TourHotels } from "@/components/tour-hotels";
 import { EmergencyInfo } from "@/components/emergency-info";
 import { DownloadButton } from "@/components/download-button";
 import { getTourBySlug } from "@/lib/api";
+import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
+import { StarRating } from "@/components/ui/StarRating";
+import { TrustBadge } from "@/components/ui/TrustBadge";
+import { ReviewList } from "@/components/reviews/ReviewList";
+import { LeaveReviewForm } from "@/components/reviews/LeaveReviewForm";
 
 interface TourDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -18,7 +23,11 @@ export async function generateMetadata({
   params,
 }: TourDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const tour = await getTourBySlug(slug);
+  const tour = await fetchCachedListings(
+    `detail_${slug}_meta`, 
+    () => getTourBySlug(slug),
+    1800 // 30 mins
+  );
 
   if (!tour) {
     return {
@@ -39,7 +48,11 @@ export async function generateMetadata({
 
 export default async function TourDetailPage({ params }: TourDetailPageProps) {
   const { slug } = await params;
-  const tour = await getTourBySlug(slug);
+  const tour = await fetchCachedListings(
+    `detail_${slug}`, 
+    () => getTourBySlug(slug),
+    1800 // 30 mins
+  );
 
   if (!tour) {
     notFound();
@@ -80,6 +93,11 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
               <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl text-balance">
                 {tour.title}
               </h1>
+              <div className="flex items-center gap-4 mt-4">
+                 <StarRating rating={tour.rating || 0} reviewCount={tour.reviewCount || 0} className="mt-1" showValue />
+                 {/* For mock data, we artificially generate a trust score based on rating or hardcode it */}
+                 <TrustBadge score={tour.rating ? tour.rating * 20 : 85} isVerified />
+              </div>
               <div className="mt-6 flex flex-wrap items-center gap-6 text-xl text-muted-foreground">
                 <div className="flex items-center gap-3">
                   <MapPin className="h-6 w-6 text-primary" aria-hidden="true" />
@@ -101,6 +119,14 @@ export default async function TourDetailPage({ params }: TourDetailPageProps) {
 
             {/* Itinerary */}
             <TourItinerary itinerary={tour.itinerary} />
+
+            {/* Reviews Section */}
+            <section className="pt-8 border-t border-gray-100">
+               <ReviewList guideId={tour.id.toString()} averageRating={tour.rating} reviewCount={tour.reviewCount} />
+               <div className="mt-10">
+                 <LeaveReviewForm guideId={tour.id.toString()} requestId="mock-request-id" />
+               </div>
+            </section>
           </div>
 
           {/* Sidebar */}

@@ -61,7 +61,7 @@ export class TokenRepository {
     static async findRenewalEligible() {
         return prisma.user.findMany({
             where: {
-                packageType: { not: "FREE" },
+                packageType: { not: "FREEMIUM" },
                 packageExpiry: { gt: new Date() },
                 role: { notIn: ["BANNED", "ADMIN"] },
             },

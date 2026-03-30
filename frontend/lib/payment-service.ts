@@ -15,9 +15,15 @@ import { grantToken } from "@/src/modules/tokens/application/grant-token.usecase
  */
 export class PaymentService {
 
-    private static stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_mock_key", {
-        apiVersion: '2023-10-16' as any,
-    });
+    private static stripe = (() => {
+        const key = process.env.STRIPE_SECRET_KEY;
+        if (!key) {
+            throw new Error("[PaymentService] STRIPE_SECRET_KEY is not set. Cannot initialize payment service.");
+        }
+        return new Stripe(key, {
+            apiVersion: '2023-10-16' as any,
+        });
+    })();
 
     /**
      * Create a Stripe Checkout Session for credit purchase.

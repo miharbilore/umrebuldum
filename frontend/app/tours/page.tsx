@@ -1,10 +1,10 @@
-
 import { prisma } from "@/lib/prisma";
-import { PackageSystem } from "@/lib/package-system";
 import { HeroSection } from "@/components/hero-section";
 import { ToursGrid } from "@/components/tours-grid";
 import { ToursSort } from "@/components/tours-sort";
 import { Metadata } from "next";
+import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
+// NOTE: EmptyState must be defined. If it doesn't exist yet we fallback to text.
 
 export const metadata: Metadata = {
   title: "Umre Turları | UmreBuldum",
@@ -13,165 +13,169 @@ export const metadata: Metadata = {
 
 export default async function ToursPage({ searchParams }: { searchParams: Promise<any> }) {
   const resolvedParams = await searchParams;
-  // Read search params
-  const departureCityId = resolvedParams?.departureCity; // This is now an ID
-  const searchDate = resolvedParams?.date;
-  const minDate = resolvedParams?.minDate;
-  const maxDate = resolvedParams?.maxDate;
-  const minPrice = resolvedParams?.minPrice;
-  const maxPrice = resolvedParams?.maxPrice;
-  const isIdentityVerifiedFilter = resolvedParams?.isIdentityVerified;
+  
+  // Create deterministic string from resolvedParams for hashing inside fetchCachedListings
+  const queryToHash = resolvedParams ? Object.keys(resolvedParams)
+    .sort()
+    .map(key => `${key}=${resolvedParams[key]}`)
+    .join('&') : 'default';
 
-  const now = new Date();
+  // We wrap ALL database logic in the fetchCachedListings fetcher callback
+  const fetchResult = await fetchCachedListings(queryToHash, async () => {
+    const departureCityId = resolvedParams?.departureCity;
+    const searchDate = resolvedParams?.date;
+    const minDate = resolvedParams?.minDate;
+    const maxDate = resolvedParams?.maxDate;
+    const minPrice = resolvedParams?.minPrice;
+    const maxPrice = resolvedParams?.maxPrice;
+    const isIdentityVerifiedFilter = resolvedParams?.isIdentityVerified;
+    const page = parseInt(resolvedParams?.page || '1', 10);
+    const limit = parseInt(resolvedParams?.limit || '20', 10);
+    const skip = (page - 1) * limit;
 
-  // Build where clause
-  const where: any = {
-    active: true,
-    approvalStatus: 'APPROVED',
-    endDate: { gte: now }
-  };
+    const now = new Date();
 
-  if (departureCityId && departureCityId !== 'all') {
-    where.departureCityId = departureCityId;
-  }
+    const where: any = {
+      active: true,
+      approvalStatus: 'APPROVED',
+      endDate: { gte: now }
+    };
 
-  if (isIdentityVerifiedFilter === 'true') {
-    where.guide = { isIdentityVerified: true };
-  }
+    if (departureCityId && departureCityId !== 'all') {
+      where.departureCityId = departureCityId;
+    }
 
-  // Sorting logic
-  const sortParam = resolvedParams?.sort || 'recommended';
-  const orderBy: any[] = [];
+    if (isIdentityVerifiedFilter === 'true') {
+      where.guide = { isIdentityVerified: true };
+    }
 
-  switch (sortParam) {
-    case 'price_asc':
-      orderBy.push({ price: 'asc' });
-      break;
-    case 'price_desc':
-      orderBy.push({ price: 'desc' });
-      break;
-    case 'date_asc':
-      orderBy.push({ startDate: 'asc' });
-      break;
-    case 'date_desc':
-      orderBy.push({ startDate: 'desc' });
-      break;
-    case 'recommended':
-    default:
-      orderBy.push({ isFeatured: 'desc' });
-      orderBy.push({ createdAt: 'desc' });
-      break;
-  }
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price.gte = parseFloat(minPrice as string);
+      if (maxPrice) where.price.lte = parseFloat(maxPrice as string);
+    }
 
-  let listings = await prisma.guideListing.findMany({
-    where,
-    include: {
-      guide: true,
-      departureCity: true,
-      airline: true,
-      tourDays: { orderBy: { day: 'asc' } }
-    },
-    orderBy
-  });
+    if (minDate || maxDate) {
+      if (minDate) where.endDate = { gte: new Date(minDate as string) };
+      if (maxDate) where.startDate = { lte: new Date(maxDate as string) };
+    } else if (searchDate) {
+      const parsedDate = new Date(searchDate as string);
+      where.startDate = { lte: parsedDate };
+      where.endDate = { gte: parsedDate };
+    }
 
-  // Date range filtering
-  if (minDate || maxDate) {
-    listings = listings.filter(l => {
-      const lStart = l.startDate.getTime();
-      // Use departureDateEnd if available, otherwise assume single day start window
-      const lEnd = l.departureDateEnd ? l.departureDateEnd.getTime() : lStart;
+    const sortParam = resolvedParams?.sort || 'recommended';
+    const orderBy: any[] = [];
+    switch (sortParam) {
+      case 'price_asc': orderBy.push({ price: 'asc' }); break;
+      case 'price_desc': orderBy.push({ price: 'desc' }); break;
+      case 'date_asc': orderBy.push({ startDate: 'asc' }); break;
+      case 'date_desc': orderBy.push({ startDate: 'desc' }); break;
+      case 'recommended':
+      default:
+        orderBy.push({ isFeatured: 'desc' });
+        orderBy.push({ createdAt: 'desc' });
+        break;
+    }
 
-      const searchMin = minDate ? new Date(minDate).getTime() : -Infinity;
-      const searchMax = maxDate ? new Date(maxDate).getTime() : Infinity;
+    const totalCount = await prisma.guideListing.count({ where });
 
-      // Overlap check: 
-      // (StartA <= EndB) and (EndA >= StartB)
-      return lStart <= searchMax && lEnd >= searchMin;
+    let listings = await prisma.guideListing.findMany({
+      where,
+      take: limit,
+      skip: skip,
+      include: {
+        guide: true,
+        departureCity: true,
+        airline: true,
+        tourDays: { orderBy: { day: 'asc' } }
+      },
+      orderBy
     });
-  } else if (searchDate) {
-    // Check if the search date falls WITHIN the tour range
-    // tour.startDate <= searchDate <= tour.endDate
-    listings = listings.filter(l => {
-      const sDate = new Date(searchDate).getTime();
-      const tStart = l.startDate.getTime();
-      const tEnd = l.endDate.getTime();
-      return sDate >= tStart && sDate <= tEnd;
-    });
-  }
 
-  // Price filtering
-  if (minPrice || maxPrice) {
-    const min = minPrice ? parseFloat(minPrice) : 0;
-    const max = maxPrice ? parseFloat(maxPrice) : Infinity;
-    listings = listings.filter(l => {
-      const prices = [l.pricingQuad, l.pricingTriple, l.pricingDouble].filter(p => p > 0);
-      const price = prices.length > 0 ? Math.min(...prices) : (l.price || 0);
-      return price >= min && price <= max;
-    });
-  }
+    // Filters are now pushed down to the database schema.
 
-  // Transform to the shape expected by ToursGrid
-  const enrichedListings = listings.map(l => {
-    const profile = l.guide;
-    // Always show phone if requested by user logic updates
-    const showPhone = profile ? true : false; // kept as per previous file logic
+    // Transform logic mapping to the return object
+    const transformedData = listings.map(l => {
+      const profile = l.guide;
+      return {
+        id: l.id,
+        guideId: l.guideId,
+        title: l.title,
+        description: l.description,
+        city: l.city,
+        departureCity: l.departureCity?.name || l.departureCityOld || "Unknown",
+        meetingCity: l.meetingCity,
+        extraServices: l.extraServices,
+        hotelName: l.hotelName,
+        airline: l.airline?.name || l.airlineOld || "Unknown",
+        pricing: {
+          double: l.pricingDouble,
+          triple: l.pricingTriple,
+          quad: l.pricingQuad,
+          currency: l.pricingCurrency
+        },
+        price: l.price,
+        quota: l.quota,
+        filled: l.filled,
+        active: l.active,
+        isFeatured: l.isFeatured,
+        startDate: l.startDate.toISOString().split('T')[0],
+        endDate: l.endDate.toISOString().split('T')[0],
+        totalDays: l.totalDays,
+        tourPlan: l.tourDays.map(d => ({
+          day: d.day,
+          city: d.city,
+          title: d.title,
+          description: d.description
+        })),
+        image: l.image,
+        createdAt: l.createdAt.toISOString(),
+        guide: profile ? {
+          fullName: profile.fullName,
+          city: profile.city,
+          bio: profile.bio,
+          phone: profile.phone,
+          isIdentityVerified: profile.isIdentityVerified,
+          photo: profile.photo,
+          trustScore: profile.trustScore || 50,
+          completedTrips: profile.completedTrips || 0,
+          package: profile.package || "FREEMIUM"
+        } : null
+      };
+    });
 
     return {
-      id: l.id,
-      guideId: l.guideId,
-      title: l.title,
-      description: l.description,
-      city: l.city,
-      departureCity: l.departureCity?.name || l.departureCityOld || "Unknown",
-      meetingCity: l.meetingCity,
-      extraServices: l.extraServices,
-      hotelName: l.hotelName,
-      airline: l.airline?.name || l.airlineOld || "Unknown",
-      pricing: {
-        double: l.pricingDouble,
-        triple: l.pricingTriple,
-        quad: l.pricingQuad,
-        currency: l.pricingCurrency
-      },
-      price: l.price,
-      quota: l.quota,
-      filled: l.filled,
-      active: l.active,
-      isFeatured: l.isFeatured,
-      startDate: l.startDate.toISOString().split('T')[0],
-      endDate: l.endDate.toISOString().split('T')[0],
-      totalDays: l.totalDays,
-      tourPlan: l.tourDays.map(d => ({
-        day: d.day,
-        city: d.city,
-        title: d.title,
-        description: d.description
-      })),
-      image: l.image,
-      createdAt: l.createdAt.toISOString(),
-      guide: profile ? {
-        fullName: profile.fullName,
-        city: profile.city,
-        bio: profile.bio,
-        phone: profile.phone,
-        isIdentityVerified: profile.isIdentityVerified,
-        photo: profile.photo,
-        trustScore: profile.trustScore || 50,
-        completedTrips: profile.completedTrips || 0,
-        package: profile.package || "FREEMIUM"
-      } : null
+      data: transformedData,
+      metadata: {
+        totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit)
+      }
     };
-  });
+  }, 300); // end of fetchCachedListings (300s TTL)
+
+  const enrichedListings = fetchResult?.data || [];
+  const totalCount = fetchResult?.metadata?.totalCount || 0;
 
   return (
     <main className="min-h-screen">
       <HeroSection />
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Bulunan Turlar ({enrichedListings.length})</h2>
+          <h2 className="text-2xl font-bold">Bulunan Turlar ({totalCount})</h2>
           <ToursSort />
         </div>
-        <ToursGrid listings={enrichedListings} />
+        
+        {enrichedListings.length === 0 ? (
+          <div className="text-center py-16 px-4 border rounded-xl bg-white shadow-sm">
+            <h3 className="text-xl font-bold mb-2">Tur Bulunamadı</h3>
+            <p className="text-muted-foreground">Kriterlerinize uygun tur ilanımız şu anda mevcut değil. Lütfen aramanızı genişletin.</p>
+          </div>
+        ) : (
+          <ToursGrid listings={enrichedListings} />
+        )}
       </div>
     </main>
   );

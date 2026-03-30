@@ -9,7 +9,7 @@ export class AgencyAnalyticsService {
 
     /**
      * The core dashboard funnel metrics: Impressions -> Views.
-     * FREE users get the base numbers. PRO+ users get the Search Keywords and Dwell Time.
+     * FREEMIUM users get the base numbers. PREMIUM+ users get the Search Keywords and Dwell Time.
      */
     static async getProfileFunnel(guideId: string, days: number = 30) {
         const startDate = new Date(Date.now() - days * 86400000);
@@ -21,7 +21,7 @@ export class AgencyAnalyticsService {
         });
 
         const listingIds = listings.map(l => l.id);
-        const pkg = listings[0]?.guide?.user?.packageType || "FREE";
+        const pkg = listings[0]?.guide?.user?.packageType || "FREEMIUM";
 
         // Aggregate core numbers
         const impressions = await prisma.listingImpression.count({
@@ -38,7 +38,7 @@ export class AgencyAnalyticsService {
         // Advanced Metrics (Gated for FREE users)
         let topKeywords: Array<{ query: string, count: number }> = [];
         let avgDwellTime = 0;
-        const isPremiumDataUnlocked = ["STARTER", "PRO", "LEGEND", "CORP_BASIC", "CORP_PRO", "CORP_ENTERPRISE"].includes(pkg);
+        const isPremiumDataUnlocked = ["PREMIUM", "PLUS", "PRO", "BUSINESS", "BUSINESS_PLUS"].includes(pkg);
 
         if (isPremiumDataUnlocked) {
             // Unlock Search Keywords
@@ -69,7 +69,7 @@ export class AgencyAnalyticsService {
                 isUnlocked: isPremiumDataUnlocked,
                 topKeywords: isPremiumDataUnlocked ? topKeywords : "BLOCKED_FOR_FREE",
                 avgDwellTimeSeconds: isPremiumDataUnlocked ? avgDwellTime : "BLOCKED_FOR_FREE",
-                unlockMessage: !isPremiumDataUnlocked ? "Arama kelimelerini ve sayfa kalma sürelerini görmek için STARTER pakete geçin." : null
+                unlockMessage: !isPremiumDataUnlocked ? "Arama kelimelerini ve sayfa kalma sürelerini görmek için PREMIUM pakete geçin." : null
             }
         };
     }

@@ -44,8 +44,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         Apple,
         Facebook,
         Nodemailer({
-            server: process.env.EMAIL_SERVER,
-            from: process.env.EMAIL_FROM,
+            server: process.env.EMAIL_SERVER || {
+                host: 'localhost',
+                port: 2525,
+                auth: { user: '', pass: '' }
+            },
+            from: process.env.EMAIL_FROM || 'noreply@localhost',
             async sendVerificationRequest({ identifier: email, url }) {
                 if (process.env.NODE_ENV === "development") {
                     console.log("----------------------------------------------")
@@ -72,7 +76,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: "Credentials",
             credentials: {
                 email: { label: "Email", type: "email" },
-                password: { label: "Password", type: "password" }
+                password: { label: "Password", type: "password" },
+                totpCode: { label: "2FA Code", type: "text" }
             },
             async authorize(credentials, req) {
                 // Determine IP address securely
@@ -82,13 +87,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 const email = credentials?.email as string;
 
                 // 1. Bruteforce Hard Check
-                const lockout = AuthRateLimit.checkLockout(ip, email);
+                const lockout = await AuthRateLimit.checkLockout(ip, email);
                 if (!lockout.allowed) {
                     throw new Error("Invalid credentials"); // Generic error, no leakage
                 }
 
                 if (!email || !credentials?.password) {
-                    AuthRateLimit.recordFailure(ip, email);
+                    await AuthRateLimit.recordFailure(ip, email);
                     return null;
                 }
 
@@ -99,19 +104,72 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 });
 
                 if (!user || !user.passwordHash) {
-                    AuthRateLimit.recordFailure(ip, email);
+                    await AuthRateLimit.recordFailure(ip, email);
                     throw new Error("Invalid credentials");
                 }
 
                 const isValid = await bcrypt.compare(credentials.password as string, user.passwordHash);
 
                 if (!isValid) {
-                    AuthRateLimit.recordFailure(ip, email);
+                    await AuthRateLimit.recordFailure(ip, email);
                     throw new Error("Invalid credentials");
                 }
 
+                // --- Email Verification Check ---
+                if (!user.isVerified) {
+                    throw new Error("EMAIL_NOT_VERIFIED");
+                }
+
+                // --- 2FA Check ---
+                if ((user as any).isTwoFactorEnabled) {
+                    const totpCode = (credentials as any)?.totpCode as string | undefined;
+                    
+                    if (!totpCode) {
+                        // User has 2FA enabled but didn't provide code -> Prompt for it
+                        throw new Error("2FA_REQUIRED");
+                    }
+                    
+                    const { verify } = await import("otplib");
+                    
+                    if (!(user as any).twoFactorSecret) {
+                         throw new Error("2FA setup not initialized");
+                    }
+                    
+                    const isValidToken = verify({
+                        token: totpCode,
+                        secret: (user as any).twoFactorSecret
+                    });
+                    
+                    if (!isValidToken) {
+                        // --- Recovery Code Fallback ---
+                        const storedCodes = (user as any).twoFactorRecoveryCodes as string[] | null;
+                        if (storedCodes && storedCodes.length > 0) {
+                            const { verifyRecoveryCode } = await import("./recovery-codes");
+                            const matchIndex = await verifyRecoveryCode(totpCode, storedCodes);
+                            
+                            if (matchIndex >= 0) {
+                                // Valid recovery code — remove it so it can't be reused
+                                const updatedCodes = [...storedCodes];
+                                updatedCodes.splice(matchIndex, 1);
+                                await prisma.user.update({
+                                    where: { id: user.id },
+                                    data: { twoFactorRecoveryCodes: updatedCodes },
+                                });
+                                // Recovery code accepted — proceed with login
+                            } else {
+                                await AuthRateLimit.recordFailure(ip, email);
+                                throw new Error("INVALID_2FA");
+                            }
+                        } else {
+                            await AuthRateLimit.recordFailure(ip, email);
+                            throw new Error("INVALID_2FA");
+                        }
+                    }
+                }
+                // -----------------
+
                 // 2. Clear failures on success
-                AuthRateLimit.recordSuccess(ip, email);
+                await AuthRateLimit.recordSuccess(ip, email);
 
                 return {
                     id: user.id,

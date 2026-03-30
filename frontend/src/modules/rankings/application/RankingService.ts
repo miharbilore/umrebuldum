@@ -152,7 +152,7 @@ export class RankingService {
 
       const guideInput: RankingGuideInput = {
         userId: guide.id,
-        packageType: guide.packageType || "FREE",
+        packageType: guide.packageType || "FREEMIUM",
         isIdentityVerified: (guide as any).isIdentityVerified || false,
         trustScore: guide.trustScore || 50,
         completedTrips: guide.completedTrips || 0,

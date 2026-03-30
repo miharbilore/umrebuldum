@@ -11,6 +11,49 @@ import { uploadToVault } from "@/lib/s3-client";
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
+/**
+ * Detect actual MIME type from file magic bytes (file signature).
+ * Prevents MIME type spoofing — e.g., a .exe renamed to .jpg.
+ */
+function detectMimeFromBytes(buffer: Buffer): string | null {
+    if (buffer.length < 12) return null;
+
+    // JPEG: FF D8 FF
+    if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+        return "image/jpeg";
+    }
+
+    // PNG: 89 50 4E 47 0D 0A 1A 0A
+    if (
+        buffer[0] === 0x89 &&
+        buffer[1] === 0x50 &&
+        buffer[2] === 0x4e &&
+        buffer[3] === 0x47 &&
+        buffer[4] === 0x0d &&
+        buffer[5] === 0x0a &&
+        buffer[6] === 0x1a &&
+        buffer[7] === 0x0a
+    ) {
+        return "image/png";
+    }
+
+    // WebP: RIFF....WEBP
+    if (
+        buffer[0] === 0x52 && // R
+        buffer[1] === 0x49 && // I
+        buffer[2] === 0x46 && // F
+        buffer[3] === 0x46 && // F
+        buffer[8] === 0x57 && // W
+        buffer[9] === 0x45 && // E
+        buffer[10] === 0x42 && // B
+        buffer[11] === 0x50 // P
+    ) {
+        return "image/webp";
+    }
+
+    return null;
+}
+
 /** Strip path separators and keep only safe characters to prevent traversal */
 function sanitizeFilename(raw: string): string {
     return path.basename(raw)          // strip any leading path components
@@ -27,7 +70,7 @@ export async function POST(req: Request) {
         if (guard) return guard;
 
         // Rate limit: 5 uploads per minute per user
-        const rl = rateLimit(`upload:${session!.user.email}`, 60_000, 5);
+        const rl = await rateLimit(`upload:${session!.user.email}`, 60_000, 5);
         if (!rl.success) {
             return NextResponse.json(
                 { error: "Too many uploads. Please wait." },
@@ -59,6 +102,15 @@ export async function POST(req: Request) {
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
+
+        // VULN-8c: Deep magic-byte validation — prevent MIME spoofing
+        const detectedType = detectMimeFromBytes(buffer);
+        if (!detectedType || !ALLOWED_MIME_TYPES.has(detectedType)) {
+            return NextResponse.json(
+                { error: "File content does not match an allowed image format." },
+                { status: 415 }
+            );
+        }
 
         // VULN-8c: Sanitize filename — prevent path traversal
         const sanitized = sanitizeFilename(file.name);

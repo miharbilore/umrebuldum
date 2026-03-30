@@ -22,7 +22,7 @@ export async function checkListingLimit(
     const activeCount = await prisma.guideListing.count({
         where: { guideId: userId, active: true, deletedAt: null },
     });
-    const limits = PackageSystem.getLimits(packageType);
+    const limits = await PackageSystem.getLimits(packageType);
 
     if (activeCount >= limits.maxListings) {
         return {
@@ -48,7 +48,7 @@ export async function checkDailyCap(
     packageType: string,
     action: "offers" | "unlocks" | "boosts" | "spotlights",
 ): Promise<PackageGuardResult> {
-    const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREE;
+    const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREEMIUM;
     const limit = caps[action];
 
     if (limit === 0) {
@@ -108,7 +108,7 @@ export async function checkBoostLimit(
     userId: string,
     packageType: string,
 ): Promise<PackageGuardResult> {
-    const limits = PackageSystem.getLimits(packageType);
+    const limits = await PackageSystem.getLimits(packageType);
 
     if (limits.maxBoosts === 0) {
         return {

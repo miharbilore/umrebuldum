@@ -5,6 +5,7 @@ import { requireSupply } from "@/lib/api-guards";
 import { spendToken } from "@/src/modules/tokens/application/spend-token.usecase";
 import { getRoleConfig } from "@/lib/role-config";
 import { rateLimit } from "@/lib/rate-limit";
+import { requireTokens } from "@/src/core/guards/token.guard";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { safeErrorMessage } from "@/lib/safe-error";
 
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
         }
 
         // Rate limit: 10 offers per minute
-        const rl = rateLimit(`offer:${session!.user.email}`, 60_000, 10);
+        const rl = await rateLimit(`offer:${session!.user.email}`, 60_000, 10);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
         // Resolve guide user
         const guideUser = await prisma.user.findUnique({
             where: { email: session!.user.email! },
-            select: { id: true },
+            select: { id: true, packageType: true },
         });
         if (!guideUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
@@ -55,20 +56,10 @@ export async function POST(req: Request) {
         if (!request) return NextResponse.json({ error: "Request not found" }, { status: 404 });
         if (request.status !== "open") return NextResponse.json({ error: "Request is closed" }, { status: 400 });
 
-        // Check daily offer count
-        const startOfDay = new Date();
-        startOfDay.setUTCHours(0, 0, 0, 0);
-        const dailyOfferCount = await prisma.offer.count({
-            where: {
-                guideId: guideUser.id,
-                createdAt: { gte: startOfDay },
-            },
-        });
-        if (dailyOfferCount >= roleConfig.maxDailyOffers) {
-            return NextResponse.json(
-                { error: "Daily offer limit reached", limit: roleConfig.maxDailyOffers },
-                { status: 429 }
-            );
+        // Pre-flight Token Guard (Role, Daily Cap, Cache Balance)
+        const tokenGuardRes = await requireTokens(guideUser.id, session!.user.role || "FREEMIUM", guideUser.packageType || "FREEMIUM", "OFFER_SEND");
+        if (!tokenGuardRes.ok) {
+            return tokenGuardRes.error!;
         }
 
         // Check for existing offer (idempotent)

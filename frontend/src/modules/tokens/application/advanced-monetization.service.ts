@@ -307,7 +307,7 @@ export async function evaluatePerformanceTier(userId: string): Promise<{
  *
  * Rules:
  *   CORP_BASIC:      500 token credit line
- *   CORP_PRO:        1,500 token credit line
+ *   CORP_PRO:        1,500 token credit line // Handles edge-case logic specific to Corporate/Holding ("BUSINESS_PLUS") tiers.
  *   CORP_ENTERPRISE: 5,000 token credit line
  *
  * Billing: Auto-charge at end of 30-day cycle.
@@ -346,6 +346,10 @@ export async function openCreditLine(userId: string): Promise<{
 
     const nextBilling = new Date();
     nextBilling.setDate(nextBilling.getDate() + 30);
+
+    if (user.packageType !== "BUSINESS_PLUS") {
+        throw new Error(`Kredi Limit Artırımı sadece Business Plus paketi için geçerlidir`);
+    }
 
     await prisma.enterpriseCreditLine.create({
         data: {
@@ -533,7 +537,7 @@ export async function analyzePlanFit(userId: string): Promise<PlanFitAnalysis> {
     if (!user) throw new Error("User not found");
 
     const currentPlan = user.packageType as PackageType;
-    const limits = PACKAGE_LIMITS[currentPlan] || PACKAGE_LIMITS.FREE;
+    const limits = PACKAGE_LIMITS[currentPlan] || PACKAGE_LIMITS.FREEMIUM;
 
     // Calculate utilization metrics
     const tokenUsageRatio = limits.monthlyTokens > 0
@@ -564,20 +568,20 @@ export async function analyzePlanFit(userId: string): Promise<PlanFitAnalysis> {
     // OVER_USING: >85% utilization
     if (utilization > 85) {
         fitStatus = "OVER_USING";
-        if (currentPlan === "FREE") suggestedPlan = "STARTER";
-        else if (currentPlan === "STARTER") suggestedPlan = "PRO";
-        else if (currentPlan === "PRO") suggestedPlan = "LEGEND";
+        if (currentPlan === "FREEMIUM") suggestedPlan = "PREMIUM";
+        else if (currentPlan === "PREMIUM") suggestedPlan = "PLUS";
+        else if (currentPlan === "PLUS") suggestedPlan = "PRO";
         reasons.push(`Token usage at ${Math.round(tokenUsageRatio * 100)}% of monthly allotment`);
         if (boostUsageRatio > 0.8) reasons.push("Boost limit frequently reached");
         if (offerUsageRatio > 0.8) reasons.push("Offer limit frequently reached");
     }
     // UNDER_USING: <30% utilization and been on plan >60 days
-    else if (utilization < 30 && currentPlan !== "FREE") {
+    else if (utilization < 30 && currentPlan !== "FREEMIUM") {
         const daysOnPlan = (Date.now() - user.createdAt.getTime()) / 86_400_000;
         if (daysOnPlan > 60) {
             fitStatus = "UNDER_USING";
-            if (currentPlan === "LEGEND") suggestedPlan = "PRO";
-            else if (currentPlan === "PRO") suggestedPlan = "STARTER";
+            if (currentPlan === "PRO") suggestedPlan = "PLUS";
+            else if (currentPlan === "PLUS") suggestedPlan = "PREMIUM";
             reasons.push(`Only using ${utilization}% of plan capacity`);
             reasons.push("Consider saving by adjusting your plan");
         }

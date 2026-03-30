@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { containsProfanity } from "@/lib/bannedWords";
 import { rateLimit } from "@/lib/rate-limit";
+import { emailService } from "@/lib/email/email-service";
+import { newMessageTemplate } from "@/lib/email/email-templates";
 
 export async function POST(req: Request) {
     try {
@@ -13,7 +15,7 @@ export async function POST(req: Request) {
         }
 
         // Global rate limit: 20 messages per minute per user
-        const rl = rateLimit(`msg:${session.user.id}`, 60_000, 20);
+        const rl = await rateLimit(`msg:${session.user.id}`, 60_000, 20);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }
@@ -96,6 +98,26 @@ export async function POST(req: Request) {
                 error: "Mesajınız uygunsuz içerik nedeniyle engellendi.",
                 blocked: true
             }, { status: 400 });
+        }
+
+        // ─── Email notification to recipient (non-blocking) ───
+        const recipientId = conversation.userId === session.user.id
+            ? conversation.guideId
+            : conversation.userId;
+        const recipient = conversation.userId === session.user.id
+            ? conversation.guide
+            : conversation.user;
+        const senderName = session.user.name || "Kullanıcı";
+
+        if (recipient?.email && recipientId !== session.user.id) {
+            emailService.sendAsync(
+                recipient.email,
+                newMessageTemplate({
+                    recipientName: recipient.name || "Kullanıcı",
+                    senderName,
+                    messagePreview: body.trim().substring(0, 200),
+                })
+            );
         }
 
         return NextResponse.json(message);

@@ -30,7 +30,8 @@ export default function GuideMarketPage() {
 
     // Get current balance
     const { data: balanceData } = useSWR(CREDIT_BALANCE_KEY, fetcher);
-    const currentBalance = balanceData?.credits ?? 0;
+    // FALLBACK: SWR returns .balance from the API
+    const currentBalance = balanceData?.balance ?? 0;
 
     useEffect(() => {
         const loadData = async () => {

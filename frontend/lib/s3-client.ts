@@ -1,12 +1,26 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
+// ── S3 Initialization ─────────────────────────────────────────────────────
+const isProduction = process.env.NODE_ENV === "production";
+const hasCredentials = !!(process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY);
+
+if (isProduction && !hasCredentials) {
+    throw new Error("[S3Client] AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be set in production.");
+}
+
+const isDevMockMode = !hasCredentials;
+
 export const s3 = new S3Client({
     region: process.env.AWS_REGION || "eu-central-1",
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || "MOCK_KEY",
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "MOCK_SECRET",
-    },
+    ...(hasCredentials
+        ? {
+              credentials: {
+                  accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+                  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+              },
+          }
+        : {}),
 });
 
 const BUCKET_NAME = process.env.AWS_BUCKET_NAME || "kyc-document-vault";
@@ -24,12 +38,11 @@ export async function uploadToVault(key: string, body: Buffer, contentType: stri
         ACL: "private", // Strict private enforcement
     });
 
-    // Auto-mocking for local environments without AWS credentials
     try {
-        if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID !== "MOCK_KEY") {
-            await s3.send(command);
-        } else {
+        if (isDevMockMode) {
             console.log(`[Mock S3 Vault] Saved file privately as ${key}`);
+        } else {
+            await s3.send(command);
         }
         return key;
     } catch (e) {
@@ -48,12 +61,11 @@ export async function getVaultPresignedUrl(key: string, expiresIn: number = 60) 
     });
 
     try {
-        if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_ACCESS_KEY_ID !== "MOCK_KEY") {
-            return await getSignedUrl(s3, command, { expiresIn });
-        } else {
+        if (isDevMockMode) {
             // Return a mock URL that proves the system logic works
             return `https://mock-s3.local.umrebuldum.com/${BUCKET_NAME}/${key}?X-Amz-Expires=${expiresIn}&mock=true`;
         }
+        return await getSignedUrl(s3, command, { expiresIn });
     } catch (e) {
         console.error("S3 Presigner Error:", e);
         throw new Error("Could not generate presigned access URL");

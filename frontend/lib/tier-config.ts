@@ -1,14 +1,15 @@
 /**
+ * @deprecated LEGACY TIER CONFIG — only used by Poster system for backward-compat.
+ * For all new code, use PackageSystem from /lib/package-system.ts
+ *
  * BACKEND TIER CONFIGURATION
  * 
- * Single Source of Truth: /wp-json/umrebuldum/v1/access
- * 
- * Logic is handled by Backend (Access_Control.php).
- * Frontend only presents data.
+ * Single Source of Truth: /wp-json/umrebuldum/v1/access  (LEGACY)
+ * Now handled via package-system.ts
  */
 
 export const TIERS = {
-    FREE: 'free',
+    FREEMIUM: 'freemium',
     PLUS: 'plus',
     PRO: 'pro',
 } as const;
@@ -48,8 +49,8 @@ export interface TierDisplayConfig {
 }
 
 export const TIER_DISPLAY_CONFIG: Record<TierType, TierDisplayConfig> = {
-    [TIERS.FREE]: {
-        id: TIERS.FREE,
+    [TIERS.FREEMIUM]: {
+        id: TIERS.FREEMIUM,
         name: 'Ücretsiz', // Backend'den gelen isim kullanılmalı ama fallback olarak burada
         price: '₺0',
         description: 'Başlangıç paketi',

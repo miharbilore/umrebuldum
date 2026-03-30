@@ -9,13 +9,13 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { token, email, newPassword } = body;
 
-        const lockout = AuthRateLimit.checkLockout(ip, email);
+        const lockout = await AuthRateLimit.checkLockout(ip, email);
         if (!lockout.allowed) {
             return NextResponse.json({ error: lockout.reason || "Too many attempts" }, { status: 429 });
         }
 
         if (!token || !email || !newPassword) {
-            AuthRateLimit.recordFailure(ip, email);
+            await AuthRateLimit.recordFailure(ip, email);
             return NextResponse.json({ error: "Eksik bilgi." }, { status: 400 });
         }
 
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         });
 
         if (!verificationToken) {
-            AuthRateLimit.recordFailure(ip, email);
+            await AuthRateLimit.recordFailure(ip, email);
             return NextResponse.json({ error: "Geçersiz veya süresi dolmuş bağlantı." }, { status: 400 });
         }
 
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
             where: { token }
         });
 
-        AuthRateLimit.recordSuccess(ip, email);
+        await AuthRateLimit.recordSuccess(ip, email);
 
         return NextResponse.json({ success: true, message: "Şifre güncellendi." });
 

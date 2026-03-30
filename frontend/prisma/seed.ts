@@ -3,22 +3,47 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-    // Seed default credit packages
+    // Seed default credit packages with dynamic features
     const packages = [
-        { id: "pkg_starter", name: "Başlangıç Paketi", credits: 10, priceTRY: 299 },
-        { id: "pkg_pro", name: "Pro Paket", credits: 30, priceTRY: 799 },
-        { id: "pkg_agency", name: "Ajans Paketi", credits: 100, priceTRY: 1999 },
+        { 
+            id: "PLUS", 
+            name: "Plus Paket", 
+            credits: 70, 
+            priceTRY: 299,
+            features: ["14 İlan Eşdeğeri", "Öne Çıkarma Desteği", "Afiş/Poster Kullanımı"]
+        },
+        { 
+            id: "PRO", 
+            name: "Pro Paket", 
+            credits: 105, 
+            priceTRY: 699,
+            features: ["21 İlan Eşdeğeri", "Öne Çıkarma Desteği", "Afiş/Poster Kullanımı"]
+        },
+        { 
+            id: "VIP", 
+            name: "VIP Paket", 
+            credits: 150, 
+            priceTRY: 1499,
+            features: ["30 İlan Eşdeğeri", "7/24 Destek", "Afiş/Poster Kullanımı"]
+        },
+        { 
+            id: "BUSINESS", 
+            name: "Kurumsal Paket", 
+            credits: 350, 
+            priceTRY: 2999,
+            features: ["70 İlan Eşdeğeri", "Hızlı Onay", "Kurumsal Fatura"]
+        },
     ];
 
     for (const pkg of packages) {
         await prisma.creditPackage.upsert({
             where: { id: pkg.id },
-            update: {},
+            update: { features: pkg.features, credits: pkg.credits, priceTRY: pkg.priceTRY },
             create: pkg,
         });
     }
 
-    console.log("✅ Seeded credit packages");
+    console.log("✅ Seeded dynamic credit packages");
 
     // ─── Seed Departure Cities ──────────────────────────────────────────────
 

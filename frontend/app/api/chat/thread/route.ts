@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         const guideId = session.user.id;
 
         // Rate limit: 5 threads per minute per user
-        const rl = rateLimit(`thread:${guideId}`, 60_000, 5);
+        const rl = await rateLimit(`thread:${guideId}`, 60_000, 5);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }

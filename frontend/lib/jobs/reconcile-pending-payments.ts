@@ -10,7 +10,11 @@ import { withSerializableRetry } from "@/lib/with-retry";
 //
 // LEDGER: All credit grants go through grantToken() → token_ledger_entries.
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_mock_key", {
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeKey) {
+    throw new Error("[ReconcilePayments] STRIPE_SECRET_KEY is not set. Cannot initialize reconciliation.");
+}
+const stripe = new Stripe(stripeKey, {
     apiVersion: "2023-10-16" as any,
 });
 

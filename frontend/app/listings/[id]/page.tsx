@@ -6,7 +6,12 @@ import Link from "next/link";
 import { ArrowLeft, MapPin, Calendar, Check, ShieldCheck, Star, Phone, MessageCircle, Info } from "lucide-react";
 import { notFound } from "next/navigation";
 
-// Helper to get listing with guide info
+// ─── Trust Engine UI Components ─────────────────────────────────────────
+import { StarRating } from "@/components/ui/StarRating";
+import { TrustBadge } from "@/components/ui/TrustBadge";
+import { ListingReviewSection } from "@/components/reviews/ListingReviewSection";
+
+// Helper to get listing with guide info + review cache
 async function getListing(id: string) {
     const l = await prisma.guideListing.findUnique({
         where: { id },
@@ -21,7 +26,7 @@ async function getListing(id: string) {
     if (!l) return null;
 
     const guide = (l as any).guide;
-    const showPhone = guide ? PackageSystem.isPhoneVisible(guide.package) : false;
+    const showPhone = guide ? await PackageSystem.isPhoneVisible(guide.package) : false;
 
     return {
         id: l.id,
@@ -60,12 +65,15 @@ async function getListing(id: string) {
             fullName: guide.fullName,
             city: guide.city,
             bio: guide.bio,
-            phone: guide.phone,
+            phone: showPhone ? guide.phone : null,
             isIdentityVerified: (guide as any).user?.isIdentityVerified || false,
             photo: guide.photo,
-            trustScore: guide.trustScore || 50,
+            trustScore: (guide as any).user?.trustScore || 50,
             completedTrips: guide.completedTrips || 0,
             package: guide.package || "FREEMIUM",
+            // ─── Review Cache (from GuideProfile) ──────────────
+            averageRating: guide.averageRating || 0,
+            reviewCount: guide.reviewCount || 0,
         } : null,
     };
 }
@@ -117,11 +125,29 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight drop-shadow-lg">
                             {listing.title}
                         </h1>
-                        <div className="flex items-center text-white/80 gap-2">
-                            <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                            <span className="font-semibold text-white">{listing.guide?.trustScore || 50} Güven Puanı</span>
-                            <span className="mx-2">•</span>
-                            <span>{listing.airline || "THY"} ile uçuş</span>
+
+                        {/* ─── Trust Signals (StarRating + TrustBadge) ──────── */}
+                        <div className="flex flex-wrap items-center gap-3 mt-2">
+                            {listing.guide && listing.guide.averageRating > 0 && (
+                                <div className="flex items-center gap-2 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full">
+                                    <StarRating
+                                        rating={listing.guide.averageRating}
+                                        size="sm"
+                                        showValue
+                                        reviewCount={listing.guide.reviewCount}
+                                    />
+                                </div>
+                            )}
+                            {listing.guide && (
+                                <TrustBadge
+                                    score={listing.guide.trustScore}
+                                    isVerified={isIdentityVerified}
+                                    variant="compact"
+                                    className="!bg-white/90 backdrop-blur-md"
+                                />
+                            )}
+                            <span className="text-white/70 text-sm">•</span>
+                            <span className="text-white/80 text-sm">{listing.airline || "THY"} ile uçuş</span>
                         </div>
                     </div>
                 </div>
@@ -198,12 +224,32 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                                 </div>
                             </div>
                         )}
+
+                        {/* ─── Reviews & Rating Section ──────────────────────── */}
+                        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border">
+                            {listing.guide && (
+                                <ListingReviewSection
+                                    guideId={listing.guideId}
+                                    averageRating={listing.guide.averageRating}
+                                    reviewCount={listing.guide.reviewCount}
+                                />
+                            )}
+                        </div>
                     </div>
 
                     {/* Sidebar */}
                     <div className="space-y-6">
 
-                        {/* Guide Card (Premium Only / Partial) */}
+                        {/* ─── Trust Badge (Hero variant) ──────────────────── */}
+                        {listing.guide && (
+                            <TrustBadge
+                                score={listing.guide.trustScore}
+                                isVerified={isIdentityVerified}
+                                variant="hero"
+                            />
+                        )}
+
+                        {/* Guide Card */}
                         <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-24">
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-16 h-16 rounded-full bg-gray-100 overflow-hidden border-2 border-white shadow-sm">
@@ -221,6 +267,17 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                                         Aktif Rehber
                                     </div>
+                                    {/* Inline star rating under name */}
+                                    {listing.guide && listing.guide.averageRating > 0 && (
+                                        <div className="mt-1.5">
+                                            <StarRating
+                                                rating={listing.guide.averageRating}
+                                                size="sm"
+                                                showValue
+                                                reviewCount={listing.guide.reviewCount}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -292,4 +349,3 @@ function UserIcon(props: any) {
         </svg>
     )
 }
-

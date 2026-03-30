@@ -52,10 +52,11 @@ export async function POST(req: Request) {
         const activeCount = await prisma.guideListing.count({
             where: { guideId: user.id, active: true },
         });
-        if (!PackageSystem.canCreateListing(user.packageType, activeCount)) {
+        if (!(await PackageSystem.canCreateListing(user.packageType, activeCount))) {
+            const limits = await PackageSystem.getLimits(user.packageType);
             return NextResponse.json({
-                error: "Active listing limit reached",
-                limit: PackageSystem.getLimits(user.packageType).maxListings,
+                error: "MAX_LISTINGS_REACHED",
+                limit: limits.maxListings,
             }, { status: 403 });
         }
 
@@ -77,15 +78,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: spendResult.error }, { status: 400 });
         }
 
-        // ─── Reactivate listing (post-spend) ───
-        const newDuration = PackageSystem.getListingDuration(user.packageType);
-        const newExpiresAt = new Date();
-        newExpiresAt.setDate(newExpiresAt.getDate() + newDuration);
+        // Reactivate logically
+        const newDuration = await PackageSystem.getListingDuration(user.packageType);
+        const expiresAt = new Date(Date.now() + newDuration * 24 * 60 * 60 * 1000);
 
         await prisma.guideListing.update({
             where: { id: listingId },
             data: {
                 active: true,
+                endDate: expiresAt,
             },
         });
 
@@ -94,7 +95,7 @@ export async function POST(req: Request) {
         return NextResponse.json({
             success: true,
             message: "İlan yeniden yayınlandı",
-            expiresAt: newExpiresAt.toISOString(),
+            expiresAt: expiresAt.toISOString(),
             tokenBalance: spendResult.newBalance,
         }, { status: 200 });
 
