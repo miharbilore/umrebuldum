@@ -1,0 +1,282 @@
+﻿'use client';
+
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import {
+    Shield, FileText, Users, CreditCard, Ban, ClipboardList,
+    Menu, X, ChevronRight, Mail, MessageSquare, Star,
+    Activity, AlertTriangle, CheckCircle, FlaskConical
+} from 'lucide-react';
+
+import PendingListingsPanel from '@/components/admin/PendingListingsPanel';
+import AllListingsPanel from '@/components/admin/AllListingsPanel';
+import UserRequestsPanel from '@/components/admin/UserRequestsPanel';
+import CreditManagementPanel from '@/components/admin/CreditManagementPanel';
+import BanPanel from '@/components/admin/BanPanel';
+import AdminMessagesPanel from '@/components/admin/AdminMessagesPanel';
+import AuditLogPanel from '@/components/admin/AuditLogPanel';
+import NewsletterPanel from '@/components/admin/NewsletterPanel';
+import ChatbotAdminPanel from '@/components/admin/ChatbotAdminPanel';
+import GuideApprovalPanel from '@/components/admin/GuideApprovalPanel';
+import LedgerPanel from '@/components/admin/LedgerPanel';
+import PendingReviewsPanel from '@/components/admin/PendingReviewsPanel';
+import TestManagementPanel from '@/components/admin/TestManagementPanel';
+// import ChatModerationPanel from '@/components/admin/ChatModerationPanel'; // We'll stub this or use a placeholder for now.
+
+const tabs = [
+    { id: 'all-listings', label: 'Tüm İlanlar', icon: ClipboardList, desc: 'Tüm İlanları Yönet' },
+    { id: 'listings', label: 'Bekleyen İlanlar', icon: FileText, desc: 'Pending Listings', badgeKey: 'pendingListings' },
+    { id: 'guide-approvals', label: 'Rehber Onayları', icon: Shield, desc: 'Bekleyen Kimlik Doğrulamaları' },
+    { id: 'reviews', label: 'Yorum Moderasyonu', icon: Star, desc: 'Bekleyen Değerlendirmeler', badgeKey: 'pendingReviews' },
+    { id: 'requests', label: 'Kullanıcı Talepleri', icon: Users, desc: 'User Requests', badgeKey: 'pendingRequests' },
+    { id: 'credits', label: 'Bakiye Paneli', icon: CreditCard, desc: 'Müşteri Kredileri' },
+    { id: 'ledger', label: 'Mali Defter (Ledger)', icon: FileText, desc: 'Double-Entry Kasa İzleme' },
+    { id: 'ban', label: 'Ban Paneli', icon: Ban, desc: 'Ban Users' },
+    { id: 'newsletter', label: 'Bülten Yönetimi', icon: Mail, desc: 'Bülten Aboneleri' },
+    { id: 'chatbot', label: 'Chatbot Kalıpları', icon: MessageSquare, desc: 'Otomatik Cevaplar' },
+    { id: 'contact-messages', label: 'İletişim Mesajları', icon: Mail, desc: 'İletişim Formundan Gelen Mesajlar', badgeKey: 'unreadMessages' },
+    { id: 'messages', label: 'Mesaj Moderasyonu', icon: MessageSquare, desc: 'Kullanıcı Sohbetleri / Şikayetler' },
+    { id: 'audit', label: 'İşlem Geçmişi', icon: ClipboardList, desc: 'Audit Logs' },
+    { id: 'tests', label: 'Test Yönetimi', icon: FlaskConical, desc: 'Otomasyon ve QA Logları' },
+] as const;
+
+type TabId = typeof tabs[number]['id'];
+
+const fetcher = (url: string) => fetch(url).then(r => r.json());
+
+export default function AdminDashboardPage() {
+    const [activeTab, setActiveTab] = useState<TabId>('all-listings');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    const { data: counts } = useSWR('/api/admin/counts', fetcher, { refreshInterval: 30000 });
+    const { data: health } = useSWR('/api/admin/system-health', fetcher, { refreshInterval: 60000 });
+
+    useEffect(() => {
+        if (status === 'unauthenticated' || (status === 'authenticated' && session?.user?.role !== 'ADMIN')) {
+            router.push('/');
+        }
+    }, [status, session, router]);
+
+    if (status === 'loading') {
+        return (
+            <div className="flex h-screen items-center justify-center bg-gray-950">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-400 text-sm">Yükleniyor...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (status === 'unauthenticated' || (status === 'authenticated' && session?.user?.role !== 'ADMIN')) {
+        return <div className="flex h-screen items-center justify-center bg-gray-950"><p className="text-gray-400 text-sm">Yönlendiriliyor...</p></div>;
+    }
+
+    const activeTabData = tabs.find(t => t.id === activeTab)!;
+
+    return (
+        <div className="min-h-screen bg-gray-950 text-gray-100">
+            {/* Mobile Header */}
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-gray-900 border-b border-gray-800 z-50 flex items-center justify-between px-4">
+                <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 text-gray-400 hover:text-white">
+                    <Menu className="w-6 h-6" />
+                </button>
+                <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-emerald-500" />
+                    <span className="font-semibold text-sm">Admin Panel</span>
+                </div>
+                <div className="w-10" />
+            </header>
+
+            {/* Mobile Sidebar Overlay */}
+            {sidebarOpen && (
+                <div className="lg:hidden fixed inset-0 z-50">
+                    <div className="absolute inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
+                    <aside className="absolute left-0 top-0 bottom-0 w-72 bg-gray-900 border-r border-gray-800">
+                        <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Shield className="w-5 h-5 text-emerald-500" />
+                                <span className="font-bold text-lg">Admin</span>
+                            </div>
+                            <button onClick={() => setSidebarOpen(false)} className="text-gray-400 hover:text-white">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <nav className="p-3 space-y-1">
+                            {tabs.map((tab) => {
+                                const Icon = tab.icon;
+                                const isActive = activeTab === tab.id;
+                                const badgeCount = (tab as any).badgeKey && counts ? counts[(tab as any).badgeKey as keyof typeof counts] : 0;
+
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => { setActiveTab(tab.id); setSidebarOpen(false); }}
+                                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${isActive
+                                            ? 'bg-emerald-500/10 text-emerald-400 font-medium'
+                                            : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                                            }`}
+                                    >
+                                        <Icon className="w-5 h-5 flex-shrink-0" />
+                                        <span>{tab.label}</span>
+                                        {badgeCount > 0 && (
+                                            <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                                {badgeCount}
+                                            </span>
+                                        )}
+                                        {isActive && badgeCount === 0 && <ChevronRight className="w-4 h-4 ml-auto" />}
+                                    </button>
+                                );
+                            })}
+                        </nav>
+                    </aside>
+                </div>
+            )}
+
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-gray-900 border-r border-gray-800 flex-col z-40">
+                <div className="p-5 border-b border-gray-800">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                            <Shield className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <div>
+                            <p className="font-bold text-base">Admin Panel</p>
+                            <p className="text-xs text-gray-500">UmreBuldum</p>
+                        </div>
+                    </div>
+                </div>
+                <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+                    {tabs.map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        const badgeCount = (tab as any).badgeKey && counts ? counts[(tab as any).badgeKey as keyof typeof counts] : 0;
+
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${isActive
+                                    ? 'bg-emerald-500/10 text-emerald-400 font-medium'
+                                    : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                                    }`}
+                            >
+                                <Icon className="w-5 h-5 flex-shrink-0" />
+                                <span>{tab.label}</span>
+                                {badgeCount > 0 && (
+                                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                        {badgeCount}
+                                    </span>
+                                )}
+                                {isActive && badgeCount === 0 && <ChevronRight className="w-4 h-4 ml-auto" />}
+                            </button>
+                        );
+                    })}
+                </nav>
+                <div className="p-4 border-t border-gray-800">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold text-gray-300">
+                            {session?.user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                        </div>
+                        <div className="min-w-0">
+                            <p className="font-medium text-sm truncate">{session?.user?.name || 'Admin'}</p>
+                            <p className="text-xs text-emerald-500 font-medium">ADMIN</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            {/* Main Content */}
+            <main className="lg:ml-64 pt-14 lg:pt-0 min-h-screen">
+                {/* Page Header */}
+                <div className="border-b border-gray-800 bg-gray-900/50 px-6 py-5">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                        <span>Admin</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                        <span className="text-gray-300">{activeTabData.label}</span>
+                    </div>
+                    <h1 className="text-xl font-bold text-white">{activeTabData.label}</h1>
+                    <p className="text-gray-400 mt-1 max-w-xl">{activeTabData.desc}</p>
+                </div>
+
+                {/* Panel Content */}
+                <div className="p-6">
+                    {/* --- SYSTEM HEALTH CARDS --- */}
+                    {activeTab === 'all-listings' && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+                            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-sm flex flex-col justify-center items-start">
+                                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                                    <Shield className="w-4 h-4 text-orange-500" />
+                                    <span className="text-xs font-semibold uppercase tracking-wider">Bekleyen Rehber</span>
+                                </div>
+                                <span className="text-2xl font-bold">{health?.metrics?.pendingGuides ?? '-'}</span>
+                            </div>
+                            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-sm flex flex-col justify-center items-start">
+                                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                                    <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                    <span className="text-xs font-semibold uppercase tracking-wider">Başarılı Ödeme</span>
+                                </div>
+                                <span className="text-2xl font-bold">{health?.metrics?.successfulPayments ?? '-'}</span>
+                            </div>
+                            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-sm flex flex-col justify-center items-start">
+                                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                                    <AlertTriangle className="w-4 h-4 text-red-500" />
+                                    <span className="text-xs font-semibold uppercase tracking-wider">Test Hata (24s)</span>
+                                </div>
+                                <span className="text-2xl font-bold">{health?.metrics?.recentTestFailures ?? '-'}</span>
+                            </div>
+                            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-sm flex flex-col justify-center items-start">
+                                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                                    <Users className="w-4 h-4 text-blue-500" />
+                                    <span className="text-xs font-semibold uppercase tracking-wider">Kimlik Bekleyen</span>
+                                </div>
+                                <span className="text-2xl font-bold">{health?.metrics?.pendingIdentity ?? '-'}</span>
+                            </div>
+                            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-sm flex flex-col justify-center items-start">
+                                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                                    <FileText className="w-4 h-4 text-purple-500" />
+                                    <span className="text-xs font-semibold uppercase tracking-wider">Bekleyen İlan</span>
+                                </div>
+                                <span className="text-2xl font-bold">{health?.metrics?.pendingListings ?? '-'}</span>
+                            </div>
+                            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-sm flex flex-col justify-center items-start">
+                                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                                    <Activity className="w-4 h-4 text-cyan-500" />
+                                    <span className="text-xs font-semibold uppercase tracking-wider">Kullanıcılar</span>
+                                </div>
+                                <span className="text-2xl font-bold">{health?.metrics?.totalUsers ?? '-'}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 relative min-h-[500px]">
+                        {activeTab === 'all-listings' && <AllListingsPanel />}
+                        {activeTab === 'listings' && <PendingListingsPanel />}
+                        {activeTab === 'guide-approvals' && <GuideApprovalPanel />}
+                        {activeTab === 'reviews' && <PendingReviewsPanel />}
+                        {activeTab === 'requests' && <UserRequestsPanel />}
+                        {activeTab === 'credits' && <CreditManagementPanel />}
+                        {activeTab === 'ledger' && <LedgerPanel />}
+                        {activeTab === 'ban' && <BanPanel />}
+                        {activeTab === 'contact-messages' && <AdminMessagesPanel />}
+                        {activeTab === 'messages' && (
+                            <div className="text-center py-12">
+                                <MessageSquare className="w-12 h-12 text-gray-700 mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-gray-300">Mesaj Moderasyonu Yapım Aşamasında</h3>
+                                <p className="text-gray-500 mt-2">Bu özellik P3 aşamasında eklenecektir.</p>
+                            </div>
+                        )}
+                        {activeTab === 'audit' && <AuditLogPanel />}
+                        {activeTab === 'newsletter' && <NewsletterPanel />}
+                        {activeTab === 'chatbot' && <ChatbotAdminPanel />}
+                        {activeTab === 'tests' && <TestManagementPanel />}
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+}
