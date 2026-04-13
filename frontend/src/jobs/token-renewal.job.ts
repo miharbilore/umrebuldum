@@ -1,9 +1,9 @@
-// ─── Token Renewal Job ──────────────────────────────────────────────────
+﻿// â”€â”€â”€ Token Renewal Job â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Monthly subscription token renewal.
 // Runs on the 1st of each month at 03:00 Istanbul time.
 
 import cron from "node-cron";
-import { processMonthlyRenewal } from "@/src/modules/tokens/application/renewal.usecase";
+import { processMonthlyRenewal } from "@/modules/tokens/application/renewal.usecase";
 
 let isRunning = false;
 

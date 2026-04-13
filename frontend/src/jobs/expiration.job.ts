@@ -1,10 +1,10 @@
-// ─── Expiration Job ─────────────────────────────────────────────────────
+﻿// â”€â”€â”€ Expiration Job â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Scheduled job: expires listings, demands, offers, and featured badges.
 // Wraps expiration-service with event emission.
 
 import cron from "node-cron";
 import { runExpiration } from "@/lib/expiration-service";
-import { EventBus } from "@/src/core/events/event-bus";
+import { EventBus } from "@/core/events/event-bus";
 
 let isRunning = false;
 

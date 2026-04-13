@@ -1,4 +1,4 @@
-// ─── Sybil Detector ─────────────────────────────────────────────────────
+﻿// â”€â”€â”€ Sybil Detector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Detects multi-account abuse via device and IP correlation.
 // Designed to run as a batch job (daily), not real-time.
 
@@ -18,7 +18,7 @@ export interface SybilCluster {
 export async function detectSybilClusters(): Promise<SybilCluster[]> {
     const clusters: Map<string, SybilCluster> = new Map();
 
-    // ── Device-based clustering ─────────────────────────────────────
+    // â”€â”€ Device-based clustering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Find fingerprints shared by multiple users
     const sharedDevices = await prisma.$queryRaw<
         { fingerprint: string; userIds: string }[]
@@ -41,7 +41,7 @@ export async function detectSybilClusters(): Promise<SybilCluster[]> {
         });
     }
 
-    // ── IP-based clustering ─────────────────────────────────────────
+    // â”€â”€ IP-based clustering â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const sharedIPs = await prisma.$queryRaw<
         { ipAddress: string; userIds: string }[]
     >`
@@ -76,7 +76,7 @@ export async function detectSybilClusters(): Promise<SybilCluster[]> {
         }
     }
 
-    // ── Persist clusters as risk events ──────────────────────────────
+    // â”€â”€ Persist clusters as risk events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const result = [...clusters.values()].filter(c => c.userIds.length > 1);
 
     for (const cluster of result) {

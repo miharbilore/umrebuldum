@@ -1,4 +1,4 @@
-// ─── Review Concentration Defense ───────────────────────────────────────
+﻿// â”€â”€â”€ Review Concentration Defense â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Detects single-target reviewer networks (Sybil review farms).
 // Lightweight: uses aggregation on existing reviews table, no graph DB.
 //
@@ -7,14 +7,14 @@
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Concentration Scoring ──────────────────────────────────────────────
+// â”€â”€â”€ Concentration Scoring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface ConcentrationResult {
     guideId: string;
     totalReviewers: number;
     singleTargetCount: number;     // Reviewers who only reviewed THIS guide
     concentrationRatio: number;     // singleTargetCount / totalReviewers
-    penalty: number;               // 0.0 – 0.60 ranking quality penalty
+    penalty: number;               // 0.0 â€“ 0.60 ranking quality penalty
     flagged: boolean;
 }
 
@@ -108,7 +108,7 @@ export async function computeReviewerConcentration(
     };
 }
 
-// ─── Review Weight Decay ────────────────────────────────────────────────
+// â”€â”€â”€ Review Weight Decay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Compute the weight of a review based on reviewer credibility.
@@ -138,21 +138,21 @@ export async function computeReviewWeight(
         ? (Date.now() - reviewer.createdAt.getTime()) / 86_400_000
         : 0;
 
-    // Single-target + new account → 20% weight
+    // Single-target + new account â†’ 20% weight
     if (otherGuideCount.length === 0 && accountAgeDays < 60) {
         return 0.2;
     }
 
-    // Single-target + established account → 50% weight (loyal customer)
+    // Single-target + established account â†’ 50% weight (loyal customer)
     if (otherGuideCount.length === 0) {
         return 0.5;
     }
 
-    // Multi-guide reviewer → full weight
+    // Multi-guide reviewer â†’ full weight
     return 1.0;
 }
 
-// ─── Batch Job: All Guides ──────────────────────────────────────────────
+// â”€â”€â”€ Batch Job: All Guides â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Run concentration analysis for all guides with >10 reviews.

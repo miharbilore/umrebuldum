@@ -1,5 +1,5 @@
 // Prisma Schema for UmreBuldum Marketplace
-// MySQL provider ÔÇö local development
+// Production-Ready Clean Version
 
 generator client {
   provider = "prisma-client-js"
@@ -10,32 +10,76 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ÔöÇÔöÇÔöÇ NextAuth Required Models ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ─── ENUMS (Single Source of Truth) ─────────
+enum PackageTier {
+  FREEMIUM
+  PREMIUM
+  PLUS
+  PRO
+  BUSINESS
+  BUSINESS_PLUS
+}
+
+enum UserRole {
+  USER
+  GUIDE
+  ORGANIZATION
+  ADMIN
+  BANNED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYTR
+  IYZICO
+}
+
+enum LedgerEntryType {
+  PURCHASE
+  CONSUME
+  REFUND
+  ADJUSTMENT
+}
+
+// ─── CORE MODELS ─────────────────────────────────────────────
 
 model User {
-  id                 String    @id @default(cuid())
-  name               String?
-  email              String?   @unique
-  emailVerified      DateTime?
-  image              String?
-  passwordHash       String?
-  role               String? // "USER" | "GUIDE" | "ORGANIZATION" | "ADMIN" | "BANNED"
-  previousRole       String? // Stored on ban for unban restoration
-  phone              String?
-  verificationCode   String?
-  verificationExpiry DateTime?
-  isVerified         Boolean   @default(false)
-  contactConsent     Boolean   @default(false)
-  twoFactorSecret    String?
-  isTwoFactorEnabled Boolean   @default(false)
-  twoFactorRecoveryCodes Json? // JSON array of hashed one-time backup codes
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  name                   String?
+  email                  String?   @unique
+  emailVerified          DateTime?
+  image                  String?
+  passwordHash           String?
+  role                   UserRole  @default(USER)
+  previousRole           UserRole?
+  phone                  String?   @unique
+  verificationCode       String?
+  verificationExpiry     DateTime?
+  isVerified             Boolean   @default(false)
+  isPhoneVerified        Boolean   @default(false)
+  contactConsent         Boolean   @default(false)
+  twoFactorSecret        String?
+  isTwoFactorEnabled     Boolean   @default(false)
+  twoFactorRecoveryCodes Json?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   accounts           Account[]
   sessions           Session[]
   guideProfile       GuideProfile?
-  creditTransactions CreditTransaction[]
   stripeTransactions Transaction[]
 
   // Chat Relations
@@ -45,24 +89,26 @@ model User {
   offers             Offer[]
 
   // --- Token Account (unified balance) ---
-  tokenBalance       Int       @default(0) @map("availableBalance")
-  // lockedBalance removed — was unused
-  packageType        String    @default("FREEMIUM")
-  packageExpiry      DateTime?
-  lastPlanChangeAt   DateTime? // Cooldown enforcement
-  planFreezeUntil    DateTime? // "Paket dondurma" freeze
-  isIdentityVerified Boolean   @default(false)
-  isApproved         Boolean   @default(false)
+  tokenBalance     Int         @default(0) @map("availableBalance")
+  packageType      PackageTier @default(FREEMIUM)
+  packageExpiry    DateTime?
+  lastPlanChangeAt DateTime?
+  planFreezeUntil  DateTime?
+
+  // --- SSOT Identity & Profile ---
+  isIdentityVerified Boolean @default(false)
+  isApproved         Boolean @default(false)
   fullName           String?
-  city               String?
-  bio                String?   @db.Text
+  city               String? @default("İstanbul")
+  bio                String? @db.Text
   photo              String?
-  trustScore         Int       @default(50) // Unified 0-100 integer scale
-  trustScoreVersion  Int       @default(0) // CAS version for atomic updates
-  completedTrips     Int       @default(0)
-  avgResponseHours   Float     @default(24.0) // SLA: computed via EMA
-  isMuted            Boolean   @default(false)
-  mutedUntil         DateTime?
+
+  trustScore        Int       @default(50)
+  trustScoreVersion Int       @default(0)
+  completedTrips    Int       @default(0)
+  avgResponseHours  Float     @default(24.0)
+  isMuted           Boolean   @default(false)
+  mutedUntil        DateTime?
 
   tokenTransactions    TokenTransaction[]
   activeBoosts         ActiveBoost[]
@@ -92,8 +138,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -104,57 +149,29 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-// ÔöÇÔöÇÔöÇ Business Models ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
-
 model GuideProfile {
-  id                 String    @id @default(cuid())
-  userId             String    @unique
-  fullName           String
-  phone              String    @default("")
-  city               String    @default("─░stanbul")
-  bio                String?   @db.Text
-  photo              String?
-  isIdentityVerified Boolean   @default(false)
-  quotaTarget        Int       @default(100)
-  currentCount       Int       @default(0)
-  isApproved         Boolean   @default(false)
-  credits            Int       @default(0)
-  // trustScore DEPRECATED — use User.trustScore (single source of truth)
-  trustScore         Int       @default(50) @map("trustScore_legacy")
-  
-  // ─── Ratings & Reviews Caching ─────────────────────────────────────
-  averageRating      Float     @default(0)
-  reviewCount        Int       @default(0)
+  id     String @id @default(cuid())
+  userId String @unique
 
-  completedTrips     Int       @default(0)
-  package            String    @default("FREEMIUM") // "FREEMIUM" | "PREMIUM" | "PLUS" | "PRO"
-  packageExpiry      DateTime?
-  tokens             Int       @default(0)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  quotaTarget  Int @default(100)
+  currentCount Int @default(0)
+
+  averageRating Decimal @default(0.0) @db.Decimal(3, 2)
+  reviewCount   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   listings GuideListing[]
 
   @@map("guide_profiles")
 }
-
-// ÔöÇÔöÇÔöÇ Reference Data Models ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 model DepartureCity {
   id       String         @id @default(cuid())
@@ -165,8 +182,6 @@ model DepartureCity {
 
   @@map("departure_cities")
 }
-
-// ─── Spotlight ─────────────────────────────────────────────────────────
 
 model Airline {
   id                String         @id @default(cuid())
@@ -182,47 +197,42 @@ model GuideListing {
   guideId     String
   title       String
   description String @db.Text
-  city        String // Target city in SA
+  city        String
 
   departureCityId String?
   departureCity   DepartureCity? @relation(fields: [departureCityId], references: [id])
 
-  // Legacy string field (keeping for safety during migration, but should be deprecated)
-  departureCityOld String? @map("departureCity")
-
   meetingCity   String?
-  extraServices Json    @default("[]") // String[]
+  extraServices Json     @default("[]")
   hotelName     String?
+  airlineId     String?
+  airline       Airline? @relation(fields: [airlineId], references: [id])
 
-  airlineId String?
-  airline   Airline? @relation(fields: [airlineId], references: [id])
+  // Pricing fields (Converted to Decimal for safe monetary math)
+  pricingDouble   Decimal @default(0) @db.Decimal(10, 2)
+  pricingTriple   Decimal @default(0) @db.Decimal(10, 2)
+  pricingQuad     Decimal @default(0) @db.Decimal(10, 2)
+  pricingCurrency String  @default("SAR")
 
-  // Legacy string field
-  airlineOld       String?   @map("airline")
-  // Pricing fields (flattened from the Pricing object)
-  pricingDouble    Float     @default(0)
-  pricingTriple    Float     @default(0)
-  pricingQuad      Float     @default(0)
-  pricingCurrency  String    @default("SAR")
-  price            Float     @default(0) // Legacy backward-compat lowest price
   quota            Int       @default(30)
   filled           Int       @default(0)
   active           Boolean   @default(true)
-  deletedAt        DateTime? // Soft-delete for guides
+  deletedAt        DateTime?
   isFeatured       Boolean   @default(false)
   startDate        DateTime
   departureDateEnd DateTime?
   endDate          DateTime
   returnDateEnd    DateTime?
   totalDays        Int       @default(10)
-  approvalStatus   String    @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
-  rejectionReason  String?   @db.Text
+
+  approvalStatus   ApprovalStatus @default(PENDING)
+  rejectionReason  String?        @db.Text
   urgencyTag       String?
-  legalConsent     Boolean   @default(false)
+  legalConsent     Boolean        @default(false)
   consentTimestamp DateTime?
   image            String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   guide             GuideProfile         @relation(fields: [guideId], references: [userId], onDelete: Cascade)
   tourDays          TourDay[]
@@ -234,8 +244,8 @@ model GuideListing {
   @@index([guideId])
   @@index([approvalStatus, active])
   @@index([departureCityId])
-  @@index([price])
   @@index([startDate, endDate])
+  @@index([deletedAt]) // Added index for soft deletes
   @@map("guide_listings")
 }
 
@@ -243,7 +253,7 @@ model TourDay {
   id          String @id @default(cuid())
   listingId   String
   day         Int
-  city        String // "Mekke" | "Medine" | "Cidde" | "Di─şer"
+  city        String
   title       String @default("")
   description String @db.Text
 
@@ -253,40 +263,23 @@ model TourDay {
   @@map("tour_days")
 }
 
-// ─── Contact Messages ───────────────────────────────────────────────────
-
-model ContactMessage {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  phone     String?
-  message   String   @db.Text
-  status    String   @default("NEW") // "NEW" | "READ" | "REPLIED" | "ARCHIVED"
-  createdAt DateTime @default(now())
-
-  @@index([status])
-  @@index([createdAt])
-  @@map("contact_messages")
-}
-
 model UmrahRequest {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   userEmail     String
   departureCity String
   peopleCount   Int
   dateRange     String
-  roomType      String  @default("4-kisilik") // "2-kisilik" | "3-kisilik" | "4-kisilik"
-  budget        Float?
-  note          String? @db.Text
+  roomType      String   @default("4-kisilik")
+  budget        Decimal? @db.Decimal(10, 2)
+  note          String?  @db.Text
 
-  // Contact Preferences
   contactViaEmail Boolean @default(false)
   contactViaPhone Boolean @default(false)
   contactViaChat  Boolean @default(true)
 
   createdAt DateTime  @default(now())
-  status    String    @default("open") // "open" | "closed" | "deleted"
-  deletedAt DateTime? // Soft-delete timestamp
+  status    String    @default("open")
+  deletedAt DateTime?
 
   interests     RequestInterest[]
   favorites     RequestFavorite[]
@@ -298,19 +291,16 @@ model UmrahRequest {
   @@index([userEmail])
   @@index([status])
   @@index([departureCity])
-  @@index([budget])
   @@map("umrah_requests")
 }
-
-// ─── Lead Distribution & Routing ──────────────────────────────────────────
 
 model LeadRoutingLog {
   id             String   @id @default(cuid())
   requestId      String   @unique
   currentWave    Int      @default(1)
-  status         String   @default("ROUTING") // "ROUTING", "SATISFIED" (5 offers hit), "EXPIRED"
+  status         String   @default("ROUTING")
   offersReceived Int      @default(0)
-  dispatchedTo   Json     @default("[]") // JSON Array of Guide IDs notified
+  dispatchedTo   Json     @default("[]")
   nextWaveAt     DateTime
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -339,16 +329,16 @@ model Offer {
   id        String   @id @default(cuid())
   guideId   String
   requestId String
-  price     Float
+  price     Decimal  @db.Decimal(10, 2)
   currency  String   @default("SAR")
   message   String?  @db.Text
-  status    String   @default("pending") // "pending" | "accepted" | "rejected" | "expired"
+  status    String   @default("pending")
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  guide     User         @relation(fields: [guideId], references: [id], onDelete: Cascade)
-  request   UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  guide   User         @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  request UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@unique([guideId, requestId])
   @@index([guideId])
@@ -360,7 +350,7 @@ model Offer {
 model RequestFavorite {
   id        String   @id @default(cuid())
   requestId String
-  userId    String // The guide/org who favorited
+  userId    String
   createdAt DateTime @default(now())
 
   request UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
@@ -377,7 +367,6 @@ model Conversation {
   createdAt     DateTime @default(now())
   lastMessageAt DateTime @default(now())
 
-  // Relations
   request  UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
   guide    User         @relation("GuideConversations", fields: [guideId], references: [id], onDelete: Cascade)
   user     User         @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
@@ -393,7 +382,7 @@ model Message {
   id             String   @id @default(cuid())
   conversationId String
   senderId       String
-  role           String // "USER" | "GUIDE" | "ORGANIZATION" | "ADMIN"
+  role           UserRole
   body           String   @db.Text
   blocked        Boolean  @default(false)
   createdAt      DateTime @default(now())
@@ -404,6 +393,7 @@ model Message {
 
   @@index([conversationId])
   @@index([senderId])
+  @@index([createdAt]) // Added for performance
   @@map("messages")
 }
 
@@ -420,47 +410,47 @@ model ModerationLog {
 }
 
 model CreditPackage {
-  id           String @id @default(cuid())
-  name         String
-  slug         String @default("")       // base tier slug: FREEMIUM, PREMIUM, PLUS, PRO, BUSINESS, BUSINESS_PLUS
-  credits      Int
-  priceTRY     Float
-  monthlyPrice Float  @default(0)        // aylık baz fiyat (indirim hesabı için)
-  billingPeriod Int   @default(1)        // 1, 3, veya 12 ay
-  roleTarget   String @default("GUIDE")  // "GUIDE" veya "ORGANIZATION"
-  sortOrder    Int    @default(0)
-  features     Json   @default("{}")
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @default("FREEMIUM")
+  credits       Int
+  priceTRY      Decimal  @db.Decimal(10, 2)
+  monthlyPrice  Decimal  @default(0) @db.Decimal(10, 2)
+  billingPeriod Int      @default(1)
+  roleTarget    UserRole @default(GUIDE)
+  sortOrder     Int      @default(0)
+  features      Json     @default("{}")
 
   @@unique([slug, billingPeriod, roleTarget])
   @@map("credit_packages")
 }
 
 model Coupon {
-  id              String    @id @default(cuid())
-  code            String    @unique
+  id              String   @id @default(cuid())
+  code            String   @unique
   discountPercent Int
-  maxUses         Int       @default(100)
-  usedCount       Int       @default(0)
+  maxUses         Int      @default(100)
+  usedCount       Int      @default(0)
   expiresAt       DateTime
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
 
   @@index([code])
   @@map("coupons")
 }
 
 model Transaction {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   userId      String
-  role        String
+  role        UserRole
   credits     Int
-  amountTRY   Float
-  provider    String   @default("stripe")  // "stripe" | "paytr"
-  status      String   @default("pending") // "pending" | "completed" | "failed" | "refunded"
-  sessionId   String?  // Stripe Session ID or PayTR merchant_oid
-  providerRef String?  // PayTR merchant_oid or Stripe payment_intent
-  metadata    Json?    // Provider-specific extra data
-  createdAt   DateTime @default(now())
+  amountTRY   Decimal           @db.Decimal(10, 2)
+  provider    PaymentProvider   @default(IYZICO)
+  status      TransactionStatus @default(PENDING)
+  sessionId   String?
+  providerRef String?
+  metadata    Json?
+  createdAt   DateTime          @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -470,20 +460,18 @@ model Transaction {
   @@map("transactions")
 }
 
-// ─── Saved Cards (Tokenized — no raw card data stored) ──────────────────
-
 model SavedCard {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   userId      String
-  provider    String   // "stripe" | "paytr"
-  cardToken   String   // Stripe: paymentMethodId, PayTR: ctoken
-  userToken   String?  // PayTR: utoken (user-level token)
-  last4       String   // Last 4 digits: "4242"
-  brand       String   // "visa" | "mastercard" | "troy" | "amex"
+  provider    PaymentProvider
+  cardToken   String
+  userToken   String?
+  last4       String
+  brand       String
   expiryMonth Int
   expiryYear  Int
-  isDefault   Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  isDefault   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -492,103 +480,43 @@ model SavedCard {
   @@map("saved_cards")
 }
 
-// ÔöÇÔöÇÔöÇ Credit Ledger (Source of Truth) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
-
-model CreditTransaction {
-  id             String   @id @default(cuid())
-  userId         String
-  amount         Int // positive = purchase/refund/admin-grant, negative = spend
-  type           String // "purchase" | "spend" | "refund" | "admin"
-  reason         String   @db.Text
-  relatedId      String? // listingId, requestId, stripeSessionId, etc.
-  idempotencyKey String?  @unique
-  createdAt      DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([type])
-  @@map("credit_transactions")
-}
-
-// ÔöÇÔöÇÔöÇ Admin Audit Log (Mandatory) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
-
-model AdminAuditLog {
-  id        String   @id @default(cuid())
-  adminId   String
-  action    String // "approve_listing" | "reject_listing" | "adjust_credits" | "ban_user" | "delete_request"
-  targetId  String
-  reason    String   @db.Text
-  metadata  Json?
-  createdAt DateTime @default(now())
-
-  @@index([adminId])
-  @@index([targetId])
-  @@map("admin_audit_logs")
-}
-
-// ─── Chat Moderation ────────────────────────────────────────────────────
-
-model ChatMuteLog {
-  id         String    @id @default(cuid())
-  adminId    String
-  userId     String
-  muted      Boolean
-  mutedUntil DateTime?
-  reason     String    @db.Text
-  createdAt  DateTime  @default(now())
-
-  @@index([userId])
-  @@index([adminId])
-  @@map("chat_mute_logs")
-}
-
-// ─── Token Economy (Ledger v2) ───────────────────────────────────────────
-
-enum LedgerEntryType {
-  PURCHASE
-  CONSUME
-  REFUND
-  ADJUSTMENT
-}
+// ÔöÇÔöÇÔöÇ Token Economy (Single Ledger) ÔöÇÔöÇÔöÇ
 
 model TokenTransaction {
   id              String          @id @default(cuid())
-  userId          String?         // Links to real user if applicable
-  accountId       String          @default("LEGACY_MIGRATION") // e.g. "USR_xxx" or "SYSTEM_BURN" or "SYSTEM_TREASURY"
-  counterpartyId  String          @default("LEGACY_MIGRATION") // The other side of this double-entry leg
+  userId          String?
+  accountId       String          @default("SYSTEM")
+  counterpartyId  String          @default("SYSTEM")
   entryType       LedgerEntryType
-  amount          Int             // Negative for CONSUME/OUT, Positive for PURCHASE/IN
-  referenceId     String?         // demandId, listingId, stripeSessionId
-  idempotencyKey  String          @unique
+  amount          Int
+  referenceId     String?
+  idempotencyKey  String
   adminId         String?
   reasonCode      String?
-  expiresAt       DateTime?       // Set for purchased/promo tokens.
-  remainingAmount Int?            // Tracks partially consumed batches.
+  expiresAt       DateTime?
+  remainingAmount Int?
   createdAt       DateTime        @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([idempotencyKey, userId]) // Fixed idempotency risk
   @@index([accountId])
   @@index([userId, createdAt])
-  @@index([idempotencyKey])
   @@map("token_ledger_entries")
 }
-
-// ─── Token Auto-Replenishment ───────────────────────────────────────────
 
 model AutoReplenishConfig {
   id              String    @id @default(cuid())
   userId          String    @unique
-  status          String    @default("ACTIVE") // "ACTIVE" | "PAUSED" | "DISABLED" | "SUSPENDED"
-  threshold       Int       @default(20) // Trigger when balance < threshold
-  packageId       String    @default("medium") // TOKEN_PACKAGES id: small|medium|large|mega|enterprise
-  monthlyCap      Int       @default(500) // Max tokens auto-purchased per calendar month
-  monthlySpent    Int       @default(0) // Tokens auto-purchased this month
-  monthlyResetAt  DateTime  @default(now()) // Last monthly counter reset
-  cooldownMinutes Int       @default(60) // Min minutes between auto-purchases
-  lastTriggeredAt DateTime? // Last auto-purchase timestamp
-  failCount       Int       @default(0) // Consecutive payment failures
+  status          String    @default("ACTIVE")
+  threshold       Int       @default(20)
+  packageId       String    @default("medium")
+  monthlyCap      Int       @default(500)
+  monthlySpent    Int       @default(0)
+  monthlyResetAt  DateTime  @default(now())
+  cooldownMinutes Int       @default(60)
+  lastTriggeredAt DateTime?
+  failCount       Int       @default(0)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -604,31 +532,30 @@ model TokenReplenishLog {
   configId       String
   userId         String
   tokensGranted  Int
-  priceTRY       Float
+  priceTRY       Decimal  @db.Decimal(10, 2)
   packageId      String
   balanceBefore  Int
   balanceAfter   Int
-  triggerSource  String // "SPEND_EVENT" | "MANUAL_CHECK" | "CRON"
-  status         String   @default("SUCCESS") // "SUCCESS" | "FAILED" | "CAPPED" | "COOLDOWN"
+  triggerSource  String
+  status         String   @default("SUCCESS")
   failReason     String?  @db.Text
-  idempotencyKey String   @unique
+  idempotencyKey String
   createdAt      DateTime @default(now())
 
   config AutoReplenishConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
 
+  @@unique([idempotencyKey, userId])
   @@index([userId, createdAt])
   @@index([configId])
   @@map("token_replenish_logs")
 }
-
-// ─── Economic Guardrails ────────────────────────────────────────────────
 
 model ActiveBoost {
   id             String   @id @default(cuid())
   listingId      String
   userId         String
   effectivePower Float
-  boostType      String   @default("BASIC") // "BASIC" | "PREMIUM" | "ELITE"
+  boostType      String   @default("BASIC")
   expiresAt      DateTime
   createdAt      DateTime @default(now())
 
@@ -649,8 +576,6 @@ model ListingBoostCounter {
   @@map("listing_boost_counters")
 }
 
-// ─── Payment Webhooks ───────────────────────────────────────────────────
-
 model WebhookEvent {
   id          String   @id @default(cuid())
   eventId     String   @unique
@@ -664,27 +589,22 @@ model WebhookEvent {
   @@map("webhook_events")
 }
 
-// ─── Identity Badge Verification (Kimlik Onaylı) ─────────────────────────
-
 model IdentityApplication {
-  id     String @id @default(cuid())
+  id     String         @id @default(cuid())
   userId String
-  status String @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED" | "REVOKED"
+  status ApprovalStatus @default(PENDING)
 
-  // ── Documents ──────────────────────────────────────────────
-  idDocumentUrl  String  @db.Text // Kimlik fotoğrafı URL
-  certificateUrl String? @db.Text // Optional supporting doc
-  contactEmail   String // İletişim e-postası
-  note           String? @db.Text // Başvuru notu
+  idDocumentUrl  String  @db.Text
+  certificateUrl String? @db.Text
+  contactEmail   String
+  note           String? @db.Text
 
-  // ── Admin Review ───────────────────────────────────────────
-  reviewedBy      String? // Admin userId
+  reviewedBy      String?
   reviewedAt      DateTime?
   rejectionReason String?   @db.Text
   revokedReason   String?   @db.Text
 
-  // ── Package Snapshot ───────────────────────────────────────
-  packageAtApply String // Başvuru anındaki paket
+  packageAtApply String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -692,12 +612,10 @@ model IdentityApplication {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([status]) // Admin: "Bekleyen başvurular"
-  @@index([status, createdAt]) // Admin: sıralı liste
+  @@index([status])
+  @@index([status, createdAt])
   @@map("identity_applications")
 }
-
-// ─── Reviews ────────────────────────────────────────────────────────────
 
 model Review {
   id             String @id @default(cuid())
@@ -711,24 +629,23 @@ model Review {
   ratingTimeManagement Int
   overallRating        Decimal @db.Decimal(2, 1)
 
-  positiveTags Json    @default("[]")
-  negativeTags Json    @default("[]")
-  comment      String? @db.VarChar(500)
-  status       String  @default("PENDING") // "PENDING" | "APPROVED" | "REJECTED"
-  isVerified   Boolean @default(true)
+  positiveTags Json           @default("[]")
+  negativeTags Json           @default("[]")
+  comment      String?        @db.VarChar(500)
+  status       ApprovalStatus @default(PENDING)
+  isVerified   Boolean        @default(true)
 
   ipHash        String?
   userAgentHash String?
+  createdAt     DateTime     @default(now())
+  approvedAt    DateTime?
+  deletedAt     DateTime?
+  guide         User         @relation("GuideReviews", fields: [guideId], references: [id], onDelete: Cascade)
+  reviewer      User         @relation("UserReviews", fields: [reviewerUserId], references: [id], onDelete: Cascade)
+  request       UmrahRequest @relation("DemandReviews", fields: [requestId], references: [id], onDelete: Cascade)
 
-  createdAt  DateTime  @default(now())
-  approvedAt DateTime?
-  deletedAt  DateTime?
-
-  guide    User         @relation("GuideReviews", fields: [guideId], references: [id], onDelete: Cascade)
-  reviewer User         @relation("UserReviews", fields: [reviewerUserId], references: [id], onDelete: Cascade)
-  request  UmrahRequest @relation("DemandReviews", fields: [requestId], references: [id], onDelete: Cascade)
-
-  @@unique([requestId, reviewerUserId])
+  // Tied to IP Hash + Device to prevent spam
+  @@unique([requestId, reviewerUserId, ipHash])
   @@index([guideId])
   @@index([reviewerUserId])
   @@index([requestId])
@@ -737,22 +654,20 @@ model Review {
   @@map("reviews")
 }
 
-// ─── Fraud Detection & Trust System ─────────────────────────────────────
-
 model RiskScore {
   id                String    @id @default(cuid())
   userId            String    @unique
-  urs               Float     @default(0) // User Risk Score (0-100)
-  tier              String    @default("GREEN") // GREEN | YELLOW | ORANGE | RED | BLACK
+  urs               Float     @default(0)
+  tier              String    @default("GREEN")
   behaviorScore     Float     @default(0)
   transactionScore  Float     @default(0)
   networkScore      Float     @default(0)
   historyScore      Float     @default(0)
-  signals           Json? // Latest signal snapshot
-  whitelistedUntil  DateTime? // False-positive whitelist expiry
-  probationUntil    DateTime? // Probation mode expiry
-  probationBaseline Json? // Signal snapshot at probation start
-  escalationCount   Int       @default(0) // Repeat escalation cycle counter
+  signals           Json?
+  whitelistedUntil  DateTime?
+  probationUntil    DateTime?
+  probationBaseline Json?
+  escalationCount   Int       @default(0)
   updatedAt         DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -763,8 +678,8 @@ model RiskScore {
 model RiskEvent {
   id        String   @id @default(cuid())
   userId    String
-  eventType String // VELOCITY_BREACH | SYBIL_DETECTED | REVIEW_FLAGGED | TIER_CHANGE | etc.
-  severity  String // LOW | MEDIUM | HIGH | CRITICAL
+  eventType String
+  severity  String
   metadata  Json
   createdAt DateTime @default(now())
 
@@ -791,12 +706,12 @@ model FraudReviewTicket {
   id              String    @id @default(cuid())
   userId          String
   agencyId        String?
-  riskTier        String // Tier at time of escalation
+  riskTier        String
   ursScore        Float
-  triggerReason   String    @db.Text // Human-readable reason
-  signals         Json // Full signal snapshot
-  status          String    @default("OPEN") // OPEN | IN_REVIEW | RESOLVED
-  resolution      String? // FALSE_POSITIVE | CONFIRMED | MONITORING
+  triggerReason   String    @db.Text
+  signals         Json
+  status          String    @default("OPEN")
+  resolution      String?
   reviewerAdminId String?
   resolvedAt      DateTime?
   createdAt       DateTime  @default(now())
@@ -807,15 +722,13 @@ model FraudReviewTicket {
   @@map("fraud_review_tickets")
 }
 
-// ─── Conversion Tracking (Ranking Signals) ──────────────────────────────
-
 model ListingImpression {
   id          String   @id @default(cuid())
   listingId   String
-  userId      String? // null for anonymous
-  source      String // SEARCH | CATEGORY | HOME | DIRECT
-  position    Int // position in results when shown
-  searchQuery String? // IMPORTANT FOR FOMO: "istanbul umre turları"
+  userId      String?
+  source      String
+  position    Int
+  searchQuery String?
   createdAt   DateTime @default(now())
 
   listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -829,9 +742,9 @@ model ListingClick {
   id           String   @id @default(cuid())
   listingId    String
   userId       String?
-  source       String // SEARCH | CATEGORY | HOME | DIRECT
-  impressionId String? // Link back to impression for funnel
-  dwellTimeMs  Int? // Time spent on listing page (ms)
+  source       String
+  impressionId String?
+  dwellTimeMs  Int?
   createdAt    DateTime @default(now())
 
   listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
@@ -841,13 +754,11 @@ model ListingClick {
   @@map("listing_clicks")
 }
 
-// ─── Velocity Counters (Persistent Rate Limiting) ───────────────────────
-
 model VelocityCounter {
   id        String   @id @default(cuid())
   userId    String
-  action    String // "OFFER_SEND" | "BOOST" | "REVIEW_SUBMIT" | etc.
-  windowKey String // Hourly bucket: "2026-02-28T15"
+  action    String
+  windowKey String
   count     Int      @default(1)
   createdAt DateTime @default(now())
 
@@ -857,17 +768,15 @@ model VelocityCounter {
   @@map("velocity_counters")
 }
 
-// ─── Cancellation Records ───────────────────────────────────────────────
-
 model CancellationRecord {
   id                  String   @id @default(cuid())
-  userId              String // Who cancelled
-  counterpartyId      String // Affected party
+  userId              String
+  counterpartyId      String
   requestId           String?
   listingId           String?
-  cancelledBy         String // "AGENCY" | "USER" | "SYSTEM"
+  cancelledBy         String
   reason              String?  @db.Text
-  severity            String // "FREE" | "SOFT" | "MODERATE" | "SEVERE" | "CRITICAL" | "NO_SHOW"
+  severity            String
   daysBeforeDeparture Int?
   trustPenalty        Int      @default(0)
   isForceMajeure      Boolean  @default(false)
@@ -878,51 +787,46 @@ model CancellationRecord {
   @@map("cancellation_records")
 }
 
-// ─── SLA Metrics ────────────────────────────────────────────────────────
-
 model SLAMetric {
   id         String   @id @default(cuid())
   userId     String
-  metricType String // "FIRST_RESPONSE" | "OFFER_RESPONSE" | "COMPLAINT_RESPONSE"
-  valueMs    Int // Response time in milliseconds
+  metricType String
+  valueMs    Int
   createdAt  DateTime @default(now())
 
   @@index([userId, metricType, createdAt])
   @@map("sla_metrics")
 }
 
-// ─── Dynamic Token Pricing ──────────────────────────────────────────────
-
 model DynamicPriceEvent {
   id              String   @id @default(cuid())
   userId          String
-  action          String // "BOOST" | "OFFER_SEND" | "SPOTLIGHT"
-  baseCost        Int // Original token cost
-  finalCost       Int // After multiplier
-  multiplier      Float // 1.0–2.5
-  surgeReason     String // "PEAK_HOUR" | "HIGH_DEMAND" | "SEASONAL" | "NONE"
-  discountApplied String? // "LOYALTY" | "BUNDLE" | "OFF_PEAK" | null
-  idempotencyKey  String   @unique
+  action          String
+  baseCost        Int
+  finalCost       Int
+  multiplier      Float
+  surgeReason     String
+  discountApplied String?
+  idempotencyKey  String
   createdAt       DateTime @default(now())
 
+  @@unique([idempotencyKey, userId])
   @@index([userId, createdAt])
   @@index([action, createdAt])
   @@map("dynamic_price_events")
 }
 
-// ─── Enterprise Credit Lines ────────────────────────────────────────────
-
 model EnterpriseCreditLine {
   id                   String   @id @default(cuid())
   userId               String   @unique
-  creditLimit          Int      @default(500) // Max tokens drawable
-  usedCredit           Int      @default(0) // Currently drawn
-  billingCycleDays     Int      @default(30) // Repayment window
-  interestRate         Float    @default(0.0) // 0% for now (feature flag)
-  status               String   @default("ACTIVE") // "ACTIVE" | "FROZEN" | "DEFAULTED" | "CLOSED"
-  nextBillingAt        DateTime // When auto-charge fires
-  gracePeriodDays      Int      @default(7) // Days after billing before DEFAULTED
-  consecutiveLateCount Int      @default(0) // Tracks reliability
+  creditLimit          Int      @default(500)
+  usedCredit           Int      @default(0)
+  billingCycleDays     Int      @default(30)
+  interestRate         Float    @default(0.0)
+  status               String   @default("ACTIVE")
+  nextBillingAt        DateTime
+  gracePeriodDays      Int      @default(7)
+  consecutiveLateCount Int      @default(0)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
@@ -938,33 +842,32 @@ model CreditLineTransaction {
   id             String   @id @default(cuid())
   creditLineId   String
   userId         String
-  type           String // "DRAW" | "REPAY" | "AUTO_CHARGE" | "WRITEOFF"
-  amount         Int // Positive for both (direction from type)
+  type           String
+  amount         Int
   balanceBefore  Int
   balanceAfter   Int
   note           String?  @db.Text
-  idempotencyKey String   @unique
+  idempotencyKey String
   createdAt      DateTime @default(now())
 
   creditLine EnterpriseCreditLine @relation(fields: [creditLineId], references: [id], onDelete: Cascade)
 
+  @@unique([idempotencyKey, userId])
   @@index([creditLineId, createdAt])
   @@index([userId])
   @@map("credit_line_transactions")
 }
 
-// ─── Performance-Based Tiers ────────────────────────────────────────────
-
 model PerformanceTier {
   id                String    @id @default(cuid())
   userId            String    @unique
-  currentTier       String    @default("BRONZE") // "BRONZE" | "SILVER" | "GOLD" | "PLATINUM"
-  monthlyRevenue30d Float     @default(0) // Rolling 30-day GMV
-  conversionRate30d Float     @default(0) // offer→booking %
-  responseScore30d  Float     @default(0) // SLA adherence
-  compositeScore    Float     @default(0) // Weighted aggregate
-  discountPercent   Float     @default(0) // Token discount earned
-  bonusTokens       Int       @default(0) // Extra monthly tokens
+  currentTier       String    @default("BRONZE")
+  monthlyRevenue30d Float     @default(0)
+  conversionRate30d Float     @default(0)
+  responseScore30d  Float     @default(0)
+  compositeScore    Float     @default(0)
+  discountPercent   Float     @default(0)
+  bonusTokens       Int       @default(0)
   lastEvaluatedAt   DateTime  @default(now())
   tierChangedAt     DateTime?
   createdAt         DateTime  @default(now())
@@ -977,24 +880,23 @@ model PerformanceTier {
   @@map("performance_tiers")
 }
 
-// ─── Spotlight Placements ───────────────────────────────────────────────
-
 model SpotlightPlacement {
   id             String   @id @default(cuid())
   listingId      String
   userId         String
-  city           String // Target city ("ALL" for homepage)
-  slotIndex      Int // 0, 1, or 2 (3 slots per city)
+  city           String
+  slotIndex      Int
   startsAt       DateTime
   expiresAt      DateTime
-  rotationGroup  String // Hourly bucket: "2026-02-28T15"
+  rotationGroup  String
   impressions    Int      @default(0)
   clicks         Int      @default(0)
-  tokenCost      Int // Actual cost charged
-  status         String   @default("ACTIVE") // "ACTIVE" | "EXPIRED" | "CANCELLED"
-  idempotencyKey String   @unique
+  tokenCost      Int
+  status         String   @default("ACTIVE")
+  idempotencyKey String
   createdAt      DateTime @default(now())
 
+  @@unique([idempotencyKey, userId])
   @@index([city, status, startsAt])
   @@index([userId, createdAt])
   @@index([rotationGroup, city])
@@ -1002,19 +904,16 @@ model SpotlightPlacement {
   @@map("spotlight_placements")
 }
 
-// ─── Programmatic SEO ──────────────────────────────────────────────────
-
-// Represents an auto-generated or manually curated dynamic landing page
 model SeoLandingPage {
   id              String   @id @default(cuid())
-  slug            String   @unique // e.g., "istanbul-cikisli-umre-turlari"
-  pageType        String // "CITY", "SEASON", "ATTRIBUTE"
-  targetKeyword   String // "İstanbul Umre Turları"
+  slug            String   @unique
+  pageType        String
+  targetKeyword   String
   h1Title         String
   metaTitle       String
   metaDescription String
-  contentHtml     String?  @db.Text // Optional contextual text for top/bottom of page
-  searchParams    Json // The actual filters to pass to RankingEngine (e.g. { city: "İstanbul" })
+  contentHtml     String?  @db.Text
+  searchParams    Json
   isIndexed       Boolean  @default(true)
   viewCount       Int      @default(0)
   createdAt       DateTime @default(now())
@@ -1023,8 +922,6 @@ model SeoLandingPage {
   @@index([pageType])
   @@map("seo_landing_pages")
 }
-
-// ─── Newsletter & Chatbot ──────────────────────────────────────────────────
 
 model NewsletterSubscriber {
   id        String   @id @default(cuid())
@@ -1040,28 +937,42 @@ model ChatbotTemplate {
   question  String   @db.Text
   answer    String   @db.Text
   isActive  Boolean  @default(true)
-  order     Int      @default(0) // Determines ordering of pre-defined questions
+  order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("chatbot_templates")
 }
 
-// ─── Notifications ──────────────────────────────────────────────────────
-
 model Notification {
   id          String   @id @default(cuid())
   userId      String
-  type        String   @default("IN_APP") // "SMS" | "EMAIL" | "IN_APP"
+  type        String   @default("IN_APP")
   title       String
   message     String   @db.Text
   isRead      Boolean  @default(false)
-  referenceId String?  
+  referenceId String?
   createdAt   DateTime @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
   @@index([createdAt])
   @@map("notifications")
+}
+
+model TestLog {
+  id           String   @id @default(cuid())
+  scenarioName String
+  status       String   @default("PENDING")
+  errorMessage String?  @db.Text
+  testerName   String
+  duration     Int?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([status])
+  @@index([scenarioName])
+  @@index([createdAt])
+  @@map("test_logs")
 }

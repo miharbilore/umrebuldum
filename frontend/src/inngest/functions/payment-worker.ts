@@ -1,6 +1,6 @@
-import { inngest } from "@/src/inngest/client";
-import { grantToken } from "@/src/modules/tokens/application/grant-token.usecase";
-import { EventBus } from "@/src/core/events/event-bus";
+﻿import { inngest } from "@/inngest/client";
+import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
+import { EventBus } from "@/core/events/event-bus";
 
 /**
  * Payment Completion Worker
@@ -9,13 +9,7 @@ import { EventBus } from "@/src/core/events/event-bus";
  * Safely executes the double-entry accounting (grantToken) logic with automatic retries if the DB fails.
  */
 export const handlePaymentCompletion = inngest.createFunction(
-    {
-        id: "payment-completion-worker",
-        name: "Payment Completion Worker",
-        // Increase retries to ensure we never lose a successful payment
-        retries: 5,
-    },
-    { event: "event/PAYMENT_COMPLETED" },
+    { id: "payment-completion-worker", name: "Payment Completion Worker", retries: 5, triggers: [{ event: "event/PAYMENT_COMPLETED" }] },
     async ({ event, step }: { event: any, step: any }) => {
         const { transactionId, userId, amount, packageId, provider } = event.data;
 

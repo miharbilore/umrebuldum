@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '../src/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 async function runSearchTests() {
@@ -10,7 +10,10 @@ async function runSearchTests() {
         data: {
             name: "Search Test Guide",
             email: testEmail,
-            role: "GUIDE"
+            role: "GUIDE",
+            phone: "1234567890",
+            city: "Mekke",
+            packageType: "PRO"
         }
     });
 
@@ -18,11 +21,8 @@ async function runSearchTests() {
         await prisma.guideProfile.create({
             data: {
                 userId: user.id,
-                fullName: "Search Guide",
-                phone: "1234567890",
-                city: "Mekke",
-                package: "PRO",
-                isIdentityVerified: true
+                quotaTarget: 100,
+                currentCount: 0
             }
         });
 
@@ -53,7 +53,7 @@ async function runSearchTests() {
                 city: "Mekke",
                 departureCityId: ankara.id,
                 pricingCurrency: "SAR",
-                price: 500,
+                pricingQuad: 500,
                 quota: 30,
                 filled: 0,
                 active: true,
@@ -71,7 +71,7 @@ async function runSearchTests() {
                 city: "Mekke",
                 departureCityId: makkah.id,
                 pricingCurrency: "SAR",
-                price: 2500,
+                pricingQuad: 2500,
                 quota: 30,
                 filled: 0,
                 active: true,
@@ -112,9 +112,9 @@ async function runSearchTests() {
                 });
             }
 
-            // Price filtering (simulating Route logic using base price field fallback)
+            // Price filtering (simulating Route logic using pricingQuad fallback)
             if (params.minPrice) {
-                listings = listings.filter(l => l.price >= params.minPrice!);
+                listings = listings.filter(l => Number(l.pricingQuad) >= params.minPrice!);
             }
 
             return listings;

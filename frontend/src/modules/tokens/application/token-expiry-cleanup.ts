@@ -1,9 +1,9 @@
-// ─── Token Expiry Cleanup ───────────────────────────────────────────────
+﻿// â”€â”€â”€ Token Expiry Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Daily cron job: expires purchased/promo tokens past their expiresAt date.
 // Creates EXPIRY ledger entries and adjusts cached balance.
 //
 // Token Lifecycle:
-//   Subscription tokens: expiresAt = null → never expire (soft cap limits accumulation)
+//   Subscription tokens: expiresAt = null â†’ never expire (soft cap limits accumulation)
 //   Purchased tokens:    expiresAt = createdAt + 90 days
 //   Promo tokens:        expiresAt = createdAt + 30 days
 //
@@ -54,7 +54,7 @@ export async function processTokenExpiry(): Promise<ExpiryResult> {
         if (expiredBatches.length === 0) break;
 
         // Group by user for efficient balance updates
-        const userExpiries = new Map<string, { batchIds: string[]; totalAmount: number }>();
+        const userExpiries = new Map<string | null, { batchIds: string[]; totalAmount: number }>();
 
         for (const batch of expiredBatches) {
             const existing = userExpiries.get(batch.userId) || { batchIds: [], totalAmount: 0 };
@@ -85,10 +85,12 @@ export async function processTokenExpiry(): Promise<ExpiryResult> {
                     });
 
                     // 3. Update cached balance
-                    await tx.user.update({
-                        where: { id: userId },
-                        data: { tokenBalance: { decrement: totalAmount } },
-                    });
+                    if (userId) {
+                        await tx.user.update({
+                            where: { id: userId },
+                            data: { tokenBalance: { decrement: totalAmount } },
+                        });
+                    }
                 });
 
                 expired += batchIds.length;

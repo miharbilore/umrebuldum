@@ -1,4 +1,4 @@
-// ─── Advanced Monetization Engine ───────────────────────────────────────
+﻿// â”€â”€â”€ Advanced Monetization Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Four-pillar monetization layer:
 //   1. Dynamic Token Pricing (demand-based surge + loyalty discounts)
 //   2. Performance-Based Tiers (revenue-linked token discounts)
@@ -11,21 +11,21 @@
 import { prisma } from "@/lib/prisma";
 import { TOKEN_COSTS, PLAN_PRICES_TRY, PACKAGE_LIMITS } from "@/lib/package-system";
 import type { PackageType } from "@/lib/db-types";
-import { EventBus } from "@/src/core/events/event-bus";
+import { EventBus } from "@/core/events/event-bus";
 
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PILLAR 1: DYNAMIC TOKEN PRICING
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
  * Surge pricing tiers:
  *   NONE:        1.0×  (normal hours, low demand)
- *   PEAK_HOUR:   1.25× (09:00–12:00, 18:00–21:00 TR time)
+ *   PEAK_HOUR:   1.25× (09:00â€“12:00, 18:00â€“21:00 TR time)
  *   HIGH_DEMAND: 1.50× (>80% boost slots used in city within 1h)
  *   SEASONAL:    1.75× (Hajj/Umrah peak months: Dhul Hijjah, Ramadan)
  *
  * Discount tiers:
- *   OFF_PEAK:    0.80× (02:00–06:00 TR time)
+ *   OFF_PEAK:    0.80× (02:00â€“06:00 TR time)
  *   LOYALTY:     0.90× (>6 months consecutive paid subscription)
  *   BUNDLE:      0.85× (>100 tokens purchased this month)
  */
@@ -64,22 +64,22 @@ const MIN_MULTIPLIER = 0.70;
 export function calculateDynamicPrice(
     action: keyof typeof TOKEN_COSTS,
     context: {
-        hourTR: number;          // Current hour in TR timezone (0–23)
-        monthIndex: number;      // 0–11
-        cityBoostUtilization: number; // 0.0–1.0 (% of boost slots used)
+        hourTR: number;          // Current hour in TR timezone (0â€“23)
+        monthIndex: number;      // 0â€“11
+        cityBoostUtilization: number; // 0.0â€“1.0 (% of boost slots used)
         userSubscriptionMonths: number; // Consecutive paid months
         userMonthlyTokensPurchased: number; // Tokens bought this month
-        performanceDiscount: number;  // From performance tier (0.0–0.15)
+        performanceDiscount: number;  // From performance tier (0.0â€“0.15)
     },
 ): DynamicPriceResult {
     const baseCost = TOKEN_COSTS[action];
 
-    // ── 1. Determine surge ──────────────────────────────────────────
+    // â”€â”€ 1. Determine surge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let surgeReason: keyof typeof SURGE_MULTIPLIERS = "NONE";
     let surgeMultiplier = 1.0;
 
     // Seasonal check: Ramadan (~month 2-3 in Islamic calendar, approximate)
-    // and Hajj (~month 11 Dhul Hijjah). Simplified: June–August + Ramadan period.
+    // and Hajj (~month 11 Dhul Hijjah). Simplified: Juneâ€“August + Ramadan period.
     const isSeasonalPeak = [5, 6, 7, 11].includes(context.monthIndex); // Jun,Jul,Aug,Dec
     if (isSeasonalPeak) {
         surgeReason = "SEASONAL";
@@ -102,11 +102,11 @@ export function calculateDynamicPrice(
         }
     }
 
-    // ── 2. Determine discount ───────────────────────────────────────
+    // â”€â”€ 2. Determine discount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let discountApplied: keyof typeof DISCOUNT_MULTIPLIERS | null = null;
     let discountMultiplier = 1.0;
 
-    // Off-peak (02:00–06:00 TR) — strongest discount
+    // Off-peak (02:00â€“06:00 TR) â€” strongest discount
     const isOffPeak = context.hourTR >= 2 && context.hourTR <= 6;
     if (isOffPeak && surgeReason === "NONE") {
         discountApplied = "OFF_PEAK";
@@ -125,10 +125,10 @@ export function calculateDynamicPrice(
         discountMultiplier = DISCOUNT_MULTIPLIERS.BUNDLE;
     }
 
-    // ── 3. Performance tier discount (stacks with others) ───────────
+    // â”€â”€ 3. Performance tier discount (stacks with others) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const perfMultiplier = 1.0 - context.performanceDiscount;
 
-    // ── 4. Compute final multiplier with caps ───────────────────────
+    // â”€â”€ 4. Compute final multiplier with caps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let finalMultiplier = surgeMultiplier * discountMultiplier * perfMultiplier;
     finalMultiplier = Math.max(MIN_MULTIPLIER, Math.min(MAX_MULTIPLIER, finalMultiplier));
 
@@ -144,9 +144,9 @@ export function calculateDynamicPrice(
     };
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PILLAR 2: PERFORMANCE-BASED TIERS
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
  * Performance tiers: reward high-performing agencies with token discounts.
@@ -174,8 +174,8 @@ export type PerformanceTierName = keyof typeof PERFORMANCE_TIERS;
  */
 export function calculatePerformanceScore(metrics: {
     monthlyRevenue30d: number;  // GMV in TRY (pass-through bookings)
-    conversionRate30d: number;  // offer→booking ratio (0.0–1.0)
-    responseScore30d: number;   // SLA adherence (0.0–1.0)
+    conversionRate30d: number;  // offerâ†’booking ratio (0.0â€“1.0)
+    responseScore30d: number;   // SLA adherence (0.0â€“1.0)
 }): { score: number; tier: PerformanceTierName; discount: number; bonus: number } {
     // Normalize revenue: ₺0 = 0.0, ₺50K+ = 1.0 (logarithmic)
     const revNorm = Math.min(1.0, Math.log10(Math.max(metrics.monthlyRevenue30d, 1) / 1000 + 1) / Math.log10(51));
@@ -243,7 +243,7 @@ export async function evaluatePerformanceTier(userId: string): Promise<{
     const avgBookingValue = 15000; // ₺15K avg Umrah package
     const monthlyRevenue = (user?.completedTrips || 0) * avgBookingValue / 12;
 
-    // Conversion rate (offers → trips)
+    // Conversion rate (offers â†’ trips)
     const conversionRate = conversionData > 0
         ? Math.min(1.0, (user?.completedTrips || 0) / conversionData)
         : 0;
@@ -298,9 +298,9 @@ export async function evaluatePerformanceTier(userId: string): Promise<{
     return { tier: result.tier, changed, score: result.score };
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PILLAR 3: ENTERPRISE CREDIT LINES
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
  * Enterprise credit line: CORP tiers can spend tokens now, pay later.
@@ -412,7 +412,7 @@ export async function drawCredit(
 /**
  * Process billing cycle for credit line. Called by monthly cron.
  * Charges the usedCredit amount to user's payment method.
- * If payment fails → grace period. If grace expires → DEFAULTED.
+ * If payment fails â†’ grace period. If grace expires â†’ DEFAULTED.
  */
 export async function processCreditBilling(userId: string): Promise<{
     ok: boolean;
@@ -424,7 +424,7 @@ export async function processCreditBilling(userId: string): Promise<{
     });
 
     if (!creditLine || creditLine.usedCredit === 0) {
-        // No balance to charge — just reset the cycle
+        // No balance to charge â€” just reset the cycle
         if (creditLine) {
             const nextBilling = new Date();
             nextBilling.setDate(nextBilling.getDate() + creditLine.billingCycleDays);
@@ -472,9 +472,9 @@ export async function processCreditBilling(userId: string): Promise<{
         return { ok: true, charged: chargeAmount };
     }
 
-    // Payment failed — increment late count
+    // Payment failed â€” increment late count
     const newLateCount = creditLine.consecutiveLateCount + 1;
-    const isDefaulted = newLateCount >= 2; // 2 missed payments → DEFAULT
+    const isDefaulted = newLateCount >= 2; // 2 missed payments â†’ DEFAULT
 
     await prisma.enterpriseCreditLine.update({
         where: { userId },
@@ -487,25 +487,25 @@ export async function processCreditBilling(userId: string): Promise<{
     return { ok: false, charged: 0, error: isDefaulted ? "DEFAULTED" : "PAYMENT_FAILED" };
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PILLAR 4: SMART PLAN RE-BUNDLING (USAGE-ADAPTIVE SUGGESTIONS)
-// ═══════════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 /**
  * Analyze user's actual usage and suggest optimal plan.
  * Called monthly or on-demand.
  *
  * Returns:
- *   UNDER_USING → downgrade suggestion (they're paying for unused capacity)
- *   OPTIMAL     → current plan is right
- *   OVER_USING  → upgrade suggestion (they're hitting limits constantly)
+ *   UNDER_USING â†’ downgrade suggestion (they're paying for unused capacity)
+ *   OPTIMAL     â†’ current plan is right
+ *   OVER_USING  â†’ upgrade suggestion (they're hitting limits constantly)
  */
 export interface PlanFitAnalysis {
     userId: string;
     currentPlan: string;
     suggestedPlan: string;
     fitStatus: "UNDER_USING" | "OPTIMAL" | "OVER_USING";
-    utilizationScore: number;  // 0–100
+    utilizationScore: number;  // 0â€“100
     monthlySavings: number;    // Negative = they'd save by downgrading
     monthlyExtraCost: number;  // What upgrade would cost
     reasons: string[];

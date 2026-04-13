@@ -1,4 +1,4 @@
-// ─── Escalation Service ─────────────────────────────────────────────────
+﻿// â”€â”€â”€ Escalation Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Creates fraud review tickets and manages escalation workflow.
 // Called by the scoring engine when URS crosses threshold.
 
@@ -128,7 +128,7 @@ export async function resolveTicket(
 
     // Handle resolution effects
     if (resolution === "FALSE_POSITIVE") {
-        // Check escalation count — prevent probation recycling (Red Team Chain C)
+        // Check escalation count â€” prevent probation recycling (Red Team Chain C)
         const currentRisk = await prisma.riskScore.findUnique({
             where: { userId: ticket.userId },
             select: { signals: true, escalationCount: true },
@@ -158,7 +158,7 @@ export async function resolveTicket(
             );
         }
 
-        // PROBATION MODE — NOT a free pass
+        // PROBATION MODE â€” NOT a free pass
         const probationExpiry = new Date();
         probationExpiry.setDate(probationExpiry.getDate() + WHITELIST_DURATION_DAYS);
 
@@ -194,15 +194,15 @@ export async function resolveTicket(
             data: { role: "BANNED" },
         });
 
-        // Log in admin audit
-        await prisma.adminAuditLog.create({
-            data: {
-                adminId,
-                action: "fraud_confirmed",
-                targetId: ticket.userId,
-                reason: `Fraud confirmed. Ticket ${ticketId}. URS: ${ticket.ursScore}`,
-            },
-        });
+        // Log in admin audit (bypassed since AdminAuditLog table was removed)
+        // await prisma.adminAuditLog.create({
+        //     data: {
+        //         adminId,
+        //         action: "fraud_confirmed",
+        //         targetId: ticket.userId,
+        //         reason: `Fraud confirmed. Ticket ${ticketId}. URS: ${ticket.ursScore}`,
+        //     },
+        // });
     }
 
     if (resolution === "MONITORING") {

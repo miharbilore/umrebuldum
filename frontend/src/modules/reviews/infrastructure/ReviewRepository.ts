@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { Review } from "../domain/Review";
 
 export class ReviewRepository {
@@ -72,12 +72,10 @@ export class ReviewRepository {
     }
 
     public async findByRequestIdAndUserId(requestId: string, userId: string): Promise<any> {
-        return prisma.review.findUnique({
+        return prisma.review.findFirst({
             where: {
-                requestId_reviewerUserId: {
-                    requestId,
-                    reviewerUserId: userId,
-                },
+                requestId,
+                reviewerUserId: userId,
             },
         });
     }

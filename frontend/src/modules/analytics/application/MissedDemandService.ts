@@ -1,4 +1,4 @@
-// ─── Missed Demand Service (Capacity Gap Engine) ──────────────────────────
+﻿// â”€â”€â”€ Missed Demand Service (Capacity Gap Engine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Powers the "Missed Demand" widget on the FREEMIUM tier dashboard.
 // Calculates how many active leads/searches an agency missed because
 // they are limited to 1 city listing by the FREEMIUM plan.

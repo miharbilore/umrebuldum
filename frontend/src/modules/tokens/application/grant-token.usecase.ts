@@ -1,4 +1,4 @@
-// ─── Grant Token Use Case ───────────────────────────────────────────────
+﻿// â”€â”€â”€ Grant Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Handles all token credit operations: purchases, admin grants, onboarding, refunds.
 // SINGLE entry point for adding tokens to any user account.
 //
@@ -10,7 +10,7 @@
 import { prisma } from "@/lib/prisma";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { LedgerEntryType } from "@prisma/client";
-import { EventBus } from "@/src/core/events/event-bus";
+import { EventBus } from "@/core/events/event-bus";
 import { TOKEN_EXPIRY_DAYS } from "@/lib/package-system";
 
 export interface GrantTokenInput {
@@ -19,7 +19,7 @@ export interface GrantTokenInput {
     type: "PURCHASE" | "ADMIN_GRANT" | "SUBSCRIPTION" | "REFUND" | "INITIAL_BALANCE";
     reason: string;
     relatedId?: string;
-    idempotencyKey: string; // MANDATORY — no optional
+    idempotencyKey: string; // MANDATORY â€” no optional
 }
 
 export interface GrantTokenResult {
@@ -47,9 +47,9 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
     try {
         const result = await withSerializableRetry(() =>
             prisma.$transaction(async (tx) => {
-                // ── (1) Idempotency check INSIDE the transaction ──────────
+                // â”€â”€ (1) Idempotency check INSIDE the transaction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 const existing = await tx.tokenTransaction.findUnique({
-                    where: { idempotencyKey: `${input.idempotencyKey}_credit` },
+                    where: { idempotencyKey_userId: { idempotencyKey: `${input.idempotencyKey}_credit`, userId: input.userId } },
                 });
                 if (existing) {
                     const user = await tx.user.findUnique({
@@ -59,7 +59,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
                     return { newBalance: user?.tokenBalance ?? 0, alreadyProcessed: true };
                 }
 
-                // ── (2) Map type string to LedgerEntryType enum ──────────
+                // â”€â”€ (2) Map type string to LedgerEntryType enum â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 const entryTypeMap: Record<string, LedgerEntryType> = {
                     PURCHASE: LedgerEntryType.PURCHASE,
                     ADMIN_GRANT: LedgerEntryType.ADJUSTMENT,
@@ -68,7 +68,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
                     INITIAL_BALANCE: LedgerEntryType.ADJUSTMENT,
                 };
 
-                // ── (3) Calculate Expiry ──────────────────────────────────
+                // â”€â”€ (3) Calculate Expiry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 let expiresAt: Date | null = null;
                 if (input.type === "PURCHASE") {
                     expiresAt = new Date();
@@ -79,7 +79,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
                 }
                 const remainingAmount = expiresAt ? input.amount : null;
 
-                // ── (4) Create immutable double-entry ledger ───────────────
+                // â”€â”€ (4) Create immutable double-entry ledger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 const entryTypeVal = entryTypeMap[input.type] || LedgerEntryType.ADJUSTMENT;
                 
                 await tx.tokenTransaction.createMany({
@@ -109,7 +109,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
                     ]
                 });
 
-                // ── (4) Update cached balance ─────────────────────────────
+                // â”€â”€ (4) Update cached balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 const user = await tx.user.update({
                     where: { id: input.userId },
                     data: { tokenBalance: { increment: input.amount } },
@@ -135,7 +135,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
         return { ok: true, newBalance: result.newBalance, alreadyProcessed: result.alreadyProcessed };
 
     } catch (error: any) {
-        // P2002 = unique constraint on idempotencyKey — parallel race resolved
+        // P2002 = unique constraint on idempotencyKey â€” parallel race resolved
         if (error.code === "P2002") {
             const user = await prisma.user.findUnique({
                 where: { id: input.userId },

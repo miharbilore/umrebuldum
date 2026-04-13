@@ -1,16 +1,16 @@
-// ─── Spend Token Use Case ───────────────────────────────────────────────
+﻿// â”€â”€â”€ Spend Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Atomic token deduction with SERIALIZABLE isolation.
 // This is the SINGLE entry point for all token spending.
 //
 // Safety proof:
-//   1. SERIALIZABLE isolation → no phantom reads, no dirty reads
-//   2. FOR UPDATE on token_ledger_entries → row-level lock prevents
+//   1. SERIALIZABLE isolation â†’ no phantom reads, no dirty reads
+//   2. FOR UPDATE on token_ledger_entries â†’ row-level lock prevents
 //      concurrent SUM from returning stale balance
 //   3. Balance check (READ) happens BEFORE any WRITE
-//   4. Execution order: READ → READ → GUARD → WRITE → WRITE
-//      If GUARD fails, no WRITE has occurred → rollback is a no-op
-//   5. Idempotency check is INSIDE the transaction → no TOCTOU race
-//   6. P2002 on idempotencyKey is caught outside → graceful de-dup
+//   4. Execution order: READ â†’ READ â†’ GUARD â†’ WRITE â†’ WRITE
+//      If GUARD fails, no WRITE has occurred â†’ rollback is a no-op
+//   5. Idempotency check is INSIDE the transaction â†’ no TOCTOU race
+//   6. P2002 on idempotencyKey is caught outside â†’ graceful de-dup
 //   7. withSerializableRetry handles deadlock/serialization retries
 //
 // Drift-proof:
@@ -23,7 +23,7 @@ import { prisma } from "@/lib/prisma";
 import { LedgerEntryType } from "@prisma/client";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { TokenPolicy, type TokenAction } from "../domain/token-policy";
-import { EventBus } from "@/src/core/events/event-bus";
+import { EventBus } from "@/core/events/event-bus";
 import { TokenService } from "./TokenService";
 
 export interface SpendTokenInput {
@@ -31,6 +31,7 @@ export interface SpendTokenInput {
     action: TokenAction;
     relatedId?: string;
     reason: string;
+    overrideCost?: number;
 }
 
 export interface SpendTokenResult {
@@ -44,20 +45,22 @@ export interface SpendTokenResult {
  * Atomically deduct tokens for an action.
  *
  * Execution order (mathematically safe):
- *   READ  → findUnique(idempotencyKey)        — O(1) index lookup
- *   READ  → $queryRaw SUM(amount) FOR UPDATE  — locks rows, authoritative balance
- *   GUARD → balance >= cost                   — rejects if insufficient
- *   WRITE → tokenTransaction.create           — immutable ledger entry
- *   WRITE → user.update(decrement)            — cached balance sync
+ *   READ  â†’ findUnique(idempotencyKey)        â€” O(1) index lookup
+ *   READ  â†’ $queryRaw SUM(amount) FOR UPDATE  â€” locks rows, authoritative balance
+ *   GUARD â†’ balance >= cost                   â€” rejects if insufficient
+ *   WRITE â†’ tokenTransaction.create           â€” immutable ledger entry
+ *   WRITE â†’ user.update(decrement)            â€” cached balance sync
  *
- * If GUARD fails → both WRITEs are skipped → ROLLBACK is a no-op.
- * If WRITE₁ fails → WRITE₂ is skipped → ROLLBACK undoes WRITE₁.
- * If WRITE₂ fails → ROLLBACK undoes both WRITE₁ and WRITE₂.
+ * If GUARD fails â†’ both WRITEs are skipped â†’ ROLLBACK is a no-op.
+ * If WRITEâ‚ fails â†’ WRITEâ‚‚ is skipped â†’ ROLLBACK undoes WRITEâ‚.
+ * If WRITEâ‚‚ fails â†’ ROLLBACK undoes both WRITEâ‚ and WRITEâ‚‚.
  */
 export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResult> {
-    const cost = TokenPolicy.getCost(input.action);
+    const cost = input.overrideCost ?? TokenPolicy.getCost(input.action);
+    console.log(`[spendToken] START: userId=${input.userId}, action=${input.action}, originalCost=${TokenPolicy.getCost(input.action)}, cost=${cost}, relatedId=${input.relatedId}`);
 
     if (cost <= 0) {
+        console.error(`[spendToken] Invalid cost: ${cost}`);
         throw new Error(`Invalid cost ${cost} for action ${input.action}`);
     }
 
@@ -66,48 +69,43 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
             prisma.$transaction(async (tx) => {
                 const generatedKey = TokenService.generateIdempotencyKey(input.userId, input.action, input.relatedId);
 
-                // ── STEP 1 (READ): Idempotency check ────────────────────
-                // Inside SERIALIZABLE tx → no TOCTOU race.
+                // â”€â”€ STEP 1 (READ): Idempotency check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // Inside SERIALIZABLE tx â†’ no TOCTOU race.
                 // If another transaction inserted this key concurrently,
                 // SERIALIZABLE will detect the conflict and retry.
                 const existing = await tx.tokenTransaction.findUnique({
-                    where: { idempotencyKey: `${generatedKey}_debit` },
+                    where: { idempotencyKey_userId: { idempotencyKey: `${generatedKey}_debit`, userId: input.userId } },
                 });
                 if (existing) {
-                    // The original code had a redundant `user` fetch here.
-                    // The new logic simplifies this by returning a specific error.
+                    console.log(`[spendToken] IdempotencyKey ${generatedKey}_debit ALREADY_PROCESSED. Skipping deduction.`);
                     return {
                         ok: true,
-                        newBalance: -1, // We don't have the current balance easily here, but caller can fetch.
+                        newBalance: -1, // Caller should rely on db check if needed
                         cost: 0,
                         error: "ALREADY_PROCESSED",
                     };
                 }
 
-                // ── STEP 2 (READ): Authoritative balance via SUM ────────
-                // FOR UPDATE locks ALL matching rows in token_ledger_entries
-                // for this userId, preventing concurrent transactions from
-                // reading a stale SUM while we decide whether to deduct.
-                //
-                // CRITICAL: Uses actual MySQL table name (not Prisma model name).
-                // Prisma @@map("token_ledger_entries") only applies to ORM calls,
-                // NOT to raw SQL.
+                // â”€â”€ STEP 2 (READ): Authoritative balance via User â”€â”€â”€â”€â”€â”€â”€â”€
+                // FOR UPDATE locks the user row, preventing concurrent transactions
+                // from reading a stale balance while we decide whether to deduct.
+                // This is our Single Source of Truth for balances.
                 const [balanceRow] = await tx.$queryRaw<[{ balance: number }]>`
-                    SELECT COALESCE(SUM(amount), 0) AS balance
-                    FROM token_ledger_entries
-                    WHERE accountId = ${input.userId}
+                    SELECT availableBalance AS balance
+                    FROM users
+                    WHERE id = ${input.userId}
                     FOR UPDATE
                 `;
                 const currentBalance = Number(balanceRow.balance);
+                console.log(`[spendToken] Current DB availableBalance for user ${input.userId} is ${currentBalance}`);
 
-                // ── STEP 3 (GUARD): Non-negative enforcement ────────────
-                // Pure arithmetic: if balance - cost < 0, reject.
-                // No writes have occurred yet → rollback is a no-op.
+                // â”€â”€ STEP 3 (GUARD): Non-negative enforcement â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 if (currentBalance < cost) {
+                    console.log(`[spendToken] INSUFFICIENT_TOKENS: ${currentBalance} < ${cost}`);
                     throw new Error("INSUFFICIENT_TOKENS");
                 }
 
-                // ── STEP 3.5 (WRITE₀): FIFO Batch Consumption ───────────
+                // â”€â”€ STEP 3.5 (WRITEâ‚€): FIFO Batch Consumption â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 // Drain expiring batches first (oldest expiry first).
                 let remainingToConsume = cost;
 
@@ -136,7 +134,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                 }
                 // If remainingToConsume > 0, the rest is covered by non-expiring subscription tokens.
 
-                // ── STEP 4 (WRITE₁): Immutable ledger entry ────────────
+                // â”€â”€ STEP 4 (WRITEâ‚): Immutable ledger entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 // entryType: LedgerEntryType.CONSUME (schema enum)
                 // reasonCode: business action string (for analytics)
                 // referenceId: contextual ID (listingId, requestId, etc.)
@@ -166,13 +164,17 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                     ]
                 });
 
-                // ── STEP 5 (WRITE₂): Cached balance sync ───────────────
-                // Uses Prisma ORM decrement → resolves tokenBalance → column
+                // â”€â”€ STEP 5 (WRITEâ‚‚): Cached balance sync â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // Uses Prisma ORM decrement â†’ resolves tokenBalance â†’ column
                 // availableBalance via @map. Atomic SQL: SET col = col - N.
-                await tx.user.update({
+                // Uses Prisma ORM decrement
+                const updatedUser = await tx.user.update({
                     where: { id: input.userId },
                     data: { tokenBalance: { decrement: cost } },
+                    select: { tokenBalance: true } // Read back the updated value just to log it
                 });
+                
+                console.log(`[spendToken] SUCCESS: Deducted ${cost}. User tokenBalance in DB is now ${updatedUser.tokenBalance}`);
 
                 return {
                     newBalance: currentBalance - cost,
@@ -184,8 +186,8 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
             })
         );
 
-        // ── POST-TX: Event emission (fire-and-forget) ───────────────
-        // Outside transaction → cannot cause rollback.
+        // â”€â”€ POST-TX: Event emission (fire-and-forget) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Outside transaction â†’ cannot cause rollback.
         if (!result.alreadyProcessed) {
             EventBus.emit("TOKEN_SPENT", {
                 userId: input.userId,
@@ -199,7 +201,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
         return { ok: true, newBalance: result.newBalance, cost };
 
     } catch (error: any) {
-        // ── INSUFFICIENT_TOKENS: controlled rejection ───────────────
+        // â”€â”€ INSUFFICIENT_TOKENS: controlled rejection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (error.message === "INSUFFICIENT_TOKENS") {
             // Return current balance for UI display
             const user = await prisma.user.findUnique({
@@ -214,7 +216,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
             };
         }
 
-        // ── P2002: idempotencyKey collision (parallel race) ─────────
+        // â”€â”€ P2002: idempotencyKey collision (parallel race) â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Two identical requests hit the DB simultaneously.
         // One committed, one got P2002. Return the committed state.
         if (error.code === "P2002") {

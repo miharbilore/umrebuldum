@@ -1,4 +1,4 @@
-// ─── Atomic Trust Delta (CAS-based) ─────────────────────────────────────
+﻿// â”€â”€â”€ Atomic Trust Delta (CAS-based) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Single entry point for ALL trust score mutations.
 // Eliminates race condition between TrustScoreEngine and TrustEngineService.
 // Uses Compare-And-Swap via trustScoreVersion field.
@@ -81,7 +81,7 @@ export async function atomicTrustDelta(
         });
 
         if (result.count === 1) {
-            // Success — log audit trail
+            // Success â€” log audit trail
             const actualDelta = newScore - previous;
             if (actualDelta !== 0) {
                 await prisma.riskEvent.create({
@@ -103,7 +103,7 @@ export async function atomicTrustDelta(
             return { previous, current: newScore, applied: true };
         }
 
-        // CAS failed — concurrent update detected, retry with fresh data
+        // CAS failed â€” concurrent update detected, retry with fresh data
         // Small jitter to reduce collision probability
         await new Promise(r => setTimeout(r, 10 + Math.random() * 20));
     }

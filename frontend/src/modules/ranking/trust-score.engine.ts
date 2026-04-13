@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { atomicTrustDelta, canRecomputeTrust } from "../fraud/application/atomic-trust";
 
 /**
- * Trust Score Calculation Engine (v3 — CAS-atomic, rate-limited)
+ * Trust Score Calculation Engine (v3 â€” CAS-atomic, rate-limited)
  * 
  * Computes the ideal trust score, then applies the DELTA via atomicTrustDelta.
  * Max 1 recomputation per day per user (prevents staircase farming).

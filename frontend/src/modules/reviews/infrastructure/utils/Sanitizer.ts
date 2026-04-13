@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+﻿import DOMPurify from "isomorphic-dompurify";
 
 export class Sanitizer {
     public static sanitizeReviewText(input: string | null | undefined): string | null {

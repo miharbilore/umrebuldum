@@ -1,4 +1,4 @@
-export const BANNED_WORDS = [
+﻿export const BANNED_WORDS = [
     "küfür", "hakaret", "aptal", "gerizekalı", "şerefsiz",
     "lan", "amk", "sik", "piç", "bok", "yavşak", "oç", "mk",
     "dinsiz", "kafir", "akp", "chp", "mhp", "siyaset"

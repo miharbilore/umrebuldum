@@ -1,4 +1,4 @@
-// ─── Scoring Engine ─────────────────────────────────────────────────────
+﻿// â”€â”€â”€ Scoring Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Re-export from the ranking module for clean imports.
 // Original implementation in lib/listing-ranking.ts.
 // This module wraps it with Clean Architecture conventions.

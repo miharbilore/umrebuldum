@@ -1,5 +1,5 @@
 import { spendToken, grantToken, TokenPolicy } from '../src/modules/tokens';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../src/lib/prisma';
 
 async function runTokenTests() {
     console.log('--- TEST: TOKEN ECONOMY ---');

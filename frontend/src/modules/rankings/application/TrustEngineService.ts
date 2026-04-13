@@ -1,4 +1,4 @@
-import { atomicTrustDelta } from "../../fraud/application/atomic-trust";
+﻿import { atomicTrustDelta } from "../../fraud/application/atomic-trust";
 
 export class TrustEngineService {
     /**
@@ -25,7 +25,7 @@ export class TrustEngineService {
         }
 
         if (delta === 0) {
-            // No penalty needed — fetch and return current score
+            // No penalty needed â€” fetch and return current score
             const { prisma } = await import("@/lib/prisma");
             const user = await prisma.user.findUnique({
                 where: { id: userId },

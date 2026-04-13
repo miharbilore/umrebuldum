@@ -1,4 +1,4 @@
-import { Sanitizer } from "../infrastructure/utils/Sanitizer";
+﻿import { Sanitizer } from "../infrastructure/utils/Sanitizer";
 import { ProfanityFilter } from "../infrastructure/utils/ProfanityFilter";
 
 describe("Sanitizer", () => {

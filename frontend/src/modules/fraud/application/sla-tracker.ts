@@ -1,10 +1,10 @@
-// ─── SLA Tracker ────────────────────────────────────────────────────────
+﻿// â”€â”€â”€ SLA Tracker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Event-driven service that computes actual response times.
 // Replaces hardcoded avgResponseHours = 12 with real EMA-computed values.
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Constants ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const EMA_ALPHA = 0.3;  // Smoothing factor for Exponential Moving Average
 
@@ -17,7 +17,7 @@ const DEADLINES = {
 
 type MetricType = keyof typeof DEADLINES;
 
-// ─── Response Time Recording ────────────────────────────────────────────
+// â”€â”€â”€ Response Time Recording â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Record a response time event and update the user's EMA-smoothed avgResponseHours.
@@ -100,10 +100,10 @@ export async function recordResponseTime(
     };
 }
 
-// ─── SLA Score Computation ──────────────────────────────────────────────
+// â”€â”€â”€ SLA Score Computation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
- * Get the current SLA score (0–100) for a user based on recent metrics.
+ * Get the current SLA score (0â€“100) for a user based on recent metrics.
  * Used by ranking engine for response time scoring.
  */
 export async function computeSLAScore(userId: string): Promise<number> {
@@ -146,7 +146,7 @@ export async function checkSLAEscalation(userId: string): Promise<{
     });
 
     return {
-        shouldDeprioritize: violationCount > 3,    // Ranking penalty −100
+        shouldDeprioritize: violationCount > 3,    // Ranking penalty âˆ’100
         shouldGateFeatures: violationCount > 5,    // Features gated until admin review
         violationCount,
     };

@@ -1,4 +1,4 @@
-// ─── Ranking Service (v3) ───────────────────────────────────────────────
+﻿// â”€â”€â”€ Ranking Service (v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Wires the 6-factor ranking engine with Prisma data layer.
 // Uses percentage-capped boost and trust-gated tiers.
 
@@ -13,8 +13,8 @@ import {
   type RankingBoostInput,
   type PersonalizationInput,
   type RankedListing,
-} from "@/src/modules/ranking/ranking-engine";
-import { getBatchConversionMetrics } from "@/src/modules/ranking/conversion-tracker";
+} from "@/modules/ranking/ranking-engine";
+import { getBatchConversionMetrics } from "@/modules/ranking/conversion-tracker";
 import { calculateProfileCompleteness } from "@/lib/listing-ranking";
 
 export class RankingService {
@@ -38,7 +38,7 @@ export class RankingService {
   }): Promise<{ listings: RankedListing[]; total: number }> {
     const { city, limit = 20, offset = 0, userId } = options;
 
-    // ── 1. Fetch approved, active listings ──────────────────────
+    // â”€â”€ 1. Fetch approved, active listings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const where: any = {
       approvalStatus: "APPROVED",
       active: true,
@@ -69,7 +69,7 @@ export class RankingService {
             select: { effectivePower: true, boostType: true },
           },
         } as any,
-        // Fetch more than needed — we'll sort in app after scoring
+        // Fetch more than needed â€” we'll sort in app after scoring
         take: Math.min(limit + offset + 50, 200),
       }),
       prisma.guideListing.count({ where }),
@@ -79,11 +79,11 @@ export class RankingService {
       return { listings: [], total: 0 };
     }
 
-    // ── 2. Batch load conversion metrics ────────────────────────
+    // â”€â”€ 2. Batch load conversion metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const listingIds = rawListings.map((l: any) => l.id);
     const conversionMap = await getBatchConversionMetrics(listingIds);
 
-    // ── 3. Load personalization data (if authenticated) ─────────
+    // â”€â”€ 3. Load personalization data (if authenticated) â”€â”€â”€â”€â”€â”€â”€â”€â”€
     let personalization: PersonalizationInput | null = null;
     if (userId) {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000);
@@ -118,7 +118,7 @@ export class RankingService {
       };
     }
 
-    // ── 4. Detect query intent ──────────────────────────────────
+    // â”€â”€ 4. Detect query intent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const intent = detectQueryIntent({
       sortBy: options.sortBy,
       priceMin: options.priceMin,
@@ -128,7 +128,7 @@ export class RankingService {
       ratingMin: options.ratingMin,
     });
 
-    // ── 5. Score each listing ───────────────────────────────────
+    // â”€â”€ 5. Score each listing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const scoringResults = rawListings.map((l: any) => {
       const guide = l.guide;
 
@@ -193,10 +193,10 @@ export class RankingService {
       return scoreListing(listingInput, guideInput, boostInput, conversion, personalization, intent);
     });
 
-    // ── 6. Rank with EMA smoothing ──────────────────────────────
+    // â”€â”€ 6. Rank with EMA smoothing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const ranked = rankListings(scoringResults);
 
-    // ── 7. Apply diversity penalty ─────────────────────────────
+    // â”€â”€ 7. Apply diversity penalty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const guideMap = new Map(rawListings.map((l: any) => [l.id, l.guide?.id ?? ""]));
     const diversified = applyDiversityPenalty(ranked, id => guideMap.get(id) ?? "");
 
@@ -204,10 +204,10 @@ export class RankingService {
     diversified.sort((a, b) => b.finalScore - a.finalScore);
     diversified.forEach((r, idx) => { r.position = idx + 1; });
 
-    // ── 8. Paginate ─────────────────────────────────────────────
+    // â”€â”€ 8. Paginate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const paginated = diversified.slice(offset, offset + limit);
 
-    // ── 8. Enrich with listing data for response ────────────────
+    // â”€â”€ 8. Enrich with listing data for response â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const enrichedMap = new Map(
       rawListings.map((l: any) => [l.id, l])
     );

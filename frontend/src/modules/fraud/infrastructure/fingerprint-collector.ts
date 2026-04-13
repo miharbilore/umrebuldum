@@ -1,4 +1,4 @@
-// ─── Device Fingerprint Collector ────────────────────────────────────────
+﻿// â”€â”€â”€ Device Fingerprint Collector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Records device fingerprints for Sybil detection and network scoring.
 // Called from API routes (fire-and-forget, no blocking).
 
@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 /**
  * Record a device fingerprint for a user.
- * Fire-and-forget — do NOT await in hot path.
+ * Fire-and-forget â€” do NOT await in hot path.
  */
 export async function collectFingerprint(
     userId: string,

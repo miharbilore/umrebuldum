@@ -1,10 +1,10 @@
-// ─── Conversion Tracker ─────────────────────────────────────────────────
+﻿// â”€â”€â”€ Conversion Tracker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Records impressions, clicks, and computes conversion metrics.
 // Fire-and-forget for recording. Sync for CTR reads (cached).
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Recording (fire-and-forget) ────────────────────────────────────────
+// â”€â”€â”€ Recording (fire-and-forget) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Record that a listing was shown in search results.
@@ -64,7 +64,7 @@ export async function recordClick(
     }
 }
 
-// ─── Conversion Metrics ─────────────────────────────────────────────────
+// â”€â”€â”€ Conversion Metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface ConversionMetrics {
     impressions: number;

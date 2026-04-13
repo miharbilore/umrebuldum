@@ -1,5 +1,5 @@
-// ─── Risk Tiers & Feature Matrix ────────────────────────────────────────
-// Pure domain constants — defines enforcement tiers and feature gates.
+﻿// â”€â”€â”€ Risk Tiers & Feature Matrix â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Pure domain constants â€” defines enforcement tiers and feature gates.
 
 export type RiskTier = "GREEN" | "YELLOW" | "ORANGE" | "RED" | "BLACK";
 
@@ -19,7 +19,7 @@ export function getTierFromScore(urs: number): RiskTier {
     return "BLACK";
 }
 
-// ─── Feature Access Matrix ──────────────────────────────────────────────
+// â”€â”€â”€ Feature Access Matrix â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface FeatureGate {
     allowed: boolean;
@@ -107,7 +107,7 @@ export function getFeatureGate(tier: RiskTier, feature: FeatureName): FeatureGat
     return FEATURE_MATRIX[tier]?.[feature] ?? BLOCKED;
 }
 
-// ─── URS Decay & Bonuses ────────────────────────────────────────────────
+// â”€â”€â”€ URS Decay & Bonuses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /** URS decays by this amount per week if no new signals fire */
 export const URS_WEEKLY_DECAY = 5;
@@ -115,13 +115,13 @@ export const URS_WEEKLY_DECAY = 5;
 /** Identity-verified guides get this URS reduction */
 export const IDENTITY_URS_BONUS = -15;
 
-/** Guides with >10 trips and avg rating >4★ get this URS reduction */
+/** Guides with >10 trips and avg rating >4â˜… get this URS reduction */
 export const TRUSTED_GUIDE_URS_BONUS = -10;
 
 /** Admin false-positive whitelist duration (days) */
 export const WHITELIST_DURATION_DAYS = 30;
 
-// ─── Escalation Thresholds ──────────────────────────────────────────────
+// â”€â”€â”€ Escalation Thresholds â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /** URS threshold for auto-creating a review ticket */
 export const ESCALATION_THRESHOLD = 60;

@@ -43,7 +43,7 @@ async function login() {
     const signinOpts = {
         hostname: 'localhost',
         port: 3000,
-        path: '/api/auth/signin/nodemailer',
+        path: '/api/auth/signin/email',
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

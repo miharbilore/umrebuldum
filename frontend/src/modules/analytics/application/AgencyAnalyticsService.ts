@@ -1,4 +1,4 @@
-// ─── Agency Analytics Service (FOMO Engine) ───────────────────────────────
+﻿// â”€â”€â”€ Agency Analytics Service (FOMO Engine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Generates the data required for the Agency Dashboard. Intentionally structured
 // to expose limitations on the FREE tier, driving the "Conversion Up" strategy.
 

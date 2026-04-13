@@ -1,4 +1,4 @@
-// ─── Lead Matching Engine (Wave-Based Distribution) ─────────────────────────
+﻿// â”€â”€â”€ Lead Matching Engine (Wave-Based Distribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Controls which agencies receive notifications for new customer leads based
 // on chronological waves. Prioritizes premium plans and high SLA agencies first.
 
@@ -15,7 +15,7 @@ interface RouteResult {
 }
 
 export class LeadMatchingService {
-    // ── Wave Configurations ──
+    // â”€â”€ Wave Configurations â”€â”€
     private static readonly WAVE_TIMINGS = {
         WAVE_1_HOURS: 0,
         WAVE_2_HOURS: 1,

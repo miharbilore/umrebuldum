@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma';
-import { PackageSystem, TOKEN_COSTS } from '../lib/package-system';
+import { prisma } from '../src/lib/prisma';
+import { PackageSystem, TOKEN_COSTS } from '../src/lib/package-system';
 
 async function runListingTests() {
     console.log('--- TEST: LISTING MANAGEMENT (TC-LIS) ---');
@@ -11,7 +11,10 @@ async function runListingTests() {
             name: "Listing Test User",
             email: testEmail,
             role: "GUIDE",
-            tokenBalance: 100 // Pre-fund wallet
+            tokenBalance: 100, // Pre-fund wallet
+            phone: "1234567890",
+            city: "Istanbul",
+            packageType: "FREEMIUM"
         }
     });
 
@@ -19,11 +22,8 @@ async function runListingTests() {
         await prisma.guideProfile.create({
             data: {
                 userId: user.id,
-                fullName: "Test Guide",
-                phone: "1234567890",
-                city: "Istanbul",
-                package: "STARTER",
-                tokens: 100
+                quotaTarget: 100,
+                currentCount: 0,
             }
         });
 
@@ -58,7 +58,7 @@ async function runListingTests() {
                 city: mockPayload.city,
                 departureCityId: mockPayload.departureCityId,
                 pricingCurrency: "SAR",
-                price: parseFloat(mockPayload.price),
+                pricingQuad: parseFloat(mockPayload.price),
                 quota: parseInt(mockPayload.quota),
                 filled: 0,
                 active: true,

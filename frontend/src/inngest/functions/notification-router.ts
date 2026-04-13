@@ -1,22 +1,17 @@
-import { inngest } from "../client";
+﻿import { inngest } from "../client";
 import { prisma } from "@/lib/prisma";
-import { NotificationType } from "@prisma/client";
 import { emailService } from "@/lib/email/email-service";
 import { smsService } from "@/lib/sms/sms-service";
 
-export const handleNotificationRouting = inngest.createFunction(
-    { id: "notification-router" },
-    { event: "event/DEMAND_UNLOCKED" },
-    async ({ event, step }) => {
+export const notificationRouter = inngest.createFunction(
+    { id: "notification-router", triggers: [{ event: "event/DEMAND_UNLOCKED" }] },
+    async ({ event, step }: { event: any, step: any }) => {
         const { demandId, guideId } = event.data;
 
         // 1. Fetch related data to know WHO to notify
         const demand = await step.run("fetch-demand-details", async () => {
             return await prisma.umrahRequest.findUnique({
-                where: { id: demandId },
-                include: {
-                    user: true, // Assuming demand has a relation to User or userEmail
-                }
+                where: { id: demandId }
             });
         });
 
@@ -49,7 +44,7 @@ export const handleNotificationRouting = inngest.createFunction(
                 await prisma.notification.create({
                     data: {
                         userId: customer.id,
-                        type: NotificationType.IN_APP,
+                        type: "IN_APP",
                         title: "Yeni Bir Rehber Talebinizi Yanıtladı!",
                         message: `${guide.guideProfile?.fullName || guide.name} talebinizle ilgileniyor.`,
                         referenceId: demandId,
@@ -74,7 +69,7 @@ export const handleNotificationRouting = inngest.createFunction(
                      await prisma.notification.create({
                          data: {
                              userId: customer.id,
-                             type: NotificationType.EMAIL,
+                             type: "EMAIL",
                              title: "Email Sent: Talebinize Yeni İlgi",
                              message: "Sent standard notification email.",
                              referenceId: demandId,
@@ -96,7 +91,7 @@ export const handleNotificationRouting = inngest.createFunction(
                      await prisma.notification.create({
                          data: {
                              userId: customer.id,
-                             type: NotificationType.SMS,
+                             type: "SMS",
                              title: "SMS Sent: Talebinize Yeni İlgi",
                              message: "Sent standard notification SMS.",
                              referenceId: demandId,

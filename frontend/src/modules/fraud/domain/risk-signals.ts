@@ -1,8 +1,8 @@
-// ─── Risk Signal Definitions ────────────────────────────────────────────
-// Pure domain constants — no DB access, no side effects.
+﻿// â”€â”€â”€ Risk Signal Definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Pure domain constants â€” no DB access, no side effects.
 // Defines all 47 signals, their weights, and category allocations.
 
-// ─── Signal Categories ──────────────────────────────────────────────────
+// â”€â”€â”€ Signal Categories â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type SignalCategory = "BEHAVIOR" | "TRANSACTION" | "NETWORK" | "HISTORY";
 
@@ -13,7 +13,7 @@ export const CATEGORY_WEIGHTS: Record<SignalCategory, number> = {
     HISTORY: 0.20,
 };
 
-// ─── Individual Signal Definitions ──────────────────────────────────────
+// â”€â”€â”€ Individual Signal Definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface SignalDefinition {
     id: string;
@@ -25,7 +25,7 @@ export interface SignalDefinition {
     maxScore: number;       // Maximum contribution to category score
 }
 
-// ─── Behavioral Signals ─────────────────────────────────────────────────
+// â”€â”€â”€ Behavioral Signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const BEHAVIOR_SIGNALS: SignalDefinition[] = [
     {
@@ -120,7 +120,7 @@ export const BEHAVIOR_SIGNALS: SignalDefinition[] = [
     },
 ];
 
-// ─── Transaction Signals ────────────────────────────────────────────────
+// â”€â”€â”€ Transaction Signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const TRANSACTION_SIGNALS: SignalDefinition[] = [
     {
@@ -128,7 +128,7 @@ export const TRANSACTION_SIGNALS: SignalDefinition[] = [
         category: "TRANSACTION",
         weight: 20,
         confidence: 0.8,
-        description: "Token spend rate exceeds 3σ from rolling mean",
+        description: "Token spend rate exceeds 3Ïƒ from rolling mean",
         threshold: 3,        // >3 standard deviations
         maxScore: 20,
     },
@@ -188,7 +188,7 @@ export const TRANSACTION_SIGNALS: SignalDefinition[] = [
     },
 ];
 
-// ─── Network/Identity Signals ───────────────────────────────────────────
+// â”€â”€â”€ Network/Identity Signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const NETWORK_SIGNALS: SignalDefinition[] = [
     {
@@ -247,7 +247,7 @@ export const NETWORK_SIGNALS: SignalDefinition[] = [
     },
 ];
 
-// ─── History Signals ────────────────────────────────────────────────────
+// â”€â”€â”€ History Signals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const HISTORY_SIGNALS: SignalDefinition[] = [
     {
@@ -306,7 +306,7 @@ export const HISTORY_SIGNALS: SignalDefinition[] = [
     },
 ];
 
-// ─── All Signals Flattened ──────────────────────────────────────────────
+// â”€â”€â”€ All Signals Flattened â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const ALL_SIGNALS: SignalDefinition[] = [
     ...BEHAVIOR_SIGNALS,
@@ -315,7 +315,7 @@ export const ALL_SIGNALS: SignalDefinition[] = [
     ...HISTORY_SIGNALS,
 ];
 
-// ─── Disposable Email Domains ───────────────────────────────────────────
+// â”€â”€â”€ Disposable Email Domains â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const DISPOSABLE_EMAIL_DOMAINS = new Set([
     "tempmail.com", "guerrillamail.com", "mailnesia.com", "throwaway.email",

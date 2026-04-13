@@ -1,4 +1,4 @@
-// ─── Real-Time Sybil Protection ─────────────────────────────────────────
+﻿// â”€â”€â”€ Real-Time Sybil Protection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Lightweight real-time checks at registration and action time.
 // Hybrid model: fast checks + batch daily deep analysis.
 
@@ -10,7 +10,7 @@ import {
     validateBehaviorData,
 } from "./behavioral-sybil";
 
-// ─── Disposable Email Domains (top offenders) ───────────────────────────
+// â”€â”€â”€ Disposable Email Domains (top offenders) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const DISPOSABLE_DOMAINS = new Set([
     "tempmail.com", "throwaway.email", "guerrillamail.com", "mailinator.com",
@@ -19,7 +19,7 @@ const DISPOSABLE_DOMAINS = new Set([
     "fakeinbox.com", "tempmailaddress.com", "10minutemail.com",
 ]);
 
-// ─── Registration-Time Sybil Check ──────────────────────────────────────
+// â”€â”€â”€ Registration-Time Sybil Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type RegistrationDecision = "PASS" | "CHALLENGE" | "BLOCK";
 
@@ -35,9 +35,9 @@ interface RegistrationSignals {
  * Lightweight Sybil check at registration time.
  * Target: <20ms latency via indexed queries.
  *
- * PASS → allow registration
- * CHALLENGE → require SMS verification before account activation
- * BLOCK → deny registration
+ * PASS â†’ allow registration
+ * CHALLENGE â†’ require SMS verification before account activation
+ * BLOCK â†’ deny registration
  */
 export async function registrationSybilCheck(
     fingerprint: string | null,
@@ -99,7 +99,7 @@ export async function registrationSybilCheck(
         (signals.phoneMismatch ? 10 : 0) +
         (signals.phoneReuse ? 50 : 0);
 
-    // Behavioral entropy score (NEW — defeats eSIM + anti-fingerprint)
+    // Behavioral entropy score (NEW â€” defeats eSIM + anti-fingerprint)
     let behaviorPenalty = 0;
     if (behavior && validateBehaviorData(behavior)) {
         behaviorPenalty = Math.round(behavioralEntropyScore(behavior) * 0.7);
@@ -114,7 +114,7 @@ export async function registrationSybilCheck(
 
     // Log high-risk registration attempts
     if (score >= 25) {
-        // Fire-and-forget — don't block registration on logging
+        // Fire-and-forget â€” don't block registration on logging
         prisma.riskEvent.create({
             data: {
                 userId: "REGISTRATION_ATTEMPT",
@@ -128,7 +128,7 @@ export async function registrationSybilCheck(
     return { decision, signals, score };
 }
 
-// ─── Action-Time Sybil Gate ─────────────────────────────────────────────
+// â”€â”€â”€ Action-Time Sybil Gate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Lightweight check before sensitive actions (BOOST, OFFER_SEND, REVIEW_SUBMIT).
@@ -168,21 +168,21 @@ export async function actionSybilGate(userId: string): Promise<{
     return { allowed: true };
 }
 
-// ─── Phone Number Weighting for URS ─────────────────────────────────────
+// â”€â”€â”€ Phone Number Weighting for URS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Computes phone-based trust adjustment for URS.
- * Turkish +90 5XX numbers require national ID → strong identity signal.
+ * Turkish +90 5XX numbers require national ID â†’ strong identity signal.
  */
 export function phoneIdentityScore(phone: string | null, isVerified: boolean): number {
     if (!phone) return 0;
 
-    // Turkish mobile number verified → trust bonus
+    // Turkish mobile number verified â†’ trust bonus
     if (phone.startsWith("+90") && isVerified) return -15; // Reduces URS by 15
 
-    // Non-Turkish number → slight risk
+    // Non-Turkish number â†’ slight risk
     if (!phone.startsWith("+90")) return 5;
 
-    // Turkish but not verified → neutral
+    // Turkish but not verified â†’ neutral
     return 0;
 }

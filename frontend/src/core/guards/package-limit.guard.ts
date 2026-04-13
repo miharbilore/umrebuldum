@@ -1,4 +1,4 @@
-// ─── Package Limit Guard ────────────────────────────────────────────────
+﻿// â”€â”€â”€ Package Limit Guard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Enforces package-based limits (listing count, daily offers, boosts).
 
 import { prisma } from "@/lib/prisma";

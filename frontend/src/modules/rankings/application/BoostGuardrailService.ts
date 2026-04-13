@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 import { TokenService } from "../../tokens/application/TokenService";
 import { getVelocityCount, checkVelocity } from "../../fraud/infrastructure/velocity-counter";
 
@@ -8,9 +8,9 @@ export class BoostGuardrailService {
      * Enforces: Trust gates per tier, sliding window limits, progressive pricing.
      *
      * Boost Tiers:
-     *   BASIC:   Trust ≥ 40, 50 tokens, 24h duration
-     *   PREMIUM: Trust ≥ 60, 120 tokens, 48h duration
-     *   ELITE:   Trust ≥ 75, 250 tokens, 72h duration
+     *   BASIC:   Trust â‰¥ 40, 50 tokens, 24h duration
+     *   PREMIUM: Trust â‰¥ 60, 120 tokens, 48h duration
+     *   ELITE:   Trust â‰¥ 75, 250 tokens, 72h duration
      */
     static async applyBoost(
         userId: string,
@@ -55,7 +55,7 @@ export class BoostGuardrailService {
         if (trustScore >= 60 && trustScore <= 79) trustFactor = 0.8;
         else if (trustScore >= 40 && trustScore <= 59) trustFactor = 0.5;
 
-        // ── 5. Sliding Window Checks (via persistent velocity counter) ──
+        // â”€â”€ 5. Sliding Window Checks (via persistent velocity counter) â”€â”€
         const listingBoostCount = await getVelocityCount(listingId, "BOOST_LISTING", 86400);
         if (listingBoostCount >= 3) {
             throw new Error("Daily maximum boost limit (3) reached for this listing.");

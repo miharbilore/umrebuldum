@@ -1,28 +1,28 @@
-// ─── Token Auto-Replenishment Service ───────────────────────────────────
+﻿// â”€â”€â”€ Token Auto-Replenishment Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Automatically purchases tokens when a user's balance drops below their
 // configured threshold. Triggered by the TOKEN_SPENT event from spendToken().
 //
-// State Machine: ACTIVE → PAUSED → ACTIVE (user toggle)
-//                ACTIVE → SUSPENDED (3 consecutive payment failures)
-//                ACTIVE → DISABLED (user explicit disable)
-//                SUSPENDED → ACTIVE (user re-enables after fixing payment)
+// State Machine: ACTIVE â†’ PAUSED â†’ ACTIVE (user toggle)
+//                ACTIVE â†’ SUSPENDED (3 consecutive payment failures)
+//                ACTIVE â†’ DISABLED (user explicit disable)
+//                SUSPENDED â†’ ACTIVE (user re-enables after fixing payment)
 //
 // Safety layers:
-//   1. Monthly hard cap (monthlyCap)  → prevents runaway billing
-//   2. Cooldown window (cooldownMinutes) → prevents rapid-fire purchases
-//   3. Fail circuit breaker (failCount ≥ 3 → SUSPENDED)
+//   1. Monthly hard cap (monthlyCap)  â†’ prevents runaway billing
+//   2. Cooldown window (cooldownMinutes) â†’ prevents rapid-fire purchases
+//   3. Fail circuit breaker (failCount â‰¥ 3 â†’ SUSPENDED)
 //   4. Fraud pattern detection (velocity check)
-//   5. Idempotency key per trigger → prevents double-charge on race conditions
+//   5. Idempotency key per trigger â†’ prevents double-charge on race conditions
 //   6. Spending alerts via EventBus
-//   7. SERIALIZABLE isolation on balance check → no phantom reads
+//   7. SERIALIZABLE isolation on balance check â†’ no phantom reads
 
 import { prisma } from "@/lib/prisma";
 import { TOKEN_PACKAGES } from "@/lib/package-system";
 import { grantToken } from "./grant-token.usecase";
-import { EventBus } from "@/src/core/events/event-bus";
-import { checkVelocity } from "@/src/modules/fraud/infrastructure/velocity-counter";
+import { EventBus } from "@/core/events/event-bus";
+import { checkVelocity } from "@/modules/fraud/infrastructure/velocity-counter";
 
-// ─── Types ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type ReplenishStatus = "ACTIVE" | "PAUSED" | "DISABLED" | "SUSPENDED";
 
@@ -42,19 +42,19 @@ export interface ReplenishCheckResult {
     failReason?: string;
 }
 
-// ─── Configuration Constants ────────────────────────────────────────────
+// â”€â”€â”€ Configuration Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const MIN_THRESHOLD = 5;
 const MAX_THRESHOLD = 200;
 const MIN_MONTHLY_CAP = 10;
 const MAX_MONTHLY_CAP = 2000;
-const MAX_FAIL_COUNT = 3;    // → SUSPENDED after 3 consecutive failures
+const MAX_FAIL_COUNT = 3;    // â†’ SUSPENDED after 3 consecutive failures
 const DEFAULT_COOLDOWN = 60; // minutes
 
 // Spending alert thresholds (% of monthly cap)
 const ALERT_THRESHOLDS = [0.50, 0.80, 0.95];
 
-// ─── Configure ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Configure â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Create or update auto-replenish configuration.
@@ -65,10 +65,10 @@ export async function configureAutoReplenish(
 ): Promise<{ ok: boolean; error?: string }> {
     // Input validation
     if (input.threshold < MIN_THRESHOLD || input.threshold > MAX_THRESHOLD) {
-        return { ok: false, error: `Threshold must be ${MIN_THRESHOLD}–${MAX_THRESHOLD}` };
+        return { ok: false, error: `Threshold must be ${MIN_THRESHOLD}â€“${MAX_THRESHOLD}` };
     }
     if (input.monthlyCap < MIN_MONTHLY_CAP || input.monthlyCap > MAX_MONTHLY_CAP) {
-        return { ok: false, error: `Monthly cap must be ${MIN_MONTHLY_CAP}–${MAX_MONTHLY_CAP}` };
+        return { ok: false, error: `Monthly cap must be ${MIN_MONTHLY_CAP}â€“${MAX_MONTHLY_CAP}` };
     }
 
     // Validate package exists
@@ -118,7 +118,7 @@ export async function configureAutoReplenish(
     return { ok: true };
 }
 
-// ─── Toggle ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Pause/resume or fully disable auto-replenish.
@@ -132,7 +132,7 @@ export async function setReplenishStatus(
     });
     if (!config) return { ok: false, error: "No auto-replenish configured" };
 
-    // Allow SUSPENDED → ACTIVE (user manually re-enables)
+    // Allow SUSPENDED â†’ ACTIVE (user manually re-enables)
     await prisma.autoReplenishConfig.update({
         where: { userId },
         data: {
@@ -144,7 +144,7 @@ export async function setReplenishStatus(
     return { ok: true };
 }
 
-// ─── Core: Check & Trigger ──────────────────────────────────────────────
+// â”€â”€â”€ Core: Check & Trigger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Check if auto-replenish should fire for a user.
@@ -164,7 +164,7 @@ export async function checkAndReplenish(
     currentBalance: number,
     triggerSource: "SPEND_EVENT" | "MANUAL_CHECK" | "CRON" = "SPEND_EVENT",
 ): Promise<ReplenishCheckResult> {
-    // ── 1. Load config ──────────────────────────────────────────────
+    // â”€â”€ 1. Load config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const config = await prisma.autoReplenishConfig.findUnique({
         where: { userId },
     });
@@ -173,17 +173,17 @@ export async function checkAndReplenish(
         return { triggered: false, tokensGranted: 0, priceTRY: 0, status: "NOT_ACTIVE" };
     }
 
-    // ── 2. Threshold check ──────────────────────────────────────────
+    // â”€â”€ 2. Threshold check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (currentBalance >= config.threshold) {
         return { triggered: false, tokensGranted: 0, priceTRY: 0, status: "BELOW_THRESHOLD" };
     }
 
-    // ── 3. Monthly cap check (reset if new month) ───────────────────
+    // â”€â”€ 3. Monthly cap check (reset if new month) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const now = new Date();
     let monthlySpent = config.monthlySpent;
     if (now.getMonth() !== config.monthlyResetAt.getMonth() ||
         now.getFullYear() !== config.monthlyResetAt.getFullYear()) {
-        // New month — reset counter
+        // New month â€” reset counter
         await prisma.autoReplenishConfig.update({
             where: { userId },
             data: { monthlySpent: 0, monthlyResetAt: now },
@@ -201,7 +201,7 @@ export async function checkAndReplenish(
         return { triggered: false, tokensGranted: 0, priceTRY: 0, status: "CAPPED" };
     }
 
-    // ── 4. Cooldown check ───────────────────────────────────────────
+    // â”€â”€ 4. Cooldown check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (config.lastTriggeredAt) {
         const minutesSinceLast = (now.getTime() - config.lastTriggeredAt.getTime()) / 60_000;
         if (minutesSinceLast < config.cooldownMinutes) {
@@ -210,16 +210,16 @@ export async function checkAndReplenish(
         }
     }
 
-    // ── 5. Fraud velocity check ─────────────────────────────────────
+    // â”€â”€ 5. Fraud velocity check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const velocityResult = await checkVelocity(userId, "AUTO_REPLENISH");
     if (!velocityResult.allowed) {
         await logReplenish(config.id, userId, pkg, currentBalance, currentBalance, triggerSource, "FAILED", "Velocity limit exceeded");
         return { triggered: false, tokensGranted: 0, priceTRY: 0, status: "FAILED", failReason: "Velocity limit" };
     }
 
-    // ── 6. Execute token purchase ───────────────────────────────────
-    // Idempotency key: user + month + spend-count → deterministic dedup
-    // If two triggers fire at the same monthlySpent, second gets P2002 → harmless.
+    // â”€â”€ 6. Execute token purchase â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Idempotency key: user + month + spend-count â†’ deterministic dedup
+    // If two triggers fire at the same monthlySpent, second gets P2002 â†’ harmless.
     // This eliminates the "double package within cap" edge case entirely.
     const idempotencyKey = `auto-replenish:${userId}:${now.getFullYear()}-${now.getMonth()}:${monthlySpent}`;
 
@@ -249,7 +249,7 @@ export async function checkAndReplenish(
         // Log success
         await logReplenish(config.id, userId, pkg, currentBalance, grantResult.newBalance, triggerSource, "SUCCESS");
 
-        // ── 7. Spending alerts ──────────────────────────────────────
+        // â”€â”€ 7. Spending alerts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const newMonthlySpent = monthlySpent + pkg.tokens;
         const capRatio = newMonthlySpent / config.monthlyCap;
         for (const alertThreshold of ALERT_THRESHOLDS) {
@@ -279,7 +279,7 @@ export async function checkAndReplenish(
         };
 
     } catch (error: any) {
-        // Payment failure — increment fail count
+        // Payment failure â€” increment fail count
         const newFailCount = config.failCount + 1;
         await prisma.autoReplenishConfig.update({
             where: { userId },
@@ -309,7 +309,7 @@ export async function checkAndReplenish(
     }
 }
 
-// ─── Monthly Reset Cron ─────────────────────────────────────────────────
+// â”€â”€â”€ Monthly Reset Cron â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Reset monthlySpent counters for all configs. Run via cron at 00:00 UTC on 1st.
@@ -322,7 +322,7 @@ export async function resetMonthlyCounters(): Promise<number> {
     return result.count;
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function logReplenish(
     configId: string,
@@ -349,7 +349,7 @@ async function logReplenish(
             idempotencyKey: `replenish-log:${userId}:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`,
         },
     }).catch(() => {
-        // Log failure is non-critical — don't break the flow
+        // Log failure is non-critical â€” don't break the flow
         console.error(`[AutoReplenish] Failed to log replenish event for ${userId}`);
     });
 }

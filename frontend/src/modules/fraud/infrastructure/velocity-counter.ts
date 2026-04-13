@@ -1,11 +1,11 @@
-// ─── Persistent Velocity Counter (DB-backed) ────────────────────────────
+﻿// â”€â”€â”€ Persistent Velocity Counter (DB-backed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Replaces in-memory Map with DB-persisted counters.
 // Survives deploys, crashes, and horizontal scaling.
 // In-memory cache layer for hot-path O(1) reads (60s TTL).
 
 import { prisma } from "@/lib/prisma";
 
-// ─── In-Memory Cache (60s TTL, best-effort) ─────────────────────────────
+// â”€â”€â”€ In-Memory Cache (60s TTL, best-effort) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface CacheEntry {
     count: number;
@@ -40,7 +40,7 @@ setInterval(() => {
     }
 }, 5 * 60_000);
 
-// ─── Velocity Rules ─────────────────────────────────────────────────────
+// â”€â”€â”€ Velocity Rules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface VelocityRule {
     action: string;
@@ -63,7 +63,7 @@ export const VELOCITY_RULES: VelocityRule[] = [
     { action: "REFUND_REQUEST", windowSeconds: 604800, maxCount: 3, response: "BLOCK" },
 ];
 
-// ─── Public API ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface VelocityCheckResult {
     allowed: boolean;
@@ -112,7 +112,7 @@ async function getVelocityCount(userId: string, action: string, windowSeconds: n
 export async function checkVelocity(userId: string, action: string): Promise<VelocityCheckResult> {
     const applicableRules = VELOCITY_RULES.filter(r => r.action === action);
 
-    // 1. INCREMENT DB FIRST (atomic upsert) — before any check
+    // 1. INCREMENT DB FIRST (atomic upsert) â€” before any check
     const now = new Date();
     const windowKey = now.toISOString().slice(0, 13); // "2026-02-28T15"
     try {
@@ -158,7 +158,7 @@ export async function checkVelocity(userId: string, action: string): Promise<Vel
         return worstViolation;
     }
 
-    // No violation — return pass
+    // No violation â€” return pass
     const tightestRule = applicableRules.sort((a, b) => a.windowSeconds - b.windowSeconds)[0];
     return {
         allowed: true,

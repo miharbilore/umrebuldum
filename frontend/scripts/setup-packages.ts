@@ -160,20 +160,7 @@ async function main() {
     }
   }
 
-  // Migrate existing FREE users to FREEMIUM
-  console.log("\nMigrating FREE → FREEMIUM...");
-  const freeUpdated = await prisma.user.updateMany({
-    where: { packageType: "FREE" },
-    data: { packageType: "FREEMIUM" },
-  });
-  console.log(`  ${freeUpdated.count} user(s) migrated.`);
 
-  // Migrate VIP → PRO (grandfathered)
-  const vipUpdated = await prisma.user.updateMany({
-    where: { packageType: "VIP" },
-    data: { packageType: "PRO" },
-  });
-  console.log(`  ${vipUpdated.count} VIP → PRO migrated.`);
 
   console.log("\n✅ Done! All packages seeded.");
 }

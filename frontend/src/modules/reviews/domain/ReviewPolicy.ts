@@ -1,4 +1,4 @@
-// src/modules/reviews/domain/ReviewPolicy.ts
+﻿// src/modules/reviews/domain/ReviewPolicy.ts
 
 export const PREDEFINED_POSITIVE_TAGS = [
     "Güler yüzlü",

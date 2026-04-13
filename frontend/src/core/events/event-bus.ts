@@ -1,7 +1,7 @@
-import { safeInngestSend } from "@/lib/inngest/safeSend";
-import { inngest } from "@/src/inngest/client";
+﻿import { safeInngestSend } from "@/lib/inngest/safeSend";
+import { inngest } from "@/inngest/client";
 
-// ─── Event Bus (Inngest Adapter) ────────────────────────────────────────
+// â”€â”€â”€ Event Bus (Inngest Adapter) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Replaces the old in-memory event bus with robust serverless background jobs.
 //
 // Usage:
@@ -30,6 +30,9 @@ export type EventName =
     | "IDENTITY_APPROVED"
     | "IDENTITY_REVOKED"
     | "MESSAGE_RECEIVED"
+    | "PERFORMANCE_TIER_CHANGED"
+    | "CREDIT_LINE_DRAWN"
+    | "CREDIT_LINE_REPAID"
     | "AUTO_REPLENISH_CONFIGURED"
     | "AUTO_REPLENISH_SUCCESS"
     | "AUTO_REPLENISH_ALERT"

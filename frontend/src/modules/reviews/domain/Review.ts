@@ -1,4 +1,4 @@
-// src/modules/reviews/domain/Review.ts
+﻿// src/modules/reviews/domain/Review.ts
 
 export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 

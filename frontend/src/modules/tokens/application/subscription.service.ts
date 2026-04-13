@@ -1,4 +1,4 @@
-// ─── Subscription Management Service ────────────────────────────────────
+﻿// â”€â”€â”€ Subscription Management Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Handles plan upgrades, downgrades, freezes, and cooldown enforcement.
 //
 // Rules:
@@ -20,9 +20,9 @@ import {
 } from "@/lib/package-system";
 import type { PackageType } from "@/lib/db-types";
 import { grantToken } from "./grant-token.usecase";
-import { EventBus } from "@/src/core/events/event-bus";
+import { EventBus } from "@/core/events/event-bus";
 
-// ─── Types ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface PlanChangeResult {
     ok: boolean;
@@ -32,7 +32,7 @@ export interface PlanChangeResult {
     error?: string;
 }
 
-// ─── Upgrade ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Upgrade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Upgrade a user's plan. Instant activation.
@@ -91,7 +91,7 @@ export async function upgradePlan(
         }, { isolationLevel: "Serializable", timeout: 10_000 })
     );
 
-    // Grant token delta (outside transaction — idempotent)
+    // Grant token delta (outside transaction â€” idempotent)
     if (tokenDelta > 0) {
         await grantToken({
             userId,
@@ -107,7 +107,7 @@ export async function upgradePlan(
     return { ok: true, newPlan: targetPlan, effectiveAt: new Date(), tokenDelta };
 }
 
-// ─── Downgrade ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Downgrade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Schedule a downgrade. Takes effect at packageExpiry.
@@ -156,7 +156,7 @@ export async function downgradePlan(
     await prisma.user.update({
         where: { id: userId },
         data: {
-            // Store scheduled downgrade — a cron job will apply it at packageExpiry
+            // Store scheduled downgrade â€” a cron job will apply it at packageExpiry
             // For now, we apply immediately if past expiry
             packageType: effectiveAt <= new Date() ? targetPlan : user.packageType,
             lastPlanChangeAt: new Date(),
@@ -173,7 +173,7 @@ export async function downgradePlan(
     return { ok: true, newPlan: targetPlan, effectiveAt, tokenDelta: 0 };
 }
 
-// ─── Freeze ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Freeze â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Freeze a plan for 1-3 months at ₺99/mo.
@@ -218,7 +218,7 @@ export async function freezePlan(
     return { ok: true, freezeUntil };
 }
 
-// ─── Can Change Plan Check ─────────────────────────────────────────────
+// â”€â”€â”€ Can Change Plan Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function canChangePlan(userId: string): Promise<{
     allowed: boolean;
@@ -246,7 +246,7 @@ export async function canChangePlan(userId: string): Promise<{
     return { allowed: true };
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function checkCooldown(lastPlanChangeAt: Date | null): string | null {
     if (!lastPlanChangeAt) return null;
@@ -261,7 +261,7 @@ function checkCooldown(lastPlanChangeAt: Date | null): string | null {
 
 /**
  * Blast detection: if user spent >80% of tokens in last 48 hours,
- * they might be gaming the system (upgrade → blast tokens → downgrade).
+ * they might be gaming the system (upgrade â†’ blast tokens â†’ downgrade).
  */
 async function detectBlast(userId: string): Promise<boolean> {
     const cutoff = new Date(Date.now() - BLAST_THRESHOLD_HOURS * 3600 * 1000);
@@ -291,7 +291,7 @@ async function detectBlast(userId: string): Promise<boolean> {
     return (totalSpent / totalAvailable) >= BLAST_THRESHOLD_PCT;
 }
 
-// ─── Get Upgrade Price ──────────────────────────────────────────────────
+// â”€â”€â”€ Get Upgrade Price â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Calculate the price for upgrading from current plan to target plan.

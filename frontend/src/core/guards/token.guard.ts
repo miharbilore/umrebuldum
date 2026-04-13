@@ -1,4 +1,4 @@
-// ─── Token Guard ────────────────────────────────────────────────────────
+﻿// â”€â”€â”€ Token Guard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Pre-validates token balance and daily cap before any token-spending action.
 // Used by controllers before calling use-cases.
 
@@ -35,7 +35,7 @@ export async function requireTokens(
 ): Promise<TokenGuardResult> {
     const cost = TOKEN_COSTS[action];
 
-    // ── 1. Role permission ──────────────────────────────────────────
+    // â”€â”€ 1. Role permission â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const roleConfig = getRoleConfig(role);
     const actionPermissionMap: Record<TokenAction, boolean> = {
         LISTING_CREATE: true,
@@ -61,7 +61,7 @@ export async function requireTokens(
         };
     }
 
-    // ── 2. Daily cap ────────────────────────────────────────────────
+    // â”€â”€ 2. Daily cap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const caps = DAILY_CAPS[packageType as PackageType] || DAILY_CAPS.FREEMIUM;
     const capMap: Partial<Record<TokenAction, number>> = {
         OFFER_SEND: caps.offers,
@@ -99,7 +99,7 @@ export async function requireTokens(
         }
     }
 
-    // ── 3. Balance check (cached — not authoritative) ───────────────
+    // â”€â”€ 3. Balance check (cached â€” not authoritative) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { tokenBalance: true },

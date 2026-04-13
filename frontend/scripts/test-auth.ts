@@ -1,6 +1,6 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '../src/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { PackageSystem } from '../lib/package-system';
+import { PackageSystem } from '../src/lib/package-system';
 
 async function runAuthTests() {
     console.log('--- TEST: AUTH & USERS (TC-AUTH) ---');

@@ -1,4 +1,4 @@
-// ─── Review Integrity Engine ────────────────────────────────────────────
+﻿// â”€â”€â”€ Review Integrity Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Lightweight integrity checks for review authenticity:
 // - Trigram Jaccard similarity detection
 // - Temporal clustering detection
@@ -6,7 +6,7 @@
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Trigram Similarity ─────────────────────────────────────────────────
+// â”€â”€â”€ Trigram Similarity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Extract trigrams from a string.
@@ -45,7 +45,7 @@ export function trigramSimilarity(a: string, b: string): number {
     return unionSize > 0 ? intersectionCount / unionSize : 0;
 }
 
-// ─── Integrity Check Results ────────────────────────────────────────────
+// â”€â”€â”€ Integrity Check Results â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface ReviewIntegrityResult {
     action: "AUTO_APPROVE" | "QUEUE_FOR_REVIEW" | "AUTO_REJECT";
@@ -54,7 +54,7 @@ export interface ReviewIntegrityResult {
     clusterCount: number;
 }
 
-// ─── Main Integrity Check ───────────────────────────────────────────────
+// â”€â”€â”€ Main Integrity Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Run all integrity checks on a new review before persisting.

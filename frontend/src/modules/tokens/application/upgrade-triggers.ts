@@ -1,4 +1,4 @@
-// ─── Upgrade Triggers ───────────────────────────────────────────────────
+﻿// â”€â”€â”€ Upgrade Triggers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Returns contextual upgrade suggestions based on user's current state.
 // Called at API boundaries when caps/limits are hit.
 //
@@ -13,8 +13,9 @@ import {
     BOOST_TIER_ACCESS,
 } from "@/lib/package-system";
 import type { PackageType } from "@/lib/db-types";
+import { UserRole } from "@prisma/client";
 
-// ─── Trigger Contexts ───────────────────────────────────────────────────
+// â”€â”€â”€ Trigger Contexts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type TriggerContext =
     | "TOKEN_DEPLETED"       // Balance hit 0
@@ -38,7 +39,7 @@ export interface UpgradeTrigger {
     savingsPercentage?: number;   // If annual billing
 }
 
-// ─── Trigger Logic ──────────────────────────────────────────────────────
+// â”€â”€â”€ Trigger Logic â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Get an upgrade suggestion based on the trigger context.
@@ -56,7 +57,7 @@ export async function getUpgradeTrigger(
     if (!user) return null;
 
     const current = user.packageType as PackageType;
-    const isCorp = current.startsWith("CORP_") || user.role === "CORPORATE";
+    const isCorp = current.startsWith("CORP_") || user.role === UserRole.ORGANIZATION;
 
     // Determine suggested plan
     const suggested = getSuggestedPlan(current, context, isCorp);
@@ -75,7 +76,7 @@ export async function getUpgradeTrigger(
     };
 }
 
-// ─── Plan Suggestion Matrix ─────────────────────────────────────────────
+// â”€â”€â”€ Plan Suggestion Matrix â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getSuggestedPlan(
     current: PackageType,
@@ -85,7 +86,7 @@ function getSuggestedPlan(
     // Already max plan
     if (current === "PRO" || current === "BUSINESS_PLUS") return null;
 
-    // Corporate users → corporate upgrade path
+    // Corporate users â†’ corporate upgrade path
     if (isCorp) {
         if (current === "BUSINESS") return "BUSINESS_PLUS";
         return "BUSINESS";
@@ -127,7 +128,7 @@ function getSuggestedPlan(
     }
 }
 
-// ─── Trigger Messages ───────────────────────────────────────────────────
+// â”€â”€â”€ Trigger Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getTriggerMessages(
     context: TriggerContext,

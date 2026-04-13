@@ -1,6 +1,6 @@
-// ─── Risk Scoring Engine ────────────────────────────────────────────────
+﻿// â”€â”€â”€ Risk Scoring Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Computes User Risk Score (URS) from signal values.
-// ASYNC-only — runs in background worker, never on hot path.
+// ASYNC-only â€” runs in background worker, never on hot path.
 // Reads from multiple tables, writes to risk_scores.
 
 import { prisma } from "@/lib/prisma";
@@ -15,14 +15,14 @@ import {
 } from "../domain/risk-signals";
 import {
     getTierFromScore,
-    IDENTITY_URS_BONUS as DIYANET_URS_BONUS,
+    IDENTITY_URS_BONUS,
     TRUSTED_GUIDE_URS_BONUS,
     ESCALATION_THRESHOLD,
     AUTO_SUSPEND_THRESHOLD,
     type RiskTier,
 } from "../domain/risk-tiers";
 
-// ─── Signal Value Types ─────────────────────────────────────────────────
+// â”€â”€â”€ Signal Value Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SignalSnapshot {
     [signalId: string]: {
@@ -44,7 +44,7 @@ interface ScoringResult {
     tierChanged: boolean;
 }
 
-// ─── Core Scoring Function ──────────────────────────────────────────────
+// â”€â”€â”€ Core Scoring Function â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Compute URS for a given user. This is the main entry point.
@@ -65,7 +65,7 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
 
     if (!user) throw new Error(`User ${userId} not found`);
 
-    // Check whitelist — skip scoring if whitelisted
+    // Check whitelist â€” skip scoring if whitelisted
     if (user.riskScore?.whitelistedUntil && user.riskScore.whitelistedUntil > new Date()) {
         return {
             urs: user.riskScore.urs,
@@ -80,14 +80,14 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
         };
     }
 
-    // ── Compute each category ───────────────────────────────────────
+    // â”€â”€ Compute each category â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     const behaviorScore = await computeBehaviorScore(userId, signals);
     const transactionScore = await computeTransactionScore(userId, signals);
     const networkScore = await computeNetworkScore(userId, user.email, signals);
     const historyScore = await computeHistoryScore(userId, user, signals);
 
-    // ── Weighted composite ──────────────────────────────────────────
+    // â”€â”€ Weighted composite â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     let urs =
         CATEGORY_WEIGHTS.BEHAVIOR * behaviorScore +
@@ -95,10 +95,10 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
         CATEGORY_WEIGHTS.NETWORK * networkScore +
         CATEGORY_WEIGHTS.HISTORY * historyScore;
 
-    // ── Apply bonuses (negative = reduces risk) ─────────────────────
+    // â”€â”€ Apply bonuses (negative = reduces risk) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-    if ((user as any).isIdentityVerified || user.isApproved) {
-        urs += DIYANET_URS_BONUS;
+    if (user.isIdentityVerified) {
+        urs += IDENTITY_URS_BONUS;
     }
 
     const avgRating = user.reviewsReceived.length > 0
@@ -116,7 +116,7 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
     const previousTier = (user.riskScore?.tier as RiskTier) || null;
     const tierChanged = previousTier !== null && previousTier !== tier;
 
-    // ── Persist ─────────────────────────────────────────────────────
+    // â”€â”€ Persist â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     await prisma.riskScore.upsert({
         where: { userId },
@@ -141,7 +141,7 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
         },
     });
 
-    // ── Log tier change as risk event ───────────────────────────────
+    // â”€â”€ Log tier change as risk event â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     if (tierChanged) {
         await prisma.riskEvent.create({
@@ -157,7 +157,7 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
     return { urs, tier, behaviorScore, transactionScore, networkScore, historyScore, signals, previousTier, tierChanged };
 }
 
-// ─── Category Scorers ───────────────────────────────────────────────────
+// â”€â”€â”€ Category Scorers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function evaluateSignal(
     signal: SignalDefinition,
@@ -194,7 +194,7 @@ async function computeBehaviorScore(userId: string, snapshot: SignalSnapshot): P
     score += evaluateSignal(BEHAVIOR_SIGNALS[4], deviceCount.length, snapshot); // DEVICE_CHANGES
 
     // IP_MISMATCH: check if latest IP country differs from registration IP
-    // (Requires IP-to-country lookup — stub for now)
+    // (Requires IP-to-country lookup â€” stub for now)
     snapshot["IP_MISMATCH"] = { value: 0, fired: false, contribution: 0 };
 
     // AUTOMATION_MARKERS: check for webdriver in recent UA
@@ -206,7 +206,7 @@ async function computeBehaviorScore(userId: string, snapshot: SignalSnapshot): P
         recentDevice?.userAgent?.includes("webdriver") ? 1 : 0;
     score += evaluateSignal(BEHAVIOR_SIGNALS[6], hasAutomation, snapshot); // AUTOMATION_MARKERS
 
-    // Other behavior signals require client telemetry — initialize as 0
+    // Other behavior signals require client telemetry â€” initialize as 0
     for (const sig of BEHAVIOR_SIGNALS) {
         if (!snapshot[sig.id]) {
             snapshot[sig.id] = { value: 0, fired: false, contribution: 0 };

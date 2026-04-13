@@ -1,10 +1,10 @@
-// ─── Cancellation Penalty Service ────────────────────────────────────────
+﻿// â”€â”€â”€ Cancellation Penalty Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Computes cancellation severity tiers, applies trust penalties,
 // and records cancellation events.
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Severity Tiers ─────────────────────────────────────────────────────
+// â”€â”€â”€ Severity Tiers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export type CancellationSeverity = "FREE" | "SOFT" | "MODERATE" | "SEVERE" | "CRITICAL" | "NO_SHOW";
 
@@ -30,7 +30,7 @@ const NO_SHOW_TIER: SeverityTier = {
     additionalEffect: "auto_escalation",
 };
 
-// ─── Frequency Multiplier ───────────────────────────────────────────────
+// â”€â”€â”€ Frequency Multiplier â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function getFrequencyMultiplier(userId: string): Promise<number> {
     const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 3600 * 1000);
@@ -48,7 +48,7 @@ async function getFrequencyMultiplier(userId: string): Promise<number> {
     return 3.0; // 3rd+ cancellation in 90 days
 }
 
-// ─── Public API ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Public API â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface CancellationInput {
     userId: string;           // Who is cancelling
@@ -75,7 +75,7 @@ export interface CancellationResult {
  * Computes severity, applies trust penalty, and records the event.
  */
 export async function processCancellation(input: CancellationInput): Promise<CancellationResult> {
-    // Force majeure → zero penalty
+    // Force majeure â†’ zero penalty
     if (input.isForceMajeure) {
         const record = await prisma.cancellationRecord.create({
             data: {

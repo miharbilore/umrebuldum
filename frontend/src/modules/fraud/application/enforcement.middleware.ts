@@ -1,8 +1,8 @@
-// ─── Enforcement Middleware ──────────────────────────────────────────────
+﻿// â”€â”€â”€ Enforcement Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Synchronous tier check at request time. O(1) DB read.
 // Call this at the top of any API route that needs risk-gating.
 //
-// This does NOT compute the URS — it reads the PRE-COMPUTED tier from
+// This does NOT compute the URS â€” it reads the PRE-COMPUTED tier from
 // risk_scores table (updated asynchronously by the scoring engine).
 
 import { prisma } from "@/lib/prisma";
@@ -33,7 +33,7 @@ export async function enforceRiskGate(
     velocityAction?: string,
 ): Promise<EnforcementResult & { response?: NextResponse }> {
 
-    // (1) Read pre-computed risk tier — O(1) indexed read
+    // (1) Read pre-computed risk tier â€” O(1) indexed read
     const riskScore = await prisma.riskScore.findUnique({
         where: { userId },
         select: { tier: true, urs: true, whitelistedUntil: true },
@@ -41,7 +41,7 @@ export async function enforceRiskGate(
 
     const tier = (riskScore?.tier as RiskTier) || "GREEN";
 
-    // (2) Check whitelist — if active, treat as GREEN
+    // (2) Check whitelist â€” if active, treat as GREEN
     const effectiveTier = riskScore?.whitelistedUntil && riskScore.whitelistedUntil > new Date()
         ? "GREEN"
         : tier;

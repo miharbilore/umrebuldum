@@ -1,18 +1,18 @@
-// ─── Behavioral Sybil Detection Layer ───────────────────────────────────
+﻿// â”€â”€â”€ Behavioral Sybil Detection Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Lightweight behavioral signals that can't be defeated by buying more
 // infrastructure (eSIMs, VPNs, anti-fingerprint browsers).
 // Requires human-speed interaction or expensive automation tooling.
 //
-// Cost escalation: $5/account → $22+/account
+// Cost escalation: $5/account â†’ $22+/account
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Registration Behavior Scoring ──────────────────────────────────────
+// â”€â”€â”€ Registration Behavior Scoring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Client-side collected behavioral metrics.
  * Transmitted as a single JSON blob on registration form submit.
- * No PII — only timing and interaction entropy.
+ * No PII â€” only timing and interaction entropy.
  */
 export interface RegistrationBehavior {
     pageLoadToFirstKeystrokeMs: number;  // Bot: <100ms, Human: 500-3000ms
@@ -26,7 +26,7 @@ export interface RegistrationBehavior {
 
 /**
  * Score registration behavior. Higher = more suspicious.
- * Range: 0–65. Added to infrastructure score for combined decision.
+ * Range: 0â€“65. Added to infrastructure score for combined decision.
  *
  * Why this works: Infrastructure signals (IP, device, phone) can be
  * bought. Behavioral signals require either a real human or Selenium
@@ -57,7 +57,7 @@ export function behavioralEntropyScore(b: RegistrationBehavior): number {
     // 6. Keystroke entropy (humans have variable timing; bots are regular)
     if (b.keystrokeDeltasMs && b.keystrokeDeltasMs.length >= 5) {
         const stdDev = computeStdDev(b.keystrokeDeltasMs);
-        if (stdDev < 15) score += 10; // Machine-like regularity (<15ms σ)
+        if (stdDev < 15) score += 10; // Machine-like regularity (<15ms Ïƒ)
     }
 
     return score;
@@ -83,14 +83,14 @@ export function validateBehaviorData(b: RegistrationBehavior): boolean {
     return true;
 }
 
-// ─── First-24h Action Cadence Check ─────────────────────────────────────
+// â”€â”€â”€ First-24h Action Cadence Check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Analyze the first 24 hours of a user's actions for bot-like patterns.
  * Run as a background check after user's 10th action.
  *
- * Bots: near-constant intervals (σ < 2s), many actions
- * Humans: highly variable intervals (σ > 10s), moderate actions
+ * Bots: near-constant intervals (Ïƒ < 2s), many actions
+ * Humans: highly variable intervals (Ïƒ > 10s), moderate actions
  */
 export async function first24hCadenceCheck(userId: string): Promise<{
     score: number;
@@ -175,7 +175,7 @@ export async function first24hCadenceCheck(userId: string): Promise<{
     return { score, isAutomated, intervalStdDev: stdDev };
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function computeStdDev(values: number[]): number {
     if (values.length < 2) return Infinity;

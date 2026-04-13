@@ -1,9 +1,9 @@
-// ─── Lead Routing Cron Job ──────────────────────────────────────────────
+﻿// â”€â”€â”€ Lead Routing Cron Job â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Runs periodically (e.g., via node-cron or Vercel Cron) to process leads
 // that are queued for the next chronological wave of distribution.
 
 import { prisma } from '@/lib/prisma';
-import { LeadMatchingService, WaveTier } from '@/src/modules/matching/application/LeadMatchingService';
+import { LeadMatchingService, WaveTier } from '@/modules/matching/application/LeadMatchingService';
 
 /**
  * Searches for all active lead routing logs where the next wave timer has

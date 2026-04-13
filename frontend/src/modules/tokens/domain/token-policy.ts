@@ -1,5 +1,5 @@
-// ─── Token Policy ───────────────────────────────────────────────────────
-// Domain rules for token spending. Pure logic — no DB access.
+﻿// â”€â”€â”€ Token Policy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Domain rules for token spending. Pure logic â€” no DB access.
 // Application layer calls these before executing transactions.
 
 import { TOKEN_COSTS, DAILY_CAPS, PACKAGE_LIMITS } from "@/lib/package-system";

@@ -1,4 +1,4 @@
-// ─── RiskEvent Retention & Cleanup ──────────────────────────────────────
+﻿// â”€â”€â”€ RiskEvent Retention & Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Severity-based TTL policy to prevent unbounded table growth.
 // Designed to run as a daily cron job.
 //
@@ -10,7 +10,7 @@
 
 import { prisma } from "@/lib/prisma";
 
-// ─── TTL Configuration ──────────────────────────────────────────────────
+// â”€â”€â”€ TTL Configuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const RETENTION_DAYS: Record<string, number> = {
     "LOW": 30,
@@ -22,7 +22,7 @@ const RETENTION_DAYS: Record<string, number> = {
 const BATCH_SIZE = 5000; // Delete in batches to avoid long locks
 const MAX_BATCHES = 20;  // Safety limit: max 100K deletes per run
 
-// ─── Cleanup Job ────────────────────────────────────────────────────────
+// â”€â”€â”€ Cleanup Job â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Delete expired risk events based on severity-level retention policy.
@@ -72,7 +72,7 @@ export async function cleanupRiskEvents(): Promise<{
     return { deletedTotal, batches, durationMs };
 }
 
-// ─── Velocity Counter Cleanup ───────────────────────────────────────────
+// â”€â”€â”€ Velocity Counter Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Delete old velocity counters (older than 8 days).
@@ -92,7 +92,7 @@ export async function cleanupVelocityCounters(): Promise<{ deleted: number }> {
     return { deleted };
 }
 
-// ─── Combined Daily Cleanup ─────────────────────────────────────────────
+// â”€â”€â”€ Combined Daily Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Run all cleanup jobs. Call from cron scheduler.

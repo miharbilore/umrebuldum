@@ -1,4 +1,4 @@
-// ─── Token Renewal Use Case ─────────────────────────────────────────────
+﻿// â”€â”€â”€ Token Renewal Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Monthly subscription token renewal with soft cap enforcement.
 //
 // Safety guarantees:
@@ -11,7 +11,7 @@ import { withSerializableRetry } from "@/lib/with-retry";
 import { LedgerEntryType } from "@prisma/client";
 import { TokenPolicy } from "../domain/token-policy";
 import { TokenRepository } from "../infrastructure/token.repository";
-import { EventBus } from "@/src/core/events/event-bus";
+import { EventBus } from "@/core/events/event-bus";
 
 export interface RenewalResult {
     processed: number;
@@ -36,9 +36,9 @@ export async function processMonthlyRenewal(): Promise<RenewalResult> {
         try {
             const result = await withSerializableRetry(() =>
                 prisma.$transaction(async (tx) => {
-                    // ── (1) Idempotency check INSIDE transaction ──────────
+                    // â”€â”€ (1) Idempotency check INSIDE transaction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     const existing = await tx.tokenTransaction.findUnique({
-                        where: { idempotencyKey },
+                        where: { idempotencyKey_userId: { idempotencyKey, userId: user.id } },
                     });
                     if (existing) return null; // Already renewed this month
 
@@ -50,7 +50,7 @@ export async function processMonthlyRenewal(): Promise<RenewalResult> {
 
                     if (grantAmount <= 0) return null; // Already at or above soft cap
 
-                    // ── (2) Create immutable ledger entry ─────────────────
+                    // â”€â”€ (2) Create immutable ledger entry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     await tx.tokenTransaction.create({
                         data: {
                             userId: user.id,
@@ -61,7 +61,7 @@ export async function processMonthlyRenewal(): Promise<RenewalResult> {
                         },
                     });
 
-                    // ── (3) Update cached balance ─────────────────────────
+                    // â”€â”€ (3) Update cached balance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                     await tx.user.update({
                         where: { id: user.id },
                         data: { tokenBalance: newBalance },
@@ -86,7 +86,7 @@ export async function processMonthlyRenewal(): Promise<RenewalResult> {
             }
 
         } catch (error: any) {
-            // P2002 = duplicate idempotencyKey — already processed by parallel cron
+            // P2002 = duplicate idempotencyKey â€” already processed by parallel cron
             if (error.code === "P2002") {
                 skipped++;
                 continue;

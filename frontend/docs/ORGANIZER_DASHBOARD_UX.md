@@ -25,10 +25,10 @@ A mobile-first dashboard for Umrah tour organizers to manage their listings, tra
 │   ├── Views Over Time
 │   ├── Click-Through Rate
 │   └── Conversion Funnel
-├── 💰 Gelir (Revenue)
-│   ├── Reservation Stats
-│   ├── Commission Summary
-│   └── Payout History
+├── 💰 Abonelik (Subscription)
+│   ├── Plan Details
+│   ├── Token Usage Stats
+│   └── Purchase History
 └── ⚙️ Ayarlar (Settings)
     ├── Profile
     ├── Notifications
@@ -176,23 +176,21 @@ Rezervasyon (227)
 
 ---
 
-### 5. Revenue (Gelir)
+### 5. Subscription & Tokens (Paket ve Tokenlar)
 
-**Purpose:** Financial overview
+**Purpose:** Manage subscription and token balance
 
 #### Cards:
-- Bu Ay Gelir: ₺45,230
-- Bekleyen Ödeme: ₺12,500
-- Toplam Rezervasyon: 23
+- Mevcut Paket: PRO
+- Kalan Token: 145
+- Aylık Yenileme Tarihi: 15.04.2026
 
-#### Commission Breakdown:
-| Kaynak | Adet | Komisyon |
-|--------|------|----------|
-| Umrebuldum | 18 | ₺3,240 |
-| Direkt | 5 | ₺0 |
+#### Token Usage:
+- Son 30 gün harcanan: 45 Token
+- En çok harcanan: İlan Öne Çıkarma (%60)
 
-#### Payout History:
-- List of past payouts with status
+#### History:
+- List of past token purchases and plan upgrades.
 
 ---
 

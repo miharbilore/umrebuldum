@@ -1,4 +1,4 @@
-import { inngest } from "@/src/inngest/client";
+﻿import { inngest } from "@/inngest/client";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -9,12 +9,7 @@ import { prisma } from "@/lib/prisma";
  * This guarantees extreme performance at the presentation layer (search, list).
  */
 export const handleRatingWorker = inngest.createFunction(
-    {
-        id: "rating-worker",
-        name: "Rating Average Computing Worker",
-        retries: 3,
-    },
-    { event: "event/REVIEW_APPROVED" },
+    { id: "rating-worker", name: "Rating Average Computing Worker", retries: 3, triggers: [{ event: "event/REVIEW_APPROVED" }] },
     async ({ event, step }: { event: any, step: any }) => {
         const { guideId } = event.data;
 

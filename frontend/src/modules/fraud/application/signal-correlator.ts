@@ -1,16 +1,16 @@
-// ─── Cross-Signal Correlation Engine ────────────────────────────────────
+﻿// â”€â”€â”€ Cross-Signal Correlation Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Detects multi-vector attack chains by correlating disparate risk events.
-// No complex event processing — lightweight windowed aggregation.
+// No complex event processing â€” lightweight windowed aggregation.
 //
 // Fires on each new RiskEvent (event-driven, not batched).
 // Detects:
-//   Chain A: Sybil → Trust farming → Review manipulation
-//   Chain B: Sybil → Cancellation weaponization
+//   Chain A: Sybil â†’ Trust farming â†’ Review manipulation
+//   Chain B: Sybil â†’ Cancellation weaponization
 //   Chain C: Repeated probation recycling
 
 import { prisma } from "@/lib/prisma";
 
-// ─── Signal Weights ─────────────────────────────────────────────────────
+// â”€â”€â”€ Signal Weights â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const SIGNAL_WEIGHTS: Record<string, number> = {
     "TRUST_CHANGE": 1,
@@ -24,7 +24,7 @@ const SIGNAL_WEIGHTS: Record<string, number> = {
     "BOOST_ABUSE": 4,
 };
 
-// ─── Correlation Result ─────────────────────────────────────────────────
+// â”€â”€â”€ Correlation Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export interface CorrelationResult {
     compositeScore: number;
@@ -37,13 +37,13 @@ export interface CorrelationResult {
     };
 }
 
-// ─── Main Correlator ────────────────────────────────────────────────────
+// â”€â”€â”€ Main Correlator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Correlate all risk signals for a user within a 7-day window.
  * Call AFTER creating a new RiskEvent.
  *
- * Runtime: single indexed query (~50-100 events) → <5ms.
+ * Runtime: single indexed query (~50-100 events) â†’ <5ms.
  */
 export async function correlateSignals(userId: string): Promise<CorrelationResult> {
     const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000);
@@ -111,13 +111,13 @@ export async function correlateSignals(userId: string): Promise<CorrelationResul
     };
 }
 
-// ─── Chain Detection ────────────────────────────────────────────────────
+// â”€â”€â”€ Chain Detection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function detectAttackChains(
     types: Set<string>,
     events: { eventType: string; metadata: any }[],
 ): string | null {
-    // Chain A: Sybil → Trust farming → Review manipulation
+    // Chain A: Sybil â†’ Trust farming â†’ Review manipulation
     // Most dangerous: complete ranking takeover
     if (
         (types.has("SYBIL_REGISTRATION_CHECK") || types.has("SYBIL_DETECTED")) &&
@@ -127,7 +127,7 @@ function detectAttackChains(
         return "CHAIN_A_RANKING_TAKEOVER";
     }
 
-    // Chain B: Sybil → Cancellation weaponization
+    // Chain B: Sybil â†’ Cancellation weaponization
     if (
         (types.has("SYBIL_DETECTED") || types.has("BEHAVIORAL_ANOMALY")) &&
         types.has("CANCELLATION_ESCALATION")
@@ -152,7 +152,7 @@ function detectAttackChains(
     return null;
 }
 
-// ─── Action Execution ───────────────────────────────────────────────────
+// â”€â”€â”€ Action Execution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function executeCorrelationAction(
     userId: string,

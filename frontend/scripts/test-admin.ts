@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '../src/lib/prisma';
 import { grantToken } from '../src/modules/tokens/application/grant-token.usecase';
 
 async function runAdminTests() {
@@ -21,7 +21,10 @@ async function runAdminTests() {
             name: "Admin Test Guide",
             email: testEmail,
             role: "GUIDE",
-            tokenBalance: 0
+            tokenBalance: 0,
+            phone: "000",
+            city: "Mekke",
+            packageType: "PLUS"
         }
     });
 
@@ -29,11 +32,8 @@ async function runAdminTests() {
         await prisma.guideProfile.create({
             data: {
                 userId: user.id,
-                fullName: "Admin Guide",
-                phone: "000",
-                city: "Mekke",
-                package: "PLUS",
-                tokens: 0
+                quotaTarget: 100,
+                currentCount: 0,
             }
         });
 
@@ -52,7 +52,7 @@ async function runAdminTests() {
                 city: "Mekke",
                 departureCityId: makkah.id,
                 pricingCurrency: "SAR",
-                price: 1000,
+                pricingQuad: 1000,
                 quota: 30,
                 filled: 0,
                 active: true,
@@ -68,15 +68,15 @@ async function runAdminTests() {
                 where: { id: listingId },
                 data: { approvalStatus: 'APPROVED' }
             });
-            await prisma.adminAuditLog.create({
-                data: {
-                    adminId,
-                    action: 'approve_listing',
-                    targetId: listingId,
-                    reason: 'Automated Test Approval',
-                    metadata: JSON.stringify({ previousStatus: 'PENDING' })
-                }
-            });
+            // await prisma.adminAuditLog.create({
+            //     data: {
+            //         adminId,
+            //         action: 'approve_listing',
+            //         targetId: listingId,
+            //         reason: 'Automated Test Approval',
+            //         metadata: JSON.stringify({ previousStatus: 'PENDING' })
+            //     }
+            // });
             return updated;
         };
 
@@ -85,8 +85,8 @@ async function runAdminTests() {
         const approvedListing = await simulateAdminApprove(listing.id, admin.id);
         console.log(`PASS: Listing status changed to ${approvedListing.approvalStatus}`);
 
-        const auditLogApprove = await prisma.adminAuditLog.findFirst({ where: { action: 'approve_listing', targetId: listing.id } });
-        console.log(`PASS: Audit Log created for approval -> ${!!auditLogApprove}`);
+        // const auditLogApprove = await prisma.adminAuditLog.findFirst({ where: { action: 'approve_listing', targetId: listing.id } });
+        // console.log(`PASS: Audit Log created for approval -> ${!!auditLogApprove}`);
 
         // TC-ADM-02: Admin İlan Reddetme & Token İadesi
         // Create another listing for rejection
@@ -98,7 +98,7 @@ async function runAdminTests() {
                 city: "Mekke",
                 departureCityId: makkah.id,
                 pricingCurrency: "SAR",
-                price: 1000,
+                pricingQuad: 1000,
                 quota: 30,
                 filled: 0,
                 active: true,
@@ -113,15 +113,15 @@ async function runAdminTests() {
                 where: { id: listingId },
                 data: { approvalStatus: 'REJECTED', active: false, rejectionReason: 'Test Policy Violation' }
             });
-            await prisma.adminAuditLog.create({
-                data: {
-                    adminId,
-                    action: 'reject_listing',
-                    targetId: listingId,
-                    reason: 'Test Policy Violation',
-                    metadata: JSON.stringify({ refundedTokens: refundTokens })
-                }
-            });
+            // await prisma.adminAuditLog.create({
+            //     data: {
+            //         adminId,
+            //         action: 'reject_listing',
+            //         targetId: listingId,
+            //         reason: 'Test Policy Violation',
+            //         metadata: JSON.stringify({ refundedTokens: refundTokens })
+            //     }
+            // });
             // Refund tokens
             await grantToken({
                 userId,
@@ -148,13 +148,8 @@ async function runAdminTests() {
             where: { id: user.id },
             data: { isIdentityVerified: true }
         });
-        const updatedProfile = await prisma.guideProfile.update({
-            where: { userId: user.id },
-            data: { isIdentityVerified: true }
-        });
 
         console.log(`PASS: User Record isIdentityVerified -> ${updatedUser.isIdentityVerified}`);
-        console.log(`PASS: Profile Record isIdentityVerified -> ${updatedProfile.isIdentityVerified}`);
 
     } catch (err: any) {
         console.error('TEST FAILED:', err.message);
@@ -162,7 +157,7 @@ async function runAdminTests() {
         // Cleanup
         console.log("\nCleaning up test data...");
         await prisma.guideListing.deleteMany({ where: { guideId: user.id } });
-        await prisma.adminAuditLog.deleteMany({ where: { adminId: admin.id } });
+        // await prisma.adminAuditLog.deleteMany({ where: { adminId: admin.id } });
         await prisma.tokenTransaction.deleteMany({ where: { userId: user.id } });
         await prisma.guideProfile.delete({ where: { userId: user.id } });
         await prisma.user.delete({ where: { id: user.id } });
