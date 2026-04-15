@@ -26,12 +26,17 @@ const ROOM_TYPES = [
     { value: "4-kisilik", label: "4 Kişilik Oda" },
 ];
 
+type CityOption = {
+    id: string;
+    name: string;
+};
+
 export default function NewRequestPage() {
     const router = useRouter();
     const { data: session } = useSession();
     const [loading, setLoading] = useState(true); // Start loading to check limit
     const [submitting, setSubmitting] = useState(false);
-    const [cities, setCities] = useState<any[]>([]);
+    const [cities, setCities] = useState<CityOption[]>([]);
     const [formData, setFormData] = useState({
         departureCity: "",
         peopleCount: "2",

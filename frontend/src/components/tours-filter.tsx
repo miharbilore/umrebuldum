@@ -28,6 +28,11 @@ interface ToursFilterProps {
   currentMaxPrice?: string;
 }
 
+type CityOption = {
+  id: string;
+  name: string;
+};
+
 export function ToursFilter({
   currentCity,
   currentMinPrice,
@@ -36,7 +41,7 @@ export function ToursFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
-  const [cities, setCities] = useState<any[]>([]);
+  const [cities, setCities] = useState<CityOption[]>([]);
 
   const [city, setCity] = useState(currentCity || "");
   const [minPrice, setMinPrice] = useState(currentMinPrice || "");

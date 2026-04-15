@@ -25,6 +25,11 @@ const ROOM_TYPES = [
     { value: "4-kisilik", label: "4 Kişilik Oda" },
 ];
 
+type CityOption = {
+    id: string;
+    name: string;
+};
+
 export default function EditRequestPage() {
     const router = useRouter();
     const params = useParams();
@@ -32,7 +37,7 @@ export default function EditRequestPage() {
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [cities, setCities] = useState<any[]>([]);
+    const [cities, setCities] = useState<CityOption[]>([]);
 
     const [formData, setFormData] = useState({
         departureCity: "",
