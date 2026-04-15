@@ -1,6 +1,7 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/api-guards";
 
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
         if (!currentUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
         // Filter conversations based on role
-        let where: any = {};
+        let where: Prisma.ConversationWhereInput = {};
         if (role === 'USER') {
             where = { userId: currentUser.id };
         } else if (role === 'GUIDE' || role === 'ORGANIZATION') {
@@ -41,12 +42,18 @@ export async function GET(req: Request) {
                 request: {
                     select: { departureCity: true, peopleCount: true }
                 },
+                user: {
+                    select: { name: true }
+                },
+                guide: {
+                    select: { user: { select: { name: true } } }
+                },
             },
             orderBy: { lastMessageAt: 'desc' },
         });
 
-        // Enrich conversations
-        const enrichedThreads = await Promise.all(conversations.map(async (conv) => {
+        // Enrich conversations (no more N+1 queries)
+        const enrichedThreads = conversations.map((conv) => {
             const lastMessage = conv.messages[0];
 
             const displayTitle = conv.request
@@ -57,18 +64,10 @@ export async function GET(req: Request) {
 
             if (role === 'USER') {
                 // User sees Guide name
-                const guideUser = await prisma.user.findUnique({
-                    where: { id: conv.guideId },
-                    select: { name: true },
-                });
-                displayCounterparty = guideUser?.name || "Rehber";
+                displayCounterparty = conv.guide?.user?.name || "Rehber";
             } else {
                 // Guide sees User initials
-                const user = await prisma.user.findUnique({
-                    where: { id: conv.userId },
-                    select: { name: true },
-                });
-                const name = user?.name || "Misafir Kullanıcı";
+                const name = conv.user?.name || "Misafir Kullanıcı";
                 const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
                 displayCounterparty = initials;
             }
@@ -81,7 +80,7 @@ export async function GET(req: Request) {
                 lastMessage: lastMessage?.body || "",
                 lastMessageTime: lastMessage?.createdAt.toISOString() || conv.lastMessageAt.toISOString()
             };
-        }));
+        });
 
         return NextResponse.json(enrichedThreads);
 

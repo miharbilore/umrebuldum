@@ -1,9 +1,23 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { HeroSection } from "@/components/hero-section";
 import { ToursGrid } from "@/components/tours-grid";
 import { ToursSort } from "@/components/tours-sort";
 import { Metadata } from "next";
 import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
+
+interface ToursSearchParams {
+  departureCity?: string;
+  date?: string;
+  minDate?: string;
+  maxDate?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  isIdentityVerified?: string;
+  page?: string;
+  limit?: string;
+  sort?: string;
+}
 // NOTE: EmptyState must be defined. If it doesn't exist yet we fallback to text.
 
 export const metadata: Metadata = {
@@ -11,7 +25,7 @@ export const metadata: Metadata = {
   description: "Türkiye'nin en güvenilir umre tur karşılaştırma platformu",
 };
 
-export default async function ToursPage({ searchParams }: { searchParams: Promise<any> }) {
+export default async function ToursPage({ searchParams }: { searchParams: Promise<ToursSearchParams> }) {
   const resolvedParams = await searchParams;
   
   // Create deterministic string from resolvedParams for hashing inside fetchCachedListings
@@ -35,7 +49,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
     const now = new Date();
 
-    const where: any = {
+    const where: Prisma.GuideListingWhereInput = {
       active: true,
       approvalStatus: 'APPROVED',
       endDate: { gte: now }

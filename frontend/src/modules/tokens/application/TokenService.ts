@@ -1,5 +1,5 @@
-﻿import { prisma } from "@/lib/prisma";
-import { LedgerEntryType } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import { Prisma, LedgerEntryType } from "@prisma/client";
 
 export class TokenService {
     /**
@@ -47,7 +47,7 @@ export class TokenService {
         cost: number,
         action: string,
         referenceId: string,
-        tx?: any
+        tx?: Prisma.TransactionClient
     ): Promise<{ balance: number; alreadyProcessed: boolean }> {
         if (cost <= 0) throw new Error("Cost must be greater than zero.");
 
@@ -61,9 +61,11 @@ export class TokenService {
         // or rely on isolation levels.
 
         // Ensure isolation if no transaction is provided
-        const executionClient = tx ? async (work: any) => work(tx) : (work: any) => prisma.$transaction(work, { isolationLevel: 'RepeatableRead' });
+        const executionClient = tx
+            ? async (work: (client: Prisma.TransactionClient) => Promise<{ balance: number; alreadyProcessed: boolean }>) => work(tx)
+            : (work: (client: Prisma.TransactionClient) => Promise<{ balance: number; alreadyProcessed: boolean }>) => prisma.$transaction(work, { isolationLevel: 'RepeatableRead' });
 
-        return await executionClient(async (txClient: any) => {
+        return await executionClient(async (txClient: Prisma.TransactionClient) => {
             // STEP 0: Check if Ledger Entry Exists (Idempotency Lock)
             const existingEntry = await txClient.$queryRaw`
                 SELECT id, amount 
