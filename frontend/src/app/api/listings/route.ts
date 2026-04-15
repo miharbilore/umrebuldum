@@ -47,24 +47,26 @@ export const GET = withErrorHandler(async (req: Request) => {
             deletedAt: null,
             endDate: { gte: now }
         };
+        const appendAndFilter = (filter: Prisma.GuideListingWhereInput) => {
+            const existingAnd = Array.isArray(where.AND) ? where.AND : (where.AND ? [where.AND] : []);
+            where.AND = [...existingAnd, filter];
+        };
 
         if (guideId) where.guideId = guideId;
         const sanitizedDepartureCity = sanitizeCityName(departureCityParam) || null;
         if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
-            where.OR = [
-                { departureCityId: sanitizedDepartureCity },
-                { departureCity: { name: { equals: sanitizedDepartureCity } } }
-            ];
+            appendAndFilter({
+                OR: [
+                    { departureCityId: sanitizedDepartureCity },
+                    { departureCity: { name: { equals: sanitizedDepartureCity } } }
+                ]
+            });
         }
         if (city) {
             const trimmedCity = city.trim();
             const normalizedCity = normalizeCityQuery(trimmedCity);
             const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
-            const existingAnd = Array.isArray(where.AND) ? where.AND : (where.AND ? [where.AND] : []);
-            where.AND = [
-                ...existingAnd,
-                { OR: cityCandidates.map((candidate) => ({ city: { contains: candidate } })) }
-            ];
+            appendAndFilter({ OR: cityCandidates.map((candidate) => ({ city: { contains: candidate } })) });
         }
 
         // Identity verification is now strictly on the User model
