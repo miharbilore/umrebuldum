@@ -51,14 +51,14 @@ async function main() {
         { name: "İstanbul", airport: "İstanbul Havalimanı / Sabiha Gökçen" },
         { name: "Ankara", airport: "Esenboğa" },
         { name: "İzmir", airport: "Adnan Menderes" },
-        { name: "Konya", airport: "Konya" },
-        { name: "Kayseri", airport: "Erkilet" },
-        { name: "Adana", airport: "Çukurova" },
-        { name: "Gaziantep", airport: "Gaziantep" },
     ];
 
     const otherCities = [
+        { name: "Adana", airport: "Çukurova" },
         { name: "Antalya", airport: "Antalya" },
+        { name: "Gaziantep", airport: "Gaziantep" },
+        { name: "Kayseri", airport: "Erkilet" },
+        { name: "Konya", airport: "Konya" },
         { name: "Trabzon", airport: "Trabzon" },
         { name: "Samsun", airport: "Çarşamba" },
         { name: "Diyarbakır", airport: "Diyarbakır" },
@@ -73,19 +73,23 @@ async function main() {
         { name: "Kahramanmaraş", airport: "Kahramanmaraş" },
     ];
 
+    const sanitizeName = (name: string) => name.replace(/\*/g, "").trim();
+
     for (const city of priorityCities) {
+        const name = sanitizeName(city.name);
         await prisma.departureCity.upsert({
-            where: { name: city.name },
-            update: { priority: true, airport: city.airport },
-            create: { ...city, priority: true },
+            where: { name },
+            update: { priority: true, airport: city.airport, name },
+            create: { ...city, name, priority: true },
         });
     }
 
     for (const city of otherCities) {
+        const name = sanitizeName(city.name);
         await prisma.departureCity.upsert({
-            where: { name: city.name },
-            update: { priority: false, airport: city.airport },
-            create: { ...city, priority: false },
+            where: { name },
+            update: { priority: false, airport: city.airport, name },
+            create: { ...city, name, priority: false },
         });
     }
     console.log("✅ Seeded departure cities");

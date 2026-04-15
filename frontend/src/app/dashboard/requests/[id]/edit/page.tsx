@@ -19,16 +19,6 @@ import { Loader2 } from "lucide-react";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 
-const CITIES = [
-    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
-    "Aydın", "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur",
-    "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan",
-    "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "İstanbul",
-    "İzmir", "Kahramanmaraş", "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kırıkkale", "Kırklareli", "Kırşehir",
-    "Kilis", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin", "Muğla", "Muş",
-    "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas",
-    "Şanlıurfa", "Şırnak", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
-];
 const ROOM_TYPES = [
     { value: "2-kisilik", label: "2 Kişilik Oda" },
     { value: "3-kisilik", label: "3 Kişilik Oda" },
@@ -42,6 +32,7 @@ export default function EditRequestPage() {
 
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [cities, setCities] = useState<any[]>([]);
 
     const [formData, setFormData] = useState({
         departureCity: "",
@@ -56,6 +47,21 @@ export default function EditRequestPage() {
         contactViaPhone: false,
         contactViaChat: true
     });
+
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const res = await fetch("/api/cities");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) setCities(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch cities", err);
+            }
+        };
+        fetchCities();
+    }, []);
 
     useEffect(() => {
         const fetchRequest = async () => {
@@ -170,7 +176,14 @@ export default function EditRequestPage() {
                                     <SelectValue placeholder="Şehir Seçiniz" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {CITIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                    {cities.map((city) => {
+                                        const cityName = String(city.name ?? "").replace(/\*/g, "").trim();
+                                        return (
+                                            <SelectItem key={city.id ?? cityName} value={cityName}>
+                                                {cityName}
+                                            </SelectItem>
+                                        );
+                                    })}
                                 </SelectContent>
                             </Select>
                         </div>
