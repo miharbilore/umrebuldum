@@ -97,7 +97,7 @@ export async function PUT(req: Request) {
                 fullName: fullName,
                 phone: phone,
                 city: city,
-                agencyCity: agencyCity ? agencyCity : null,
+                agencyCity: agencyCity ?? null,
                 bio: bio,
                 photo: photo
             }

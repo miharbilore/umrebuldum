@@ -33,6 +33,12 @@ export const GET = withErrorHandler(async (req: Request) => {
 
         const now = new Date();
         const sanitizeCityName = (value?: string | null) => (value ? value.replace(/\*/g, "").trim() : value);
+        const normalizeCityQuery = (value: string) =>
+            value
+                .toLocaleLowerCase("tr-TR")
+                .split(" ")
+                .map((word) => (word ? `${word[0].toLocaleUpperCase("tr-TR")}${word.slice(1)}` : ""))
+                .join(" ");
 
         // Build where clause
         let where: Prisma.GuideListingWhereInput = {
@@ -51,7 +57,14 @@ export const GET = withErrorHandler(async (req: Request) => {
             ];
         }
         if (city) {
-            where.city = { contains: city };
+            const trimmedCity = city.trim();
+            const normalizedCity = normalizeCityQuery(trimmedCity);
+            const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
+            const existingAnd = Array.isArray(where.AND) ? where.AND : (where.AND ? [where.AND] : []);
+            where.AND = [
+                ...existingAnd,
+                { OR: cityCandidates.map((candidate) => ({ city: { contains: candidate } })) }
+            ];
         }
 
         // Identity verification is now strictly on the User model
