@@ -112,6 +112,7 @@ model User {
 
   tokenTransactions    TokenTransaction[]
   activeBoosts         ActiveBoost[]
+  quizAttempts         QuizAttempt[]
   identityApplications IdentityApplication[]
   reviewsReceived      Review[]              @relation("GuideReviews")
   reviewsGiven         Review[]              @relation("UserReviews")
@@ -975,4 +976,17 @@ model TestLog {
   @@index([scenarioName])
   @@index([createdAt])
   @@map("test_logs")
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  score     Int
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("quiz_attempts")
 }

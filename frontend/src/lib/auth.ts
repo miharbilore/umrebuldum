@@ -19,7 +19,6 @@ declare module "next-auth" {
             id?: string;
             role?: string;
             requires_onboarding?: boolean;
-            wp_user_id?: number | string;
             name?: string | null;
             email?: string | null;
             image?: string | null;

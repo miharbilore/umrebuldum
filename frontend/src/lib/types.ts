@@ -1,4 +1,7 @@
-﻿// WordPress API Types for Umrebuldum
+/**
+ * Core Domain Types for Umrebuldum
+ * Standardized to CamelCase for the modern Prisma/Next.js architecture.
+ */
 
 export interface Hotel {
   name: string;
@@ -20,21 +23,19 @@ export interface EmergencyContact {
 }
 
 export interface Tour {
-  id: number;
+  id: string | number;
   slug: string;
   title: string;
-  featured_image?: string;
-  thumbnail?: string; // specific to legacy/mock
+  featuredImage?: string;
+  thumbnail?: string;
   price: number;
   duration: string;
-  departure_city: string;
-  departureCity?: string; // alias for legacy/mock
+  departureCity: string;
   hotels: Hotel[];
   itinerary: ItineraryDay[];
-  guide_name?: string;
-  guide_phone?: string;
-  agency_name?: string;
-  agencyName?: string; // alias
+  guideName?: string;
+  guidePhone?: string;
+  agencyName?: string;
   agencyPhone?: string;
   agencyEmail?: string;
   images?: string[];
@@ -47,19 +48,17 @@ export interface Tour {
 }
 
 export interface TourListItem {
-  id: number;
+  id: string | number;
   slug: string;
   title: string;
-  featured_image?: string;
-  thumbnail?: string; // alias
+  featuredImage?: string;
+  thumbnail?: string;
   price: number;
   duration: string;
-  departure_city: string;
-  departureCity?: string; // alias
+  departureCity: string;
   rating?: number;
   reviewCount?: number;
   agencyName?: string;
-  agency_name?: string;
   featured?: boolean;
 }
 

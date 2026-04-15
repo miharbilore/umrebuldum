@@ -1,8 +1,8 @@
-﻿// â”€â”€â”€ pSEO JSON-LD Structured Data Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ pSEO JSON-LD Structured Data Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Injects Schema.org structured data into Next.js pages to win rich snippets
 // in Google search results (e.g., Star ratings, Prices, FAQs, Breadcrumbs).
 
-import { RankingListingInput, RankingGuideInput } from "@/modules/ranking/ranking-engine";
+import { RankingListingInput, RankingGuideInput } from "@/modules/ranking/domain/ranking-engine";
 
 export const PseoSchemaGenerator = {
     // 1. BreadcrumbList (Essential for deep generic navigation)

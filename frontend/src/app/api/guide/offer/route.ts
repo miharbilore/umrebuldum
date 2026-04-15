@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
@@ -42,12 +42,27 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }
 
-        // Resolve guide user
         const guideUser = await prisma.user.findUnique({
             where: { email: session!.user.email! },
             select: { id: true, packageType: true },
         });
         if (!guideUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        // â”€â”€â”€ Security Fix: Check for active & approved listings â”€â”€â”€
+        const activeListingsCount = await prisma.guideListing.count({
+            where: { 
+                guideId: guideUser.id, 
+                active: true, 
+                approvalStatus: "APPROVED" 
+            }
+        });
+
+        if (activeListingsCount === 0) {
+            return NextResponse.json({ 
+                error: "FORBIDDEN_NO_LISTING",
+                message: "Teklif verebilmek için en az bir adet onaylanmış aktif ilanınız bulunmalıdır." 
+            }, { status: 403 });
+        }
 
         // Verify request exists and is open
         const request = await prisma.umrahRequest.findUnique({
@@ -140,4 +155,41 @@ export async function POST(req: Request) {
         console.error("Offer error:", error);
         return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
     }
+}
+
+/**
+ * GET /api/guide/offer
+ * Returns all interests (offers) sent by the current guide.
+ */
+export async function GET() {
+    const session = await auth();
+    const guard = requireSupply(session);
+    if (guard) return guard;
+
+    // Find interests by this guide, include the related request
+    const interests = await prisma.requestInterest.findMany({
+        where: { guideEmail: session!.user.email! },
+        include: {
+            request: true
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    // Map to the expected response shape
+    const offers = interests
+        .filter(i => i.request)
+        .map(i => ({
+            id: i.request.id,
+            departureCity: i.request.departureCity,
+            peopleCount: i.request.peopleCount,
+            dateRange: i.request.dateRange,
+            roomType: i.request.roomType,
+            budget: i.request.budget,
+            note: i.request.note,
+            status: i.request.status,
+            createdAt: i.request.createdAt.toISOString(),
+            interestDate: i.createdAt.toISOString()
+        }));
+
+    return NextResponse.json({ offers });
 }

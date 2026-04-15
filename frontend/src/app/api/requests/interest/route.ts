@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
@@ -35,6 +35,22 @@ export async function POST(req: Request) {
             where: { email: session!.user.email! }
         });
         if (!guideUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+        // â”€â”€â”€ Security Fix: Check for active & approved listings â”€â”€â”€
+        const activeListingsCount = await prisma.guideListing.count({
+            where: { 
+                guideId: guideUser.id, 
+                active: true, 
+                approvalStatus: "APPROVED" 
+            }
+        });
+
+        if (activeListingsCount === 0) {
+            return NextResponse.json({ 
+                error: "FORBIDDEN_NO_LISTING",
+                message: "Müşteri taleplerine ilgi gösterebilmek için en az bir adet onaylanmış aktif ilanınız bulunmalıdır." 
+            }, { status: 403 });
+        }
 
         // Check for duplicate interest (idempotent early exit â€” free, no credits needed)
         const existingInterest = await prisma.requestInterest.findUnique({

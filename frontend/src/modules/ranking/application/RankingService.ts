@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Ranking Service (v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Ranking Service (v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Wires the 6-factor ranking engine with Prisma data layer.
 // Uses percentage-capped boost and trust-gated tiers.
 
@@ -13,9 +13,9 @@ import {
   type RankingBoostInput,
   type PersonalizationInput,
   type RankedListing,
-} from "@/modules/ranking/ranking-engine";
-import { getBatchConversionMetrics } from "@/modules/ranking/conversion-tracker";
-import { calculateProfileCompleteness } from "@/lib/listing-ranking";
+} from "@/modules/ranking/domain/ranking-engine";
+import { getBatchConversionMetrics } from "@/modules/ranking/domain/conversion-tracker";
+import { calculateProfileCompleteness } from "../domain/scoring.engine";
 
 export class RankingService {
   /**

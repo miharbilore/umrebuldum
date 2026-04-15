@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { PackageSystem } from "@/lib/package-system";
@@ -7,7 +7,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { Prisma, ApprovalStatus, PackageTier } from "@prisma/client";
 import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
-import { calculateListingScore } from "@/lib/listing-ranking";
+import { calculateListingScore, calculateProfileCompleteness } from "@/modules/ranking/domain/scoring.engine";
 import { spendToken } from "@/modules/tokens";
 
 import { withErrorHandler } from "@/lib/errors/api-handler";

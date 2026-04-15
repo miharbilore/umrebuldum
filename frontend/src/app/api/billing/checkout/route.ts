@@ -1,10 +1,11 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 import { rateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { selectGateway, getAvailableProviders } from "@/lib/payment-router";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
+import { canPurchaseTokens } from "@/lib/package-system";
 import type { PaymentProvider } from "@/lib/payment-gateway";
 // DOĞRU IMPORT: İsim çakışmasını önlemek için Prisma Enum'una 'PrismaPaymentProvider' takma adı verdik
 import { TransactionStatus, PaymentProvider as PrismaPaymentProvider } from "@prisma/client"; 
@@ -94,10 +95,18 @@ export async function POST(req: Request) {
         // Find user's DB id
         const user = await prisma.user.findUnique({
             where: { email: session!.user.email! },
-            select: { id: true, email: true, role: true },
+            select: { id: true, email: true, role: true, packageType: true },
         });
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        // ── Hard Paywall: FREEMIUM users cannot purchase additional tokens ──
+        if (!canPurchaseTokens(user.packageType)) {
+            return NextResponse.json(
+                { error: "Ek jeton almak için PRO veya PREMIUM pakete geçmelisiniz.", code: "FREEMIUM_PAYWALL" },
+                { status: 403 }
+            );
         }
 
         // Find package

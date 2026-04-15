@@ -1,23 +1,81 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { Check, Crown, Zap, AlertCircle } from 'lucide-react';
-import { TIERS, TIER_DISPLAY_CONFIG, type AccessInfo, type TierType } from '@/lib/tier-config';
+import { PACKAGE_LIMITS, PLAN_PRICES_TRY } from '@/lib/package-system';
 
 // ======================================
-// PRICING TABLE (Backend Aligned)
+// TYPES
+// ======================================
+
+type PackageTier = 'FREEMIUM' | 'PRO' | 'PREMIUM' | 'PLUS' | 'BUSINESS' | 'BUSINESS_PLUS';
+
+interface QuotaData {
+    tokenBalance: number;
+    packageType: PackageTier;
+    daily_limit: number;
+    daily_used: number;
+    features: {
+        can_generate: boolean;
+        high_quality: boolean;
+    };
+}
+
+// ======================================
+// PRICING TABLE (Internal Engine Aligned)
 // ======================================
 
 interface PricingTableProps {
-    currentTier?: TierType;
-    onUpgrade?: (tier: TierType) => void;
+    currentTier?: PackageTier;
+    onUpgrade?: (tier: PackageTier) => void;
 }
 
-export function PricingTable({ currentTier = TIERS.FREEMIUM, onUpgrade }: PricingTableProps) {
+export function PricingTable({ currentTier = 'FREEMIUM', onUpgrade }: PricingTableProps) {
     const plans = [
-        TIER_DISPLAY_CONFIG.freemium,
-        TIER_DISPLAY_CONFIG.plus,
-        TIER_DISPLAY_CONFIG.pro
+        {
+            id: 'FREEMIUM' as PackageTier,
+            name: 'Ücretsiz',
+            price: '₺0',
+            description: 'Başlangıç paketi',
+            cta: 'Mevcut Plan',
+            features: [
+                'Günde 1 Teklif Hakkı',
+                '1 Aktif İlan Limiti',
+                'Standart Sıralama',
+                'Temel Profil'
+            ],
+            popular: false
+        },
+        {
+            id: 'PRO' as PackageTier,
+            name: 'PRO',
+            price: `₺${PLAN_PRICES_TRY.PRO}/ay`,
+            description: 'Bireysel rehberler için',
+            cta: "PRO'ya Yükselt",
+            features: [
+                'Günde 10 Teklif Hakkı',
+                '5 Aktif İlan Limiti',
+                'Öncelikli Sıralama',
+                'Kimlik Doğrulama Rozeti',
+                'Spotlight Uygunluğu'
+            ],
+            popular: true
+        },
+        {
+            id: 'PREMIUM' as PackageTier,
+            name: 'PREMIUM',
+            price: `₺${PLAN_PRICES_TRY.PREMIUM}/ay`,
+            description: 'En kapsamlı paket',
+            cta: "PREMIUM'a Yükselt",
+            features: [
+                'Günde 20 Teklif Hakkı',
+                '15 Aktif İlan Limiti',
+                'Maksimum Görünürlük',
+                'Yüksek Kaliteli Posterler',
+                'AI İlan Oluşturucu'
+            ],
+            popular: false
+        }
     ];
 
     return (
@@ -80,54 +138,55 @@ export function PricingTable({ currentTier = TIERS.FREEMIUM, onUpgrade }: Pricin
 }
 
 // ======================================
-// QUOTA STATUS (API Driven)
+// QUOTA STATUS (Internal API Driven)
 // ======================================
 
 export function QuotaStatus() {
-    const [access, setAccess] = useState<AccessInfo | null>(null);
+    const [quota, setQuota] = useState<QuotaData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('/wp-json/umrebuldum/v1/access')
+        fetch('/api/user/quota')
             .then(res => res.json())
-            .then((data: AccessInfo) => {
-                setAccess(data);
+            .then((data: QuotaData) => {
+                setQuota(data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error('API Error:', err);
+                console.error('Quota Fetch Error:', err);
                 setLoading(false);
             });
     }, []);
 
     if (loading) return <div className="h-12 bg-gray-100 animate-pulse rounded-lg"></div>;
-    if (!access) return null;
+    if (!quota) return null;
 
-    // Unlimited User
-    if (access.daily_limit === null) {
+    // Unlimited/Business handling (if applicable)
+    if (quota.daily_limit >= 100) {
         return (
             <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-xl p-4 flex items-center gap-3">
                 <div className="bg-purple-100 p-2 rounded-lg text-purple-600">
                     <Crown size={20} />
                 </div>
                 <div>
-                    <h4 className="font-semibold text-purple-900">Sınırsız Erişim Aktif</h4>
-                    <p className="text-sm text-purple-700">Tüm PRO özellikler kullanımınıza hazır.</p>
+                    <h4 className="font-semibold text-purple-900">Kurumsal Erişim Aktif</h4>
+                    <p className="text-sm text-purple-700">Kotalarınız işletmeniz için genişletildi.</p>
                 </div>
             </div>
         );
     }
 
-    // Free User with Quota
-    const percentage = Math.min(100, (access.daily_used / access.daily_limit) * 100);
-    const isLimitReached = access.daily_used >= access.daily_limit;
+    // Standard User with Quota
+    const percentage = Math.min(100, (quota.daily_used / quota.daily_limit) * 100);
+    const isLimitReached = quota.daily_used >= quota.daily_limit;
+    console.log("DEBUG QUOTA:", quota);
 
     return (
-        <div className="bg-white border boundary-gray-200 rounded-xl p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-700">Günlük Limit</span>
+                <span className="font-medium text-gray-700">Günlük Teklif Limiti</span>
                 <span className="text-sm font-semibold text-gray-900">
-                    {access.daily_used} / {access.daily_limit}
+                    {quota.daily_used} / {quota.daily_limit}
                 </span>
             </div>
 
@@ -142,23 +201,34 @@ export function QuotaStatus() {
             {isLimitReached ? (
                 <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-2 rounded-lg">
                     <AlertCircle size={16} />
-                    <span>Limit doldu. Yarına kadar bekleyin veya yükseltin.</span>
+                    <span>Günlük limit doldu. Yetersiz bakiye veya limit aşımı.</span>
                 </div>
             ) : (
                 <p className="text-xs text-gray-500">
-                    Kalan hakkınız: {access.daily_limit - access.daily_used} poster
+                    Bugün kalan hakkınız: {quota.daily_limit - quota.daily_used} teklif
                 </p>
+            )}
+
+            {/* Nuclear Solution: Standalone Quiz CTA for Freemium users with 0 balance */}
+            {quota.packageType === 'FREEMIUM' && quota.tokenBalance <= 0 && (
+                <div className="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg flex flex-col items-center text-center">
+                    <h4 className="font-bold text-purple-800 dark:text-purple-300 mb-1">Jetonunuz Bitti! ⚡</h4>
+                    <p className="text-sm text-purple-600 dark:text-purple-400 mb-3">Hemen rehberlik bilgini kanıtla, tek seferlik 15 jeton ödülünü kap.</p>
+                    <a href="/dashboard/quiz" className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium transition-colors">
+                        Sınava Gir ve Kazan
+                    </a>
+                </div>
             )}
         </div>
     );
 }
 
 // ======================================
-// FEATURE GATE (Logic-less)
+// FEATURE GATE (Server-Synced)
 // ======================================
 
 interface FeatureGateProps {
-    feature: keyof AccessInfo['features'];
+    feature: keyof QuotaData['features'];
     fallback?: React.ReactNode;
     children: React.ReactNode;
 }
@@ -167,18 +237,10 @@ export function FeatureGate({ feature, fallback = null, children }: FeatureGateP
     const [hasAccess, setHasAccess] = useState<boolean | null>(null);
 
     useEffect(() => {
-        // Check sessionStorage first for cache
-        const cached = sessionStorage.getItem('ube_access');
-        if (cached) {
-            const data = JSON.parse(cached) as AccessInfo;
-            setHasAccess(data.features[feature]);
-        }
-
-        // Fetch fresh
-        fetch('/wp-json/umrebuldum/v1/access')
+        // Fetch fresh quota and check features
+        fetch('/api/user/quota')
             .then(res => res.json())
-            .then((data: AccessInfo) => {
-                sessionStorage.setItem('ube_access', JSON.stringify(data));
+            .then((data: QuotaData) => {
                 setHasAccess(data.features[feature]);
             })
             .catch(() => setHasAccess(false));

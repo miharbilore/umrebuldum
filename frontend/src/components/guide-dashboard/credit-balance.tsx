@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Wallet, Shield, Star, Loader2 } from "lucide-react";
+import { Wallet, Shield, Star, Loader2, Zap } from "lucide-react";
 import useSWR from "swr";
 import Link from "next/link";
 
@@ -55,9 +55,11 @@ export function CreditBalance() {
         BUSINESS_PLUS: 'bg-slate-800 text-amber-400 border-slate-700',
     };
 
+    console.log("DEBUG CREDIT BALANCE:", { credits, packageType: pkg });
+
     return (
         <div className="mb-6">
-            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-100 rounded-2xl p-5 sm:p-6">
+            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border border-blue-100 rounded-2xl p-5 sm:p-6 shadow-sm">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     {/* Stats Grid */}
                     <div className="flex-1 flex flex-wrap gap-4 sm:gap-6">
@@ -96,14 +98,24 @@ export function CreditBalance() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 w-full sm:w-auto">
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                        {/* Dynamic Growth Hook: Quiz CTA for Freemium with 0 balance */}
+                        {pkg === 'FREEMIUM' && credits <= 0 && (
+                            <Button asChild variant="default" className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-0 shadow-lg shadow-purple-200 animate-pulse">
+                                <Link href="/dashboard/quiz" className="flex items-center gap-1.5">
+                                    <Zap className="w-4 h-4 fill-yellow-300 text-yellow-300" />
+                                    <span className="font-bold">Bilgini Kanıtla, 15 Jeton Kazan!</span>
+                                </Link>
+                            </Button>
+                        )}
+                        
                         <Button asChild variant="default" className="bg-amber-600 hover:bg-amber-700 text-white flex-1 sm:flex-initial">
                             <Link href="/dashboard/billing">
                                 <Wallet className="w-4 h-4 mr-1.5" />
                                 Kredi Yükle
                             </Link>
                         </Button>
-                        <Button asChild variant="outline" className="flex-1 sm:flex-initial">
+                        <Button asChild variant="outline" className="flex-1 sm:flex-initial hidden sm:flex">
                             <Link href="/dashboard/credits">
                                 İşlem Geçmişi
                             </Link>

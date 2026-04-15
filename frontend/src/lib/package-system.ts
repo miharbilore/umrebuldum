@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Package Limits & Token Economy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Package Limits & Token Economy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Source of truth for all package capabilities and token pricing.
 
 import type { PackageType } from "./db-types";
@@ -7,13 +7,22 @@ import { prisma } from "./prisma";
 // â”€â”€ Token Costs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const TOKEN_COSTS = {
-    LISTING_CREATE: 10,
+    LISTING_CREATE: 5,
     OFFER_SEND: 5,
     DEMAND_UNLOCK: 3,
     BOOST: 15,
     SPOTLIGHT: 25,
     REPUBLISH: 2,
     REFRESH: 1,
+} as const;
+
+// ── Package Pricing Metadata (UI display) ─────────────────────────────────
+// Strikethrough pricing for psychological anchoring.
+// Values are in TRY. Admin can override via DB CreditPackage.features.
+
+export const PACKAGE_PRICING = {
+    PRO: { defaultPrice: 499, strikethroughPrice: 1499 },
+    PREMIUM: { defaultPrice: 899, strikethroughPrice: 2499 },
 } as const;
 
 
@@ -28,14 +37,14 @@ export interface DailyCaps {
 
 export const DAILY_CAPS: Record<PackageType, DailyCaps> = {
     FREEMIUM:      { offers: 1,   unlocks: 0,  boosts: 0,  spotlights: 0 },
-    PREMIUM:       { offers: 5,   unlocks: 3,  boosts: 1,  spotlights: 0 },
+    PRO:           { offers: 10,  unlocks: 5,  boosts: 3,  spotlights: 1 },
+    PREMIUM:       { offers: 20,  unlocks: 15, boosts: 5,  spotlights: 2 },
     PLUS:          { offers: 10,  unlocks: 5,  boosts: 2,  spotlights: 1 },
-    PRO:           { offers: 20,  unlocks: 15, boosts: 5,  spotlights: 2 },
     BUSINESS:      { offers: 50,  unlocks: 30, boosts: 10, spotlights: 3 },
     BUSINESS_PLUS: { offers: 100, unlocks: 50, boosts: 30, spotlights: 10 },
 };
 
-// â”€â”€ Package Limits â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Package Limits ───────────────────────────────────────────────────────────
 
 export interface PackageLimits {
     maxListings: number;
@@ -59,7 +68,8 @@ export interface PackageLimits {
 }
 
 export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
-    // â”€â”€ Rehber/Kurumsal FREEMIUM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── FREEMIUM (Ücretsiz Başlangıç) ──────────────────────────
+    // Hard Paywall: Ek jeton SATIN ALAMAZ. Sadece initialTokens ile sınırlı.
     FREEMIUM: {
         maxListings: 1,
         listingDays: 30,
@@ -80,28 +90,51 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: true,
         aiGenerator: false,
     },
-    // â”€â”€ Rehber Premium â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    PREMIUM: {
-        maxListings: 3,
-        listingDays: 60,
-        initialTokens: 50,
-        monthlyTokens: 50,
-        softCap: 100,
-        maxDailyOffers: 5,
-        maxBoosts: 1,
-        boostDays: 3,
+    // ── PRO (Profesyonel Rehber) ────────────────────────────────
+    // Ek jeton satın alabilir.
+    PRO: {
+        maxListings: 5,
+        listingDays: 90,
+        initialTokens: 150,
+        monthlyTokens: 150,
+        softCap: 300,
+        maxDailyOffers: 10,
+        maxBoosts: 3,
+        boostDays: 5,
         phoneVisible: true,
-        featuredEligible: false,
-        priorityRanking: false,
+        featuredEligible: true,
+        priorityRanking: true,
         trustBoost: false,
         identityVerificationEligible: true,
-        spotlightEligible: false,
+        spotlightEligible: true,
         posterQuality: "NORMAL",
         canCreatePoster: true,
-        watermark: true,
+        watermark: false,
         aiGenerator: false,
     },
-    // â”€â”€ Rehber Plus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── PREMIUM (En Kapsamlı Bireysel Paket) ────────────────────
+    // Ek jeton satın alabilir.
+    PREMIUM: {
+        maxListings: 15,
+        listingDays: 180,
+        initialTokens: 300,
+        monthlyTokens: 300,
+        softCap: 600,
+        maxDailyOffers: 20,
+        maxBoosts: 5,
+        boostDays: 7,
+        phoneVisible: true,
+        featuredEligible: true,
+        priorityRanking: true,
+        trustBoost: true,
+        identityVerificationEligible: true,
+        spotlightEligible: true,
+        posterQuality: "HIGH",
+        canCreatePoster: true,
+        watermark: false,
+        aiGenerator: true,
+    },
+    // ── Legacy/Backward-Compat Tiers (DB override ile yönetilir) ─
     PLUS: {
         maxListings: 5,
         listingDays: 90,
@@ -122,28 +155,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: false,
         aiGenerator: false,
     },
-    // â”€â”€ Rehber Pro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    PRO: {
-        maxListings: 15,
-        listingDays: 180,
-        initialTokens: 200,
-        monthlyTokens: 200,
-        softCap: 400,
-        maxDailyOffers: 20,
-        maxBoosts: 5,
-        boostDays: 7,
-        phoneVisible: true,
-        featuredEligible: true,
-        priorityRanking: true,
-        trustBoost: true,
-        identityVerificationEligible: true,
-        spotlightEligible: true,
-        posterQuality: "HIGH",
-        canCreatePoster: true,
-        watermark: false,
-        aiGenerator: true,
-    },
-    // â”€â”€ Kurumsal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Kurumsal (esnek, DB override ile özelleştirilebilir) ────
     BUSINESS: {
         maxListings: 30,
         listingDays: 180,
@@ -344,9 +356,9 @@ export function canAccessBoostTier(packageType: string, tier: BoostTier): boolea
 
 export const PLAN_PRICES_TRY: Record<PackageType, number> = {
     FREEMIUM: 0,
-    PREMIUM: 199,
-    PLUS: 399,
-    PRO: 699,
+    PRO: 499,
+    PREMIUM: 899,
+    PLUS: 399,        // legacy
     BUSINESS: 1299,
     BUSINESS_PLUS: 2499,
 };
@@ -372,9 +384,16 @@ export const BLAST_THRESHOLD_PCT = 0.80;
 // â”€â”€ Plan Ordering (for upgrade/downgrade detection) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PLAN_ORDER: Record<string, number> = {
-    FREEMIUM: 0, PREMIUM: 1, PLUS: 2, PRO: 3,
+    FREEMIUM: 0, PRO: 1, PREMIUM: 2, PLUS: 2,
     BUSINESS: 10, BUSINESS_PLUS: 11,
 };
+
+// ── Hard Paywall Guard ────────────────────────────────────────────────────
+// FREEMIUM users cannot purchase additional tokens. They must upgrade first.
+
+export function canPurchaseTokens(packageType: string): boolean {
+    return packageType !== "FREEMIUM";
+}
 
 export function isUpgrade(from: string, to: string): boolean {
     return (PLAN_ORDER[to] ?? 0) > (PLAN_ORDER[from] ?? 0);
