@@ -3,7 +3,7 @@
 import { Shield, ShieldCheck, ShieldAlert } from 'lucide-react';
 
 /**
- * TrustBadge â€” Displays the unified Trust Score (0-100) as a visual badge.
+ * TrustBadge — Displays the unified Trust Score (0-100) as a visual badge.
  *
  * Trust Score System:
  *   - 0-100 scale stored in User.trustScore

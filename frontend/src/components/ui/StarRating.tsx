@@ -1,7 +1,7 @@
 ﻿'use client';
 
 /**
- * StarRating â€” Renders full, half, and empty stars for a given 0â€“5 rating.
+ * StarRating — Renders full, half, and empty stars for a given 0–5 rating.
  * 
  * Usage:
  *   <StarRating rating={4.3} />

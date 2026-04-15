@@ -174,7 +174,7 @@ function GuideDashboard({ userName }: { userName: string }) {
     return (
         <div className="p-4 lg:p-6 space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Merhaba, {userName || "Rehber"} 🗺️ï¸</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Merhaba, {userName || "Rehber"} 🗺️</h1>
                 <p className="text-gray-500 mt-1">Rehberlik paneli ve bugünkü özetiniz.</p>
             </div>
             <CreditBalance />

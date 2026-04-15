@@ -2,7 +2,7 @@
 import { withSerializableRetry } from "./with-retry";
 import { LedgerEntryType } from "@prisma/client";
 
-// â”€â”€â”€ Credit Economy Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Credit Economy Constants ───────────────────────────────────────────
 
 export class TokenService {
     // Interest costs
@@ -45,7 +45,7 @@ export class TokenService {
     ): Promise<{ success: boolean; newBalance: number; idempotent?: boolean }> {
         try {
             const result = await withSerializableRetry(() => prisma.$transaction(async (tx) => {
-                // â”€â”€ (1) Idempotency check: if key exists, return cached result â”€â”€
+                // ── (1) Idempotency check: if key exists, return cached result ──
                 if (idempotencyKey) {
                     const existing = await tx.tokenTransaction.findUnique({
                         where: { idempotencyKey_userId: { idempotencyKey, userId } }
@@ -59,7 +59,7 @@ export class TokenService {
                     }
                 }
 
-                // â”€â”€ (2) Row-level lock via raw SQL (MySQL SELECT FOR UPDATE) â”€â”€
+                // ── (2) Row-level lock via raw SQL (MySQL SELECT FOR UPDATE) ──
                 // Single Source of Truth: ONLY User.tokenBalance
                 const [balanceRow] = await tx.$queryRaw<[{ balance: number }]>`
                     SELECT availableBalance AS balance
@@ -69,12 +69,12 @@ export class TokenService {
                 `;
                 const currentBalance = Number(balanceRow.balance);
 
-                // â”€â”€ (3) Strict non-negative guard â”€â”€
+                // ── (3) Strict non-negative guard ──
                 if (currentBalance - cost < 0) {
                     throw new Error('INSUFFICIENT_CREDITS');
                 }
 
-                // â”€â”€ (4) Write to unified TokenTransaction ledger â”€â”€
+                // ── (4) Write to unified TokenTransaction ledger ──
                 await tx.tokenTransaction.create({
                     data: {
                         userId,
@@ -86,7 +86,7 @@ export class TokenService {
                     }
                 });
 
-                // â”€â”€ (5) Decrement ONLY User.tokenBalance (Single Source of Truth) â”€â”€
+                // ── (5) Decrement ONLY User.tokenBalance (Single Source of Truth) ──
                 const updatedUser = await tx.user.update({
                     where: { id: userId },
                     data: { tokenBalance: { decrement: cost } },
@@ -109,7 +109,7 @@ export class TokenService {
                 });
                 return { success: false, newBalance: user?.tokenBalance ?? 0 };
             }
-            // P2002 = unique constraint violation â†’ idempotency key collision (parallel race both passed check)
+            // P2002 = unique constraint violation → idempotency key collision (parallel race both passed check)
             if (error.code === 'P2002') {
                 const user = await prisma.user.findUnique({
                     where: { id: userId },
@@ -161,7 +161,7 @@ export class TokenService {
                 }
             });
 
-            // â”€â”€ Single Source of Truth: Update ONLY User.tokenBalance â”€â”€
+            // ── Single Source of Truth: Update ONLY User.tokenBalance ──
             const updatedUser = await tx.user.update({
                 where: { id: userId },
                 data: { tokenBalance: { increment: amount } },

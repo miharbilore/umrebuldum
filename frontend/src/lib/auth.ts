@@ -44,12 +44,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: { strategy: "jwt" },
 
     callbacks: {
-        // â”€â”€ JWT Callback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── JWT Callback ─────────────────────────────────────────────
         // Merges auth.config.ts logic (role, onboarding, OAuth stub)
         // with auth.ts logic (custom fields, manual refresh).
         async jwt({ token, user, account, trigger, session }) {
 
-            // â”€â”€â”€ FROM auth.config.ts: Client-side update handling â”€â”€â”€â”€
+            // ─── FROM auth.config.ts: Client-side update handling ────
             if (trigger === "update" && session) {
                 // SECURITY: Never accept role from client-side updates.
                 if (typeof session.requires_onboarding === "boolean") {
@@ -72,7 +72,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             }
 
-            // â”€â”€â”€ FROM auth.ts: Custom field mapping on first login â”€â”€â”€
+            // ─── FROM auth.ts: Custom field mapping on first login ───
             if (user) {
                 token.id = (user as any).id;
                 token.role = (user as any).role || null;
@@ -83,7 +83,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.isPhoneVerified = (user as any).isPhoneVerified;
                 token.requires_onboarding = !token.role;
 
-                // â”€â”€â”€ FROM auth.config.ts: OAuth First-Login Stub â”€â”€â”€â”€â”€
+                // ─── FROM auth.config.ts: OAuth First-Login Stub ─────
                 if (!token.role && account && ["google", "facebook", "apple"].includes(account.provider)) {
                     try {
                         const email = token.email as string;
@@ -110,7 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             }
 
-            // â”€â”€â”€ FROM auth.config.ts: DB fallback for role-less tokens â”€â”€
+            // ─── FROM auth.config.ts: DB fallback for role-less tokens ──
             if (!token.role && token.email) {
                 try {
                     const dbUser = await prisma.user.findUnique({
@@ -126,11 +126,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
             }
 
-            // â”€â”€â”€ FROM auth.config.ts: Final role guards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // ─── FROM auth.config.ts: Final role guards ─────────────
             if (!token.role) token.requires_onboarding = true;
             if (token.role === "BANNED") token.requires_onboarding = false;
 
-            // â”€â”€â”€ FROM auth.ts: Manual refresh (trigger === "update") â”€
+            // ─── FROM auth.ts: Manual refresh (trigger === "update") ─
             if (trigger === "update" && token.id) {
                 try {
                     const dbUser = await prisma.user.findUnique({
@@ -161,7 +161,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return token;
         },
 
-        // â”€â”€ Session Callback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Session Callback ─────────────────────────────────────────
         // Merges auth.config.ts (role, onboarding, billing sync)
         // with auth.ts (custom field transfer to frontend).
         async session({ session, token }) {
@@ -219,7 +219,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         Apple,
         Facebook,
 
-        // â”€â”€ Email Magic Link (via Resend) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Email Magic Link (via Resend) ────────────────────────────
         // Endpoint: /api/auth/signin/email
         // ── Email Magic Link (via Resend) ────────────────────────────
         // Endpoint: /api/auth/signin/email

@@ -92,7 +92,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                     <div className="flex justify-between items-start">
                         <div className="text-[11px] text-gray-500 font-semibold bg-gray-50 px-2.5 py-1 rounded-md inline-flex items-center gap-1.5 border border-gray-100">
                             <Plane className="w-3 h-3" />
-                            {listing.departureCity} {listing.airline ? `â†’ ${listing.airline}` : ''}
+                            {listing.departureCity} {listing.airline ? `→ ${listing.airline}` : ''}
                         </div>
                         <div className="flex items-center text-[11px] text-amber-600 font-bold bg-amber-50 px-2.5 py-1 rounded-md border border-amber-100/50">
                             <Star className="w-3 h-3 mr-1 fill-amber-500" />

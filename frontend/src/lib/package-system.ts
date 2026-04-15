@@ -1,10 +1,10 @@
-﻿// â”€â”€â”€ Package Limits & Token Economy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── Package Limits & Token Economy ─────────────────────────────────────
 // Source of truth for all package capabilities and token pricing.
 
 import type { PackageType } from "./db-types";
 import { prisma } from "./prisma";
 
-// â”€â”€ Token Costs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Token Costs ─────────────────────────────────────────────────────────
 
 export const TOKEN_COSTS = {
     LISTING_CREATE: 10,
@@ -17,7 +17,7 @@ export const TOKEN_COSTS = {
 } as const;
 
 
-// â”€â”€ Daily Hard Caps (per package) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Daily Hard Caps (per package) ───────────────────────────────────────
 
 export interface DailyCaps {
     offers: number;
@@ -35,7 +35,7 @@ export const DAILY_CAPS: Record<PackageType, DailyCaps> = {
     BUSINESS_PLUS: { offers: 100, unlocks: 50, boosts: 30, spotlights: 10 },
 };
 
-// â”€â”€ Package Limits â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Package Limits ──────────────────────────────────────────────────────
 
 export interface PackageLimits {
     maxListings: number;
@@ -59,7 +59,7 @@ export interface PackageLimits {
 }
 
 export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
-    // â”€â”€ Rehber/Kurumsal FREEMIUM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Rehber/Kurumsal FREEMIUM ────────────────────────────────
     FREEMIUM: {
         maxListings: 1,
         listingDays: 30,
@@ -80,7 +80,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: true,
         aiGenerator: false,
     },
-    // â”€â”€ Rehber Premium â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Rehber Premium ──────────────────────────────────────────
     PREMIUM: {
         maxListings: 3,
         listingDays: 60,
@@ -101,7 +101,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: true,
         aiGenerator: false,
     },
-    // â”€â”€ Rehber Plus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Rehber Plus ─────────────────────────────────────────────
     PLUS: {
         maxListings: 5,
         listingDays: 90,
@@ -122,7 +122,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: false,
         aiGenerator: false,
     },
-    // â”€â”€ Rehber Pro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Rehber Pro ──────────────────────────────────────────────
     PRO: {
         maxListings: 15,
         listingDays: 180,
@@ -143,7 +143,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: false,
         aiGenerator: true,
     },
-    // â”€â”€ Kurumsal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Kurumsal ────────────────────────────────────────────────
     BUSINESS: {
         maxListings: 30,
         listingDays: 180,
@@ -164,7 +164,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: false,
         aiGenerator: false,
     },
-    // â”€â”€ Kurumsal Plus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Kurumsal Plus ───────────────────────────────────────────
     BUSINESS_PLUS: {
         maxListings: 100,
         listingDays: 365,
@@ -187,7 +187,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
     },
 };
 
-// â”€â”€ Token Pricing (Ek Satın Alma) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Token Pricing (Ek Satın Alma) ───────────────────────────────────────
 
 export const TOKEN_PACKAGES = [
     { id: "small", tokens: 10, priceTRY: 49, unitPrice: 4.90 },
@@ -212,7 +212,7 @@ export function calculateTokenPrice(quantity: number): number {
     return Math.round(unitPrice * quantity);
 }
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers ─────────────────────────────────────────────────────────────
 
 export class PackageSystem {
     /**
@@ -322,7 +322,7 @@ export class PackageSystem {
     }
 }
 
-// â”€â”€ Boost Tier Access (per package) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Boost Tier Access (per package) ─────────────────────────────────────
 
 export type BoostTier = "BASIC" | "PREMIUM" | "ELITE";
 
@@ -340,7 +340,7 @@ export function canAccessBoostTier(packageType: string, tier: BoostTier): boolea
     return access.includes(tier);
 }
 
-// â”€â”€ Plan Prices (TRY, monthly) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Plan Prices (TRY, monthly) ──────────────────────────────────────────
 
 export const PLAN_PRICES_TRY: Record<PackageType, number> = {
     FREEMIUM: 0,
@@ -351,11 +351,11 @@ export const PLAN_PRICES_TRY: Record<PackageType, number> = {
     BUSINESS_PLUS: 2499,
 };
 
-export const ANNUAL_DISCOUNT = 0.14;  // 14% off â†’ "2 ay hediye"
+export const ANNUAL_DISCOUNT = 0.14;  // 14% off → "2 ay hediye"
 export const QUARTERLY_DISCOUNT = 0.07; // ~7% off for 3-month
 export const FREEZE_MONTHLY_TRY = 99; // Paket dondurma fee
 
-// â”€â”€ Token Expiry Rules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Token Expiry Rules ──────────────────────────────────────────────────
 
 export const TOKEN_EXPIRY_DAYS = {
     PURCHASED: 90,   // À la carte purchases
@@ -363,13 +363,13 @@ export const TOKEN_EXPIRY_DAYS = {
     SUBSCRIPTION: null, // Never expires (capped by soft cap)
 } as const;
 
-// â”€â”€ Subscription Rules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Subscription Rules ──────────────────────────────────────────────────
 
 export const DOWNGRADE_COOLDOWN_DAYS = 7;
 export const BLAST_THRESHOLD_HOURS = 48;
 export const BLAST_THRESHOLD_PCT = 0.80;
 
-// â”€â”€ Plan Ordering (for upgrade/downgrade detection) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Plan Ordering (for upgrade/downgrade detection) ─────────────────────
 
 const PLAN_ORDER: Record<string, number> = {
     FREEMIUM: 0, PREMIUM: 1, PLUS: 2, PRO: 3,

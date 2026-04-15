@@ -277,7 +277,7 @@ export function CreditPackages() {
                                 </div>
 
                                 <h3 className="text-lg font-bold text-gray-900">
-                                    {pkg.name.replace(/ â€” .*$/, "")}
+                                    {pkg.name.replace(/ — .*$/, "")}
                                 </h3>
 
                                 {/* Price */}

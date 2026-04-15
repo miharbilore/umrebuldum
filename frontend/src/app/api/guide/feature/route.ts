@@ -28,7 +28,7 @@ export async function POST(req: Request) {
         });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        // â”€â”€â”€ Feature Cap: Max 3 featured listings per GUIDE/ORG â”€â”€â”€
+        // ─── Feature Cap: Max 3 featured listings per GUIDE/ORG ───
         const featuredCount = await prisma.guideListing.count({
             where: {
                 guideId: user.id,
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: spendResult.error }, { status: 400 });
         }
 
-        // â”€â”€â”€ Feature the listing (post-spend) â”€â”€â”€
+        // ─── Feature the listing (post-spend) ───
         await prisma.guideListing.update({
             where: { id: listingId },
             data: { isFeatured: true }
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 }
 
 /**
- * DELETE â€” De-feature a listing (no refund, just toggle off)
+ * DELETE — De-feature a listing (no refund, just toggle off)
  */
 export async function DELETE(req: Request) {
     try {

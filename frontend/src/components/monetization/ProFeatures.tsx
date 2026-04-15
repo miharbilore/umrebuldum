@@ -240,7 +240,7 @@ export function LimitReachedModal({ type, currentUsage, limit, onUpgrade, onClos
             title: 'Günlük Afiş Limitine Ulaştınız',
             description: 'Bugün için afiş üretim hakkınız bitti.',
             benefit: 'PLUS ile sınırsız afiş oluşturun',
-            icon: 'ğŸ¨',
+            icon: '🎨',
         },
         // Listing limits removed per backend alignment rules
         // Request limits removed per backend alignment rules
@@ -350,11 +350,11 @@ export function SocialProofBanner() {
                 <span className="flex items-center gap-2">
                     <span className="font-bold">12,000+</span> organizatör
                 </span>
-                <span className="hidden sm:block">â€¢</span>
+                <span className="hidden sm:block">•</span>
                 <span className="flex items-center gap-2">
                     <span className="font-bold">47</span> bu hafta Pro'ya geçti
                 </span>
-                <span className="hidden sm:block">â€¢</span>
+                <span className="hidden sm:block">•</span>
                 <span className="flex items-center gap-2">
                     Pro organizatörler <span className="font-bold">3.5x</span> daha fazla talep alıyor
                 </span>

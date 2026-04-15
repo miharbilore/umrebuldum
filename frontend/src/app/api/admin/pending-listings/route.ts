@@ -27,8 +27,8 @@ export async function GET() {
             id: l.id,
             title: l.title,
             // DOĞRU: Veri user altından okunuyor
-            guideName: l.guide?.user?.fullName || l.guide?.user?.name || "â€”",
-            guideEmail: l.guide?.user?.email || "â€”",
+            guideName: l.guide?.user?.fullName || l.guide?.user?.name || "—",
+            guideEmail: l.guide?.user?.email || "—",
             // DOĞRU: Eski price silindi, Decimal alan Number'a çevrildi
             price: Number(l.pricingQuad || l.pricingDouble || 0),
             createdAt: l.createdAt,

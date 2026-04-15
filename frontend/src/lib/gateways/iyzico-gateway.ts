@@ -154,7 +154,7 @@ export class IyzicoGateway implements PaymentGateway {
         return { success: false, error: "Iyzico refund requires paymentTransactionId storage" };
     }
 
-    // â”€â”€ PKI Hash Generator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── PKI Hash Generator ──────────────────────────────────────────────
 
     private generateHeaders(body: any, urlPath: string) {
         const rnd = Date.now().toString();

@@ -6,10 +6,10 @@ import { TransactionStatus } from "@prisma/client";
 
 // Reconcile stale pending payment transactions.
 //
-// Intended to run every 10â€“15 minutes via cron.
-// Safe to run concurrently â€” each row is atomically claimed via WebhookEvent dedup.
+// Intended to run every 10–15 minutes via cron.
+// Safe to run concurrently — each row is atomically claimed via WebhookEvent dedup.
 //
-// LEDGER: All credit grants go through grantToken() â†’ token_ledger_entries.
+// LEDGER: All credit grants go through grantToken() → token_ledger_entries.
 
 function getStripe() {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -64,9 +64,9 @@ export async function reconcilePendingPayments(): Promise<ReconcileResult> {
             const session = await stripe.checkout.sessions.retrieve(sessionId);
 
             if (session.payment_status === "paid") {
-                // â”€â”€ Grant tokens if not already done â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Grant tokens if not already done ─────────────────────
                 await withSerializableRetry(() => prisma.$transaction(async (dbTx) => {
-                    // WebhookEvent row â€” dedup gate
+                    // WebhookEvent row — dedup gate
                     try {
                         await dbTx.webhookEvent.create({
                             data: {

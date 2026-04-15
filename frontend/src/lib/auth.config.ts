@@ -37,7 +37,7 @@ export const authConfig = {
                 token.role = (user as any).role || null;
                 token.requires_onboarding = !token.role;
 
-                // â”€â”€â”€ OAuth First-Login Stub â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ─── OAuth First-Login Stub ────────────────────────────────
                 // When a user signs in via OAuth (Google/Facebook/Apple) for
                 // the first time, the PrismaAdapter creates a DB user but
                 // does NOT set a role. We detect this and assign "USER" as
@@ -54,7 +54,7 @@ export const authConfig = {
                         });
 
                         if (dbUser && !dbUser.role) {
-                            // First-time OAuth user â†’ assign default USER role
+                            // First-time OAuth user → assign default USER role
                             await prisma.user.update({
                                 where: { id: dbUser.id },
                                 data: { role: "USER", isVerified: true },
@@ -70,7 +70,7 @@ export const authConfig = {
                         console.error("[OAuth] Role assignment failed:", e);
                     }
                 }
-                // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ──────────────────────────────────────────────────────────
             }
 
             // If token still has no role, try to read from DB (handles token refresh)
@@ -104,7 +104,7 @@ export const authConfig = {
                     (session.user as any).id = token.sub;
                 }
 
-                // â”€â”€ Taze packageType ve tokenBalance'ı DB'den çek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // ── Taze packageType ve tokenBalance'ı DB'den çek ──────────
                 // JWT çerezi eski paket bilgisi taşıyabilir; her session okumada
                 // User tablosundan güncel veriyi alarak "stale session" sorununu önlüyoruz.
                 if (token.sub) {
@@ -126,7 +126,7 @@ export const authConfig = {
             return session;
         },
         authorized() {
-            // Let middleware.ts handle all redirect logic
+            // Let proxy.ts handle all redirect logic
             return true;
         },
         async redirect({ url, baseUrl }) {

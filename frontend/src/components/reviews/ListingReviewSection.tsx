@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 /**
- * ListingReviewSection â€” Combined review display + review form for a listing page.
+ * ListingReviewSection — Combined review display + review form for a listing page.
  * Shows ReviewList (fetches from API) and LeaveReviewForm (if user is authenticated).
  */
 

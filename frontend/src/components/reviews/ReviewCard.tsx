@@ -3,7 +3,7 @@
 import { StarRating } from '@/components/ui/StarRating';
 
 /**
- * ReviewCard â€” Displays a single customer review with rating, comment, tags, and date.
+ * ReviewCard — Displays a single customer review with rating, comment, tags, and date.
  */
 
 interface ReviewCardProps {

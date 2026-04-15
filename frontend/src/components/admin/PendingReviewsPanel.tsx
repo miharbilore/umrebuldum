@@ -107,11 +107,11 @@ export default function PendingReviewsPanel() {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2">
                                         <span className="text-white font-medium text-sm">{review.reviewer?.name || review.reviewer?.email || 'Anonim'}</span>
-                                        <span className="text-gray-600">â†’</span>
+                                        <span className="text-gray-600">→</span>
                                         <span className="text-emerald-400 text-sm font-medium">{review.guide?.name || review.guide?.email || 'Rehber'}</span>
                                     </div>
                                     <div className="text-xs text-gray-500 mt-1">
-                                        Talep: {review.request?.departureCity || 'N/A'} â€¢ {new Date(review.createdAt).toLocaleDateString('tr-TR')}
+                                        Talep: {review.request?.departureCity || 'N/A'} • {new Date(review.createdAt).toLocaleDateString('tr-TR')}
                                     </div>
                                 </div>
 
@@ -166,12 +166,12 @@ export default function PendingReviewsPanel() {
                                         <div className="flex flex-wrap gap-1.5">
                                             {(review.positiveTags || []).map((tag: string, i: number) => (
                                                 <span key={`p-${i}`} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs rounded-full">
-                                                    âœ“ {tag}
+                                                    ✓ {tag}
                                                 </span>
                                             ))}
                                             {(review.negativeTags || []).map((tag: string, i: number) => (
                                                 <span key={`n-${i}`} className="px-2 py-0.5 bg-red-500/10 text-red-400 text-xs rounded-full">
-                                                    âœ— {tag}
+                                                    ✗ {tag}
                                                 </span>
                                             ))}
                                         </div>

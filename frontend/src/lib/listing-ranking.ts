@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Listing Ranking Algorithm (LEGACY) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── Listing Ranking Algorithm (LEGACY) ─────────────────────────────────
 // @deprecated Use `src/modules/ranking/ranking-engine.ts` instead.
 // This file is kept for backward compatibility only.
 // New code should import from the ranking-engine module.
@@ -14,7 +14,7 @@
 import { PACKAGE_LIMITS } from "./package-system";
 import type { PackageType } from "./db-types";
 
-// â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Types ───────────────────────────────────────────────────────────────
 
 interface ListingInput {
     type: "GUIDE_PROFILE" | "CORPORATE_TOUR";
@@ -47,7 +47,7 @@ interface CorporateInput {
     lastActivityAt: Date;
 }
 
-// â”€â”€ Weight Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Weight Constants ────────────────────────────────────────────────────
 
 const GUIDE_WEIGHTS = {
     PACKAGE_LEGEND: 400,
@@ -81,7 +81,7 @@ const CORP_WEIGHTS = {
     FILL_PENALTY_MAX: -150,
 } as const;
 
-// â”€â”€ Guide Ranking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Guide Ranking ───────────────────────────────────────────────────────
 
 /**
  * Score a GUIDE_PROFILE listing.
@@ -103,7 +103,7 @@ const CORP_WEIGHTS = {
 export function scoreGuideListing(listing: ListingInput, guide: GuideInput): number {
     const now = Date.now();
 
-    // â”€â”€ 1. Package tier â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 1. Package tier ───────────────────────────────────────────
     let packageScore: number = GUIDE_WEIGHTS.PACKAGE_FREEMIUM;
     switch (guide.packageType) {
         case "BUSINESS_PLUS": packageScore = GUIDE_WEIGHTS.PACKAGE_LEGEND; break;
@@ -113,39 +113,39 @@ export function scoreGuideListing(listing: ListingInput, guide: GuideInput): num
         case "PREMIUM": packageScore = GUIDE_WEIGHTS.PACKAGE_STARTER; break;
     }
 
-    // â”€â”€ 2. Identity badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 2. Identity badge ──────────────────────────────────────────
     const identityBadge = guide.isIdentityVerified ? GUIDE_WEIGHTS.IDENTITY_VERIFIED : 0;
 
-    // â”€â”€ 3. Response time â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 3. Response time ──────────────────────────────────────────
     let responseScore: number = GUIDE_WEIGHTS.RESPONSE_TIME_SLOW;
     if (guide.avgResponseHours <= 1) responseScore = GUIDE_WEIGHTS.RESPONSE_TIME_FAST;
     else if (guide.avgResponseHours <= 6) responseScore = GUIDE_WEIGHTS.RESPONSE_TIME_MED;
 
-    // â”€â”€ 4. Recent activity (last 90 days) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 4. Recent activity (last 90 days) ─────────────────────────
     const activityRatio = Math.min(guide.recentActivityCount / 30, 1);
     const activityScore = Math.round(GUIDE_WEIGHTS.ACTIVITY_MAX * activityRatio);
 
-    // â”€â”€ 5. Boost â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 5. Boost ──────────────────────────────────────────────────
     const boostActive =
         listing.isFeatured && listing.featuredUntil && listing.featuredUntil.getTime() > now
             ? GUIDE_WEIGHTS.BOOST_ACTIVE
             : 0;
     const boostRaw = listing.boostScore * GUIDE_WEIGHTS.BOOST_SCORE_MULTI;
 
-    // â”€â”€ 6. Profile completeness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 6. Profile completeness ───────────────────────────────────
     const profileScore = Math.round(
         (guide.profileCompleteness / 100) * GUIDE_WEIGHTS.PROFILE_COMPLETE_MAX
     );
 
-    // â”€â”€ 7. Trust & trips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 7. Trust & trips ──────────────────────────────────────────
     const trustScore = Math.min(guide.trustScore, 100) * GUIDE_WEIGHTS.TRUST_SCORE_MULTI;
     const tripScore = Math.min(guide.completedTrips * GUIDE_WEIGHTS.TRIPS_MULTI, 250);
 
-    // â”€â”€ 8. Freshness (decays 4 points per day) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 8. Freshness (decays 4 points per day) ────────────────────
     const daysSinceUpdate = (now - listing.updatedAt.getTime()) / 86_400_000;
     const freshness = Math.max(0, GUIDE_WEIGHTS.FRESHNESS_MAX - daysSinceUpdate * 4);
 
-    // â”€â”€ 9. Fill rate penalty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 9. Fill rate penalty ──────────────────────────────────────
     const fillPenalty = listing.quota > 0
         ? (listing.filled / listing.quota) * GUIDE_WEIGHTS.FILL_PENALTY_MAX
         : 0;
@@ -157,7 +157,7 @@ export function scoreGuideListing(listing: ListingInput, guide: GuideInput): num
     );
 }
 
-// â”€â”€ Corporate Ranking â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Corporate Ranking ───────────────────────────────────────────────────
 
 /**
  * Score a CORPORATE_TOUR listing.
@@ -176,37 +176,37 @@ export function scoreGuideListing(listing: ListingInput, guide: GuideInput): num
 export function scoreCorporateListing(listing: ListingInput, corp: CorporateInput): number {
     const now = Date.now();
 
-    // â”€â”€ 1. Spotlight (highest priority) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 1. Spotlight (highest priority) ───────────────────────────
     const spotlight = corp.hasSpotlight ? CORP_WEIGHTS.SPOTLIGHT : 0;
 
-    // â”€â”€ 2. Premium banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 2. Premium banner ─────────────────────────────────────────
     const banner = corp.hasPremiumBanner ? CORP_WEIGHTS.PREMIUM_BANNER : 0;
 
-    // â”€â”€ 3. Boost â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 3. Boost ──────────────────────────────────────────────────
     const boostActive =
         listing.isFeatured && listing.featuredUntil && listing.featuredUntil.getTime() > now
             ? CORP_WEIGHTS.BOOST_ACTIVE
             : 0;
     const boostRaw = listing.boostScore * CORP_WEIGHTS.BOOST_SCORE_MULTI;
 
-    // â”€â”€ 4. Package tier â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 4. Package tier ───────────────────────────────────────────
     let packageScore: number = CORP_WEIGHTS.PACKAGE_BASIC;
     switch (corp.packageType) {
         case "CORP_ENTERPRISE": packageScore = CORP_WEIGHTS.PACKAGE_ENTERPRISE; break;
         case "CORP_PRO": packageScore = CORP_WEIGHTS.PACKAGE_PRO; break;
     }
 
-    // â”€â”€ 5. Recent activity (bonus if active in last 7 days) â”€â”€â”€â”€â”€â”€â”€
+    // ── 5. Recent activity (bonus if active in last 7 days) ───────
     const daysSinceActivity = (now - corp.lastActivityAt.getTime()) / 86_400_000;
     const activityScore = daysSinceActivity <= 7
         ? CORP_WEIGHTS.ACTIVITY_MAX
         : Math.max(0, CORP_WEIGHTS.ACTIVITY_MAX - (daysSinceActivity - 7) * 10);
 
-    // â”€â”€ 6. Freshness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 6. Freshness ──────────────────────────────────────────────
     const daysSinceUpdate = (now - listing.updatedAt.getTime()) / 86_400_000;
     const freshness = Math.max(0, CORP_WEIGHTS.FRESHNESS_MAX - daysSinceUpdate * 4);
 
-    // â”€â”€ 7. Fill rate penalty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 7. Fill rate penalty ──────────────────────────────────────
     const fillPenalty = listing.quota > 0
         ? (listing.filled / listing.quota) * CORP_WEIGHTS.FILL_PENALTY_MAX
         : 0;
@@ -217,7 +217,7 @@ export function scoreCorporateListing(listing: ListingInput, corp: CorporateInpu
     );
 }
 
-// â”€â”€ Unified Scorer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Unified Scorer ──────────────────────────────────────────────────────
 
 /**
  * Score any listing. Dispatches to the correct formula based on type.
@@ -236,7 +236,7 @@ export function calculateListingScore(
     return 0;
 }
 
-// â”€â”€ Profile Completeness Calculator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Profile Completeness Calculator ─────────────────────────────────────
 
 /**
  * Calculate profile completeness as 0-100 percentage.

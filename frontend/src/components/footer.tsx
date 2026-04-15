@@ -203,7 +203,7 @@ export function Footer() {
             Yasal Uyarı: Umrebuldum, sadece seyahat acentelerinin ilanlarını yayınlayan bir platformdur. Kullanıcılardan (umrecilerden) hiçbir ücret talep etmemekteyiz. Umrebuldum turların bir parçası veya düzenleyicisi değildir ve acentelerin sunduğu hizmetlerden sorumlu tutulamaz.
           </p>
           <p className="text-center text-lg text-card/60">
-            Â© {new Date().getFullYear()} Umrebuldum. Tüm hakları saklıdır.
+            © {new Date().getFullYear()} Umrebuldum. Tüm hakları saklıdır.
           </p>
         </div>
       </div>

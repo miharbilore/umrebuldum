@@ -74,7 +74,7 @@ export function ListingCard({ listing, onAction, guideImage }: ListingCardProps)
                                 </span>
                                 {listing.isFeatured && (
                                     <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                                        â­ Öne Çıkan
+                                        ⭐ Öne Çıkan
                                     </span>
                                 )}
                             </div>

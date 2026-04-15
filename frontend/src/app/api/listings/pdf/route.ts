@@ -43,8 +43,8 @@ const generateHTML = (listing: any, guide: any) => `
   <div class="meta">
     <div>🛫 ${listing.departureCity} kalkışlı</div>
     <div>📅 ${listing.totalDays || 10} Gün</div>
-    <div>ğŸ¨ ${listing.hotelName || "Belirtilmemiş"}</div>
-    <div>âœˆï¸ ${listing.airline || "THY"}</div>
+    <div>🏨 ${listing.hotelName || "Belirtilmemiş"}</div>
+    <div>✈️ ${listing.airline || "THY"}</div>
   </div>
 
   <div class="price-box">

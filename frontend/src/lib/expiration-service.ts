@@ -1,6 +1,6 @@
 ﻿import { prisma } from "./prisma";
 
-// â”€â”€â”€ Expiration Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Expiration Service ─────────────────────────────────────────────────
 // Handles expiration of Listings, Demands, Offers, and featured badges.
 // Called by cron job every 15 minutes.
 
@@ -20,7 +20,7 @@ export async function runExpiration(): Promise<ExpirationResult> {
     const now = new Date();
     const notifiedUsers: string[] = [];
 
-    // â”€â”€ 1. Expire Listings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 1. Expire Listings ──────────────────────────────────────────
     const expiringListings = await prisma.guideListing.findMany({
         where: {
             active: true,
@@ -45,7 +45,7 @@ export async function runExpiration(): Promise<ExpirationResult> {
         data: { active: false },
     });
 
-    // â”€â”€ 2. Expire Demands (UmrahRequests) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 2. Expire Demands (UmrahRequests) ───────────────────────────
     const expiringDemands = await prisma.umrahRequest.findMany({
         where: {
             status: "open",
@@ -65,7 +65,7 @@ export async function runExpiration(): Promise<ExpirationResult> {
         data: { status: "closed" },
     });
 
-    // â”€â”€ 3. Expire Offers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 3. Expire Offers ────────────────────────────────────────────
     const expiredOffers = await prisma.offer.updateMany({
         where: {
             status: "pending",
@@ -74,7 +74,7 @@ export async function runExpiration(): Promise<ExpirationResult> {
         data: { status: "expired" },
     });
 
-    // â”€â”€ 4. Remove expired featured badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 4. Remove expired featured badges ───────────────────────────
     // Use activeBoost table since 'featuredUntil' doesn't exist on GuideListing
     const expiredBoosts = await prisma.activeBoost.findMany({
         where: { expiresAt: { lte: now } },
@@ -92,7 +92,7 @@ export async function runExpiration(): Promise<ExpirationResult> {
     }
     const unfeatured = { count: expiredBoosts.length };
 
-    // â”€â”€ 5. Queue notifications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 5. Queue notifications ──────────────────────────────────────
     for (const listing of expiringListings) {
         const email = listing.guide?.user?.email;
         const name = listing.guide?.user?.name;
@@ -138,7 +138,7 @@ export async function runExpiration(): Promise<ExpirationResult> {
     return result;
 }
 
-// â”€â”€ Email Queue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Email Queue ─────────────────────────────────────────────────────────
 // TODO: Replace with actual email service (SendGrid, Resend, etc.)
 
 interface ExpirationEmailData {

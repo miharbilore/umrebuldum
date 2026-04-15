@@ -69,7 +69,7 @@ export default async function middleware(req: any) {
             return NextResponse.redirect(new URL(onboardingPath, nextUrl));
         }
 
-        // User has completed onboarding â€” redirect away from /onboarding
+        // User has completed onboarding — redirect away from /onboarding
         if (isOnboardingRoute) {
             if (role === "ADMIN") return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
             return NextResponse.redirect(new URL("/dashboard", nextUrl));

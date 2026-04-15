@@ -19,6 +19,8 @@ export const GET = withErrorHandler(async (req: Request) => {
         const { searchParams } = new URL(req.url);
         const guideId = searchParams.get('guideId');
         const departureCityId = searchParams.get('departureCity') || searchParams.get('departureCityId');
+        const rawCity = searchParams.get('city');
+        const city = rawCity ? rawCity.replace(/\*/g, "").trim() : null;
         const searchDate = searchParams.get('date');
         const minDate = searchParams.get('minDate');
         const maxDate = searchParams.get('maxDate');
@@ -30,6 +32,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         const skip = (page - 1) * limit;
 
         const now = new Date();
+        const sanitizeCityName = (value?: string | null) => (value ? value.replace(/\*/g, "").trim() : value);
 
         // Build where clause
         let where: Prisma.GuideListingWhereInput = {
@@ -42,6 +45,9 @@ export const GET = withErrorHandler(async (req: Request) => {
         if (guideId) where.guideId = guideId;
         if (departureCityId && departureCityId !== 'all') {
             where.departureCityId = departureCityId;
+        }
+        if (city) {
+            where.city = { contains: city, mode: 'insensitive' };
         }
 
         // Identity verification is now strictly on the User model
@@ -143,10 +149,10 @@ export const GET = withErrorHandler(async (req: Request) => {
                 guideId: l.guideId,
                 title: l.title,
                 description: l.description,
-                city: l.city,
-                departureCity: l.departureCity?.name || "Bilinmiyor",
+                city: sanitizeCityName(l.city) || "",
+                departureCity: sanitizeCityName(l.departureCity?.name) || "Bilinmiyor",
                 departureCityId: l.departureCityId,
-                meetingCity: l.meetingCity,
+                meetingCity: sanitizeCityName(l.meetingCity),
                 extraServices: l.extraServices,
                 hotelName: l.hotelName,
                 airline: l.airline?.name || "Bilinmiyor",
@@ -167,7 +173,7 @@ export const GET = withErrorHandler(async (req: Request) => {
                 totalDays: l.totalDays,
                 tourPlan: l.tourDays.map(d => ({
                     day: d.day,
-                    city: d.city,
+                    city: sanitizeCityName(d.city) || "",
                     title: d.title,
                     description: d.description
                 })),

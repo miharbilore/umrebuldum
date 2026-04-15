@@ -138,7 +138,7 @@ export function InlineUpsell({ feature, onAction }: InlineUpsellProps) {
                     onClick={onAction}
                     className="flex-shrink-0 bg-white/20 hover:bg-white/30 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                    {cta} â€¢ {price}
+                    {cta} • {price}
                 </button>
             </div>
         </div>

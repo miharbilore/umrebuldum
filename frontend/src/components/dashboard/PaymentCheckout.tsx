@@ -27,7 +27,7 @@ interface PaymentCheckoutProps {
 type ProviderTab = "paytr" | "stripe";
 
 /**
- * PaymentCheckout â€” Modern payment modal with Stripe / PayTR toggle.
+ * PaymentCheckout — Modern payment modal with Stripe / PayTR toggle.
  *
  * - Stripe: Redirects to hosted Checkout page
  * - PayTR: Embeds iFrame within this component
@@ -159,7 +159,7 @@ export function PaymentCheckout({
                         </div>
                         <div>
                             <h2 className="text-lg font-bold">Güvenli Ödeme</h2>
-                            <p className="text-white/60 text-xs">PCI DSS Level 1 Uyumlu â€¢ 3D Secure</p>
+                            <p className="text-white/60 text-xs">PCI DSS Level 1 Uyumlu • 3D Secure</p>
                         </div>
                     </div>
 
@@ -282,9 +282,9 @@ export function PaymentCheckout({
                                 <ShieldCheck className="h-3 w-3" />
                                 <span>3D Secure Korumalı</span>
                             </div>
-                            <span className="text-gray-300">â€¢</span>
+                            <span className="text-gray-300">•</span>
                             <div className="text-[10px] text-gray-400">
-                                {selectedProvider === "paytr" ? "Powered by PayTRâ„¢" : "Powered by Stripeâ„¢"}
+                                {selectedProvider === "paytr" ? "Powered by PayTR™" : "Powered by Stripe™"}
                             </div>
                         </div>
                     </div>

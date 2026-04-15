@@ -3,16 +3,16 @@
  * Profanity filter with production-grade normalization.
  *
  * Normalization pipeline (in order):
- *  1. NFC  â€” canonical composition
- *  2. NFD  â€” decompose, strip all combining marks (diacritics)
- *  3. NFC  â€” recompose clean chars
- *  4. Repeated-char collapse: "siiikkk" â†’ "sik", "fuuuck" â†’ "fuk"
+ *  1. NFC  — canonical composition
+ *  2. NFD  — decompose, strip all combining marks (diacritics)
+ *  3. NFC  — recompose clean chars
+ *  4. Repeated-char collapse: "siiikkk" → "sik", "fuuuck" → "fuk"
  *  5. Lowercase
  *
  * This defeats common evasion techniques:
- *  - Accented chars:  "şİktÃ®r" â†’ "siktir"
- *  - Repeated chars:  "siiikktttiirr" â†’ "sikitr"
- *  - Mixed case:      "FuCk" â†’ "fuck"
+ *  - Accented chars:  "şİktÃ®r" → "siktir"
+ *  - Repeated chars:  "siiikktttiirr" → "sikitr"
+ *  - Mixed case:      "FuCk" → "fuck"
  *  - Unicode clones:  Cyrillic, look-alike letters (stripped by combining mark removal)
  */
 
@@ -26,7 +26,7 @@ const BANNED_WORDS: string[] = [
 
 /**
  * Normalizes text for comparison against the banned list.
- * Does NOT mutate the stored message body â€” call this only for check purposes.
+ * Does NOT mutate the stored message body — call this only for check purposes.
  */
 export function normalizeText(text: string): string {
     return text
@@ -39,7 +39,7 @@ export function normalizeText(text: string): string {
         // 4. Recompose
         .normalize("NFC")
         // 5. Collapse consecutive identical characters to one
-        //    "siiikktttiirr" â†’ "sikitr"   "fuuuck" â†’ "fuk"
+        //    "siiikktttiirr" → "sikitr"   "fuuuck" → "fuk"
         .replace(/(.)\1+/gu, "$1")
         // 6. Lowercase
         .toLowerCase()
@@ -49,7 +49,7 @@ export function normalizeText(text: string): string {
 /**
  * Returns true if `text` contains any banned word after normalization.
  * Uses substring match (not word-boundary) so embedded words are caught:
- * e.g. "myfuckingday" â†’ matched.
+ * e.g. "myfuckingday" → matched.
  */
 export function containsProfanity(text: string): boolean {
     const normalized = normalizeText(text);

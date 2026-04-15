@@ -9,7 +9,7 @@ export default async function AdminLayout({
 }) {
     const session = await auth();
 
-    // Server-side ADMIN role guard â€” no client-side trust
+    // Server-side ADMIN role guard — no client-side trust
     if (!session?.user?.email || session.user.role !== "ADMIN") {
         redirect("/");
     }

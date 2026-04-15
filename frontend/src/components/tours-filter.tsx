@@ -55,8 +55,9 @@ export function ToursFilter({
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (city && city !== "all") {
-      params.set("city", city);
+    const sanitizedCity = city.replace(/\*/g, "").trim();
+    if (sanitizedCity && sanitizedCity !== "all") {
+      params.set("city", sanitizedCity);
     } else {
       params.delete("city");
     }

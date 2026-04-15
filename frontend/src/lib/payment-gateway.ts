@@ -10,7 +10,7 @@
  * - All providers must support 3D Secure
  */
 
-// â”€â”€â”€ Core Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Core Types ─────────────────────────────────────────────────────────
 
 export type PaymentProvider = "stripe" | "paytr" | "iyzico";
 
@@ -70,7 +70,7 @@ export interface SavedCardInfo {
     isDefault: boolean;
 }
 
-// â”€â”€â”€ Gateway Interface â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Gateway Interface ──────────────────────────────────────────────────
 
 export interface PaymentGateway {
     readonly provider: PaymentProvider;

@@ -44,14 +44,14 @@ export function PhoneVerificationModal({
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
   const recaptchaContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // â”€â”€ Countdown timer â”€â”€
+  // ── Countdown timer ──
   useEffect(() => {
     if (countdown <= 0) return;
     const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  // â”€â”€ Cleanup recaptcha on unmount â”€â”€
+  // ── Cleanup recaptcha on unmount ──
   useEffect(() => {
     return () => {
       if (recaptchaRef.current) {
@@ -65,7 +65,7 @@ export function PhoneVerificationModal({
     };
   }, []);
 
-  // â”€â”€ Reset state when modal opens/closes â”€â”€
+  // ── Reset state when modal opens/closes ──
   useEffect(() => {
     if (!open) {
       setStep("phone");
@@ -76,14 +76,14 @@ export function PhoneVerificationModal({
     }
   }, [open]);
 
-  // â”€â”€ Initialize invisible reCAPTCHA â”€â”€
+  // ── Initialize invisible reCAPTCHA ──
   const initRecaptcha = useCallback(() => {
     if (recaptchaRef.current) return;
 
     recaptchaRef.current = new RecaptchaVerifier(firebaseAuth, "recaptcha-container", {
       size: "invisible",
       callback: () => {
-        // reCAPTCHA solved â€” will proceed with SMS
+        // reCAPTCHA solved — will proceed with SMS
       },
       "expired-callback": () => {
         toast.error("reCAPTCHA süresi doldu, tekrar deneyin.");
@@ -92,7 +92,7 @@ export function PhoneVerificationModal({
     });
   }, []);
 
-  // â”€â”€ Format phone for Turkey â”€â”€
+  // ── Format phone for Turkey ──
   const formatPhone = (raw: string) => {
     let cleaned = raw.replace(/\s/g, "").replace(/[^\d+]/g, "");
     if (cleaned.startsWith("0")) cleaned = "+90" + cleaned.slice(1);
@@ -100,7 +100,7 @@ export function PhoneVerificationModal({
     return cleaned;
   };
 
-  // â”€â”€ Step 1: Send SMS â”€â”€
+  // ── Step 1: Send SMS ──
   const handleSendSMS = async () => {
     const formatted = formatPhone(phoneNumber);
     if (!/^\+90\d{10}$/.test(formatted)) {
@@ -137,7 +137,7 @@ export function PhoneVerificationModal({
     }
   };
 
-  // â”€â”€ Step 2: Verify OTP + Backend call â”€â”€
+  // ── Step 2: Verify OTP + Backend call ──
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) {
       toast.error("6 haneli kodu girin.");
@@ -175,8 +175,8 @@ export function PhoneVerificationModal({
       setStep("success");
       toast.success(
         data.tokensGranted
-          ? `Telefon doğrulandı! ğŸ‰ ${data.tokensGranted} hediye token hesabınıza eklendi.`
-          : "Telefon numaranız doğrulandı! âœ…"
+          ? `Telefon doğrulandı! 🎉 ${data.tokensGranted} hediye token hesabınıza eklendi.`
+          : "Telefon numaranız doğrulandı! ✅"
       );
 
       onVerified?.();
@@ -212,7 +212,7 @@ export function PhoneVerificationModal({
           </DialogDescription>
         </DialogHeader>
 
-        {/* â”€â”€ Phone Input Step â”€â”€ */}
+        {/* ── Phone Input Step ── */}
         {step === "phone" && (
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
@@ -244,7 +244,7 @@ export function PhoneVerificationModal({
           </div>
         )}
 
-        {/* â”€â”€ OTP Input Step â”€â”€ */}
+        {/* ── OTP Input Step ── */}
         {step === "otp" && (
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
@@ -284,7 +284,7 @@ export function PhoneVerificationModal({
                 }}
                 disabled={loading}
               >
-                â† Numarayı Değiştir
+                ← Numarayı Değiştir
               </Button>
               <Button
                 variant="ghost"
@@ -298,7 +298,7 @@ export function PhoneVerificationModal({
           </div>
         )}
 
-        {/* â”€â”€ Success Step â”€â”€ */}
+        {/* ── Success Step ── */}
         {step === "success" && (
           <div className="flex flex-col items-center gap-4 py-6">
             <CheckCircle2 className="h-16 w-16 text-emerald-500" />

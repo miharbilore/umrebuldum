@@ -12,7 +12,7 @@ import { TransactionStatus, PaymentProvider } from "@prisma/client";
  *           Stripe API call happens OUTSIDE the DB transaction.
  * RC-5 fix: checkout session creation rate-limited by pending-session guard.
  *
- * LEDGER: All balance mutations go through grantToken() â†’ token_ledger_entries.
+ * LEDGER: All balance mutations go through grantToken() → token_ledger_entries.
  */
 export class PaymentService {
 
@@ -57,7 +57,7 @@ export class PaymentService {
         });
         if (!user) throw new Error("USER_NOT_FOUND");
 
-        // â”€â”€ RC-5/RC-1 fix: Pending session guard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── RC-5/RC-1 fix: Pending session guard ─────────────────────────
         const existingPending = await prisma.transaction.findFirst({
             where: {
                 userId,
@@ -76,11 +76,11 @@ export class PaymentService {
                     return { url: existingSession.url, sessionId: existingSession.id };
                 }
             } catch {
-                // Session expired or invalid â€” fall through to create a new one
+                // Session expired or invalid — fall through to create a new one
             }
         }
 
-        // â”€â”€ Step 3: Create PENDING Transaction row first â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Step 3: Create PENDING Transaction row first ──────────────────
         const pendingTx = await prisma.transaction.create({
             data: {
                 userId,
@@ -93,7 +93,7 @@ export class PaymentService {
             },
         });
 
-        // â”€â”€ Step 4: Call Stripe (outside DB transaction) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Step 4: Call Stripe (outside DB transaction) ──────────────────
         let stripeSession: Stripe.Checkout.Session;
         try {
             stripeSession = await this.getStripe().checkout.sessions.create(
@@ -105,7 +105,7 @@ export class PaymentService {
                         price_data: {
                             currency: "try",
                             product_data: {
-                                name: `${pkg.credits} Kredi â€” ${pkg.name}`,
+                                name: `${pkg.credits} Kredi — ${pkg.name}`,
                                 description: "UmreBuldum kredi paketi",
                             },
                             unit_amount: Math.round(pkg.priceTRY.toNumber() * 100),
@@ -132,7 +132,7 @@ export class PaymentService {
             throw err;
         }
 
-        // â”€â”€ Step 5: Attach real Stripe sessionId â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Step 5: Attach real Stripe sessionId ─────────────────────────
         await prisma.transaction.update({
             where: { id: pendingTx.id },
             data: { sessionId: stripeSession.id },
@@ -157,7 +157,7 @@ export class PaymentService {
         let refundUserId = "";
         let sessionIdForLookup: string | null = null;
 
-        // â”€â”€ Atomic DB operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Atomic DB operations ─────────────────────────────────────────
         await prisma.$transaction(async (tx) => {
             const rows = await tx.$queryRaw<Array<{
                 id: string;
@@ -187,7 +187,7 @@ export class PaymentService {
             });
         }, { isolationLevel: "Serializable", timeout: 15_000 });
 
-        // â”€â”€ Write refund to unified ledger (outside lock) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Write refund to unified ledger (outside lock) ────────────────
         await grantToken({
             userId: refundUserId,
             amount: -refundCredits,
@@ -197,13 +197,13 @@ export class PaymentService {
             idempotencyKey: `refund:${transactionId}`,
         });
 
-        // â”€â”€ Stripe session retrieval OUTSIDE transaction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Stripe session retrieval OUTSIDE transaction ─────────────────
         if (sessionIdForLookup) {
             const session = await this.getStripe().checkout.sessions.retrieve(sessionIdForLookup);
             paymentIntentId = session.payment_intent as string | null;
         }
 
-        // â”€â”€ Stripe refund AFTER DB commit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Stripe refund AFTER DB commit ────────────────────────────────
         if (paymentIntentId) {
             await this.getStripe().refunds.create(
                 { payment_intent: paymentIntentId, reason: "requested_by_customer" },

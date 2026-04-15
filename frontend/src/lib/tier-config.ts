@@ -1,5 +1,5 @@
 ﻿/**
- * @deprecated LEGACY TIER CONFIG â€” only used by Poster system for backward-compat.
+ * @deprecated LEGACY TIER CONFIG — only used by Poster system for backward-compat.
  * For all new code, use PackageSystem from /lib/package-system.ts
  *
  * BACKEND TIER CONFIGURATION
