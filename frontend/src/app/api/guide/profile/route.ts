@@ -39,17 +39,29 @@ export async function GET(req: Request) {
             }
         });
 
+        const {
+            fullName,
+            phone,
+            city,
+            agencyCity,
+            bio,
+            photo,
+            isIdentityVerified,
+            packageType,
+            tokenBalance
+        } = user;
+
         return NextResponse.json({
             ...profile,
-            fullName: user.fullName,
-            phone: user.phone,
-            city: user.city,
-            agencyCity: user.agencyCity,
-            bio: user.bio,
-            photo: user.photo,
-            isIdentityVerified: user.isIdentityVerified,
-            package: user.packageType,
-            tokenBalance: user.tokenBalance
+            fullName,
+            phone,
+            city,
+            agencyCity,
+            bio,
+            photo,
+            isIdentityVerified,
+            package: packageType,
+            tokenBalance
         });
     } catch (error) {
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });

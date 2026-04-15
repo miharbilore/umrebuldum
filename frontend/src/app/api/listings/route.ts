@@ -33,7 +33,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         const skip = (page - 1) * limit;
 
         const now = new Date();
-        const titleCaseCity = (value: string) =>
+        const toTurkishTitleCase = (value: string) =>
             value
                 .toLocaleLowerCase("tr-TR")
                 .split(" ")
@@ -64,7 +64,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         }
         if (city) {
             const trimmedCity = city.trim();
-            const normalizedCity = titleCaseCity(trimmedCity);
+            const normalizedCity = toTurkishTitleCase(trimmedCity);
             const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
             appendAndFilter({ OR: cityCandidates.map((candidate) => ({ city: { contains: candidate } })) });
         }
