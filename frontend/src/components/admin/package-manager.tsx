@@ -29,16 +29,16 @@ const NUMERIC_FEATURES = [
     { key: "maxListings", label: "Maks. İlan Sayısı", icon: "📋" },
     { key: "listingDays", label: "İlan Süresi (Gün)", icon: "📅" },
     { key: "maxBoosts", label: "Aylık Boost Hakkı", icon: "🚀" },
-    { key: "boostDays", label: "Boost Süresi (Gün)", icon: "â±ï¸" },
+    { key: "boostDays", label: "Boost Süresi (Gün)", icon: "⏱️" },
 ];
 
 const TOGGLE_FEATURES = [
-    { key: "phoneVisible", label: "Telefon Görünürlüğü", icon: "ğŸ“" },
-    { key: "spotlightEligible", label: "Vitrin İlanı (Spotlight)", icon: "â­" },
+    { key: "phoneVisible", label: "Telefon Görünürlüğü", icon: "📞" },
+    { key: "spotlightEligible", label: "Vitrin İlanı (Spotlight)", icon: "⭐" },
     { key: "priorityRanking", label: "Öncelikli Sıralama", icon: "📊" },
-    { key: "trustBoost", label: "Güven Puanı Desteği", icon: "ğŸ…" },
-    { key: "identityVerificationEligible", label: "Kimlik Doğrulama", icon: "âœ…" },
-    { key: "canCreatePoster", label: "Afiş/Poster Motoru", icon: "ğŸ¨" },
+    { key: "trustBoost", label: "Güven Puanı Desteği", icon: "🏆" },
+    { key: "identityVerificationEligible", label: "Kimlik Doğrulama", icon: "✅" },
+    { key: "canCreatePoster", label: "Afiş/Poster Motoru", icon: "🎨" },
     { key: "watermark", label: "Filigran Zorunlu", icon: "💧" },
 ];
 

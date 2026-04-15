@@ -55,7 +55,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing or invalid packageId" }, { status: 400 });
         }
 
-        // â”€â”€ Validate Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Validate Provider ────────────────────────────────────────────
         const availableProviders = getAvailableProviders();
         let selectedProvider: PaymentProvider | undefined;
         if (requestedProvider) {
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
             selectedProvider = requestedProvider;
         }
 
-        // â”€â”€ Coupon Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Coupon Validation ────────────────────────────────────────────
         let discountPercent = 0;
         if (couponCode && typeof couponCode === "string") {
             const coupon = await (prisma as any).coupon.findUnique({
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
 
         console.log(`[Checkout] User ${user.id}, package ${packageId}, provider: ${selectedProvider || "auto"}`);
 
-        // â”€â”€ Dev Bypass (Test Mode Sandbox) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Dev Bypass (Test Mode Sandbox) ──────────────────────────────
         if (process.env.NODE_ENV === "development") {
             const baseTier = (pkg as any).slug || packageId;
             console.log(`[Checkout] DEV MODE: Auto-granting ${pkg.credits} credits to ${user.id}`);
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
             });
         }
 
-        // â”€â”€ Select Gateway & Create Session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Select Gateway & Create Session ─────────────────────────────
         const gateway = selectGateway(selectedProvider);
 
         // Pending-session guard (prevent duplicate charges)
@@ -167,7 +167,7 @@ export async function POST(req: Request) {
                     });
                 }
             } catch {
-                // Session expired â€” fall through
+                // Session expired — fall through
             }
         }
 

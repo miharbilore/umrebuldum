@@ -1,8 +1,8 @@
-﻿// â”€â”€â”€ Type Compatibility Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── Type Compatibility Layer ───────────────────────────────────────────
 // Re-exports types for client components.
 // These match API response shapes (not raw Prisma models).
 
-// â”€â”€ Roles & Packages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Roles & Packages ────────────────────────────────────────────────────
 
 export type UserRole = "FREEMIUM" | "GUIDE" | "CORPORATE" | "ADMIN" | "BANNED";
 
@@ -16,7 +16,7 @@ export type DemandStatus = "OPEN" | "CLOSED" | "EXPIRED" | "DELETED";
 export type OfferStatus = "pending" | "accepted" | "rejected" | "expired";
 export type TokenType = "OFFER_SEND" | "DEMAND_UNLOCK" | "BOOST" | "REPUBLISH" | "PURCHASE" | "REFUND" | "ADMIN_GRANT" | "SUBSCRIPTION";
 
-// â”€â”€ Data Interfaces â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Data Interfaces ─────────────────────────────────────────────────────
 
 export interface Pricing {
     double: number;

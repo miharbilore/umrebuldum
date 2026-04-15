@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ pSEO JSON-LD Structured Data Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── pSEO JSON-LD Structured Data Utilities ───────────────────────────────
 // Injects Schema.org structured data into Next.js pages to win rich snippets
 // in Google search results (e.g., Star ratings, Prices, FAQs, Breadcrumbs).
 

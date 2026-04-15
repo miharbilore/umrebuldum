@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/api-guards";
 
 /**
- * PATCH /api/user/request-close â€” User closes their own request
+ * PATCH /api/user/request-close — User closes their own request
  */
 export async function PATCH(req: Request) {
     try {

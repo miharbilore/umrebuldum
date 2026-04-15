@@ -31,7 +31,7 @@ export async function rateLimit(
     maxRequests: number = 30
 ): Promise<{ success: boolean; remaining: number }> {
     if (!defaultRateLimiter) {
-        // In production, fail CLOSED â€” block requests when rate limiting is unavailable
+        // In production, fail CLOSED — block requests when rate limiting is unavailable
         if (process.env.NODE_ENV === "production") {
             console.error("[RateLimit] Redis not configured in production! Blocking request.");
             return { success: false, remaining: 0 };

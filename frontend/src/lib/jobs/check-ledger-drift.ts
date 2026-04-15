@@ -1,13 +1,13 @@
 ﻿import { prisma } from "@/lib/prisma";
 
 /**
- * Ledger Drift Check â€” scheduled job.
+ * Ledger Drift Check — scheduled job.
  * Run daily via cron (e.g. Vercel Cron, node-cron, or external scheduler).
  *
  * Detects and optionally auto-repairs any divergence between:
  *   users.tokenBalance (cache)  vs  SUM(token_ledger_entries.amount) (truth)
  *
- * This is a SAFETY NET â€” if the invariant holds, this job finds nothing.
+ * This is a SAFETY NET — if the invariant holds, this job finds nothing.
  * If drift is detected, it means a bug bypassed grantToken/spendToken.
  */
 
@@ -28,7 +28,7 @@ export async function checkLedgerDrift(autoRepair: boolean = false): Promise<{
 }> {
     console.log("[LedgerDrift] Starting drift check...");
 
-    // â”€â”€ Check 1: Balance drift (cache â‰  ledger SUM) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Check 1: Balance drift (cache ≠ ledger SUM) ─────────────────
     const drifted = await prisma.$queryRaw<DriftResult[]>`
         SELECT
             u.id AS userId,
@@ -42,7 +42,7 @@ export async function checkLedgerDrift(autoRepair: boolean = false): Promise<{
         HAVING u.availableBalance != COALESCE(SUM(t.amount), 0)
     `;
 
-    // â”€â”€ Check 2: Users without any ledger entry (invariant #5) â”€â”€â”€â”€â”€â”€
+    // ── Check 2: Users without any ledger entry (invariant #5) ──────
     const unseeded = await prisma.$queryRaw<{ id: string; email: string | null }[]>`
         SELECT u.id, u.email
         FROM users u
@@ -55,7 +55,7 @@ export async function checkLedgerDrift(autoRepair: boolean = false): Promise<{
     let repaired = 0;
 
     if (drifted.length > 0) {
-        console.error(`[LedgerDrift] âš ï¸ DRIFT DETECTED: ${drifted.length} users`);
+        console.error(`[LedgerDrift] ⚠️ DRIFT DETECTED: ${drifted.length} users`);
         for (const d of drifted) {
             console.error(`  - ${d.userId} (${d.email}): cached=${d.cached}, ledger=${d.ledger}, drift=${d.drift}`);
         }
@@ -72,11 +72,11 @@ export async function checkLedgerDrift(autoRepair: boolean = false): Promise<{
             console.log(`[LedgerDrift] Repaired ${repaired} users.`);
         }
     } else {
-        console.log("[LedgerDrift] âœ… No drift detected.");
+        console.log("[LedgerDrift] ✅ No drift detected.");
     }
 
     if (unseeded.length > 0) {
-        console.error(`[LedgerDrift] âš ï¸ UNSEEDED USERS: ${unseeded.length}`);
+        console.error(`[LedgerDrift] ⚠️ UNSEEDED USERS: ${unseeded.length}`);
         for (const u of unseeded) {
             console.error(`  - ${u.id} (${u.email}): no ledger entries`);
         }
@@ -109,7 +109,7 @@ export async function checkLedgerDrift(autoRepair: boolean = false): Promise<{
             console.log(`[LedgerDrift] Seeded ${repaired} users.`);
         }
     } else {
-        console.log("[LedgerDrift] âœ… All users have ledger entries.");
+        console.log("[LedgerDrift] ✅ All users have ledger entries.");
     }
 
     return {

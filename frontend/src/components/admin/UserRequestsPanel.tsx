@@ -113,7 +113,7 @@ export default function UserRequestsPanel() {
                                     <td className="px-4 py-3 text-gray-400 text-xs">{req.dateRange}</td>
                                     <td className="px-4 py-3 text-gray-400">{req.roomType}</td>
                                     <td className="px-4 py-3 text-gray-400">
-                                        {req.budget ? `${req.budget.toLocaleString('tr-TR')} ₺` : 'â€”'}
+                                        {req.budget ? `${req.budget.toLocaleString('tr-TR')} ₺` : '—'}
                                     </td>
                                     <td className="px-4 py-3">
                                         <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${req.status === 'open' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-700 text-gray-400'

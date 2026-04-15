@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
  * GET /api/billing/saved-cards
  *
  * Returns the current user's saved (tokenized) cards.
- * No actual card data is stored â€” only tokens and last4 digits.
+ * No actual card data is stored — only tokens and last4 digits.
  */
 export async function GET() {
     const session = await auth();

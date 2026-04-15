@@ -57,8 +57,8 @@ export function Template3({ data, id, showWatermark = true }: { data: PosterData
                                 {/* Features List under box */}
                                 <div className="w-full pt-6 border-t border-[#cfb53b]/20">
                                     <div className="text-slate-300 text-sm space-y-3 font-light tracking-wide">
-                                        <div><span className="text-[#cfb53b] text-xs mr-1">âœ¦</span> {data.hotelMecca}</div>
-                                        <div><span className="text-[#cfb53b] text-xs mr-1">âœ¦</span> {data.hotelMedina}</div>
+                                        <div><span className="text-[#cfb53b] text-xs mr-1">✦</span> {data.hotelMecca}</div>
+                                        <div><span className="text-[#cfb53b] text-xs mr-1">✦</span> {data.hotelMedina}</div>
                                         <div className="opacity-70">Transfer & Vize</div>
                                     </div>
                                 </div>

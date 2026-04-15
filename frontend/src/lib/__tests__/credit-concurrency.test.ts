@@ -17,7 +17,7 @@ import { prisma } from "@/lib/prisma";
 import { TokenService } from "@/lib/token-service";
 import { LedgerEntryType } from "@prisma/client";
 
-// â”€â”€â”€ Test Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Test Helpers ──────────────────────────────────────────────────────────
 
 async function createTestUser(id: string) {
     // Upsert a test user
@@ -67,7 +67,7 @@ async function cleanupTestUser(id: string) {
     await prisma.user.deleteMany({ where: { id } });
 }
 
-// â”€â”€â”€ Concurrency Test â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Concurrency Test ─────────────────────────────────────────────────────
 
 describe("Credit concurrency: parallel deductions", () => {
     const TEST_USER_ID = "concurrency-test-user-abc123";
@@ -110,7 +110,7 @@ describe("Credit concurrency: parallel deductions", () => {
 
         console.log(`Successes: ${successes.length}, Failures: ${failures.length}, Errors: ${errors.length}`);
 
-        // â”€â”€ Core assertions â”€â”€
+        // ── Core assertions ──
 
         // Exactly 2 should succeed (10 / 5 = 2)
         expect(successes.length).toBe(2);

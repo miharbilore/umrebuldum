@@ -11,13 +11,13 @@ import type {
  * PayTR iFrame Payment Gateway
  *
  * Integration flow:
- * 1. Server â†’ POST https://www.paytr.com/odeme/api/get-token â†’ iframe_token
- * 2. Client â†’ <iframe src="https://www.paytr.com/odeme/guvenli/{iframe_token}">
- * 3. PayTR â†’ POST callback_url (server) â†’ HMAC hash verification â†’ grant tokens
+ * 1. Server → POST https://www.paytr.com/odeme/api/get-token → iframe_token
+ * 2. Client → <iframe src="https://www.paytr.com/odeme/guvenli/{iframe_token}">
+ * 3. PayTR → POST callback_url (server) → HMAC hash verification → grant tokens
  *
  * 3D Secure: Enforced by PayTR (configured in merchant panel: "3D Secure Zorunlu")
  * Tokenization: Card data handled entirely within PayTR's PCI Level 1 iframe
- * Card Storage (CAPI): store_card=1 + utoken in request â†’ ctoken in callback
+ * Card Storage (CAPI): store_card=1 + utoken in request → ctoken in callback
  */
 
 const PAYTR_API_URL = "https://www.paytr.com/odeme/api/get-token";
@@ -61,10 +61,10 @@ export class PayTRGateway implements PaymentGateway {
             JSON.stringify([[`${params.credits} Kredi Paketi`, String(params.amountTRY), 1]])
         ).toString("base64");
 
-        // User IP â€” PayTR requires this; will be injected by the route handler
+        // User IP — PayTR requires this; will be injected by the route handler
         const userIp = (params as any).userIp || "127.0.0.1";
 
-        // â”€â”€ Build HMAC token â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Build HMAC token ────────────────────────────────────────────
         const hashStr = [
             this.merchantId,
             userIp,
@@ -80,7 +80,7 @@ export class PayTRGateway implements PaymentGateway {
 
         const paytrToken = this.generateHash(hashStr + this.merchantSalt);
 
-        // â”€â”€ Build request body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Build request body ──────────────────────────────────────────
         const body: Record<string, string> = {
             merchant_id: this.merchantId,
             user_ip: userIp,
@@ -98,7 +98,7 @@ export class PayTRGateway implements PaymentGateway {
             merchant_fail_url: params.cancelUrl,
         };
 
-        // â”€â”€ Card storage (CAPI) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Card storage (CAPI) ─────────────────────────────────────────
         if (params.storeCard) {
             body.store_card = "1";
         }
@@ -109,7 +109,7 @@ export class PayTRGateway implements PaymentGateway {
             body.ctoken = params.savedCardToken;
         }
 
-        // â”€â”€ POST to PayTR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── POST to PayTR ───────────────────────────────────────────────
         const formBody = new URLSearchParams(body);
         const response = await fetch(PAYTR_API_URL, {
             method: "POST",
@@ -146,7 +146,7 @@ export class PayTRGateway implements PaymentGateway {
             return { success: false, error: "Missing callback parameters" };
         }
 
-        // â”€â”€ Verify HMAC hash â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Verify HMAC hash ────────────────────────────────────────────
         const expectedHash = this.generateHash(
             merchant_oid + this.merchantSalt + status + total_amount
         );
@@ -163,7 +163,7 @@ export class PayTRGateway implements PaymentGateway {
             };
         }
 
-        // â”€â”€ Extract card storage tokens if present â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Extract card storage tokens if present ──────────────────────
         const result: CallbackResult = {
             success: true,
             merchantOid: merchant_oid,
@@ -189,7 +189,7 @@ export class PayTRGateway implements PaymentGateway {
     /**
      * PayTR refund via their API.
      * Note: PayTR refund API requires a separate integration.
-     * For now, this is a placeholder â€” full refund requires PayTR panel or API call.
+     * For now, this is a placeholder — full refund requires PayTR panel or API call.
      */
     async refund(merchantOid: string, amountInKurus: number): Promise<RefundResult> {
         try {
@@ -221,7 +221,7 @@ export class PayTRGateway implements PaymentGateway {
         }
     }
 
-    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Helpers ──────────────────────────────────────────────────────────
 
     private generateHash(data: string): string {
         return crypto

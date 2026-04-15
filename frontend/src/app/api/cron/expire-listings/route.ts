@@ -13,7 +13,7 @@ import { runExpiration } from "@/lib/expiration-service";
  * Security: Protected by CRON_SECRET header in production.
  */
 export async function GET(req: Request) {
-    // â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Auth ────────────────────────────────────────────────────────
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
         }
     }
 
-    // â”€â”€ Execute â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Execute ─────────────────────────────────────────────────────
     try {
         const result = await runExpiration();
 

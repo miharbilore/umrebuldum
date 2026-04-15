@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Role Capability Configuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── Role Capability Configuration ──────────────────────────────────────
 // Centralized role limits. Package-level overrides in package-system.ts.
 
 export interface RoleCapabilities {

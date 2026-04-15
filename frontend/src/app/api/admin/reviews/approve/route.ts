@@ -11,11 +11,11 @@ import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği eklendi
  * POST /api/admin/reviews/approve
  * * Admin-only endpoint to approve or reject a pending review.
  * On approval, fires:
- * - REVIEW_APPROVED â†’ Inngest rating-worker recalculates guide cache
- * - NOTIFICATION_CREATE â†’ In-app notification to reviewer
+ * - REVIEW_APPROVED → Inngest rating-worker recalculates guide cache
+ * - NOTIFICATION_CREATE → In-app notification to reviewer
  */
 export const POST = withErrorHandler(async (req: Request) => {
-    // â”€â”€ Auth Guard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Auth Guard ────────────────────────────────────────────────────
     const session = await auth();
     if (!session?.user || (session.user as any).role !== "ADMIN") {
         throw new AppError("Yetkisiz erişim", ERROR_CODES.UNAUTHORIZED, 401);
@@ -24,7 +24,7 @@ export const POST = withErrorHandler(async (req: Request) => {
     const body = await req.json();
     const { reviewId, status, reason } = body;
 
-    // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Validation ────────────────────────────────────────────────────
     if (!reviewId || !["APPROVED", "REJECTED"].includes(status)) {
         throw new AppError(
             "reviewId ve geçerli bir status (APPROVED/REJECTED) zorunludur.",
@@ -33,7 +33,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         );
     }
 
-    // â”€â”€ Fetch & Guard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Fetch & Guard ─────────────────────────────────────────────────
     const review = await prisma.review.findUnique({
         where: { id: reviewId },
         select: { id: true, guideId: true, status: true, reviewerUserId: true },
@@ -47,7 +47,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         throw new AppError("Yorum zaten bu durumda.", ERROR_CODES.VALIDATION_ERROR, 400);
     }
 
-    // â”€â”€ Update Review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Update Review ─────────────────────────────────────────────────
     const updatedReview = await prisma.review.update({
         where: { id: reviewId },
         data: {
@@ -56,7 +56,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         },
     });
 
-    // â”€â”€ Side Effects (Event-Driven) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Side Effects (Event-Driven) ───────────────────────────────────
     if (status === "APPROVED") {
         // Fire background worker to recalculate guide's average rating
         await EventBus.emit("REVIEW_APPROVED", {

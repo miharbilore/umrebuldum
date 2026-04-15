@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
         const userId = session.user.id;
 
-        // â”€â”€â”€ Deterministic idempotency key for onboarding â”€â”€â”€
+        // ─── Deterministic idempotency key for onboarding ───
         const idempotencyKey = `onboarding:${userId}`;
 
         // Check if already claimed (quick read from unified ledger)
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: "Hoşgeldin tokenları hesabınıza yüklendi!" });
 
     } catch (error: any) {
-        // P2002 = parallel race on idempotencyKey â€” already claimed
+        // P2002 = parallel race on idempotencyKey — already claimed
         if (error.code === "P2002") {
             return NextResponse.json({ error: "Onboarding tokens already claimed." }, { status: 400 });
         }

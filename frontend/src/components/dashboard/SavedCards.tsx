@@ -140,7 +140,7 @@ export function SavedCards() {
                             <div>
                                 <div className="flex items-center gap-2">
                                     <span className="font-mono text-sm text-gray-800 tracking-wider">
-                                        â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ â€¢â€¢â€¢â€¢ {card.last4}
+                                        •••• •••• •••• {card.last4}
                                     </span>
                                     {card.isDefault && (
                                         <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">

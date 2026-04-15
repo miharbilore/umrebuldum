@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         });
         if (!guideUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        // Check for duplicate interest (idempotent early exit â€” free, no credits needed)
+        // Check for duplicate interest (idempotent early exit — free, no credits needed)
         const existingInterest = await prisma.requestInterest.findUnique({
             where: {
                 requestId_guideEmail: {
@@ -66,12 +66,12 @@ export async function POST(req: Request) {
         });
         if (!requestOwner) return NextResponse.json({ error: "Request owner not found" }, { status: 404 });
 
-        // â”€â”€â”€ Get cost from ROLE_CONFIG â”€â”€â”€
+        // ─── Get cost from ROLE_CONFIG ───
         const roleConfig = getRoleConfig(session!.user.role);
         const expectedCost = roleConfig.interestCost;
         console.log(`[Interest API] Processing for ${guideUser.email}, Role: ${session!.user.role}, interestCost: ${expectedCost}`);
 
-        // â”€â”€â”€ Daily interest limit check â”€â”€â”€
+        // ─── Daily interest limit check ───
         const startOfDay = new Date();
         startOfDay.setUTCHours(0, 0, 0, 0);
         const dailyInterestCount = await prisma.requestInterest.count({
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: spendResult.error }, { status: 400 });
         }
 
-        // â”€â”€â”€ Create interest + conversation (post-spend) â”€â”€â”€
+        // ─── Create interest + conversation (post-spend) ───
         try {
             await prisma.$transaction(async (tx) => {
                 await tx.requestInterest.create({
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
                 }
             });
         } catch (err: any) {
-            // P2002 on requestInterest unique constraint â€” parallel race
+            // P2002 on requestInterest unique constraint — parallel race
             if (err.code === "P2002") {
                 return NextResponse.json({ message: "Interest already recorded", creditsRemaining: spendResult.newBalance }, { status: 200 });
             }

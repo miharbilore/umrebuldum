@@ -4,7 +4,7 @@ import { runDataCleanup } from "@/lib/data-cleanup";
 /**
  * GET /api/cron/cleanup
  *
- * Data retention cleanup â€” deletes old analytics and rate-limiting records.
+ * Data retention cleanup — deletes old analytics and rate-limiting records.
  *
  * Use cases:
  *   - Coolify / external cron (daily)
@@ -19,7 +19,7 @@ import { runDataCleanup } from "@/lib/data-cleanup";
  *   - VelocityCounter: 7 days
  */
 export async function GET(req: Request) {
-    // â”€â”€ Auth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Auth ────────────────────────────────────────────────────────
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
         }
     }
 
-    // â”€â”€ Execute Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Execute Cleanup ─────────────────────────────────────────────
     try {
         const result = await runDataCleanup();
 

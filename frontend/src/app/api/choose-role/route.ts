@@ -30,7 +30,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Ad Soyad zorunludur" }, { status: 400 })
         }
 
-        // Find the user â€” ID is guaranteed non-null after requireAuth
+        // Find the user — ID is guaranteed non-null after requireAuth
         const user = await prisma.user.findUnique({
             where: { id: session!.user.id! }
         })
