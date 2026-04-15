@@ -22,7 +22,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
   // We wrap ALL database logic in the fetchCachedListings fetcher callback
   const fetchResult = await fetchCachedListings(queryToHash, async () => {
-    const departureCityId = resolvedParams?.departureCity;
+    const departureCityParam = resolvedParams?.departureCity;
     const searchDate = resolvedParams?.date;
     const minDate = resolvedParams?.minDate;
     const maxDate = resolvedParams?.maxDate;
@@ -41,8 +41,12 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
       endDate: { gte: now }
     };
 
-    if (departureCityId && departureCityId !== 'all') {
-      where.departureCityId = departureCityId;
+    const sanitizedDepartureCity = departureCityParam ? String(departureCityParam).replace(/\*/g, "").trim() : null;
+    if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
+      where.OR = [
+        { departureCityId: sanitizedDepartureCity },
+        { departureCity: { name: { equals: sanitizedDepartureCity, mode: 'insensitive' } } }
+      ];
     }
 
     if (isIdentityVerifiedFilter === 'true') {

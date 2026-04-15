@@ -15,24 +15,17 @@ import {
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { MagneticButton } from "@/components/ui/magnetic-button";
+import { cities } from "@/lib/data/cities";
 
 export function HeroSection() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [cities, setCities] = useState<any[]>([]);
   const [city, setCity] = useState("");
   const [date, setDate] = useState<Date | undefined>();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Fetch cities
-    fetch('/api/cities')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setCities(data);
-      })
-      .catch(err => console.error("Failed to fetch cities", err));
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -104,7 +97,7 @@ export function HeroSection() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
               {/* Departure City (5 cols) */}
               <div className="md:col-span-5">
-                <Label className="text-xs text-gray-500 font-medium ml-1 mb-1.5 block">Kalkış Yeri</Label>
+                <Label className="text-xs text-gray-500 font-medium ml-1 mb-1.5 block">Kalkış Şehri</Label>
                 <div className="relative">
                   <MapPin className="absolute left-3 h-5 w-5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none" />
                   <Select value={city} onValueChange={setCity}>
@@ -113,14 +106,11 @@ export function HeroSection() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Tüm Şehirler</SelectItem>
-                      {cities.map((c) => {
-                        const cityName = String(c.name ?? "").replace(/\*/g, "").trim();
-                        return (
-                          <SelectItem key={c.id} value={c.id}>
-                            {cityName} {c.priority ? '⭐' : ''}
-                          </SelectItem>
-                        );
-                      })}
+                      {cities.map((cityName) => (
+                        <SelectItem key={cityName} value={cityName}>
+                          {cityName}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>

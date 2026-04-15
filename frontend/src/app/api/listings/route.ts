@@ -18,7 +18,7 @@ export const GET = withErrorHandler(async (req: Request) => {
     try {
         const { searchParams } = new URL(req.url);
         const guideId = searchParams.get('guideId');
-        const departureCityId = searchParams.get('departureCity') || searchParams.get('departureCityId');
+        const departureCityParam = searchParams.get('departureCity') || searchParams.get('departureCityId');
         const rawCity = searchParams.get('city');
         const city = rawCity ? rawCity.replace(/\*/g, "").trim() : null;
         const searchDate = searchParams.get('date');
@@ -43,8 +43,12 @@ export const GET = withErrorHandler(async (req: Request) => {
         };
 
         if (guideId) where.guideId = guideId;
-        if (departureCityId && departureCityId !== 'all') {
-            where.departureCityId = departureCityId;
+        const sanitizedDepartureCity = departureCityParam ? departureCityParam.replace(/\*/g, "").trim() : null;
+        if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
+            where.OR = [
+                { departureCityId: sanitizedDepartureCity },
+                { departureCity: { name: { equals: sanitizedDepartureCity, mode: 'insensitive' } } }
+            ];
         }
         if (city) {
             where.city = { contains: city, mode: 'insensitive' };
@@ -299,8 +303,16 @@ export const POST = withErrorHandler(async (req: Request) => {
         });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        const cityExists = await prisma.departureCity.findUnique({ where: { id: departureCityId } });
-        if (!cityExists) return NextResponse.json({ error: "Invalid Departure City" }, { status: 400 });
+        const sanitizedDepartureCity = String(departureCityId || "").replace(/\*/g, "").trim();
+        const departureCityRecord = await prisma.departureCity.findFirst({
+            where: {
+                OR: [
+                    { id: sanitizedDepartureCity },
+                    { name: { equals: sanitizedDepartureCity, mode: 'insensitive' } }
+                ]
+            }
+        });
+        if (!departureCityRecord) return NextResponse.json({ error: "Invalid Departure City" }, { status: 400 });
 
         // Upsert GuideProfile just to ensure relation exists, data is managed in User
         await prisma.guideProfile.upsert({
@@ -359,7 +371,7 @@ export const POST = withErrorHandler(async (req: Request) => {
                 title,
                 description: description || "",
                 city: city || "",
-                departureCityId,
+                departureCityId: departureCityRecord.id,
                 meetingCity: meetingCity || null,
                 extraServices: Array.isArray(extraServices) ? extraServices : [],
                 hotelName: hotelName || null,

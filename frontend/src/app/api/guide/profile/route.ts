@@ -9,6 +9,7 @@ const profileSchema = z.object({
     fullName: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
     phone: z.string().regex(/^\+[1-9]\d{1,14}$/, "Geçerli bir uluslararası telefon numarası giriniz (Örn: +90555...)"),
     city: z.string().min(2, "Şehir bilgisi gereklidir"),
+    agencyCity: z.string().optional(),
     bio: z.string().nullable().optional(),
     photo: z.string().nullable().optional(),
     isIdentityVerified: z.boolean().optional(),
@@ -40,6 +41,12 @@ export async function GET(req: Request) {
 
         return NextResponse.json({
             ...profile,
+            fullName: user.fullName,
+            phone: user.phone,
+            city: user.city,
+            agencyCity: user.agencyCity,
+            bio: user.bio,
+            photo: user.photo,
             isIdentityVerified: user.isIdentityVerified,
             package: user.packageType,
             tokenBalance: user.tokenBalance
@@ -65,7 +72,7 @@ export async function PUT(req: Request) {
             );
         }
 
-        const { fullName, phone, city, bio, photo } = validation.data;
+        const { fullName, phone, city, agencyCity, bio, photo } = validation.data;
 
         // email guaranteed non-null after requireSupply guard
         const user = await prisma.user.findUnique({
@@ -91,6 +98,7 @@ export async function PUT(req: Request) {
                 fullName: fullName,
                 phone: phone,
                 city: city,
+                agencyCity: agencyCity ? agencyCity : null,
                 bio: bio,
                 photo: photo
             }
