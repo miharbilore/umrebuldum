@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,19 +15,21 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 
-const CITIES = [
-    "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Konya", "Adana", "Gaziantep",
-];
-
 const ROOM_TYPES = [
     { id: "2-kisilik", label: "2 Kişilik Oda" },
     { id: "3-kisilik", label: "3 Kişilik Oda" },
     { id: "4-kisilik", label: "4 Kişilik Oda" },
 ];
 
+type CityOption = {
+    id: string;
+    name: string;
+};
+
 export default function RequestPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [cities, setCities] = useState<CityOption[]>([]);
     const [formData, setFormData] = useState({
         departureCity: "",
         peopleCount: "",
@@ -36,6 +38,21 @@ export default function RequestPage() {
         budget: "",
         note: ""
     });
+
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const res = await fetch("/api/cities");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) setCities(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch cities", err);
+            }
+        };
+        fetchCities();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -81,9 +98,14 @@ export default function RequestPage() {
                             <SelectValue placeholder="Şehir seçin" />
                         </SelectTrigger>
                         <SelectContent>
-                            {CITIES.map(c => (
-                                <SelectItem key={c} value={c}>{c}</SelectItem>
-                            ))}
+                            {cities.map((city) => {
+                                const cityName = String(city.name ?? "").replace(/\*/g, "").trim();
+                                return (
+                                    <SelectItem key={city.id ?? cityName} value={cityName}>
+                                        {cityName}
+                                    </SelectItem>
+                                );
+                            })}
                         </SelectContent>
                     </Select>
                 </div>
