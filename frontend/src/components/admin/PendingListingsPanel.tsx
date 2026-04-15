@@ -131,7 +131,7 @@ export default function PendingListingsPanel() {
                                     <td className="px-4 py-3">
                                         <div>
                                             <p className="font-medium text-gray-200">{listing.title}</p>
-                                            <p className="text-xs text-gray-500">{listing.departureCity} â†’ {listing.city}</p>
+                                            <p className="text-xs text-gray-500">{listing.departureCity} → {listing.city}</p>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">

@@ -20,9 +20,9 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
  * POST /api/stripe/webhook
  *
  * Hardened idempotency guarantee:
- *  1. INSERT webhook_events(eventId) â€” DB-level dedup on Stripe event.id
+ *  1. INSERT webhook_events(eventId) — DB-level dedup on Stripe event.id
  *  2. UPDATE transactions SET status="completed" WHERE sessionId=? AND status="pending"
- *  3. grantToken() â€” writes to token_ledger_entries with idempotencyKey="stripe:"+sessionId
+ *  3. grantToken() — writes to token_ledger_entries with idempotencyKey="stripe:"+sessionId
  *     grantToken has its own internal idempotency (defense-in-depth)
  *
  *  Steps 1-2 in SERIALIZABLE $transaction, step 3 has its own atomic transaction.
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
     }
 
-    // â”€â”€ checkout.session.completed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── checkout.session.completed ─────────────────────────────────────────
     if (event.type === "checkout.session.completed") {
         const session = event.data.object as Stripe.Checkout.Session;
         const metadata = session.metadata;
@@ -108,9 +108,9 @@ export async function POST(req: Request) {
             console.log(`[Webhook] PAYMENT_COMPLETED event dispatched for session ${session.id}`);
 
         } catch (err: any) {
-            // P2002 on webhookEvent.create â†’ duplicate event delivery â†’ safe to skip
+            // P2002 on webhookEvent.create → duplicate event delivery → safe to skip
             if (err.code === "P2002") {
-                console.log(`[Webhook] Duplicate event ${event.id} â€” skipping (already processed).`);
+                console.log(`[Webhook] Duplicate event ${event.id} — skipping (already processed).`);
                 return new NextResponse(null, { status: 200 });
             }
             console.error(`[Webhook] Error processing ${event.id}:`, err);
@@ -118,7 +118,7 @@ export async function POST(req: Request) {
         }
     }
 
-    // â”€â”€ checkout.session.expired â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── checkout.session.expired ───────────────────────────────────────────
     if (event.type === "checkout.session.expired") {
         const session = event.data.object as Stripe.Checkout.Session;
 

@@ -64,7 +64,7 @@ export async function DELETE(req: Request) {
         });
         if (!adminUser) return NextResponse.json({ error: "Admin not found" }, { status: 404 });
 
-        // â”€â”€â”€ REFUND all interest tokens before soft-delete â”€â”€â”€
+        // ─── REFUND all interest tokens before soft-delete ───
         const refundPromises = [];
         for (const interest of request.interests) {
             const guideUser = await prisma.user.findUnique({
@@ -88,7 +88,7 @@ export async function DELETE(req: Request) {
         }
         await Promise.all(refundPromises);
 
-        // â”€â”€â”€ SOFT-DELETE â”€â”€â”€
+        // ─── SOFT-DELETE ───
         await prisma.umrahRequest.update({
             where: { id: requestId },
             data: {

@@ -52,7 +52,7 @@ export function ConversionFunnel({ stages }: ConversionFunnelProps) {
                             </div>
                             {stage.percentage !== undefined && index > 0 && (
                                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-500">
-                                    â†“ {stage.percentage}%
+                                    ↓ {stage.percentage}%
                                 </span>
                             )}
                         </div>

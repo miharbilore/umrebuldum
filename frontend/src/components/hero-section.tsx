@@ -38,7 +38,8 @@ export function HeroSection() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (city && city !== "all") params.set("departureCity", city);
+    const sanitizedCity = city.replace(/\*/g, "").trim();
+    if (sanitizedCity && sanitizedCity !== "all") params.set("departureCity", sanitizedCity);
 
     if (date) {
       // Add timezone offset correction or just use YYYY-MM-DD
@@ -112,11 +113,14 @@ export function HeroSection() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Tüm Şehirler</SelectItem>
-                      {cities.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name} {c.priority ? 'â­' : ''}
-                        </SelectItem>
-                      ))}
+                      {cities.map((c) => {
+                        const cityName = String(c.name ?? "").replace(/\*/g, "").trim();
+                        return (
+                          <SelectItem key={c.id} value={c.id}>
+                            {cityName} {c.priority ? '⭐' : ''}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>

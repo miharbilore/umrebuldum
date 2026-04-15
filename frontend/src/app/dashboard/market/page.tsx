@@ -229,7 +229,7 @@ export default function GuideMarketPage() {
                                     className={`w-full ${((req as any).isContacted || interestedIds.has(req.id)) ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : ""}`}
                                 >
                                     {((req as any).isContacted || interestedIds.has(req.id))
-                                        ? "İletişime Geçildi (Detaya Git) âœ…"
+                                        ? "İletişime Geçildi (Detaya Git) ✅"
                                         : currentBalance < creditCost
                                             ? "Yetersiz Bakiye 💰"
                                             : `Teklif Ver (${creditCost} Kredi) ✨`

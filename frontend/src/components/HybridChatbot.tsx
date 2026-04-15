@@ -68,8 +68,8 @@ export default function HybridChatbot() {
                 text: 'Selamün Aleyküm, UmreBuldum Asistanı\'na hoş geldiniz. Size daha hızlı yardımcı olabilmem için lütfen profilinizi seçin:',
                 options: [
                     { label: '🕋 Umre Yolcusuyum / Müşteriyim', action: 'ROLE_CUSTOMER' },
-                    { label: 'ğŸ—‚ï¸ Rehberim / İlan Vermek İstiyorum', action: 'ROLE_GUIDE' },
-                    { label: 'â“ Diğer / Bilgi Almak İstiyorum', action: 'ROLE_OTHER' },
+                    { label: '🗂 Rehberim / İlan Vermek İstiyorum', action: 'ROLE_GUIDE' },
+                    { label: '❓ Diğer / Bilgi Almak İstiyorum', action: 'ROLE_OTHER' },
                     { label: '📚 Sıkça Sorulan Sorular (SSS)', action: 'ACTION_FAQ' },
                 ]
             }]);
@@ -93,7 +93,7 @@ export default function HybridChatbot() {
                 setUserRole('MÜŞTERİ');
                 setChatState('CUSTOMER_MENU');
                 addBotMessage('Harika! Size nasıl yardımcı olabilirim?', [
-                    { label: '🔑 Uygun İlanları Listele', action: 'CUSTOMER_LIST' },
+                    { label: '🔑 Uygun İlanları Listele', action: 'CUSTOMER_LIST' },
                     { label: '💰 Ödeme ve Taksit Seçenekleri', action: 'CUSTOMER_PAYMENT' },
                     { label: '📄 Vize ve Gerekli Evraklar', action: 'CUSTOMER_VISA' },
                     { label: '👤 Danışmanla Görüşmek İstiyorum', action: 'CONNECT_AGENT' },
@@ -103,10 +103,10 @@ export default function HybridChatbot() {
                 setUserRole('REHBER');
                 setChatState('GUIDE_MENU');
                 addBotMessage('Hoş geldiniz hocam. İşleminizi seçin:', [
-                    { label: 'â• Yeni İlan Nasıl Verilir?', action: 'GUIDE_NEW' },
-                    { label: 'âœï¸ İlanımı Güncellemek İstiyorum', action: 'GUIDE_UPDATE' },
+                    { label: '➕ Yeni İlan Nasıl Verilir?', action: 'GUIDE_NEW' },
+                    { label: '✏️ İlanımı Güncellemek İstiyorum', action: 'GUIDE_UPDATE' },
                     { label: '📈 İlanım Neden Onaylanmadı?', action: 'GUIDE_REJECTED' },
-                    { label: 'ğŸ‘¨â€ğŸ’» Teknik Destek / Admin', action: 'CONNECT_AGENT' },
+                    { label: '👨‍💻 Teknik Destek / Admin', action: 'CONNECT_AGENT' },
                 ]);
                 break;
             case 'ROLE_OTHER':

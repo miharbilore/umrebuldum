@@ -219,11 +219,14 @@ export default function NewListingPage() {
                                     <Select onValueChange={(v) => handleSelectChange("departureCityId", v)}>
                                         <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                                         <SelectContent>
-                                            {cities.map((c: any) => (
-                                                <SelectItem key={c.id} value={String(c.id)}>
-                                                    {c.name} {c.priority ? 'â­' : ''}
-                                                </SelectItem>
-                                            ))}
+                                            {cities.map((c: any) => {
+                                                const cityName = String(c.name ?? "").replace(/\*/g, "").trim();
+                                                return (
+                                                    <SelectItem key={c.id} value={String(c.id)}>
+                                                        {cityName} {c.priority ? '⭐' : ''}
+                                                    </SelectItem>
+                                                );
+                                            })}
                                         </SelectContent>
                                     </Select>
                                 </div>

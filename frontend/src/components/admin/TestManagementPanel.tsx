@@ -157,7 +157,7 @@ export default function TestManagementPanel() {
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         <span className="text-sm text-gray-400">
-                          {log.duration ? `${log.duration}ms` : 'â€”'}
+                          {log.duration ? `${log.duration}ms` : '—'}
                         </span>
                       </td>
                       <td className="px-4 py-3">

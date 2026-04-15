@@ -32,7 +32,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
-        // â”€â”€â”€ 500-char limit â”€â”€â”€
+        // ─── 500-char limit ───
         if (typeof body !== 'string' || body.length > 500) {
             return NextResponse.json({ error: "Message too long (max 500 characters)" }, { status: 400 });
         }
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        // â”€â”€â”€ 2-second rate limit â”€â”€â”€
+        // ─── 2-second rate limit ───
         const lastMessage = await prisma.message.findFirst({
             where: {
                 conversationId,
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
             }, { status: 400 });
         }
 
-        // â”€â”€â”€ Email notification to recipient (non-blocking) â”€â”€â”€
+        // ─── Email notification to recipient (non-blocking) ───
         const recipientId = conversation.userId === session.user.id
             ? conversation.guideId
             : conversation.userId;

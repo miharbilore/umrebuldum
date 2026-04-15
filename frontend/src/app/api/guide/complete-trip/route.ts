@@ -7,7 +7,7 @@ import { logAdminAction } from "@/lib/admin-audit";
 
 /**
  * ADMIN-ONLY: Mark a trip as completed for a guide.
- * Requires listingId. Idempotent â€” cannot complete same listing twice.
+ * Requires listingId. Idempotent — cannot complete same listing twice.
  */
 export async function PUT(req: Request) {
     try {

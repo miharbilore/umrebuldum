@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 
 /**
- * DELETE /api/guide/listing â€” Soft-delete a guide's own listing
+ * DELETE /api/guide/listing — Soft-delete a guide's own listing
  */
 export async function DELETE(req: Request) {
     try {

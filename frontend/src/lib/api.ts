@@ -216,7 +216,10 @@ export async function getTours(filters?: TourFilters): Promise<ToursResponse> {
   const params = new URLSearchParams();
 
   if (filters?.city) {
-    params.append('departure_city', filters.city);
+    const sanitizedCity = filters.city.replace(/\*/g, "").trim();
+    if (sanitizedCity) {
+      params.append('departure_city', sanitizedCity);
+    }
   }
   if (filters?.minPrice !== undefined) {
     params.append('min_price', filters.minPrice.toString());

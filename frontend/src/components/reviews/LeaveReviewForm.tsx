@@ -5,7 +5,7 @@ import { Star, Send, Loader2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 /**
- * LeaveReviewForm â€” Allows authenticated users to rate and review a guide.
+ * LeaveReviewForm — Allows authenticated users to rate and review a guide.
  * Posts to POST /api/reviews.
  */
 
@@ -179,7 +179,7 @@ export function LeaveReviewForm({ guideId, requestId, onSuccess }: LeaveReviewFo
                                     : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
                             }`}
                         >
-                            {selectedPositive.includes(tag) ? 'âœ“ ' : ''}{tag}
+                            {selectedPositive.includes(tag) ? '✓ ' : ''}{tag}
                         </button>
                     ))}
                 </div>
@@ -202,7 +202,7 @@ export function LeaveReviewForm({ guideId, requestId, onSuccess }: LeaveReviewFo
                                     : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
                             }`}
                         >
-                            {selectedNegative.includes(tag) ? 'âœ— ' : ''}{tag}
+                            {selectedNegative.includes(tag) ? '✗ ' : ''}{tag}
                         </button>
                     ))}
                 </div>

@@ -95,6 +95,8 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
     // Filters are now pushed down to the database schema.
 
+    const sanitizeCity = (value?: string | null) => (value ? value.replace(/\*/g, "").trim() : value);
+
     // Transform logic mapping to the return object
     const transformedData = listings.map(l => {
       const profile = l.guide;
@@ -103,9 +105,9 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
         guideId: l.guideId,
         title: l.title,
         description: l.description,
-        city: l.city,
-        departureCity: l.departureCity?.name || l.city || "Unknown",
-        meetingCity: l.meetingCity,
+        city: sanitizeCity(l.city) || "",
+        departureCity: sanitizeCity(l.departureCity?.name || l.city) || "Unknown",
+        meetingCity: sanitizeCity(l.meetingCity),
         extraServices: l.extraServices,
         hotelName: l.hotelName,
         airline: l.airline?.name || "Unknown",
@@ -125,7 +127,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
         totalDays: l.totalDays,
         tourPlan: l.tourDays.map(d => ({
           day: d.day,
-          city: d.city,
+          city: sanitizeCity(d.city) || "",
           title: d.title,
           description: d.description
         })),

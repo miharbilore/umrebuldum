@@ -50,10 +50,10 @@ export async function POST(req: Request) {
             const resetUrl = `${baseUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
             // Development: log to console only (no file writes)
-            console.log("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
+            console.log("──────────────────────────────────────────────");
             console.log(`Password Reset Link for ${email}:`);
             console.log(resetUrl);
-            console.log("â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
+            console.log("──────────────────────────────────────────────");
 
             // Send password reset email (non-blocking)
             emailService.sendAsync(

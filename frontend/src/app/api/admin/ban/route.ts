@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/api-guards";
 import { logAdminAction } from "@/lib/admin-audit";
 
 /**
- * POST /api/admin/ban â€” Ban a user (cannot ban ADMIN)
+ * POST /api/admin/ban — Ban a user (cannot ban ADMIN)
  * Stores previousRole for unban restoration.
  */
 export async function POST(req: Request) {
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
 }
 
 /**
- * PUT /api/admin/ban â€” Unban a user, restoring previous role.
+ * PUT /api/admin/ban — Unban a user, restoring previous role.
  */
 export async function PUT(req: Request) {
     try {

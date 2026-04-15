@@ -17,7 +17,7 @@ const profileSchema = z.object({
 export async function GET(req: Request) {
     try {
         const session = await auth();
-        // VULN-7 fix: GuideProfile data is only for GUIDE/ORG â€” USERs have no profile to read
+        // VULN-7 fix: GuideProfile data is only for GUIDE/ORG — USERs have no profile to read
         const authErr = requireSupply(session);
         if (authErr) return authErr;
 

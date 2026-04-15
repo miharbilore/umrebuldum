@@ -90,7 +90,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: spendResult.error }, { status: 400 });
         }
 
-        // â”€â”€â”€ Create offer + conversation (post-spend) â”€â”€â”€
+        // ─── Create offer + conversation (post-spend) ───
         try {
             await prisma.$transaction(async (tx) => {
                 await tx.offer.create({

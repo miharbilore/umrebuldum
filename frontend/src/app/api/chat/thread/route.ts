@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Only Guides and Organizations can start conversations via this endpoint" }, { status: 403 });
         }
 
-        // Check if conversation already exists â€” free early return
+        // Check if conversation already exists — free early return
         const existing = await prisma.conversation.findUnique({
             where: {
                 requestId_guideId: {
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: spendResult.error }, { status: 400 });
         }
 
-        // â”€â”€â”€ Create conversation (post-spend) â”€â”€â”€
+        // ─── Create conversation (post-spend) ───
         try {
             const newConv = await prisma.conversation.create({
                 data: {
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
 
             return NextResponse.json(newConv);
         } catch (error: any) {
-            // P2002: parallel call already created the conversation â€” return existing
+            // P2002: parallel call already created the conversation — return existing
             if (error.code === 'P2002') {
                 const existingConv = await prisma.conversation.findUnique({
                     where: {

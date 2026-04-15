@@ -48,7 +48,7 @@ export async function POST(req: Request) {
             return new NextResponse("OK", { status: 200 });
         }
 
-        // â”€â”€ Process successful payment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Process successful payment ──────────────────────────────────
 
         // Find the pending transaction by ID (merchant_oid = our internal tx ID)
         const pendingTx = await prisma.transaction.findFirst({
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
         console.log(`[PayTR Callback] Processing payment for user ${pendingTx.userId}, ${pendingTx.credits} credits`);
 
-        // â”€â”€ Atomic settlement (same pattern as Stripe webhook) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Atomic settlement (same pattern as Stripe webhook) ──────────
         await withSerializableRetry(() =>
             prisma.$transaction(async (tx) => {
                 // WebhookEvent dedup (same table as Stripe)
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
             }, { isolationLevel: "Serializable", timeout: 15_000 })
         );
 
-        // â”€â”€ Grant tokens event triggered â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Grant tokens event triggered ──────────────────────────────────
         const txMetadata = pendingTx.metadata as any;
         await EventBus.emit("PAYMENT_COMPLETED", {
             transactionId: merchantOid!,
@@ -107,7 +107,7 @@ export async function POST(req: Request) {
 
         console.log(`[PayTR Callback] Payment handled & event dispatched for user ${pendingTx.userId}`);
 
-        // â”€â”€ Save card if token was returned â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Save card if token was returned ─────────────────────────────
         if (result.cardToken && result.last4) {
             try {
                 await prisma.savedCard.upsert({
@@ -134,7 +134,7 @@ export async function POST(req: Request) {
                 });
                 console.log(`[PayTR Callback] Card saved for user ${pendingTx.userId}`);
             } catch (err: any) {
-                // Non-critical â€” log but don't fail
+                // Non-critical — log but don't fail
                 console.error(`[PayTR Callback] Failed to save card: ${err.message}`);
             }
         }
@@ -142,9 +142,9 @@ export async function POST(req: Request) {
         return new NextResponse("OK", { status: 200 });
 
     } catch (err: any) {
-        // P2002 = duplicate WebhookEvent â†’ already processed
+        // P2002 = duplicate WebhookEvent → already processed
         if (err.code === "P2002") {
-            console.log(`[PayTR Callback] Duplicate callback â€” already processed`);
+            console.log(`[PayTR Callback] Duplicate callback — already processed`);
             return new NextResponse("OK", { status: 200 });
         }
 

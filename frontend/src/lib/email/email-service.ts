@@ -2,7 +2,7 @@
 import type { EmailTemplate } from "./email-templates";
 
 /**
- * EmailService â€” Unified transactional email sender via Resend API.
+ * EmailService — Unified transactional email sender via Resend API.
  *
  * ALL email in the system (Auth verification, notifications, messages)
  * MUST flow through this service. No other transport (SMTP, Nodemailer) exists.
@@ -14,7 +14,7 @@ import type { EmailTemplate } from "./email-templates";
  * - Batch send support for bulk notifications
  */
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Types ──────────────────────────────────────────────────────────────
 
 export type EmailType = "verification" | "notification" | "message";
 
@@ -31,7 +31,7 @@ export interface SendResult {
     error?: string;
 }
 
-// â”€â”€â”€ Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Config ─────────────────────────────────────────────────────────────
 
 const FROM_ADDRESS = process.env.EMAIL_FROM || "UmreBuldum <noreply@umrebuldum.com>";
 
@@ -42,7 +42,7 @@ function getClient(): Resend | null {
 
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-        console.warn("[EmailService] RESEND_API_KEY not set â€” emails will be logged to console only.");
+        console.warn("[EmailService] RESEND_API_KEY not set — emails will be logged to console only.");
         return null;
     }
 
@@ -50,7 +50,7 @@ function getClient(): Resend | null {
     return resendClient;
 }
 
-// â”€â”€â”€ Core: sendEmail (Standard Interface) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Core: sendEmail (Standard Interface) ───────────────────────────────
 
 /**
  * Standard email sending method. ALL callers (Auth.js, notifications, etc.)
@@ -62,11 +62,11 @@ async function sendEmail(options: SendEmailOptions): Promise<SendResult> {
 
     // Development / no API key: console.log ONLY (no file writes)
     if (!client) {
-        console.log(`â”€â”€ EMAIL [${type.toUpperCase()}] (DEV) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`);
+        console.log(`── EMAIL [${type.toUpperCase()}] (DEV) ──────────────`);
         console.log(`To: ${to}`);
         console.log(`Subject: ${subject}`);
         console.log(`HTML: ${html.length} chars`);
-        console.log(`â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`);
+        console.log(`────────────────────────────────────────────`);
         return { success: true, id: `dev_${Date.now()}` };
     }
 
@@ -79,19 +79,19 @@ async function sendEmail(options: SendEmailOptions): Promise<SendResult> {
         });
 
         if (error) {
-            console.error(`[EmailService] [${type}] Failed â†’ ${to}:`, error);
+            console.error(`[EmailService] [${type}] Failed → ${to}:`, error);
             return { success: false, error: error.message };
         }
 
-        console.log(`[EmailService] [${type}] Sent â†’ ${to}: ${data?.id}`);
+        console.log(`[EmailService] [${type}] Sent → ${to}: ${data?.id}`);
         return { success: true, id: data?.id };
     } catch (err: any) {
-        console.error(`[EmailService] [${type}] Exception â†’ ${to}:`, err.message);
+        console.error(`[EmailService] [${type}] Exception → ${to}:`, err.message);
         return { success: false, error: err.message };
     }
 }
 
-// â”€â”€â”€ Legacy-compatible wrappers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Legacy-compatible wrappers ─────────────────────────────────────────
 
 /**
  * Send using an EmailTemplate object (backward-compatible with existing callers).
@@ -115,7 +115,7 @@ async function sendBatch(
 
     if (!client) {
         return recipients.map((r) => {
-            console.log(`[EmailService] DEV batch â†’ ${r.email}: ${r.template.subject}`);
+            console.log(`[EmailService] DEV batch → ${r.email}: ${r.template.subject}`);
             return { success: true, id: `dev_batch_${Date.now()}` };
         });
     }
@@ -156,7 +156,7 @@ function sendAsync(to: string, template: EmailTemplate, replyTo?: string): void 
     });
 }
 
-// â”€â”€â”€ Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Export ─────────────────────────────────────────────────────────────
 
 export const emailService = {
     sendEmail,

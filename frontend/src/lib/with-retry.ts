@@ -18,7 +18,7 @@ export async function withSerializableRetry<T>(
                 err.message?.includes("lock wait timeout");
 
             if (isRetryable && attempt < maxAttempts) {
-                await new Promise(r => setTimeout(r, 100 * attempt)); // 100ms â†’ 200ms
+                await new Promise(r => setTimeout(r, 100 * attempt)); // 100ms → 200ms
                 continue;
             }
             throw err;

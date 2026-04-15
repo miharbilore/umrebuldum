@@ -6,7 +6,7 @@ import { StarRating } from '@/components/ui/StarRating';
 import { Loader2, MessageSquareText, ChevronDown } from 'lucide-react';
 
 /**
- * ReviewList â€” Fetches and displays paginated APPROVED reviews for a guide.
+ * ReviewList — Fetches and displays paginated APPROVED reviews for a guide.
  * Uses client-side fetching from GET /api/reviews?guideId=xxx
  */
 

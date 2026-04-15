@@ -100,7 +100,7 @@ export default function AuditLogPanel() {
                                             {log.reason}
                                         </td>
                                         <td className="px-4 py-3 text-gray-500 text-xs max-w-[200px] truncate">
-                                            {log.metadata ? JSON.stringify(log.metadata) : 'â€”'}
+                                            {log.metadata ? JSON.stringify(log.metadata) : '—'}
                                         </td>
                                     </tr>
                                 );

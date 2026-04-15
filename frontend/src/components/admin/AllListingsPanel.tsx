@@ -61,7 +61,7 @@ export default function AllListingsPanel() {
                                 <tr key={listing.id} className="hover:bg-gray-800/50 transition-colors">
                                     <td className="px-4 py-3">
                                         <div className="font-medium text-gray-200">{listing.title}</div>
-                                        <div className="text-xs text-gray-500">{new Date(listing.createdAt).toLocaleDateString('tr-TR')} â€¢ {listing.departureCity || 'Konumsuz'}</div>
+                                        <div className="text-xs text-gray-500">{new Date(listing.createdAt).toLocaleDateString('tr-TR')} • {listing.departureCity || 'Konumsuz'}</div>
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="text-gray-300">{listing.guideName}</div>

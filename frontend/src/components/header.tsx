@@ -236,7 +236,7 @@ export function Header() {
                   className="rounded-lg px-3 py-2 text-base font-medium text-foreground hover:bg-secondary transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  🗺️ï¸ Haritalı Gezi Rehberi <span className="ml-2 inline-flex px-1.5 py-0.5 rounded bg-emerald-100 text-[10px] font-bold text-emerald-700">YENİ</span>
+                  🗺️ Haritalı Gezi Rehberi <span className="ml-2 inline-flex px-1.5 py-0.5 rounded bg-emerald-100 text-[10px] font-bold text-emerald-700">YENİ</span>
                 </Link>
                 <Link
                   href="/sanal-tur"

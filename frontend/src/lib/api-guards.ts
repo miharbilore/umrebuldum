@@ -1,8 +1,8 @@
 ﻿import { NextResponse } from "next/server";
 
-// â”€â”€â”€ Server-Side API Guards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Server-Side API Guards ─────────────────────────────────────────────
 // Every guard returns a NextResponse error OR null. 
-// If null â†’ guard passed, continue.
+// If null → guard passed, continue.
 
 type Session = {
     user: {

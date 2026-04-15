@@ -1,16 +1,16 @@
 ﻿/**
  * Two-tier chat rate limiter.
  *
- * Tier 1 â€” Burst (in-memory)
+ * Tier 1 — Burst (in-memory)
  *   Max 1 message per 2 seconds per (userId, conversationId).
  *   Uses the shared in-memory `rateLimit()` from rate-limit.ts.
- *   âš ï¸  Not shared across multiple Node.js processes/replicas.
+ *   ⚠️  Not shared across multiple Node.js processes/replicas.
  *   For multi-instance deployment: replace with Redis SET NX + TTL.
  *
- * Tier 2 â€” Daily cap (DB-backed)
+ * Tier 2 — Daily cap (DB-backed)
  *   Max 100 messages per (senderId, conversationId) per UTC calendar day.
- *   Uses a DB COUNT query â€” accurate across restarts and replicas.
- *   âš ï¸  At high scale (>50 k/day): replace with a Redis counter
+ *   Uses a DB COUNT query — accurate across restarts and replicas.
+ *   ⚠️  At high scale (>50 k/day): replace with a Redis counter
  *   (INCR + EXPIREAT set to next UTC midnight).
  */
 
@@ -44,19 +44,19 @@ export async function checkChatRateLimits(
     senderId: string,
     conversationId: string,
 ): Promise<{ allowed: true } | RateLimitResult> {
-    // â”€â”€ Tier 1: burst â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Tier 1: burst ──────────────────────────────────────────────────────
     const burstKey = `chat:burst:${senderId}:${conversationId}`;
     const burst = await rateLimit(burstKey, BURST_WINDOW_MS, BURST_MAX);
     if (!burst.success) {
         return {
             allowed: false,
             status: 429,
-            reason: "Too fast â€” wait 2 seconds between messages.",
+            reason: "Too fast — wait 2 seconds between messages.",
             retryAfterMs: BURST_WINDOW_MS,
         };
     }
 
-    // â”€â”€ Tier 2: daily cap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Tier 2: daily cap ──────────────────────────────────────────────────
     const startOfDay = new Date();
     startOfDay.setUTCHours(0, 0, 0, 0);
 

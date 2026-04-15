@@ -41,7 +41,7 @@ export async function POST(req: Request) {
             return NextResponse.redirect(cancelUrl, 303);
         }
 
-        // â”€â”€ Process successful payment â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Process successful payment ──────────────────────────────────
         
         const pendingTx = await prisma.transaction.findFirst({
             where: {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 
         console.log(`[Iyzico Callback] Processing success for user ${pendingTx.userId}, tx: ${pendingTx.id}`);
 
-        // â”€â”€ Atomic settlement â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Atomic settlement ──────────────────────────────────────────
         await withSerializableRetry(() => 
             prisma.$transaction(async (tx) => {
                 // Deduplication
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
             }, { isolationLevel: "Serializable", timeout: 15_000 })
         );
 
-        // â”€â”€ Emit event for token granting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Emit event for token granting ─────────────────────────────
         const txMetadata = pendingTx.metadata as any;
         await EventBus.emit("PAYMENT_COMPLETED", {
             transactionId: pendingTx.id,
@@ -107,7 +107,7 @@ export async function POST(req: Request) {
             provider: "iyzico"
         });
 
-        // â”€â”€ Redirect user back to dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Redirect user back to dashboard ───────────────────────────
         const successUrl = process.env.NEXT_PUBLIC_APP_URL + "/dashboard/checkout?status=success";
         return NextResponse.redirect(successUrl, 303);
 

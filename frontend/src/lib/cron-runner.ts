@@ -1,7 +1,7 @@
 ﻿import cron from "node-cron";
 import { runExpiration } from "./expiration-service";
 
-// â”€â”€â”€ Cron Runner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Cron Runner ────────────────────────────────────────────────────────
 // Self-hosted cron scheduler using node-cron.
 // Import this file from your server entry point (e.g., custom server.ts or instrumentation.ts).
 //
@@ -11,7 +11,7 @@ let isRunning = false;
 
 /**
  * Start the cron scheduler.
- * Safe to call multiple times â€” only starts once.
+ * Safe to call multiple times — only starts once.
  */
 export function startCronJobs(): void {
     if (isRunning) {
@@ -19,7 +19,7 @@ export function startCronJobs(): void {
         return;
     }
 
-    // â”€â”€ Expire stale entities: every 15 minutes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Expire stale entities: every 15 minutes ─────────────────────
     cron.schedule("*/15 * * * *", async () => {
         console.log(`[Cron] Running expiration check at ${new Date().toISOString()}`);
         try {
@@ -32,7 +32,7 @@ export function startCronJobs(): void {
         timezone: "Europe/Istanbul",
     });
 
-    // â”€â”€ Data retention cleanup: daily at 03:00 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Data retention cleanup: daily at 03:00 ──────────────────────
     cron.schedule("0 3 * * *", async () => {
         console.log(`[Cron] Running data cleanup at ${new Date().toISOString()}`);
         try {

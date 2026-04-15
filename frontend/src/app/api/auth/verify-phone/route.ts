@@ -8,14 +8,14 @@ const FREEMIUM_PHONE_BONUS = 15;
 
 export async function POST(req: NextRequest) {
   try {
-    // â”€â”€ 1. Auth guard: user must be logged in â”€â”€
+    // ── 1. Auth guard: user must be logged in ──
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const userId = session.user.id;
 
-    // â”€â”€ 2. Parse request body â”€â”€
+    // ── 2. Parse request body ──
     const body = await req.json();
     const { idToken } = body;
 
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // â”€â”€ 3. Verify Firebase ID Token (server-side security) â”€â”€
+    // ── 3. Verify Firebase ID Token (server-side security) ──
     let decodedToken;
     try {
       decodedToken = await adminAuth.verifyIdToken(idToken);
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // â”€â”€ 4. Extract phone number from decoded token â”€â”€
+    // ── 4. Extract phone number from decoded token ──
     const verifiedPhone = decodedToken.phone_number;
     if (!verifiedPhone) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // â”€â”€ 5. Check if this phone is already used by ANOTHER user â”€â”€
+    // ── 5. Check if this phone is already used by ANOTHER user ──
     const existingUser = await prisma.user.findUnique({
       where: { phone: verifiedPhone },
       select: { id: true },
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // â”€â”€ 6. Check current verification status â”€â”€
+    // ── 6. Check current verification status ──
     const currentUser = await prisma.user.findUnique({
       where: { id: userId },
       select: { isPhoneVerified: true },
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     const isFirstVerification = !currentUser?.isPhoneVerified;
 
-    // â”€â”€ 7. Update User: set phone + isPhoneVerified â”€â”€
+    // ── 7. Update User: set phone + isPhoneVerified ──
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // â”€â”€ 8. Grant 15 Freemium tokens ONLY on first verification â”€â”€
+    // ── 8. Grant 15 Freemium tokens ONLY on first verification ──
     let tokensGranted = 0;
     if (isFirstVerification) {
       await TokenService.grantCredits(
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         "admin",
         "Phone Verification Gift",
         undefined,
-        `phone_verify:${userId}` // Idempotency key â€” prevents double-grant
+        `phone_verify:${userId}` // Idempotency key — prevents double-grant
       );
       tokensGranted = FREEMIUM_PHONE_BONUS;
     }

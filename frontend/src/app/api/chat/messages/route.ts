@@ -6,12 +6,12 @@ import { containsProfanity } from "@/lib/bannedWords";
 import { checkChatRateLimits } from "@/lib/chat-rate-limit";
 import { UserRole } from "@prisma/client";
 
-// â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Constants ──────────────────────────────────────────────────────────────
 const MAX_MESSAGE_LENGTH = 500;
 const DEFAULT_PAGE_SIZE = 30;
 const MAX_PAGE_SIZE = 100;
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers ────────────────────────────────────────────────────────────────
 
 /** Resolve current mute status, clearing expired mutes automatically */
 async function getMuteStatus(userId: string): Promise<{
@@ -67,7 +67,7 @@ export async function GET(req: Request) {
         });
         if (!currentUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        // â”€â”€ SECURITY: Participant check before ANY data read â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── SECURITY: Participant check before ANY data read ──────────────
         // This prevents message enumeration: a non-participant gets 403,
         // not 200 with empty results (which would confirm the thread exists).
         const conversation = await prisma.conversation.findUnique({
@@ -82,7 +82,7 @@ export async function GET(req: Request) {
             conversation.guideId === currentUser.id;
         if (!isParticipant) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-        // â”€â”€ Cursor pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Cursor pagination ─────────────────────────────────────────────
         // We fetch `limit + 1` rows to determine whether there is a next page.
         // The extra row is NOT included in the response.
         const messages = await prisma.message.findMany({
@@ -122,15 +122,15 @@ export async function GET(req: Request) {
  * Send a message. Participant-only.
  *
  * Hardening checklist:
- *  âœ… Auth + BANNED check
- *  âœ… Mute check (with auto-expiry)
- *  âœ… Participant check (enumeration prevention)
- *  âœ… 500 char limit
- *  âœ… Empty message guard
- *  âœ… Burst rate limit (1/2s) via chat-rate-limit
- *  âœ… Daily cap (100/day/conversation) via chat-rate-limit
- *  âœ… Profanity filter using upgraded normalizeText
- *  âœ… Moderation log on block
+ *  ✅ Auth + BANNED check
+ *  ✅ Mute check (with auto-expiry)
+ *  ✅ Participant check (enumeration prevention)
+ *  ✅ 500 char limit
+ *  ✅ Empty message guard
+ *  ✅ Burst rate limit (1/2s) via chat-rate-limit
+ *  ✅ Daily cap (100/day/conversation) via chat-rate-limit
+ *  ✅ Profanity filter using upgraded normalizeText
+ *  ✅ Moderation log on block
  */
 export async function POST(req: Request) {
     try {
@@ -143,7 +143,7 @@ export async function POST(req: Request) {
 
         if (!threadId || !message) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
-        // â”€â”€ Content validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Content validation ────────────────────────────────────────────
         if (typeof message !== "string" || message.length > MAX_MESSAGE_LENGTH) {
             return NextResponse.json(
                 { error: `Message too long (max ${MAX_MESSAGE_LENGTH} characters)` },
@@ -154,14 +154,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Message cannot be empty" }, { status: 400 });
         }
 
-        // â”€â”€ Resolve sender â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Resolve sender ────────────────────────────────────────────────
         const currentUser = await prisma.user.findUnique({
             where: { email: session.user.email },
             select: { id: true },
         });
         if (!currentUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        // â”€â”€ Mute check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Mute check ────────────────────────────────────────────────────
         const { isMuted, mutedUntil } = await getMuteStatus(currentUser.id);
         if (isMuted) {
             return NextResponse.json(
@@ -176,7 +176,7 @@ export async function POST(req: Request) {
             );
         }
 
-        // â”€â”€ Participant check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Participant check ─────────────────────────────────────────────
         const conversation = await prisma.conversation.findUnique({
             where: { id: threadId },
             select: { userId: true, guideId: true },
@@ -189,7 +189,7 @@ export async function POST(req: Request) {
             conversation.guideId === currentUser.id;
         if (!isParticipant) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-        // â”€â”€ Rate limiting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Rate limiting ─────────────────────────────────────────────────
         const rateResult = await checkChatRateLimits(currentUser.id, threadId);
         if (!rateResult.allowed) {
             const res = NextResponse.json({ error: rateResult.reason }, { status: rateResult.status });
@@ -199,10 +199,10 @@ export async function POST(req: Request) {
             return res;
         }
 
-        // â”€â”€ Profanity filter (upgraded normalizer) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Profanity filter (upgraded normalizer) ────────────────────────
         const isBlocked = containsProfanity(message);
 
-        // â”€â”€ Persist â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── Persist ───────────────────────────────────────────────────────
         const newMessage = await prisma.message.create({
             data: {
                 conversationId: threadId,

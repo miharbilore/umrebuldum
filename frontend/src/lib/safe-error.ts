@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Safe Error Response â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── Safe Error Response ────────────────────────────────────────────────
 // Strips Prisma/Stripe internals from API error responses.
 // Use in catch blocks to prevent information leakage.
 

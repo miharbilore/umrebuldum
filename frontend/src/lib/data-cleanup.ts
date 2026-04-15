@@ -1,7 +1,7 @@
 ﻿import { prisma } from "@/lib/prisma";
 
 /**
- * Data retention cleanup â€” shared logic used by both:
+ * Data retention cleanup — shared logic used by both:
  *   - /api/cron/cleanup (HTTP endpoint)
  *   - cron-runner.ts (node-cron schedule)
  *

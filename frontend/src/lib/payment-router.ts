@@ -4,13 +4,13 @@ import { PayTRGateway } from "./gateways/paytr-gateway";
 import { IyzicoGateway } from "./gateways/iyzico-gateway";
 
 /**
- * Payment Router â€” Intelligent provider selection
+ * Payment Router — Intelligent provider selection
  *
  * Routing rules (in priority order):
- * 1. Explicit user selection â†’ use selected provider
- * 2. Iyzico/PayTR configured â†’ prioritize these for local market
- * 3. Default provider from env â†’ DEFAULT_PAYMENT_PROVIDER
- * 4. Final fallback â†’ Iyzico
+ * 1. Explicit user selection → use selected provider
+ * 2. Iyzico/PayTR configured → prioritize these for local market
+ * 3. Default provider from env → DEFAULT_PAYMENT_PROVIDER
+ * 4. Final fallback → Iyzico
  */
 
 // Singleton gateway instances
@@ -67,7 +67,7 @@ export function selectGateway(preferredProvider?: PaymentProvider): PaymentGatew
     if (preferredProvider === "paytr" && isPayTRConfigured()) return getPayTRGateway();
     if (preferredProvider === "stripe") return getStripeGateway();
 
-    // 2. No explicit preference â†’ use default logic
+    // 2. No explicit preference → use default logic
     const defaultProvider = getDefaultProvider();
     if (defaultProvider === "iyzico") return getIyzicoGateway();
     if (defaultProvider === "paytr") return getPayTRGateway();

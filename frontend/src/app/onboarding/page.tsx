@@ -74,7 +74,7 @@ export default function OnboardingPage() {
     const [selectedRole, setSelectedRole] = useState<string | null>(null)
     const [submitting, setSubmitting] = useState(false)
 
-    // Form fields â€” pre-filled from session (OAuth data)
+    // Form fields — pre-filled from session (OAuth data)
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [phone, setPhone] = useState("")

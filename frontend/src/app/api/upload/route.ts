@@ -7,13 +7,13 @@ import { rateLimit } from "@/lib/rate-limit";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { uploadToVault } from "@/lib/s3-client";
 
-// â”€â”€ Security constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Security constants ──────────────────────────────────────────────────────
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 /**
  * Detect actual MIME type from file magic bytes (file signature).
- * Prevents MIME type spoofing â€” e.g., a .exe renamed to .jpg.
+ * Prevents MIME type spoofing — e.g., a .exe renamed to .jpg.
  */
 function detectMimeFromBytes(buffer: Buffer): string | null {
     if (buffer.length < 12) return null;
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No file received." }, { status: 400 });
         }
 
-        // VULN-8a: File type validation â€” allowlist only
+        // VULN-8a: File type validation — allowlist only
         if (!ALLOWED_MIME_TYPES.has(file.type)) {
             return NextResponse.json(
                 { error: "Invalid file type. Only JPEG, PNG, and WebP images are allowed." },
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
 
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        // VULN-8c: Deep magic-byte validation â€” prevent MIME spoofing
+        // VULN-8c: Deep magic-byte validation — prevent MIME spoofing
         const detectedType = detectMimeFromBytes(buffer);
         if (!detectedType || !ALLOWED_MIME_TYPES.has(detectedType)) {
             return NextResponse.json(
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
             );
         }
 
-        // VULN-8c: Sanitize filename â€” prevent path traversal
+        // VULN-8c: Sanitize filename — prevent path traversal
         const sanitized = sanitizeFilename(file.name);
 
         // Vault Upload Branch (Private KYC)
