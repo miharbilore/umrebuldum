@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -125,6 +125,12 @@ export function Header() {
             className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
           >
             Hakkımızda
+          </Link>
+          <Link
+            href="/pricing"
+            className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+          >
+            Fiyatlandırma
           </Link>
           <Link
             href="/contact"

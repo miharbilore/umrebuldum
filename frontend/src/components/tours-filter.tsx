@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useCallback } from "react";
@@ -22,34 +22,40 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cities } from "@/lib/data/cities";
+import { DatePicker } from "@/components/ui/date-picker";
 
 interface ToursFilterProps {
   currentCity?: string;
   currentMinPrice?: string;
   currentMaxPrice?: string;
+  currentDate?: string;
 }
 
 export function ToursFilter({
   currentCity,
   currentMinPrice,
   currentMaxPrice,
+  currentDate,
 }: ToursFilterProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
 
-  const [city, setCity] = useState(currentCity || "");
+  const [departureCity, setDepartureCity] = useState(currentCity || "");
   const [minPrice, setMinPrice] = useState(currentMinPrice || "");
   const [maxPrice, setMaxPrice] = useState(currentMaxPrice || "");
+  const [date, setDate] = useState<Date | undefined>(
+    currentDate ? new Date(currentDate) : undefined
+  );
 
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    const sanitizedCity = city.replace(/\*/g, "").trim();
+    const sanitizedCity = departureCity.replace(/\*/g, "").trim();
     if (sanitizedCity && sanitizedCity !== "all") {
-      params.set("city", sanitizedCity);
+      params.set("departureCity", sanitizedCity);
     } else {
-      params.delete("city");
+      params.delete("departureCity");
     }
 
     if (minPrice) {
@@ -64,32 +70,39 @@ export function ToursFilter({
       params.delete("maxPrice");
     }
 
+    if (date) {
+      const offsetDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      params.set("date", offsetDate.toISOString().split('T')[0]);
+    } else {
+      params.delete("date");
+    }
+
     // Reset to page 1 when filters change
     params.delete("page");
 
     router.push(`/tours${params.toString() ? `?${params.toString()}` : ""}`);
     setIsOpen(false);
-  }, [city, minPrice, maxPrice, router, searchParams]);
+  }, [departureCity, minPrice, maxPrice, router, searchParams]);
 
   const clearFilters = useCallback(() => {
-    setCity("");
+    setDepartureCity("");
     setMinPrice("");
     setMaxPrice("");
+    setDate(undefined);
     router.push("/tours");
     setIsOpen(false);
   }, [router]);
 
-  const hasActiveFilters = currentCity || currentMinPrice || currentMaxPrice;
+  const hasActiveFilters = currentCity || currentMinPrice || currentMaxPrice || currentDate;
 
   const FilterContent = () => (
     <div className="flex flex-col gap-8">
       {/* City Filter */}
-      <div className="space-y-3">
-        <Label htmlFor="city" className="text-lg font-medium">
+        <Label htmlFor="departureCity" className="text-lg font-medium">
           Kalkış Şehri
         </Label>
-        <Select value={city} onValueChange={setCity}>
-          <SelectTrigger id="city" className="h-14 text-lg">
+        <Select value={departureCity} onValueChange={setDepartureCity}>
+          <SelectTrigger id="departureCity" className="h-14 text-lg">
             <SelectValue placeholder="Tüm şehirler" />
           </SelectTrigger>
           <SelectContent>
@@ -101,6 +114,17 @@ export function ToursFilter({
             ))}
           </SelectContent>
         </Select>
+
+
+      {/* Date Filter */}
+      <div className="space-y-3">
+        <Label className="text-lg font-medium">Tur Tarihi</Label>
+        <DatePicker
+          date={date}
+          setDate={setDate}
+          className="h-14 w-full text-lg"
+          placeholder="Tarih Seçiniz"
+        />
       </div>
 
       {/* Price Range Filter */}

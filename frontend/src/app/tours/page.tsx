@@ -1,11 +1,13 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { HeroSection } from "@/components/hero-section";
 import { ToursGrid } from "@/components/tours-grid";
 import { ToursSort } from "@/components/tours-sort";
+import { ToursFilter } from "@/components/tours-filter";
 import { Metadata } from "next";
 import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
 import { sanitizeCityName } from "@/lib/city-utils";
-// NOTE: EmptyState must be defined. If it doesn't exist yet we fallback to text.
+import { ApprovalStatus, Prisma } from "@prisma/client";
+import { rankListings, scoreListing, detectQueryIntent } from "@/modules/ranking/ranking-engine";
 
 export const metadata: Metadata = {
   title: "Umre Turları | UmreBuldum",
@@ -42,11 +44,12 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
       endDate: { gte: now }
     };
 
-    const sanitizedDepartureCity = sanitizeCityName(departureCityParam ? String(departureCityParam) : null);
-    if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
+    const searchCity = sanitizeCityName(resolvedParams?.city || resolvedParams?.departureCity) || null;
+    if (searchCity && searchCity.toLowerCase() !== 'all') {
       where.OR = [
-        { departureCityId: sanitizedDepartureCity },
-        { departureCity: { name: { equals: sanitizedDepartureCity } } }
+        { departureCity: { name: { contains: searchCity } } },
+        { guide: { user: { city: { contains: searchCity } } } },
+        { city: { contains: searchCity } }
       ];
     }
 
@@ -65,8 +68,9 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
       if (maxDate) where.startDate = { lte: new Date(maxDate as string) };
     } else if (searchDate) {
       const parsedDate = new Date(searchDate as string);
-      where.startDate = { lte: parsedDate };
+      const futureLimit = new Date(parsedDate.getTime() + 90 * 86400000);
       where.endDate = { gte: parsedDate };
+      where.startDate = { lte: futureLimit };
     }
 
     const sortParam = resolvedParams?.sort || 'recommended';
@@ -97,8 +101,6 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
       },
       orderBy
     });
-
-    // Filters are now pushed down to the database schema.
 
     // Transform logic mapping to the return object
     const transformedData = listings.map(l => {
@@ -137,21 +139,82 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
         image: l.image,
         createdAt: l.createdAt.toISOString(),
         guide: profile ? {
-          fullName: profile.user?.fullName || profile.user?.name || "Rehber",
-          city: profile.user?.city || "İstanbul",
-          bio: profile.user?.bio || "",
-          phone: profile.user?.phone || null,
-          isIdentityVerified: profile.user?.isIdentityVerified || false,
-          photo: profile.user?.photo || null,
-          trustScore: profile.user?.trustScore || 50,
-          completedTrips: profile.user?.completedTrips || 0,
-          package: profile.user?.packageType || "FREEMIUM"
+          fullName: profile.user.fullName,
+          city: profile.user.city,
+          agencyCity: profile.user.city || "",
+          photo: profile.user.photo,
+          isIdentityVerified: profile.user.isIdentityVerified,
+          trustScore: profile.user.trustScore,
+          package: profile.user.packageType,
+          completedTrips: profile.user.completedTrips,
+          averageRating: Number(profile.averageRating)
         } : null
       };
     });
 
+    // ── Ranking Engine Integration ──────────────────────────────────
+    // Variables (searchCity, searchDate, minPrice, maxPrice) are reused from outer scope in the same callback
+    const intent = detectQueryIntent({
+      city: searchCity || undefined,
+      date: (searchDate as string) || undefined,
+      priceMin: minPrice ? parseFloat(minPrice as string) : undefined,
+      priceMax: maxPrice ? parseFloat(maxPrice as string) : undefined
+    });
+
+    const scoredResults = transformedData.map(l => {
+      const rankingListing = {
+        id: l.id,
+        type: "GUIDE_PROFILE" as const,
+        createdAt: new Date(l.createdAt),
+        updatedAt: new Date(l.createdAt),
+        filled: l.filled || 0,
+        quota: l.quota || 30,
+        price: Number(l.price),
+        city: l.city,
+        departureCity: l.departureCity,
+        startDate: new Date(l.startDate),
+        endDate: new Date(l.endDate)
+      };
+
+      const rankingGuide = {
+        userId: l.guideId,
+        packageType: l.guide?.package || "FREEMIUM",
+        isIdentityVerified: l.guide?.isIdentityVerified || false,
+        trustScore: l.guide?.trustScore || 50,
+        completedTrips: l.guide?.completedTrips || 0,
+        profileCompleteness: 70,
+        avgResponseHours: 12,
+        recentActivityCount: 5,
+        avgReviewRating: l.guide?.averageRating || 0,
+        reviewCount: l.guide?.reviewCount || 0,
+        accountAgeDays: 30,
+        totalListingsCreated: 1,
+        agencyCity: l.guide?.city || ""
+      };
+
+      const boost = {
+        isActive: l.isFeatured || false,
+        effectivePower: 1.0,
+        activeBoostCount: 1,
+        boostTier: "BASIC" as const
+      };
+
+      return scoreListing(rankingListing, rankingGuide, boost, null, null, intent);
+    });
+
+    const rankedResults = rankListings(scoredResults);
+    
+    const enrichedListings = rankedResults.map(r => {
+      const original = transformedData.find(l => l.id === r.listingId);
+      return { 
+        ...original, 
+        _score: r.finalScore,
+        _breakdown: r.breakdown 
+      };
+    });
+
     return {
-      data: transformedData,
+      data: enrichedListings,
       metadata: {
         totalCount,
         page,
@@ -165,23 +228,71 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
   const totalCount = fetchResult?.metadata?.totalCount || 0;
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gray-50/50">
       <HeroSection />
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Bulunan Turlar ({totalCount})</h2>
-          <ToursSort />
-        </div>
-        
-        {enrichedListings.length === 0 ? (
-          <div className="text-center py-16 px-4 border rounded-xl bg-white shadow-sm">
-            <h3 className="text-xl font-bold mb-2">Tur Bulunamadı</h3>
-            <p className="text-muted-foreground">Kriterlerinize uygun tur ilanımız şu anda mevcut değil. Lütfen aramanızı genişletin.</p>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Filter */}
+          <div className="w-full lg:w-1/4">
+            <ToursFilter
+              currentCity={resolvedParams?.departureCity}
+              currentMinPrice={resolvedParams?.minPrice}
+              currentMaxPrice={resolvedParams?.maxPrice}
+              currentDate={resolvedParams?.date}
+            />
           </div>
-        ) : (
-          <ToursGrid listings={enrichedListings} />
-        )}
+
+          {/* Main Content */}
+          <div className="flex-1">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 bg-white p-4 rounded-xl border shadow-sm">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Bulunan Turlar</h2>
+                <p className="text-gray-500 text-sm mt-1">Kriterlerinize uygun {totalCount} ilan bulundu</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 font-medium">Sırala:</span>
+                <ToursSort />
+              </div>
+            </div>
+
+            {enrichedListings.length === 0 ? (
+              <div className="text-center py-20 px-4 border rounded-2xl bg-white shadow-sm">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 mb-4">
+                  <FilterIcon className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Tur Bulunamadı</h3>
+                <p className="text-muted-foreground max-w-sm mx-auto">
+                  Seçtiğiniz tarihte veya şehirde aktif tur ilanımız şu anda mevcut değil. Lütfen filtreleri esnetmeyi deneyin.
+                </p>
+              </div>
+            ) : (
+              <ToursGrid listings={enrichedListings} />
+            )}
+          </div>
+        </div>
       </div>
     </main>
+  );
+}
+
+function FilterIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="12" x="2" y="3" rx="2" />
+      <path d="M12 15v5" />
+      <path d="M12 21h0" />
+      <path d="M4 11h16" />
+    </svg>
   );
 }

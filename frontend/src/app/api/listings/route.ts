@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { PackageSystem } from "@/lib/package-system";
@@ -7,7 +7,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { Prisma, ApprovalStatus, PackageTier } from "@prisma/client";
 import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
-import { calculateListingScore } from "@/lib/listing-ranking";
+import { rankListings, scoreListing, detectQueryIntent } from "@/modules/ranking/ranking-engine";
 import { spendToken } from "@/modules/tokens";
 import { sanitizeCityName } from "@/lib/city-utils";
 
@@ -19,17 +19,22 @@ export const GET = withErrorHandler(async (req: Request) => {
     try {
         const { searchParams } = new URL(req.url);
         const guideId = searchParams.get('guideId');
-        const departureCityParam = searchParams.get('departureCity') || searchParams.get('departureCityId');
         const rawCity = searchParams.get('city');
         const city = sanitizeCityName(rawCity) || null;
+        const departureCityParam = searchParams.get('departureCity') || searchParams.get('departureCityId');
+        const departureCity = sanitizeCityName(departureCityParam) || null;
         const searchDate = searchParams.get('date');
         const minDate = searchParams.get('minDate');
         const maxDate = searchParams.get('maxDate');
         const minPrice = searchParams.get('minPrice');
         const maxPrice = searchParams.get('maxPrice');
         const isIdentityVerifiedFilter = searchParams.get('isIdentityVerified');
-        const page = parseInt(searchParams.get('page') || '1', 10);
-        const limit = parseInt(searchParams.get('limit') || '20', 10);
+        let page = parseInt(searchParams.get('page') || '1', 10);
+        let limit = parseInt(searchParams.get('limit') || '20', 10);
+
+        if (isNaN(page) || page < 1) page = 1;
+        if (isNaN(limit) || limit < 1) limit = 20;
+
         const skip = (page - 1) * limit;
 
         const now = new Date();
@@ -53,20 +58,19 @@ export const GET = withErrorHandler(async (req: Request) => {
         };
 
         if (guideId) where.guideId = guideId;
-        const sanitizedDepartureCity = sanitizeCityName(departureCityParam) || null;
-        if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
-            appendAndFilter({
-                OR: [
-                    { departureCityId: sanitizedDepartureCity },
-                    { departureCity: { name: { equals: sanitizedDepartureCity } } }
-                ]
-            });
-        }
-        if (city) {
-            const trimmedCity = city.trim();
+        const activeCitySearch = departureCity || city;
+        if (activeCitySearch && activeCitySearch.toLowerCase() !== 'all') {
+            const trimmedCity = activeCitySearch.trim();
             const normalizedCity = toTurkishTitleCase(trimmedCity);
             const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
-            appendAndFilter({ OR: cityCandidates.map((candidate) => ({ city: { contains: candidate } })) });
+
+            appendAndFilter({
+                OR: [
+                    { departureCity: { name: { in: cityCandidates } } },
+                    { guide: { user: { city: { in: cityCandidates } } } },
+                    { city: { in: cityCandidates } }
+                ]
+            });
         }
 
         // Identity verification is now strictly on the User model
@@ -86,8 +90,15 @@ export const GET = withErrorHandler(async (req: Request) => {
             if (maxDate) where.startDate = { lte: new Date(maxDate) };
         } else if (searchDate) {
             const parsedDate = new Date(searchDate);
-            where.startDate = { lte: parsedDate };
-            where.endDate = { gte: parsedDate };
+            // Dynamic window: Show tours ending after search date AND starting before search date + 60 days
+            // This ensures we get a wide pool for proximity ranking
+            const futureLimit = new Date(parsedDate.getTime() + 60 * 86400000);
+            const pastLimit = new Date(parsedDate.getTime() - 30 * 86400000);
+            
+            appendAndFilter({
+                endDate: { gte: new Date(searchDate) },
+                startDate: { lte: futureLimit }
+            });
         }
 
         const totalCount = await prisma.guideListing.count({ where });
@@ -161,7 +172,6 @@ export const GET = withErrorHandler(async (req: Request) => {
         const enrichedListings = await Promise.all(listings.map(async l => {
             const guideUser = l.guide?.user;
             const pkgType = guideUser?.packageType ? String(guideUser.packageType) : "FREEMIUM";
-            const showPhone = guideUser ? await PackageSystem.isPhoneVisible(pkgType) : false;
 
             return {
                 id: l.id,
@@ -205,6 +215,7 @@ export const GET = withErrorHandler(async (req: Request) => {
                 guide: guideUser ? {
                     fullName: guideUser.fullName,
                     city: guideUser.city,
+                    agencyCity: guideUser.city || "",
                     bio: guideUser.bio,
                     isIdentityVerified: guideUser.isIdentityVerified || false,
                     photo: guideUser.photo,
@@ -217,35 +228,76 @@ export const GET = withErrorHandler(async (req: Request) => {
             };
         }));
 
-        const scoredListings = enrichedListings.map(l => ({
-            ...l,
-            _score: calculateListingScore(
-                {
-                    type: "GUIDE_PROFILE",
-                    isFeatured: l.isFeatured || false,
-                    featuredUntil: null, 
-                    boostScore: 0, 
-                    updatedAt: new Date(l.createdAt || Date.now()),
-                    createdAt: new Date(l.createdAt || Date.now()),
-                    filled: l.filled || 0,
-                    quota: l.quota || 30,
-                },
-                {
-                    packageType: l.guide?.package || "FREEMIUM",
-                    trustScore: l.guide?.trustScore || 50,
-                    completedTrips: l.guide?.completedTrips || 0,
-                    isIdentityVerified: l.guide?.isIdentityVerified || false,
-                    profileCompleteness: 50, 
-                    avgResponseHours: 24, 
-                    recentActivityCount: 1, 
-                },
-            ),
-        }));
+        // ── Ranking Engine v3 Integration ───────────────────────────────
+        const intent = detectQueryIntent({
+            city: activeCitySearch || undefined,
+            date: searchDate || undefined,
+            priceMin: minPrice ? parseFloat(minPrice) : undefined,
+            priceMax: maxPrice ? parseFloat(maxPrice) : undefined
+        });
 
-        scoredListings.sort((a, b) => (b._score || 0) - (a._score || 0));
+        const scoredResults = enrichedListings.map(l => {
+            const rankingListing = {
+                id: l.id,
+                type: "GUIDE_PROFILE" as const,
+                createdAt: new Date(l.createdAt),
+                updatedAt: new Date(l.createdAt),
+                filled: l.filled || 0,
+                quota: l.quota || 30,
+                price: l.price,
+                city: l.city,
+                departureCity: l.departureCity,
+                startDate: new Date(l.startDate),
+                endDate: new Date(l.endDate)
+            };
+
+            const rankingGuide = {
+                userId: l.guideId,
+                packageType: l.guide?.package || "FREEMIUM",
+                isIdentityVerified: l.guide?.isIdentityVerified || false,
+                trustScore: l.guide?.trustScore || 50,
+                completedTrips: l.guide?.completedTrips || 0,
+                profileCompleteness: 70,
+                avgResponseHours: 12,
+                recentActivityCount: 5,
+                avgReviewRating: l.guide?.averageRating || 0,
+                reviewCount: l.guide?.reviewCount || 0,
+                accountAgeDays: 30,
+                totalListingsCreated: 1,
+                agencyCity: l.guide?.agencyCity || ""
+            };
+
+            const boost = {
+                isActive: l.isFeatured || false,
+                effectivePower: 1.0,
+                activeBoostCount: 1,
+                boostTier: "BASIC" as const
+            };
+
+            return scoreListing(
+                rankingListing,
+                rankingGuide,
+                boost,
+                null, 
+                null, 
+                intent
+            );
+        });
+
+        const rankedResults = rankListings(scoredResults);
+        
+        const finalResults = rankedResults.map(r => {
+            const original = enrichedListings.find(l => l.id === r.listingId);
+            return {
+                ...original,
+                _score: r.finalScore,
+                _rank: r.position,
+                _breakdown: r.breakdown
+            };
+        });
 
         return NextResponse.json({
-            data: scoredListings,
+            data: finalResults,
             metadata: {
                 totalCount,
                 page,
@@ -369,7 +421,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             if (error.message.includes('Insufficient tickets') || error.message.includes('Insufficient balance')) {
                 return NextResponse.json({
                     error: "Yetersiz Bakiye",
-                    message: "İlan yayınlamak için yeterli jetonunuz bulunmuyor. Lütfen kredi yükleyin.",
+                    message: "İlan yayınlamak için yeterli tokeniniz bulunmuyor. Lütfen kredi yükleyin.",
                     code: "INSUFFICIENT_FUNDS"
                 }, { status: 402 });
             }

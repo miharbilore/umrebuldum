@@ -1,6 +1,6 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Image from "next/image";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, Rocket } from "lucide-react";
 
 export function Footer() {
   return (
@@ -69,7 +69,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/tours?city=istanbul"
+                  href="/tours?departureCity=İstanbul"
                   className="text-lg text-card/70 transition-colors hover:text-card"
                 >
                   İstanbul Kalkışlı
@@ -77,7 +77,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/tours?city=ankara"
+                  href="/tours?departureCity=Ankara"
                   className="text-lg text-card/70 transition-colors hover:text-card"
                 >
                   Ankara Kalkışlı
@@ -85,10 +85,19 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/tours?city=izmir"
+                  href="/tours?departureCity=İzmir"
                   className="text-lg text-card/70 transition-colors hover:text-card"
                 >
                   İzmir Kalkışlı
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/pricing"
+                  className="text-lg text-primary/90 font-bold transition-colors hover:text-primary flex items-center gap-2"
+                >
+                  <Rocket className="h-4 w-4" />
+                  <span>İlan Paketleri</span>
                 </Link>
               </li>
             </ul>
@@ -124,6 +133,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/pricing"
+                  className="text-lg text-card/70 transition-colors hover:text-card"
+                >
+                  Paketler ve Ücretler
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/refund-policy"
                   className="text-lg text-card/70 transition-colors hover:text-card"
                 >
@@ -137,6 +154,14 @@ export function Footer() {
           <div>
             <h3 className="text-xl font-semibold text-card">Kurumsal</h3>
             <ul className="mt-6 space-y-4">
+              <li>
+                <Link
+                  href="/pricing"
+                  className="text-lg text-card/70 transition-colors hover:text-card"
+                >
+                  Paketler ve Ücretler
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/about"

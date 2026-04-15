@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Deterministic Ranking Engine v3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Deterministic Ranking Engine v3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // 6-factor weighted formula on a 1000-point scale.
 // Boost is percentage-capped (â‰¤20% of organic) â€” cannot override trust.
 // Trust-gated boost tiers prevent pay-to-win.
@@ -29,6 +29,9 @@ export interface RankingListingInput {
     quota: number;
     price: number;
     city: string;
+    departureCity?: string;
+    startDate: Date;
+    endDate: Date;
 }
 
 export interface RankingGuideInput {
@@ -46,6 +49,7 @@ export interface RankingGuideInput {
     concentrationPenalty?: number; // 0.0â€“0.60, from review-concentration.ts
     accountAgeDays: number;
     totalListingsCreated: number;
+    agencyCity?: string;
 }
 
 export interface RankingBoostInput {
@@ -341,7 +345,65 @@ export interface ScoringResult {
     freshnessScore: number;
     personalizationAdjust: number;
     fillPenalty: number;
+    priorityBonus: number;
     breakdown: string;
+}
+
+// â”€â”€â”€ Priority Factors (Location & Date Proximity) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export function computeLocationPriority(
+    listing: RankingListingInput,
+    guide: RankingGuideInput,
+    searchedCity: string | null
+): number {
+    if (!searchedCity) return 0;
+    
+    const city = searchedCity.toLowerCase().trim();
+    let bonus = 0;
+
+    // Highest Priority: Departure City matches search
+    if (listing.departureCity?.toLowerCase().includes(city)) {
+        bonus += 5000;
+    }
+
+    // Secondary Priority: Agency Headquarters matches search
+    if (guide.agencyCity?.toLowerCase().includes(city)) {
+        bonus += 2000;
+    }
+
+    // Tertiary Priority: Destination city match
+    if (listing.city.toLowerCase().includes(city)) {
+        bonus += 1000;
+    }
+
+    return bonus;
+}
+
+export function computeDateProximity(
+    listing: RankingListingInput,
+    searchDate: string | null
+): number {
+    if (!searchDate) return 0;
+
+    const targetTime = new Date(searchDate).getTime();
+    const startTime = listing.startDate.getTime();
+    const endTime = listing.endDate.getTime();
+
+    let bonus = 0;
+
+    // 1. Direct Match: Current date is within tour range
+    if (targetTime >= startTime && targetTime <= endTime) {
+        bonus += 10000;
+    }
+
+    // 2. Proximity: Closer to start date is better (Max 3000 points)
+    const dayDiff = Math.abs(targetTime - startTime) / (1000 * 60 * 60 * 24);
+    
+    // Decay: 100 points per day distance, up to 30 days
+    const proximityScore = Math.max(0, 3000 - (dayDiff * 100));
+    bonus += Math.round(proximityScore);
+
+    return bonus;
 }
 
 // â”€â”€â”€ Composite Scorer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -397,8 +459,19 @@ export function scoreListing(
     // Fill rate penalty
     const fillPenalty = computeFillPenalty(listing);
 
+    // Priority Bonuses (Explicit Search Matches)
+    const locationBonus = intent.type === "LOCATION_SPECIFIC" || intent.type === "BROWSE" 
+        ? computeLocationPriority(listing, guide, (intent as any).searchedCity || null)
+        : 0;
+    
+    const dateBonus = intent.type === "DATE_SPECIFIC" || intent.type === "BROWSE"
+        ? computeDateProximity(listing, (intent as any).searchDate || null)
+        : 0;
+
+    const priorityBonus = locationBonus + dateBonus;
+
     // Final composite
-    const finalScore = Math.max(0, organicScore + boostComponent + personalizationAdjust + fillPenalty);
+    const finalScore = Math.max(0, organicScore + boostComponent + personalizationAdjust + fillPenalty + priorityBonus);
 
     return {
         listingId: listing.id,
@@ -413,7 +486,8 @@ export function scoreListing(
         freshnessScore: Math.round(freshness * WEIGHTS.freshness * SCALE),
         personalizationAdjust,
         fillPenalty,
-        breakdown: `Q:${Math.round(quality * 100)}|T:${Math.round(trust * 100)}|R:${Math.round(review * 100)}|S:${Math.round(sla * 100)}|A:${Math.round(activity * 100)}|F:${Math.round(freshness * 100)}â†’Org:${organicScore}+B:${boostComponent}+P:${personalizationAdjust}+FP:${fillPenalty}=${finalScore}`,
+        priorityBonus,
+        breakdown: `Q:${Math.round(quality * 100)}|T:${Math.round(trust * 100)}|R:${Math.round(review * 100)}|S:${Math.round(sla * 100)}|A:${Math.round(activity * 100)}|F:${Math.round(freshness * 100)}|PB:${priorityBonus}â†’Org:${organicScore}+B:${boostComponent}+P:${personalizationAdjust}+FP:${fillPenalty}=${finalScore}`,
     };
 }
 
@@ -507,7 +581,7 @@ export function detectQueryIntent(params: {
 }): QueryIntentInput {
     if (params.sortBy === "price") return { type: "PRICE_SENSITIVE" };
     if (params.ratingMin && params.ratingMin >= 4) return { type: "QUALITY_SEEKING" };
-    if (params.date) return { type: "DATE_SPECIFIC" };
-    if (params.city) return { type: "LOCATION_SPECIFIC" };
-    return { type: "BROWSE" };
+    if (params.date) return { type: "DATE_SPECIFIC", searchDate: params.date } as any;
+    if (params.city) return { type: "LOCATION_SPECIFIC", searchedCity: params.city } as any;
+    return { type: "BROWSE", searchedCity: params.city, searchDate: params.date } as any;
 }

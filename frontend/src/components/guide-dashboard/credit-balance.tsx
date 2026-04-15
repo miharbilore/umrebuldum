@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Wallet, Shield, Star, Loader2 } from "lucide-react";
+import { Wallet, Shield, Star, Loader2, GraduationCap, Zap, ArrowRight } from "lucide-react";
 import useSWR from "swr";
 import Link from "next/link";
 
@@ -68,7 +68,7 @@ export function CreditBalance() {
                             </div>
                             <div>
                                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Bakiye</p>
-                                <p className="text-2xl font-bold text-gray-900">{credits} <span className="text-sm font-normal text-gray-500">kredi</span></p>
+                                <p className="text-2xl font-bold text-gray-900">{credits} <span className="text-sm font-normal text-gray-500">token</span></p>
                             </div>
                         </div>
 
@@ -96,18 +96,37 @@ export function CreditBalance() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 w-full sm:w-auto">
-                        <Button asChild variant="default" className="bg-amber-600 hover:bg-amber-700 text-white flex-1 sm:flex-initial">
-                            <Link href="/dashboard/billing">
-                                <Wallet className="w-4 h-4 mr-1.5" />
-                                Kredi Yükle
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline" className="flex-1 sm:flex-initial">
-                            <Link href="/dashboard/credits">
-                                İşlem Geçmişi
-                            </Link>
-                        </Button>
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                        {pkg === 'FREEMIUM' ? (
+                            <>
+                                <Button asChild variant="default" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex-1 sm:flex-initial shadow-md">
+                                    <Link href="/dashboard/quiz">
+                                        <GraduationCap className="w-4 h-4 mr-1.5" />
+                                        Sınavla Token Kazan
+                                    </Link>
+                                </Button>
+                                <Button asChild variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 flex-1 sm:flex-initial">
+                                    <Link href="/pricing" className="flex items-center">
+                                        <Zap className="w-4 h-4 mr-1.5 text-blue-600" />
+                                        Paket Satın Al
+                                    </Link>
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button asChild variant="default" className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white flex-1 sm:flex-initial shadow-md">
+                                    <Link href="/pricing" className="flex items-center">
+                                        <Zap className="w-4 h-4 mr-1.5" />
+                                        Token Yükle veya Paket Al
+                                    </Link>
+                                </Button>
+                                <Button asChild variant="outline" className="flex-1 sm:flex-initial">
+                                    <Link href="/dashboard/credits">
+                                        İşlem Geçmişi
+                                    </Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

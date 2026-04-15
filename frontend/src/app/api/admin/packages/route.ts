@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -63,5 +63,44 @@ export async function PUT(req: Request) {
     } catch (error) {
         console.error("[Admin Packages PUT]", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
+}
+/**
+ * POST /api/admin/packages
+ * Creates a new CreditPackage record.
+ */
+export async function POST(req: Request) {
+    try {
+        const session = await auth();
+        if (!session?.user?.role || session.user.role !== "ADMIN") {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+        }
+
+        const body = await req.json();
+        const { slug, name, credits, priceTRY, monthlyPrice, billingPeriod, roleTarget, features } = body;
+
+        // Basic validation
+        if (!slug || !name || credits === undefined || priceTRY === undefined || !roleTarget) {
+            return NextResponse.json({ error: "Missing required fields (slug, name, credits, priceTRY, roleTarget)" }, { status: 400 });
+        }
+
+        const newPackage = await prisma.creditPackage.create({
+            data: {
+                slug,
+                name,
+                credits: Number(credits),
+                priceTRY: Number(priceTRY),
+                monthlyPrice: Number(monthlyPrice || 0),
+                billingPeriod: Number(billingPeriod || 1),
+                roleTarget,
+                features: features || {},
+                sortOrder: 0, // Frontend will sort by price anyway
+            },
+        });
+
+        return NextResponse.json(newPackage);
+    } catch (error: any) {
+        console.error("[Admin Packages POST]", error);
+        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
     }
 }

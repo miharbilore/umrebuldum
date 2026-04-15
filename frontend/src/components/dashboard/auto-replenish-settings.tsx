@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -99,7 +99,7 @@ export function AutoReplenishSettings() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Aylık Tavan (Max Jeton)</Label>
+                            <Label>Aylık Tavan (Max Token)</Label>
                             <Input
                                 type="number"
                                 min="10"

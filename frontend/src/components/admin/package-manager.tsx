@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
-    Save, Loader2, Package, RefreshCw,
+    Save, Loader2, Package, RefreshCw, Plus,
     Crown, Building2, ChevronDown, ChevronUp,
     Zap, Shield, Image as ImageIcon, Calendar
 } from "lucide-react";
@@ -63,6 +63,17 @@ export function PackageManager() {
     const [saving, setSaving] = useState<string | null>(null);
     const [editData, setEditData] = useState<Record<string, Partial<CreditPackage>>>({});
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [newPkg, setNewPkg] = useState<Partial<CreditPackage>>({
+        slug: "PREMIUM",
+        roleTarget: "GUIDE",
+        billingPeriod: 1,
+        credits: 100,
+        priceTRY: 299,
+        monthlyPrice: 299,
+        features: {}
+    });
 
     const fetchPackages = async () => {
         setLoading(true);
@@ -137,6 +148,34 @@ export function PackageManager() {
             setSaving(null);
         }
     };
+
+    const handleCreate = async () => {
+        if (!newPkg.slug || !newPkg.name || !newPkg.roleTarget) {
+            toast.error("Lütfen zorunlu alanları doldurun.");
+            return;
+        }
+        setCreating(true);
+        try {
+            const res = await fetch("/api/admin/packages", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newPkg),
+            });
+            if (res.ok) {
+                toast.success("Yeni paket oluşturuldu.");
+                setShowCreateForm(false);
+                fetchPackages();
+            } else {
+                const err = await res.json();
+                toast.error(err.error || "Oluşturma başarısız.");
+            }
+        } catch {
+            toast.error("Bağlantı hatası.");
+        } finally {
+            setCreating(false);
+        }
+    };
+
 
     const hasChanges = (pkg: CreditPackage) => {
         const edits = editData[pkg.id];
@@ -383,15 +422,75 @@ export function PackageManager() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-lg font-bold text-slate-800">Paket Yönetimi</h2>
+                    <h2 className="text-lg font-bold text-slate-800">Abonelik Paketleri</h2>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                        {packages.length} paket kaydı Â· Slug bazlı gruplandı
+                        {packages.length} paket kaydı · Dinamik fiyatlandırma yönetimi
                     </p>
                 </div>
-                <Button variant="outline" size="sm" onClick={fetchPackages} disabled={loading} className="gap-1.5 text-xs">
-                    <RefreshCw className="h-3 w-3" /> Yenile
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setShowCreateForm(!showCreateForm)} className={`gap-1.5 text-xs transition-all ${showCreateForm ? 'bg-red-50 border-red-200 text-red-600' : 'border-emerald-300 text-emerald-700 hover:bg-emerald-50'}`}>
+                        {showCreateForm ? <ChevronUp className="h-3 w-3" /> : <Plus className="h-3 w-3" />} 
+                        {showCreateForm ? "Vazgeç" : "Yeni Paket Ekle"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={fetchPackages} disabled={loading} className="gap-1.5 text-xs">
+                        <RefreshCw className="h-3 w-3" /> Yenile
+                    </Button>
+                </div>
             </div>
+
+            {/* Create Form */}
+            {showCreateForm && (
+                <div className="p-5 bg-white border-2 border-emerald-100 rounded-2xl shadow-sm space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
+                        <Plus className="h-4 w-4" /> Yeni Paket Tanımla
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600 uppercase">Slug (Örn: PREMIUM)</Label>
+                            <Input value={newPkg.slug} onChange={e => setNewPkg({ ...newPkg, slug: e.target.value.toUpperCase() })} placeholder="PREMIUM" className="h-9" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600 uppercase">Paket Adı</Label>
+                            <Input value={newPkg.name} onChange={e => setNewPkg({ ...newPkg, name: e.target.value })} placeholder="Premium Paket" className="h-9" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600 uppercase">Hedef Rol</Label>
+                            <select 
+                                value={newPkg.roleTarget} 
+                                onChange={e => setNewPkg({ ...newPkg, roleTarget: e.target.value })}
+                                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                            >
+                                <option value="GUIDE">REHBER</option>
+                                <option value="ORGANIZATION">KURUMSAL</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600 uppercase">Token (Kredi)</Label>
+                            <Input type="number" value={newPkg.credits} onChange={e => setNewPkg({ ...newPkg, credits: Number(e.target.value) })} className="h-9" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600 uppercase">Toplam Fiyat (₺)</Label>
+                            <Input type="number" value={newPkg.priceTRY} onChange={e => setNewPkg({ ...newPkg, priceTRY: Number(e.target.value) })} className="h-9" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-semibold text-slate-600 uppercase">Dönem (Ay)</Label>
+                            <select 
+                                value={newPkg.billingPeriod} 
+                                onChange={e => setNewPkg({ ...newPkg, billingPeriod: Number(e.target.value) })}
+                                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                            >
+                                <option value={1}>1 Ay (Aylık)</option>
+                                <option value={3}>3 Ay (Çeyrek)</option>
+                                <option value={12}>12 Ay (Yıllık)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <Button onClick={handleCreate} disabled={creating} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-11">
+                        {creating ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                        Paketi Oluştur ve Kaydet
+                    </Button>
+                </div>
+            )}
 
             {/* Guide Section */}
             {guidePackages.length > 0 && (

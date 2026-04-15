@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
@@ -23,7 +23,8 @@ import GuideApprovalPanel from '@/components/admin/GuideApprovalPanel';
 import LedgerPanel from '@/components/admin/LedgerPanel';
 import PendingReviewsPanel from '@/components/admin/PendingReviewsPanel';
 import TestManagementPanel from '@/components/admin/TestManagementPanel';
-// import ChatModerationPanel from '@/components/admin/ChatModerationPanel'; // We'll stub this or use a placeholder for now.
+import { PackageManager } from '@/components/admin/package-manager';
+// import ChatModerationPanel from '@/components/admin/ChatModerationPanel';
 
 const tabs = [
     { id: 'all-listings', label: 'Tüm İlanlar', icon: ClipboardList, desc: 'Tüm İlanları Yönet' },
@@ -31,7 +32,8 @@ const tabs = [
     { id: 'guide-approvals', label: 'Rehber Onayları', icon: Shield, desc: 'Bekleyen Kimlik Doğrulamaları' },
     { id: 'reviews', label: 'Yorum Moderasyonu', icon: Star, desc: 'Bekleyen Değerlendirmeler', badgeKey: 'pendingReviews' },
     { id: 'requests', label: 'Kullanıcı Talepleri', icon: Users, desc: 'User Requests', badgeKey: 'pendingRequests' },
-    { id: 'credits', label: 'Bakiye Paneli', icon: CreditCard, desc: 'Müşteri Kredileri' },
+    { id: 'packages', label: 'Abonelik Paketleri', icon: CreditCard, desc: 'Üyelik Paketleri ve Özellikleri' },
+    { id: 'credits', label: 'Token Yönetimi', icon: CreditCard, desc: 'Müşteri Tokenları' },
     { id: 'ledger', label: 'Mali Defter (Ledger)', icon: FileText, desc: 'Double-Entry Kasa İzleme' },
     { id: 'ban', label: 'Ban Paneli', icon: Ban, desc: 'Ban Users' },
     { id: 'newsletter', label: 'Bülten Yönetimi', icon: Mail, desc: 'Bülten Aboneleri' },
@@ -259,6 +261,11 @@ export default function AdminDashboardPage() {
                         {activeTab === 'guide-approvals' && <GuideApprovalPanel />}
                         {activeTab === 'reviews' && <PendingReviewsPanel />}
                         {activeTab === 'requests' && <UserRequestsPanel />}
+                        {activeTab === 'packages' && (
+                            <div className="space-y-6">
+                                <PackageManager />
+                            </div>
+                        )}
                         {activeTab === 'credits' && <CreditManagementPanel />}
                         {activeTab === 'ledger' && <LedgerPanel />}
                         {activeTab === 'ban' && <BanPanel />}

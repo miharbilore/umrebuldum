@@ -1,4 +1,4 @@
-﻿// ─── Type Compatibility Layer ───────────────────────────────────────────
+// ─── Type Compatibility Layer ───────────────────────────────────────────
 // Re-exports types for client components.
 // These match API response shapes (not raw Prisma models).
 
@@ -7,8 +7,7 @@
 export type UserRole = "FREEMIUM" | "GUIDE" | "CORPORATE" | "ADMIN" | "BANNED";
 
 export type PackageType =
-    | "FREEMIUM" | "PREMIUM" | "PLUS" | "PRO"
-    | "BUSINESS" | "BUSINESS_PLUS";
+    | "FREEMIUM" | "PREMIUM" | "PRO" | "BUSINESS";
 
 export type ListingType = "GUIDE_PROFILE" | "CORPORATE_TOUR";
 export type ListingStatus = "ACTIVE" | "EXPIRED" | "ARCHIVED" | "PENDING" | "REJECTED";

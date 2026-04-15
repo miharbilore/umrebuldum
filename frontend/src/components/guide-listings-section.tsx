@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { ListingCard } from "@/components/listing-card";
@@ -15,7 +15,11 @@ export function GuideListingsSection() {
                 return res.json();
             })
             .then(data => {
-                if (Array.isArray(data)) setListings(data);
+                // Support both legacy array format and new structured object format
+                const listingsArray = Array.isArray(data) ? data : (data?.data || []);
+                if (Array.isArray(listingsArray)) {
+                    setListings(listingsArray);
+                }
             })
             .catch(err => {
                 console.error("Guide listings fetch error:", err);

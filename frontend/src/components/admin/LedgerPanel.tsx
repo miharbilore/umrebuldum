@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import useSWR from 'swr';
 import { RefreshCw, FileText, IndianRupee, CreditCard, ShieldAlert } from 'lucide-react';
@@ -45,7 +45,7 @@ export default function LedgerPanel() {
                         <FileText className="text-emerald-500" />
                         Finansal Defter (Double-Entry Ledger)
                     </h2>
-                    <p className="text-gray-400 text-sm mt-1">Platformdaki tüm jeton/kredi işlemlerinin finansal akış dökümü.</p>
+                    <p className="text-gray-400 text-sm mt-1">Platformdaki tüm token/kredi işlemlerinin finansal akış dökümü.</p>
                 </div>
                 <button
                     onClick={() => mutate()}

@@ -40,12 +40,12 @@ async function getListing(id: string) {
         hotelName: l.hotelName,
         airline: (l as any).airline?.name || l.airlineOld,
         pricing: {
-            double: l.pricingDouble,
-            triple: l.pricingTriple,
-            quad: l.pricingQuad,
+            double: Number(l.pricingDouble || 0),
+            triple: Number(l.pricingTriple || 0),
+            quad: Number(l.pricingQuad || 0),
             currency: l.pricingCurrency,
         },
-        price: l.price,
+        price: Number(l.price || 0),
         quota: l.quota,
         filled: l.filled,
         active: l.active,
@@ -72,7 +72,7 @@ async function getListing(id: string) {
             completedTrips: guide.user?.completedTrips || 0,
             package: guide.user?.packageType || "FREEMIUM",
             // ─── Review Cache (from GuideProfile) ──────────────
-            averageRating: guide.averageRating || 0,
+            averageRating: Number(guide.averageRating || 0),
             reviewCount: guide.reviewCount || 0,
         } : null,
     };

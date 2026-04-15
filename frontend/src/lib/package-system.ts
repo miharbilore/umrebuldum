@@ -1,4 +1,4 @@
-﻿// ─── Package Limits & Token Economy ─────────────────────────────────────
+// ─── Package Limits & Token Economy ─────────────────────────────────────
 // Source of truth for all package capabilities and token pricing.
 
 import type { PackageType } from "./db-types";
@@ -7,7 +7,7 @@ import { prisma } from "./prisma";
 // ── Token Costs ─────────────────────────────────────────────────────────
 
 export const TOKEN_COSTS = {
-    LISTING_CREATE: 10,
+    LISTING_CREATE: 5,
     OFFER_SEND: 5,
     DEMAND_UNLOCK: 3,
     BOOST: 15,
@@ -29,10 +29,8 @@ export interface DailyCaps {
 export const DAILY_CAPS: Record<PackageType, DailyCaps> = {
     FREEMIUM:      { offers: 1,   unlocks: 0,  boosts: 0,  spotlights: 0 },
     PREMIUM:       { offers: 5,   unlocks: 3,  boosts: 1,  spotlights: 0 },
-    PLUS:          { offers: 10,  unlocks: 5,  boosts: 2,  spotlights: 1 },
     PRO:           { offers: 20,  unlocks: 15, boosts: 5,  spotlights: 2 },
     BUSINESS:      { offers: 50,  unlocks: 30, boosts: 10, spotlights: 3 },
-    BUSINESS_PLUS: { offers: 100, unlocks: 50, boosts: 30, spotlights: 10 },
 };
 
 // ── Package Limits ──────────────────────────────────────────────────────
@@ -101,27 +99,6 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: true,
         aiGenerator: false,
     },
-    // ── Rehber Plus ─────────────────────────────────────────────
-    PLUS: {
-        maxListings: 5,
-        listingDays: 90,
-        initialTokens: 100,
-        monthlyTokens: 100,
-        softCap: 200,
-        maxDailyOffers: 10,
-        maxBoosts: 3,
-        boostDays: 5,
-        phoneVisible: true,
-        featuredEligible: true,
-        priorityRanking: true,
-        trustBoost: false,
-        identityVerificationEligible: true,
-        spotlightEligible: true,
-        posterQuality: "NORMAL",
-        canCreatePoster: true,
-        watermark: false,
-        aiGenerator: false,
-    },
     // ── Rehber Pro ──────────────────────────────────────────────
     PRO: {
         maxListings: 15,
@@ -163,27 +140,6 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         canCreatePoster: true,
         watermark: false,
         aiGenerator: false,
-    },
-    // ── Kurumsal Plus ───────────────────────────────────────────
-    BUSINESS_PLUS: {
-        maxListings: 100,
-        listingDays: 365,
-        initialTokens: 1000,
-        monthlyTokens: 1000,
-        softCap: 2000,
-        maxDailyOffers: 100,
-        maxBoosts: 30,
-        boostDays: 14,
-        phoneVisible: true,
-        featuredEligible: true,
-        priorityRanking: true,
-        trustBoost: true,
-        identityVerificationEligible: true,
-        spotlightEligible: true,
-        posterQuality: "HIGH",
-        canCreatePoster: true,
-        watermark: false,
-        aiGenerator: true,
     },
 };
 
@@ -329,10 +285,8 @@ export type BoostTier = "BASIC" | "PREMIUM" | "ELITE";
 export const BOOST_TIER_ACCESS: Record<PackageType, BoostTier[]> = {
     FREEMIUM: [],
     PREMIUM: ["BASIC"],
-    PLUS: ["BASIC", "PREMIUM"],
     PRO: ["BASIC", "PREMIUM", "ELITE"],
     BUSINESS: ["BASIC", "PREMIUM"],
-    BUSINESS_PLUS: ["BASIC", "PREMIUM", "ELITE"],
 };
 
 export function canAccessBoostTier(packageType: string, tier: BoostTier): boolean {
@@ -345,10 +299,8 @@ export function canAccessBoostTier(packageType: string, tier: BoostTier): boolea
 export const PLAN_PRICES_TRY: Record<PackageType, number> = {
     FREEMIUM: 0,
     PREMIUM: 199,
-    PLUS: 399,
     PRO: 699,
     BUSINESS: 1299,
-    BUSINESS_PLUS: 2499,
 };
 
 export const ANNUAL_DISCOUNT = 0.14;  // 14% off → "2 ay hediye"
@@ -372,8 +324,8 @@ export const BLAST_THRESHOLD_PCT = 0.80;
 // ── Plan Ordering (for upgrade/downgrade detection) ─────────────────────
 
 const PLAN_ORDER: Record<string, number> = {
-    FREEMIUM: 0, PREMIUM: 1, PLUS: 2, PRO: 3,
-    BUSINESS: 10, BUSINESS_PLUS: 11,
+    FREEMIUM: 0, PREMIUM: 1, PRO: 3,
+    BUSINESS: 10,
 };
 
 export function isUpgrade(from: string, to: string): boolean {

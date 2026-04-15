@@ -1,4 +1,4 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { MapPin, Calendar, Star, ShieldCheck, Flame, Plane, Check } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,8 @@ interface ListingCardProps {
         urgencyTag?: string; // "SON_FIRSAT", etc.
         guide: {
             fullName: string;
-            city?: string; // Guide base city
+            city?: string; // Destination/Legacy city
+            agencyCity?: string; // Added agencyCity
             photo?: string;
             isIdentityVerified: boolean;
             trustScore: number;
@@ -110,10 +111,17 @@ export function ListingCard({ listing }: ListingCardProps) {
                             <span className="font-medium text-gray-700">{new Date(listing.startDate).toLocaleDateString('tr-TR')} - {listing.totalDays} Gün</span>
                         </div>
 
-                        {/* Guide Location */}
-                        <div className="flex items-center text-sm text-gray-600 gap-2.5">
-                            <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                            <span className="truncate">{listing.guide?.city || listing.city || "Suudi Arabistan"}</span>
+                        {/* Location Details (Split) */}
+                        <div className="space-y-2">
+                            <div className="flex items-center text-sm text-gray-600 gap-2.5">
+                                <Plane className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+                                <span className="font-medium text-gray-700">{listing.departureCity} Kalkışlı</span>
+                            </div>
+
+                            <div className="flex items-center text-sm text-gray-500 gap-2.5">
+                                <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                <span className="truncate">Acente Merkezi: {listing.guide?.agencyCity || listing.guide?.city || "Belirtilmemiş"}</span>
+                            </div>
                         </div>
 
                         {/* Extra Services Badges */}
