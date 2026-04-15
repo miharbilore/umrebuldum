@@ -9,6 +9,7 @@ const profileSchema = z.object({
     fullName: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
     phone: z.string().regex(/^\+[1-9]\d{1,14}$/, "Geçerli bir uluslararası telefon numarası giriniz (Örn: +90555...)"),
     city: z.string().min(2, "Şehir bilgisi gereklidir"),
+    agencyCity: z.string().optional(),
     bio: z.string().nullable().optional(),
     photo: z.string().nullable().optional(),
     isIdentityVerified: z.boolean().optional(),
@@ -38,11 +39,29 @@ export async function GET(req: Request) {
             }
         });
 
+        const {
+            fullName,
+            phone,
+            city,
+            agencyCity,
+            bio,
+            photo,
+            isIdentityVerified,
+            packageType,
+            tokenBalance
+        } = user;
+
         return NextResponse.json({
             ...profile,
-            isIdentityVerified: user.isIdentityVerified,
-            package: user.packageType,
-            tokenBalance: user.tokenBalance
+            fullName,
+            phone,
+            city,
+            agencyCity,
+            bio,
+            photo,
+            isIdentityVerified,
+            package: packageType,
+            tokenBalance
         });
     } catch (error) {
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
@@ -65,7 +84,7 @@ export async function PUT(req: Request) {
             );
         }
 
-        const { fullName, phone, city, bio, photo } = validation.data;
+        const { fullName, phone, city, agencyCity, bio, photo } = validation.data;
 
         // email guaranteed non-null after requireSupply guard
         const user = await prisma.user.findUnique({
@@ -75,12 +94,11 @@ export async function PUT(req: Request) {
 
         await prisma.guideProfile.upsert({
             where: { userId: user.id },
-            update: { bio }, // Bio guideProfile tablosunda da olabilir, SSOT için User da güncelliyoruz
+            update: {},
             create: {
                 userId: user.id,
                 quotaTarget: 30,
-                currentCount: 0,
-                bio // Update bio here too if needed
+                currentCount: 0
             }
         });
 
@@ -91,6 +109,7 @@ export async function PUT(req: Request) {
                 fullName: fullName,
                 phone: phone,
                 city: city,
+                agencyCity: agencyCity ?? null,
                 bio: bio,
                 photo: photo
             }

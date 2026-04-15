@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD COLUMN `agencyCity` VARCHAR(191) NULL;

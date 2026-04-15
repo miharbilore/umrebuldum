@@ -100,6 +100,7 @@ model User {
   isApproved         Boolean @default(false)
   fullName           String?
   city               String? @default("İstanbul")
+  agencyCity         String?
   bio                String? @db.Text
   photo              String?
 

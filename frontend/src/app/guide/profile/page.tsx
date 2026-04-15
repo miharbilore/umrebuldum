@@ -6,8 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { cities } from "@/lib/data/cities";
 
 export default function GuideProfilePage() {
     const router = useRouter();
@@ -18,6 +26,7 @@ export default function GuideProfilePage() {
         fullName: "",
         phone: "",
         city: "",
+        agencyCity: "",
         bio: "",
         isIdentityVerified: false
     });
@@ -31,6 +40,7 @@ export default function GuideProfilePage() {
                         fullName: data.fullName || "",
                         phone: data.phone || "",
                         city: data.city || "",
+                        agencyCity: data.agencyCity || "",
                         bio: data.bio || "",
                         isIdentityVerified: data.isIdentityVerified || false
                     });
@@ -93,6 +103,24 @@ export default function GuideProfilePage() {
                             onChange={e => setFormData({ ...formData, city: e.target.value })}
                             required
                         />
+                    </div>
+                    <div>
+                        <Label>Faaliyet/Merkez Şehri</Label>
+                        <Select
+                            value={formData.agencyCity}
+                            onValueChange={(value) => setFormData({ ...formData, agencyCity: value })}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Şehir seçiniz" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {cities.map((cityName) => (
+                                    <SelectItem key={cityName} value={cityName}>
+                                        {cityName}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div>
                         <Label>Hakkında (Biyografi)</Label>

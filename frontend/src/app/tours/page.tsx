@@ -4,6 +4,7 @@ import { ToursGrid } from "@/components/tours-grid";
 import { ToursSort } from "@/components/tours-sort";
 import { Metadata } from "next";
 import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
+import { sanitizeCityName } from "@/lib/city-utils";
 // NOTE: EmptyState must be defined. If it doesn't exist yet we fallback to text.
 
 export const metadata: Metadata = {
@@ -22,7 +23,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
   // We wrap ALL database logic in the fetchCachedListings fetcher callback
   const fetchResult = await fetchCachedListings(queryToHash, async () => {
-    const departureCityId = resolvedParams?.departureCity;
+    const departureCityParam = resolvedParams?.departureCity;
     const searchDate = resolvedParams?.date;
     const minDate = resolvedParams?.minDate;
     const maxDate = resolvedParams?.maxDate;
@@ -41,8 +42,12 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
       endDate: { gte: now }
     };
 
-    if (departureCityId && departureCityId !== 'all') {
-      where.departureCityId = departureCityId;
+    const sanitizedDepartureCity = sanitizeCityName(departureCityParam ? String(departureCityParam) : null);
+    if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
+      where.OR = [
+        { departureCityId: sanitizedDepartureCity },
+        { departureCity: { name: { equals: sanitizedDepartureCity } } }
+      ];
     }
 
     if (isIdentityVerifiedFilter === 'true') {
@@ -95,8 +100,6 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
     // Filters are now pushed down to the database schema.
 
-    const sanitizeCity = (value?: string | null) => (value ? value.replace(/\*/g, "").trim() : value);
-
     // Transform logic mapping to the return object
     const transformedData = listings.map(l => {
       const profile = l.guide;
@@ -105,9 +108,9 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
         guideId: l.guideId,
         title: l.title,
         description: l.description,
-        city: sanitizeCity(l.city) || "",
-        departureCity: sanitizeCity(l.departureCity?.name || l.city) || "Unknown",
-        meetingCity: sanitizeCity(l.meetingCity),
+        city: sanitizeCityName(l.city) || "",
+        departureCity: sanitizeCityName(l.departureCity?.name || l.city) || "Unknown",
+        meetingCity: sanitizeCityName(l.meetingCity),
         extraServices: l.extraServices,
         hotelName: l.hotelName,
         airline: l.airline?.name || "Unknown",
@@ -127,7 +130,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
         totalDays: l.totalDays,
         tourPlan: l.tourDays.map(d => ({
           day: d.day,
-          city: sanitizeCity(d.city) || "",
+          city: sanitizeCityName(d.city) || "",
           title: d.title,
           description: d.description
         })),

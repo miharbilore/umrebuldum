@@ -19,6 +19,7 @@ import { Plus, Trash2, Check, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { STOCK_BACKGROUNDS } from "@/components/dashboard/poster-generator/poster-assets";
+import { cities } from "@/lib/data/cities";
 
 const SAUDI_CITIES = ["Mekke", "Medine", "Cidde", "Riyad"];
 
@@ -38,14 +39,13 @@ export default function NewListingPage() {
     const [loading, setLoading] = useState(false);
 
     // Dynamic Data State
-    const [cities, setCities] = useState<any[]>([]);
     const [airlines, setAirlines] = useState<any[]>([]);
 
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         city: "", // Saudi city
-        departureCityId: "", // Changed from departureCity string
+        departureCityId: "", // Departure city name (mapped server-side)
         meetingCity: "",
         hotelName: "",
         airlineId: "", // Changed from airline string
@@ -69,21 +69,16 @@ export default function NewListingPage() {
     });
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchAirlines = async () => {
             try {
-                const [citiesRes, airlinesRes] = await Promise.all([
-                    fetch('/api/cities'),
-                    fetch('/api/airlines')
-                ]);
-
-                if (citiesRes.ok) setCities(await citiesRes.json());
+                const airlinesRes = await fetch('/api/airlines');
                 if (airlinesRes.ok) setAirlines(await airlinesRes.json());
             } catch (err) {
                 console.error("Failed to fetch form data", err);
                 toast.error("Form verileri yüklenirken hata oluştu.");
             }
         };
-        fetchData();
+        fetchAirlines();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -219,14 +214,11 @@ export default function NewListingPage() {
                                     <Select onValueChange={(v) => handleSelectChange("departureCityId", v)}>
                                         <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                                         <SelectContent>
-                                            {cities.map((c: any) => {
-                                                const cityName = String(c.name ?? "").replace(/\*/g, "").trim();
-                                                return (
-                                                    <SelectItem key={c.id} value={String(c.id)}>
-                                                        {cityName} {c.priority ? '⭐' : ''}
-                                                    </SelectItem>
-                                                );
-                                            })}
+                                            {cities.map((cityName) => (
+                                                <SelectItem key={cityName} value={cityName}>
+                                                    {cityName}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </div>

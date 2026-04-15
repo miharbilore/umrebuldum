@@ -7,12 +7,20 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { Camera, ExternalLink, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PhoneInput from 'react-phone-number-input'
+import { cities } from '@/lib/data/cities';
 
 export default function DashboardProfilePage() {
     const { data: session } = useSession();
@@ -25,6 +33,7 @@ export default function DashboardProfilePage() {
         fullName: '',
         phone: '',
         city: '',
+        agencyCity: '',
         bio: '',
         photo: '',
         isIdentityVerified: false,
@@ -39,6 +48,7 @@ export default function DashboardProfilePage() {
                         fullName: data.fullName || '',
                         phone: data.phone || '',
                         city: data.city || '',
+                        agencyCity: data.agencyCity || '',
                         bio: data.bio || '', // Handle null
                         photo: data.photo || '',
                         isIdentityVerified: data.isIdentityVerified || false,
@@ -257,6 +267,24 @@ export default function DashboardProfilePage() {
                                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                                 required
                             />
+                        </div>
+                        <div>
+                            <Label>Faaliyet/Merkez Şehri</Label>
+                            <Select
+                                value={formData.agencyCity}
+                                onValueChange={(value) => setFormData({ ...formData, agencyCity: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Şehir seçiniz" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {cities.map((cityName) => (
+                                        <SelectItem key={cityName} value={cityName}>
+                                            {cityName}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div>

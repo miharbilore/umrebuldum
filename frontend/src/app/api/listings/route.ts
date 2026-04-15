@@ -9,6 +9,7 @@ import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { calculateListingScore } from "@/lib/listing-ranking";
 import { spendToken } from "@/modules/tokens";
+import { sanitizeCityName } from "@/lib/city-utils";
 
 import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
@@ -18,9 +19,9 @@ export const GET = withErrorHandler(async (req: Request) => {
     try {
         const { searchParams } = new URL(req.url);
         const guideId = searchParams.get('guideId');
-        const departureCityId = searchParams.get('departureCity') || searchParams.get('departureCityId');
+        const departureCityParam = searchParams.get('departureCity') || searchParams.get('departureCityId');
         const rawCity = searchParams.get('city');
-        const city = rawCity ? rawCity.replace(/\*/g, "").trim() : null;
+        const city = sanitizeCityName(rawCity) || null;
         const searchDate = searchParams.get('date');
         const minDate = searchParams.get('minDate');
         const maxDate = searchParams.get('maxDate');
@@ -32,7 +33,12 @@ export const GET = withErrorHandler(async (req: Request) => {
         const skip = (page - 1) * limit;
 
         const now = new Date();
-        const sanitizeCityName = (value?: string | null) => (value ? value.replace(/\*/g, "").trim() : value);
+        const toTurkishTitleCase = (value: string) =>
+            value
+                .toLocaleLowerCase("tr-TR")
+                .split(" ")
+                .map((word) => (word ? `${word[0].toLocaleUpperCase("tr-TR")}${word.slice(1)}` : ""))
+                .join(" ");
 
         // Build where clause
         let where: Prisma.GuideListingWhereInput = {
@@ -41,13 +47,26 @@ export const GET = withErrorHandler(async (req: Request) => {
             deletedAt: null,
             endDate: { gte: now }
         };
+        const appendAndFilter = (filter: Prisma.GuideListingWhereInput) => {
+            const existingAnd = Array.isArray(where.AND) ? where.AND : (where.AND ? [where.AND] : []);
+            where.AND = [...existingAnd, filter];
+        };
 
         if (guideId) where.guideId = guideId;
-        if (departureCityId && departureCityId !== 'all') {
-            where.departureCityId = departureCityId;
+        const sanitizedDepartureCity = sanitizeCityName(departureCityParam) || null;
+        if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
+            appendAndFilter({
+                OR: [
+                    { departureCityId: sanitizedDepartureCity },
+                    { departureCity: { name: { equals: sanitizedDepartureCity } } }
+                ]
+            });
         }
         if (city) {
-            where.city = { contains: city, mode: 'insensitive' };
+            const trimmedCity = city.trim();
+            const normalizedCity = toTurkishTitleCase(trimmedCity);
+            const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
+            appendAndFilter({ OR: cityCandidates.map((candidate) => ({ city: { contains: candidate } })) });
         }
 
         // Identity verification is now strictly on the User model
@@ -299,8 +318,16 @@ export const POST = withErrorHandler(async (req: Request) => {
         });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        const cityExists = await prisma.departureCity.findUnique({ where: { id: departureCityId } });
-        if (!cityExists) return NextResponse.json({ error: "Invalid Departure City" }, { status: 400 });
+        const sanitizedDepartureCity = sanitizeCityName(String(departureCityId || "")) || "";
+        const departureCityRecord = await prisma.departureCity.findFirst({
+            where: {
+                OR: [
+                    { id: sanitizedDepartureCity },
+                    { name: { equals: sanitizedDepartureCity } }
+                ]
+            }
+        });
+        if (!departureCityRecord) return NextResponse.json({ error: "Invalid Departure City" }, { status: 400 });
 
         // Upsert GuideProfile just to ensure relation exists, data is managed in User
         await prisma.guideProfile.upsert({
@@ -359,7 +386,7 @@ export const POST = withErrorHandler(async (req: Request) => {
                 title,
                 description: description || "",
                 city: city || "",
-                departureCityId,
+                departureCityId: departureCityRecord.id,
                 meetingCity: meetingCity || null,
                 extraServices: Array.isArray(extraServices) ? extraServices : [],
                 hotelName: hotelName || null,
