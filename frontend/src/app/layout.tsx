@@ -1,6 +1,5 @@
 import React from "react"
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -9,8 +8,6 @@ import NewsletterPopup from "@/components/NewsletterPopup";
 import HybridChatbot from "@/components/HybridChatbot";
 import "./globals.css";
 import 'react-phone-number-input/style.css'
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -79,7 +76,7 @@ export default async function RootLayout({
 
   return (
     <html lang="tr" suppressHydrationWarning>
-      <body className={`${inter.className} font-sans antialiased flex flex-col min-h-screen`}>
+      <body className="font-sans antialiased flex flex-col min-h-screen">
         <SmoothScrollProvider>
           <Providers session={session}>
             <Header />
@@ -95,4 +92,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
