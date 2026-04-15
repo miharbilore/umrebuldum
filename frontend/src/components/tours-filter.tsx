@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,22 +22,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const CITIES = [
-  "İstanbul",
-  "Ankara",
-  "İzmir",
-  "Bursa",
-  "Antalya",
-  "Konya",
-  "Adana",
-  "Gaziantep",
-];
-
 interface ToursFilterProps {
   currentCity?: string;
   currentMinPrice?: string;
   currentMaxPrice?: string;
 }
+
+type CityOption = {
+  id: string;
+  name: string;
+};
 
 export function ToursFilter({
   currentCity,
@@ -47,10 +41,26 @@ export function ToursFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(false);
+  const [cities, setCities] = useState<CityOption[]>([]);
 
   const [city, setCity] = useState(currentCity || "");
   const [minPrice, setMinPrice] = useState(currentMinPrice || "");
   const [maxPrice, setMaxPrice] = useState(currentMaxPrice || "");
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const res = await fetch("/api/cities");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) setCities(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch cities", err);
+      }
+    };
+    fetchCities();
+  }, []);
 
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -104,11 +114,14 @@ export function ToursFilter({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tüm şehirler</SelectItem>
-            {CITIES.map((c) => (
-              <SelectItem key={c} value={c.toLowerCase()}>
-                {c}
-              </SelectItem>
-            ))}
+            {cities.map((c) => {
+              const cityName = String(c.name ?? "").replace(/\*/g, "").trim();
+              return (
+                <SelectItem key={c.id ?? cityName} value={cityName.toLowerCase()}>
+                  {cityName}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
