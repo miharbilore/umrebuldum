@@ -9,6 +9,7 @@ import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { calculateListingScore } from "@/lib/listing-ranking";
 import { spendToken } from "@/modules/tokens";
+import { sanitizeCityName } from "@/lib/city-utils";
 
 import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
@@ -20,7 +21,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         const guideId = searchParams.get('guideId');
         const departureCityParam = searchParams.get('departureCity') || searchParams.get('departureCityId');
         const rawCity = searchParams.get('city');
-        const city = rawCity ? rawCity.replace(/\*/g, "").trim() : null;
+        const city = sanitizeCityName(rawCity) || null;
         const searchDate = searchParams.get('date');
         const minDate = searchParams.get('minDate');
         const maxDate = searchParams.get('maxDate');
@@ -32,7 +33,6 @@ export const GET = withErrorHandler(async (req: Request) => {
         const skip = (page - 1) * limit;
 
         const now = new Date();
-        const sanitizeCityName = (value?: string | null) => (value ? value.replace(/\*/g, "").trim() : value);
         const normalizeCityQuery = (value: string) =>
             value
                 .toLocaleLowerCase("tr-TR")
@@ -49,7 +49,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         };
 
         if (guideId) where.guideId = guideId;
-        const sanitizedDepartureCity = departureCityParam ? departureCityParam.replace(/\*/g, "").trim() : null;
+        const sanitizedDepartureCity = sanitizeCityName(departureCityParam) || null;
         if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
             where.OR = [
                 { departureCityId: sanitizedDepartureCity },
@@ -59,9 +59,7 @@ export const GET = withErrorHandler(async (req: Request) => {
         if (city) {
             const trimmedCity = city.trim();
             const normalizedCity = normalizeCityQuery(trimmedCity);
-            const cityCandidates = trimmedCity === normalizedCity
-                ? [trimmedCity]
-                : [trimmedCity, normalizedCity];
+            const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
             const existingAnd = Array.isArray(where.AND) ? where.AND : (where.AND ? [where.AND] : []);
             where.AND = [
                 ...existingAnd,
@@ -318,7 +316,7 @@ export const POST = withErrorHandler(async (req: Request) => {
         });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        const sanitizedDepartureCity = String(departureCityId || "").replace(/\*/g, "").trim();
+        const sanitizedDepartureCity = sanitizeCityName(String(departureCityId || "")) || "";
         const departureCityRecord = await prisma.departureCity.findFirst({
             where: {
                 OR: [
