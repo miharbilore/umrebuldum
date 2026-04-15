@@ -59,7 +59,9 @@ export const GET = withErrorHandler(async (req: Request) => {
         if (city) {
             const trimmedCity = city.trim();
             const normalizedCity = normalizeCityQuery(trimmedCity);
-            const cityCandidates = Array.from(new Set([trimmedCity, normalizedCity]));
+            const cityCandidates = trimmedCity === normalizedCity
+                ? [trimmedCity]
+                : [trimmedCity, normalizedCity];
             const existingAnd = Array.isArray(where.AND) ? where.AND : (where.AND ? [where.AND] : []);
             where.AND = [
                 ...existingAnd,
