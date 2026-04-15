@@ -45,7 +45,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
     if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
       where.OR = [
         { departureCityId: sanitizedDepartureCity },
-        { departureCity: { name: { equals: sanitizedDepartureCity, mode: 'insensitive' } } }
+        { departureCity: { name: { equals: sanitizedDepartureCity } } }
       ];
     }
 

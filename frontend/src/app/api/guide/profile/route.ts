@@ -82,12 +82,11 @@ export async function PUT(req: Request) {
 
         await prisma.guideProfile.upsert({
             where: { userId: user.id },
-            update: { bio }, // Bio guideProfile tablosunda da olabilir, SSOT için User da güncelliyoruz
+            update: {},
             create: {
                 userId: user.id,
                 quotaTarget: 30,
-                currentCount: 0,
-                bio // Update bio here too if needed
+                currentCount: 0
             }
         });
 

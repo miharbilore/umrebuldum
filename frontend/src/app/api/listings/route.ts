@@ -47,11 +47,11 @@ export const GET = withErrorHandler(async (req: Request) => {
         if (sanitizedDepartureCity && sanitizedDepartureCity.toLowerCase() !== 'all') {
             where.OR = [
                 { departureCityId: sanitizedDepartureCity },
-                { departureCity: { name: { equals: sanitizedDepartureCity, mode: 'insensitive' } } }
+                { departureCity: { name: { equals: sanitizedDepartureCity } } }
             ];
         }
         if (city) {
-            where.city = { contains: city, mode: 'insensitive' };
+            where.city = { contains: city };
         }
 
         // Identity verification is now strictly on the User model
@@ -308,7 +308,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             where: {
                 OR: [
                     { id: sanitizedDepartureCity },
-                    { name: { equals: sanitizedDepartureCity, mode: 'insensitive' } }
+                    { name: { equals: sanitizedDepartureCity } }
                 ]
             }
         });
