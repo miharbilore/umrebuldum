@@ -174,11 +174,18 @@ export class TokenService {
             } catch (error: any) {
                 // P2002 = unique constraint violation -> race condition collision
                 if (error.code === 'P2002' && idempotencyKey) {
-                    const user = await transaction.user.findUnique({
-                        where: { id: userId },
-                        select: { tokenBalance: true },
+                    // VERIFY: Did this specific transaction succeed before?
+                    const existingTx = await transaction.tokenTransaction.findUnique({
+                        where: { idempotencyKey_userId: { idempotencyKey, userId } }
                     });
-                    return user?.tokenBalance ?? 0;
+                    
+                    if (existingTx) {
+                        const user = await transaction.user.findUnique({
+                            where: { id: userId },
+                            select: { tokenBalance: true },
+                        });
+                        return user?.tokenBalance ?? 0;
+                    }
                 }
                 throw error;
             }

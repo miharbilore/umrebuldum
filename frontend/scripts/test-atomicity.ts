@@ -9,17 +9,34 @@ import { Prisma } from "@prisma/client";
  * correctly rolls back all operations (User state & Token grant).
  */
 async function runAtomicityTest() {
-    const testUserId = "cmmhzs1p500003uj64jbhi0l5"; // Sample Admin account
+    // 1. Production Guard (Senior Architect Requirement)
+    if (process.env.NODE_ENV === 'production') {
+        console.error("❌ CRITICAL: This script cannot be run in PRODUCTION environment.");
+        process.exit(1);
+    }
 
-    console.log("=== [SENIOR ARCHITECT] STARTING ATOMICITY TEST ===");
+    // 2. Dynamic CLI Argument Support
+    const testUserId = process.argv[2] || "cmmhzs1p500003uj64jbhi0l5"; 
+    
+    if (!testUserId) {
+        console.error("❌ ERROR: Please provide a userId as an argument. Usage: npm run test:atomicity <userId>");
+        process.exit(1);
+    }
 
-    // 1. Capture initial state
+    console.log(`=== [SENIOR ARCHITECT] STARTING ATOMICITY TEST (User: ${testUserId}) ===`);
+
+    // 3. Capture initial state
     const beforeUser = await prisma.user.findUnique({
         where: { id: testUserId },
         select: { quizAttempts: true, tokenBalance: true }
     });
     
-    console.log(`[Initial State] Attempts: ${beforeUser?.quizAttempts}, Balance: ${beforeUser?.tokenBalance}`);
+    if (!beforeUser) {
+        console.error(`❌ ERROR: User ${testUserId} not found in database.`);
+        process.exit(1);
+    }
+
+    console.log(`[Initial State] Attempts: ${beforeUser.quizAttempts}, Balance: ${beforeUser.tokenBalance}`);
 
     try {
         await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -34,9 +51,9 @@ async function runAtomicityTest() {
                 testUserId,
                 15,
                 "admin",
-                "ATOMICITY_STRESS_TEST",
+                "ATOMICITY_STRESS_TEST_V2",
                 undefined,
-                `idemp_test_${Date.now()}`,
+                `idemp_test_v2_${Date.now()}`,
                 tx
             );
 
@@ -53,20 +70,25 @@ async function runAtomicityTest() {
         }
     }
 
-    // 2. Verify Final State (Should be identical to initial state)
+    // 4. Verify Final State (Should be identical to initial state)
     const afterUser = await prisma.user.findUnique({
         where: { id: testUserId },
         select: { quizAttempts: true, tokenBalance: true }
     });
 
-    console.log(`[Final State]   Attempts: ${afterUser?.quizAttempts}, Balance: ${afterUser?.tokenBalance}`);
+    if (!afterUser) {
+        console.error("❌ ERROR: User disappeared during test?");
+        process.exit(1);
+    }
 
-    const isAttemptsRolledBack = beforeUser?.quizAttempts === afterUser?.quizAttempts;
-    const isBalanceRolledBack = beforeUser?.tokenBalance === afterUser?.tokenBalance;
+    console.log(`[Final State]   Attempts: ${afterUser.quizAttempts}, Balance: ${afterUser.tokenBalance}`);
+
+    const isAttemptsRolledBack = beforeUser.quizAttempts === afterUser.quizAttempts;
+    const isBalanceRolledBack = beforeUser.tokenBalance === afterUser.tokenBalance;
 
     if (isAttemptsRolledBack && isBalanceRolledBack) {
         console.log("\n✅ PROOF SUCCESSFUL: Both operations were rolled back.");
-        console.log("🎉 SISTEM TAMAMEN KİLİTLENDİ VE GÜVENDE!");
+        console.log("🚀 SISTEM BİR TANK KADAR SAĞLAM!");
     } else {
         console.log("\n❌ PROOF FAILED: Data was partially committed!");
         if (!isAttemptsRolledBack) console.log("   - quizAttempts was NOT rolled back");
