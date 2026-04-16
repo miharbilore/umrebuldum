@@ -1,6 +1,6 @@
-﻿import { prisma } from "./prisma";
+import { prisma } from "./prisma";
 import { withSerializableRetry } from "./with-retry";
-import { LedgerEntryType } from "@prisma/client";
+import { LedgerEntryType, Prisma } from "@prisma/client";
 
 // ─── Credit Economy Constants ───────────────────────────────────────────
 
@@ -132,16 +132,18 @@ export class TokenService {
         type: "purchase" | "refund" | "admin",
         reason: string,
         relatedId?: string,
-        idempotencyKey?: string
+        idempotencyKey?: string,
+        tx?: Prisma.TransactionClient
     ): Promise<number> {
-        const result = await withSerializableRetry(() => prisma.$transaction(async (tx) => {
+        // Core logic function to be called either in internal or external transaction
+        const executeGrant = async (transaction: Prisma.TransactionClient) => {
             // Idempotency check
             if (idempotencyKey) {
-                const existing = await tx.tokenTransaction.findUnique({
+                const existing = await transaction.tokenTransaction.findUnique({
                     where: { idempotencyKey_userId: { idempotencyKey, userId } }
                 });
                 if (existing) {
-                    const user = await tx.user.findUnique({
+                    const user = await transaction.user.findUnique({
                         where: { id: userId },
                         select: { tokenBalance: true },
                     });
@@ -150,7 +152,7 @@ export class TokenService {
             }
 
             // Write to unified TokenTransaction ledger
-            await tx.tokenTransaction.create({
+            await transaction.tokenTransaction.create({
                 data: {
                     userId,
                     amount,
@@ -162,12 +164,22 @@ export class TokenService {
             });
 
             // ── Single Source of Truth: Update ONLY User.tokenBalance ──
-            const updatedUser = await tx.user.update({
+            const updatedUser = await transaction.user.update({
                 where: { id: userId },
                 data: { tokenBalance: { increment: amount } },
             });
 
             return updatedUser.tokenBalance;
+        };
+
+        // If transaction client is provided, use it directly (Transaction-Aware)
+        if (tx) {
+            return executeGrant(tx);
+        }
+
+        // If no transaction provided, use internal serializable transaction
+        const result = await withSerializableRetry(() => prisma.$transaction(async (internalTx) => {
+            return executeGrant(internalTx);
         }));
 
         console.log(`[CreditService] Granted ${amount} to ${userId} (${type}): ${reason}. New balance: ${result}`);
