@@ -15,11 +15,11 @@ async function runAtomicityTest() {
         process.exit(1);
     }
 
-    // 2. Dynamic CLI Argument Support
-    const testUserId = process.argv[2];
+    // 2. Dynamic CLI Argument Support (Hard-coded ID Removed)
+    const testUserId = process.argv[2]; 
     
     if (!testUserId) {
-        console.error("❌ HATA: Lütfen bir kullanıcı ID'si girin. Kullanım: npm run test:atomicity <USER_ID>");
+        console.error("❌ HATA: Kullanıcı ID'si eksik. Kullanım: npm run test:atomicity <USER_ID>");
         process.exit(1);
     }
 
