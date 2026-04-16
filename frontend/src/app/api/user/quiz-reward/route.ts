@@ -84,6 +84,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ 
             success: true, 
+            message: result.isPassed ? "Tebrikler! 15 Token hesabınıza eklendi." : "Sınav tamamlandı.",
             isPassed: result.isPassed, 
             score, 
             attemptsLeft: result.attemptsLeft,
