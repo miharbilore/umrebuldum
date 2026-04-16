@@ -122,6 +122,11 @@ model User {
   performanceTier      PerformanceTier?
   savedCards           SavedCard[]
   notifications        Notification[]
+  
+  // Quiz Module
+  hasCompletedQuiz   Boolean   @default(false)
+  quizAttempts       Int       @default(0)
+  lastQuizAttempt    DateTime?
 
   @@map("users")
 }

@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { LayoutDashboard, FileText, MessageSquare, Settings, Menu, X, Bell, User, History, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useSession } from "next-auth/react";
+import { ProfileProgressBar } from './ProfileProgressBar';
 
 interface NavItem {
     label: string;
@@ -148,6 +149,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
             {/* Main Content */}
             <main className="flex-1 min-w-0 pt-14 lg:pt-0">
+                <ProfileProgressBar />
                 {children}
             </main>
         </div>

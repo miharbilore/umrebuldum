@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Shield, Star, Loader2, GraduationCap, Zap, ArrowRight } from "lucide-react";
 import useSWR from "swr";
 import Link from "next/link";
+import { useState } from "react";
+import { UmrahQuizModal } from "../dashboard/UmrahQuizModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -12,6 +14,7 @@ import { useSession } from "next-auth/react";
 export const CREDIT_BALANCE_KEY = "/api/guide/credits";
 
 export function CreditBalance() {
+    const [isQuizOpen, setIsQuizOpen] = useState(false);
     const { data: session, status } = useSession();
     const { data: balanceData, isLoading: balLoading } = useSWR(CREDIT_BALANCE_KEY, fetcher);
     const { data: profileData, isLoading: profLoading } = useSWR('/api/guide/profile', fetcher);
@@ -49,10 +52,8 @@ export function CreditBalance() {
     const pkgColors: Record<string, string> = {
         FREEMIUM: 'bg-gray-100 text-gray-600 border-gray-200',
         PREMIUM: 'bg-blue-50 text-blue-700 border-blue-200',
-        PLUS: 'bg-blue-50 text-blue-700 border-blue-200',
         PRO: 'bg-purple-50 text-purple-700 border-purple-200',
         BUSINESS: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        BUSINESS_PLUS: 'bg-slate-800 text-amber-400 border-slate-700',
     };
 
     return (
@@ -99,11 +100,13 @@ export function CreditBalance() {
                     <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                         {pkg === 'FREEMIUM' ? (
                             <>
-                                <Button asChild variant="default" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex-1 sm:flex-initial shadow-md">
-                                    <Link href="/dashboard/quiz">
-                                        <GraduationCap className="w-4 h-4 mr-1.5" />
-                                        Sınavla Token Kazan
-                                    </Link>
+                                <Button 
+                                    onClick={() => setIsQuizOpen(true)}
+                                    variant="default" 
+                                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white flex-1 sm:flex-initial shadow-md"
+                                >
+                                    <GraduationCap className="w-4 h-4 mr-1.5" />
+                                    Sınavla Token Kazan
                                 </Button>
                                 <Button asChild variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50 flex-1 sm:flex-initial">
                                     <Link href="/pricing" className="flex items-center">
@@ -130,6 +133,11 @@ export function CreditBalance() {
                     </div>
                 </div>
             </div>
+            
+            <UmrahQuizModal 
+                isOpen={isQuizOpen} 
+                onClose={() => setIsQuizOpen(false)} 
+            />
         </div>
     );
 }

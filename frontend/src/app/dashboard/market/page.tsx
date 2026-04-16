@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { UmrahRequest } from "@prisma/client";
@@ -11,8 +11,9 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSWRConfig as useConfiguredSWR } from "swr";
 import useSWR from "swr";
-import { Heart, Coins, AlertTriangle, Loader2, Inbox } from "lucide-react";
+import { Heart, Coins, AlertTriangle, Loader2, Inbox, GraduationCap } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { UmrahQuizModal } from "@/components/dashboard/UmrahQuizModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -23,6 +24,7 @@ export default function GuideMarketPage() {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [confirmModal, setConfirmModal] = useState<{ requestId: string; city: string } | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const [isQuizOpen, setIsQuizOpen] = useState(false);
 
     const { data: session, update } = useSession();
     const role = session?.user?.role;
@@ -274,9 +276,19 @@ export default function GuideMarketPage() {
                             </div>
 
                             {currentBalance < creditCost && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4 flex items-center gap-2">
-                                    <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                                    <p className="text-xs text-red-700">Yetersiz bakiye. Lütfen kredi yükleyin.</p>
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                                        <p className="text-sm font-semibold text-red-700">Yetersiz Bakiye</p>
+                                    </div>
+                                    <Button 
+                                        onClick={() => setIsQuizOpen(true)}
+                                        variant="outline" 
+                                        className="w-full bg-white border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center justify-center gap-2 py-5 rounded-xl transition-all"
+                                    >
+                                        <GraduationCap className="w-4 h-4" />
+                                        🎁 Token Kazan (Mini Sınav)
+                                    </Button>
                                 </div>
                             )}
 
@@ -300,6 +312,11 @@ export default function GuideMarketPage() {
                     </div>
                 )}
             </div>
+
+            <UmrahQuizModal 
+                isOpen={isQuizOpen} 
+                onClose={() => setIsQuizOpen(false)} 
+            />
         </DashboardLayout >
     );
 }
