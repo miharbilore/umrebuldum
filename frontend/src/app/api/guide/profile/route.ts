@@ -48,7 +48,10 @@ export async function GET(req: Request) {
             photo,
             isIdentityVerified,
             packageType,
-            tokenBalance
+            tokenBalance,
+            hasCompletedQuiz,
+            quizAttempts,
+            lastQuizAttempt
         } = user;
 
         return NextResponse.json({
@@ -61,7 +64,10 @@ export async function GET(req: Request) {
             photo,
             isIdentityVerified,
             package: packageType,
-            tokenBalance
+            tokenBalance,
+            hasCompletedQuiz,
+            quizAttempts,
+            lastQuizAttempt
         });
     } catch (error) {
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });

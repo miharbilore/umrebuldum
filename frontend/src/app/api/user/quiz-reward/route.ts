@@ -7,86 +7,96 @@ import { differenceInHours } from "date-fns";
 export async function POST(req: Request) {
     try {
         const session = await auth();
-        if (!session?.user?.email) {
+        if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const { score } = await req.json();
 
-        if (typeof score !== 'number') {
+        // 1. Strict Validation (QA Point 3)
+        if (typeof score !== 'number' || !Number.isInteger(score) || score < 0 || score > 10) {
             return NextResponse.json({ error: "Invalid score" }, { status: 400 });
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-        });
+        const userId = session.user.id;
 
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
-        }
+        // 2. Atomic Logic started via Transaction (QA Point 3)
+        const result = await prisma.$transaction(async (tx) => {
+            // Fetch fresh state inside transaction
+            const user = await tx.user.findUnique({
+                where: { id: userId },
+                select: {
+                    id: true,
+                    quizAttempts: true,
+                    hasCompletedQuiz: true,
+                    lastQuizAttempt: true,
+                    tokenBalance: true
+                }
+            });
 
-        // Eligibility checks
-        if (user.hasCompletedQuiz) {
-            return NextResponse.json({ 
-                error: "QUIZ_ALREADY_COMPLETED", 
-                message: "Sınavı zaten başarıyla tamamladınız. Tokenlar hesabınıza eklendi." 
-            }, { status: 400 });
-        }
+            if (!user) throw new Error("USER_NOT_FOUND");
 
-        if (user.quizAttempts >= 3) {
-            return NextResponse.json({ 
-                error: "MAX_ATTEMPTS_REACHED", 
-                message: "Maksimum sınav deneme sınırına (3/3) ulaştınız. Teşekkür ederiz." 
-            }, { status: 400 });
-        }
+            // Eligibility checks
+            if (user.hasCompletedQuiz) throw new Error("QUIZ_ALREADY_COMPLETED");
+            if (user.quizAttempts >= 3) throw new Error("MAX_ATTEMPTS_REACHED");
 
-        if (user.lastQuizAttempt) {
-            const hoursSinceLast = differenceInHours(new Date(), user.lastQuizAttempt);
-            if (hoursSinceLast < 24) {
-                return NextResponse.json({ 
-                    error: "COOLDOWN_ACTIVE", 
-                    message: `Tekrar denemek için ${24 - hoursSinceLast} saat beklemelisiniz.` 
-                }, { status: 400 });
+            if (user.lastQuizAttempt) {
+                const hoursSinceLast = differenceInHours(new Date(), user.lastQuizAttempt);
+                if (hoursSinceLast < 24) throw new Error("COOLDOWN_ACTIVE");
             }
-        }
 
-        // Process attempt
-        const updatedAttempts = user.quizAttempts + 1;
-        const isPassed = score >= 7;
+            const isPassed = score >= 7;
+            const newAttemptCount = user.quizAttempts + 1;
 
-        let newBalance = user.tokenBalance;
+            // Update user state first
+            const updatedUser = await tx.user.update({
+                where: { id: userId },
+                data: {
+                    quizAttempts: newAttemptCount,
+                    lastQuizAttempt: new Date(),
+                    hasCompletedQuiz: isPassed
+                }
+            });
 
-        if (isPassed) {
-            // Grant reward
-            newBalance = await TokenService.grantCredits(
-                user.id,
-                15,
-                "admin",
-                "QUIZ_REWARD",
-                undefined,
-                `quiz_reward_${user.id}_${updatedAttempts}` // Idempotency
-            );
-        }
+            let finalBalance = user.tokenBalance;
 
-        // Update user state
-        await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                quizAttempts: updatedAttempts,
-                lastQuizAttempt: new Date(),
-                hasCompletedQuiz: isPassed,
+            if (isPassed) {
+                // We use the internal TokenService logic but ensure it's linked
+                // Note: TokenService.grantCredits manages its OWN transaction. 
+                // To be truly atomic, we manually create the ledger entry here or ensure grantCredits is safe.
+                // Since grantCredits uses unique idempotency keys, it's safe against double-spend.
+                finalBalance = await TokenService.grantCredits(
+                    userId,
+                    15,
+                    "admin",
+                    "QUIZ_REWARD",
+                    tx as any, // Pass current transaction client
+                    `quiz_reward_${userId}_${newAttemptCount}`
+                );
             }
+
+            return { isPassed, attemptsLeft: 3 - newAttemptCount, finalBalance };
         });
 
         return NextResponse.json({ 
             success: true, 
-            isPassed, 
+            isPassed: result.isPassed, 
             score, 
-            attemptsLeft: 3 - updatedAttempts,
-            newBalance 
+            attemptsLeft: result.attemptsLeft,
+            newBalance: result.finalBalance 
         });
 
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message === "QUIZ_ALREADY_COMPLETED") {
+            return NextResponse.json({ error, message: "Sınavı zaten tamamladınız." }, { status: 400 });
+        }
+        if (error.message === "MAX_ATTEMPTS_REACHED") {
+            return NextResponse.json({ error, message: "Maksimum deneme sınırına ulaştınız." }, { status: 400 });
+        }
+        if (error.message === "COOLDOWN_ACTIVE") {
+            return NextResponse.json({ error, message: "Tekrar denemek için 24 saat beklemelisiniz." }, { status: 400 });
+        }
+
         console.error("Quiz reward API error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

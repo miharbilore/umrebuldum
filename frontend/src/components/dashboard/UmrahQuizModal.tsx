@@ -75,7 +75,6 @@ export function UmrahQuizModal({ isOpen, onClose }: UmrahQuizModalProps) {
     };
 
     const finishQuiz = async (finalScore: number) => {
-        setStep("result");
         setLoading(true);
         try {
             const res = await fetch("/api/user/quiz-reward", {
@@ -86,8 +85,9 @@ export function UmrahQuizModal({ isOpen, onClose }: UmrahQuizModalProps) {
             const data = await res.json();
             
             if (res.ok) {
-                refreshStats(); // Update profile stats
-                mutate("/api/guide/credits"); // Update balance UI
+                setStep("result"); // Sadece sunucu onaylarsa sonuç ekranına geç
+                refreshStats(); // Profil verilerini yenile
+                mutate("/api/guide/credits"); // Bakiye UI'ı güncelle
                 
                 if (data.isPassed) {
                     toast.success("Tebrikler! 15 Token kazandınız.");
@@ -137,7 +137,7 @@ export function UmrahQuizModal({ isOpen, onClose }: UmrahQuizModalProps) {
                         </div>
                         
                         <p className="text-gray-500 mb-8 leading-relaxed">
-                            Umrah bilginizi tazeleyin ve <span className="font-bold text-blue-600">15 Token</span> kazanın! 10 sorudan 7'sini bilmeniz yeterli.
+                            Umrah bilginizi tazeleyin ve <span className="font-bold text-blue-600">15 Token</span> kazanın! 10 sorudan 7'sini bilmeniz yeterli. <span className="block mt-2 text-xs text-amber-600 italic">Başarısız olursanız yeni hak için 24 saat beklemelisiniz.</span>
                         </p>
 
                         <div className="space-y-3 mb-8">
@@ -162,7 +162,7 @@ export function UmrahQuizModal({ isOpen, onClose }: UmrahQuizModalProps) {
                             </div>
                         ) : attemptsUsed >= 3 ? (
                             <div className="p-4 bg-red-50 rounded-2xl text-red-700 text-sm font-medium border border-red-100">
-                                3 deneme hakkınızı da kullandınız.
+                                3 deneme hakkınızı da kullandınız. Teşekkür ederiz!
                             </div>
                         ) : (
                             <Button 

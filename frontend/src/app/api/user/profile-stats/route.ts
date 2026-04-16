@@ -42,11 +42,6 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // 2. Trigger a trust score recalculation in the background (async)
-        // This ensures the score is relatively fresh even if we don't block.
-        // For larger apps, this would be a queued job.
-        recalculateTrustScore(userId).catch(e => console.error("Trust score update failed:", e));
-
         // 3. Compute completion
         const completion = calculateProfileCompletion(user as any);
 
