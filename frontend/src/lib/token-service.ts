@@ -137,7 +137,7 @@ export class TokenService {
     ): Promise<number> {
         // Core logic function to be called either in internal or external transaction
         const executeGrant = async (transaction: Prisma.TransactionClient) => {
-            // Idempotency check
+            // Idempotency check: Pre-emptive check
             if (idempotencyKey) {
                 const existing = await transaction.tokenTransaction.findUnique({
                     where: { idempotencyKey_userId: { idempotencyKey, userId } }
@@ -151,25 +151,37 @@ export class TokenService {
                 }
             }
 
-            // Write to unified TokenTransaction ledger
-            await transaction.tokenTransaction.create({
-                data: {
-                    userId,
-                    amount,
-                    entryType: type === "refund" ? LedgerEntryType.REFUND : type === "purchase" ? LedgerEntryType.PURCHASE : LedgerEntryType.ADJUSTMENT,
-                    reasonCode: reason,
-                    referenceId: relatedId || null,
-                    idempotencyKey: idempotencyKey || `grant:${Date.now()}-${Math.random()}`,
+            try {
+                // Write to unified TokenTransaction ledger
+                await transaction.tokenTransaction.create({
+                    data: {
+                        userId,
+                        amount,
+                        entryType: type === "refund" ? LedgerEntryType.REFUND : type === "purchase" ? LedgerEntryType.PURCHASE : LedgerEntryType.ADJUSTMENT,
+                        reasonCode: reason,
+                        referenceId: relatedId || null,
+                        idempotencyKey: idempotencyKey || `grant:${Date.now()}-${Math.random()}`,
+                    }
+                });
+
+                // ── Single Source of Truth: Update ONLY User.tokenBalance ──
+                const updatedUser = await transaction.user.update({
+                    where: { id: userId },
+                    data: { tokenBalance: { increment: amount } },
+                });
+
+                return updatedUser.tokenBalance;
+            } catch (error: any) {
+                // P2002 = unique constraint violation -> race condition collision
+                if (error.code === 'P2002' && idempotencyKey) {
+                    const user = await transaction.user.findUnique({
+                        where: { id: userId },
+                        select: { tokenBalance: true },
+                    });
+                    return user?.tokenBalance ?? 0;
                 }
-            });
-
-            // ── Single Source of Truth: Update ONLY User.tokenBalance ──
-            const updatedUser = await transaction.user.update({
-                where: { id: userId },
-                data: { tokenBalance: { increment: amount } },
-            });
-
-            return updatedUser.tokenBalance;
+                throw error;
+            }
         };
 
         // If transaction client is provided, use it directly (Transaction-Aware)

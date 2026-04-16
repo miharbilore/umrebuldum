@@ -3,25 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { TokenService } from "@/lib/token-service";
 import { differenceInHours } from "date-fns";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
     try {
         const session = await auth();
         if (!session?.user?.id) {
-            return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+            return NextResponse.json({ error: "UNAUTHORIZED", message: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
         const { score } = await req.json();
 
         // 1. Strict Validation
         if (typeof score !== 'number' || !Number.isInteger(score) || score < 0 || score > 10) {
-            return NextResponse.json({ error: "INVALID_SCORE" }, { status: 400 });
+            return NextResponse.json({ error: "INVALID_SCORE", message: "Geçersiz sınav puanı." }, { status: 400 });
         }
 
         const userId = session.user.id;
 
-        // 2. Atomic Logic via Transaction
-        const result = await prisma.$transaction(async (tx) => {
+        // 2. Atomic Logic via Transaction with SERIALIZABLE isolation (Senior Architect Fix)
+        const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             // Fetch fresh state inside transaction
             const user = await tx.user.findUnique({
                 where: { id: userId },
@@ -61,19 +62,21 @@ export async function POST(req: Request) {
             let finalBalance = user.tokenBalance;
 
             if (isPassed) {
-                // Pass current transaction client 'tx' as the last argument (7th)
+                // Pass current transaction client 'tx' for real atomic ledger entry
                 finalBalance = await TokenService.grantCredits(
                     userId,
                     15,
                     "admin",
                     "QUIZ_REWARD",
-                    undefined, // relatedId
-                    `quiz_reward_${userId}_${newAttemptCount}`, // idempotencyKey
-                    tx as any // Transaction Client
+                    undefined,
+                    `quiz_reward_${userId}_${newAttemptCount}`,
+                    tx
                 );
             }
 
             return { isPassed, attemptsLeft: 3 - newAttemptCount, finalBalance };
+        }, {
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable
         });
 
         return NextResponse.json({ 
@@ -85,21 +88,21 @@ export async function POST(req: Request) {
         });
 
     } catch (error: any) {
-        // Map specific errors to correct HTTP status and clean string codes
+        // Map specific errors to correct HTTP status and localized messages
         if (error.message === "USER_NOT_FOUND") {
-            return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 });
+            return NextResponse.json({ error: "USER_NOT_FOUND", message: "Kullanıcı bulunamadı." }, { status: 404 });
         }
         if (error.message === "QUIZ_ALREADY_COMPLETED") {
-            return NextResponse.json({ error: "QUIZ_ALREADY_COMPLETED" }, { status: 400 });
+            return NextResponse.json({ error: "QUIZ_ALREADY_COMPLETED", message: "Ödülü zaten aldınız." }, { status: 400 });
         }
         if (error.message === "MAX_ATTEMPTS_REACHED") {
-            return NextResponse.json({ error: "MAX_ATTEMPTS_REACHED" }, { status: 400 });
+            return NextResponse.json({ error: "MAX_ATTEMPTS_REACHED", message: "3 deneme hakkınızı da kullandınız." }, { status: 400 });
         }
         if (error.message === "COOLDOWN_ACTIVE") {
-            return NextResponse.json({ error: "COOLDOWN_ACTIVE" }, { status: 400 });
+            return NextResponse.json({ error: "COOLDOWN_ACTIVE", message: "Tekrar denemek için 24 saat beklemelisiniz." }, { status: 400 });
         }
 
         console.error("Quiz reward API error:", error);
-        return NextResponse.json({ error: "INTERNAL_SERVER_ERROR" }, { status: 500 });
+        return NextResponse.json({ error: "INTERNAL_SERVER_ERROR", message: "Beklenmedik bir hata oluştu." }, { status: 500 });
     }
 }
