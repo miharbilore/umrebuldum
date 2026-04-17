@@ -1,157 +1,135 @@
-'use client';
+"use client";
 
+import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { toast } from 'sonner';
-import { useSession } from 'next-auth/react';
-import { Camera, ExternalLink, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import PhoneInput from 'react-phone-number-input'
-import { cities } from '@/lib/data/cities';
+import { useRouter } from "next/navigation";
 
-export default function DashboardProfilePage() {
+export default function ProfileEditingPage() {
     const { data: session } = useSession();
+    const role = session?.user?.role;
     const router = useRouter();
+    
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [uploading, setUploading] = useState(false);
-
+    
+    // Form State
     const [formData, setFormData] = useState({
-        fullName: '',
-        phone: '',
-        city: '',
-        agencyCity: '',
-        bio: '',
-        photo: '',
-        isIdentityVerified: false,
+        image: "",
+        coverImage: "",
+        bio: "",
+        city: "",
+        agencyCity: "",
+        tursabNumber: "",
+        establishmentYear: "",
+        languagesSpoken: "", // Handled as comma separated for simple text input
+        experienceYears: "",
+        specialties: "", // Comma separated
+        videoIntroduction: "",
     });
 
+    const profileInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
+
     useEffect(() => {
-        fetch('/api/guide/profile')
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.userId) {
+        fetch('/api/user/profile')
+            .then(res => res.json())
+            .then(data => {
+                if (data && !data.error) {
                     setFormData({
-                        fullName: data.fullName || '',
-                        phone: data.phone || '',
-                        city: data.city || '',
-                        agencyCity: data.agencyCity || '',
-                        bio: data.bio || '', // Handle null
-                        photo: data.photo || '',
-                        isIdentityVerified: data.isIdentityVerified || false,
+                        image: data.image || "",
+                        coverImage: data.coverImage || "",
+                        bio: data.bio || "",
+                        city: data.city || "",
+                        agencyCity: data.agencyCity || "",
+                        tursabNumber: data.tursabNumber || "",
+                        establishmentYear: data.establishmentYear || "",
+                        languagesSpoken: (data.languagesSpoken || []).join(", "),
+                        experienceYears: data.experienceYears || "",
+                        specialties: (data.specialties || []).join(", "),
+                        videoIntroduction: data.videoIntroduction || "",
                     });
                 }
+                setLoading(false);
             })
-            .finally(() => setLoading(false));
+            .catch(() => setLoading(false));
     }, []);
 
-    const compressImageToWebP = (file: File, maxWidth = 800): Promise<File> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target?.result as string;
-                img.onload = () => {
-                    const canvas = document.createElement("canvas");
-                    let width = img.width;
-                    let height = img.height;
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "image" | "coverImage") => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
+        const uploadPromise = async () => {
+            // 1. Get Presigned URL
+            const res = await fetch('/api/upload/s3', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: file.name,
+                    contentType: file.type,
+                    folder: type === 'image' ? 'avatars' : 'covers'
+                })
+            });
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext("2d");
-                    ctx?.drawImage(img, 0, 0, width, height);
+            if (!res.ok) throw new Error("URL alınamadı");
+            const { signedUrl, publicUrl } = await res.json();
 
-                    canvas.toBlob((blob) => {
-                        if (blob) {
-                            const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
-                                type: "image/webp",
-                                lastModified: Date.now(),
-                            });
-                            resolve(newFile);
-                        } else {
-                            reject(new Error("Canvas to Blob failed"));
-                        }
-                    }, "image/webp", 0.8); // 80% quality WEBP
-                };
-                img.onerror = (error) => reject(error);
-            };
-            reader.onerror = (error) => reject(error);
+            // 2. Upload to S3
+            const uploadRes = await fetch(signedUrl, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Content-Type': file.type
+                }
+            });
+
+            if (!uploadRes.ok) throw new Error("Yükleme başarısız");
+
+            // 3. Update local state
+            setFormData(prev => ({ ...prev, [type]: publicUrl }));
+            
+            return "Fotoğraf yüklendi";
+        };
+
+        toast.promise(uploadPromise(), {
+            loading: 'Yükleniyor...',
+            success: 'Fotoğraf başarıyla güncellendi.',
+            error: 'Fotoğraf yüklenemedi.'
         });
     };
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files || e.target.files.length === 0) return;
-        const originalFile = e.target.files[0];
-
-        // Simple validation
-        if (originalFile.size > 15 * 1024 * 1024) { // Increased to 15MB to allow raw camera but compress it down
-            toast.error("Dosya boyutu başlangıç için 15MB'dan küçük olmalıdır.");
-            return;
-        }
-
-        setUploading(true);
-        try {
-            const compressedFile = await compressImageToWebP(originalFile);
-            const data = new FormData();
-            data.append("file", compressedFile);
-
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                body: data,
-            });
-            const json = await res.json();
-            if (res.ok) {
-                setFormData(prev => ({ ...prev, photo: json.url }));
-                toast.success("Fotoğraf yüklendi.");
-            } else {
-                toast.error(json.error || "Yükleme başarısız.");
-            }
-        } catch (err) {
-            toast.error("Yükleme hatası.");
-        } finally {
-            setUploading(false);
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSave = async () => {
         setSaving(true);
         try {
-            const res = await fetch('/api/guide/profile', {
-                method: 'PUT',
+            const payload = {
+                ...formData,
+                languagesSpoken: formData.languagesSpoken.split(",").map(s => s.trim()).filter(Boolean),
+                specialties: formData.specialties.split(",").map(s => s.trim()).filter(Boolean),
+            };
+
+            const res = await fetch('/api/user/profile', {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload)
             });
+
             if (res.ok) {
-                toast.success('Profil güncellendi.');
-                // Redirect to public profile
-                if (session?.user?.id) {
-                    router.push(`/guides/${session.user.id}`);
-                }
+                toast.success("Profiliniz başarıyla güncellendi. Açık Profilinizde görünür olacaktır.");
+                setTimeout(() => {
+                    router.push(`/rehber/${session?.user?.id}-profil`);
+                }, 1000);
             } else {
-                toast.error('Hata oluştu.');
+                toast.error("Güncelleme başarısız.");
             }
         } catch {
-            toast.error('Sunucu hatası.');
+            toast.error("Bağlantı hatası.");
         } finally {
             setSaving(false);
         }
@@ -160,153 +138,194 @@ export default function DashboardProfilePage() {
     if (loading) {
         return (
             <DashboardLayout>
-                <div className="p-8 text-center">Yükleniyor...</div>
+                <div className="flex h-[50vh] items-center justify-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                </div>
             </DashboardLayout>
         );
     }
 
+    const isOrganization = role === "ORGANIZATION";
+    const isGuide = role === "GUIDE";
+
     return (
         <DashboardLayout>
-            <div className="max-w-2xl mx-auto py-10 px-4">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">Profilim</h1>
-                    {session?.user?.id && (
-                        <Link href={`/guides/${session.user.id}`} target="_blank">
-                            <Button variant="outline" className="gap-2">
-                                <ExternalLink className="w-4 h-4" />
-                                Profili Görüntüle
-                            </Button>
-                        </Link>
-                    )}
+            <div className="container mx-auto py-10 px-4 max-w-4xl space-y-8">
+                <div>
+                    <h1 className="text-3xl font-bold">Profilimi Düzenle</h1>
+                    <p className="text-muted-foreground mt-2">Dışarıya (Umrecilere) yansıyacak olan vitrin bilgilerinizi buradan düzenleyebilirsiniz.</p>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl border shadow-sm">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-
-                        {/* Profile Image Section */}
-                        <div className="flex flex-col items-center gap-4 py-4 border-b">
-                            <div className="relative w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-200 overflow-hidden flex items-center justify-center">
-                                {formData.photo ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={formData.photo} alt="Profile" className="w-full h-full object-cover" />
+                {/* Görsel Yükleme */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Görseller</CardTitle>
+                        <CardDescription>Profilinizi daha güvenilir kılan yüksek kaliteli fotoğraflar seçin.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {/* Kapak Görseli */}
+                        <div className="space-y-2">
+                            <Label>Kapak Fotoğrafı</Label>
+                            <div 
+                                className="relative h-48 rounded-lg bg-slate-100 border border-dashed flex items-center justify-center overflow-hidden cursor-pointer hover:bg-slate-50 transition"
+                                onClick={() => coverInputRef.current?.click()}
+                            >
+                                {formData.coverImage ? (
+                                    <img src={formData.coverImage} alt="Cover" className="w-full h-full object-cover" />
                                 ) : (
-                                    <Camera className="w-8 h-8 text-gray-400" />
-                                )}
-                                {uploading && (
-                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                        <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                    <div className="text-center text-slate-500">
+                                        <ImageIcon className="mx-auto h-8 w-8 mb-2" />
+                                        <span className="text-sm">Kapak Görüntüsü Yükle (Önerilen: 1200x400)</span>
                                     </div>
                                 )}
-                            </div>
-                            <div className="flex flex-col sm:flex-row items-center gap-3">
-                                {/* Camera Input */}
-                                <div className="relative">
-                                    <Label htmlFor="camera-upload" className="flex items-center gap-2 cursor-pointer bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                                        <Camera className="w-4 h-4" />
-                                        {uploading ? "Bekleyin..." : "Kameradan Çek"}
-                                    </Label>
-                                    <Input
-                                        id="camera-upload"
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                        capture="environment"
-                                        onChange={handleFileChange}
-                                        disabled={uploading}
-                                    />
-                                </div>
-
-                                {/* Gallery Input */}
-                                <div className="relative">
-                                    <Label htmlFor="gallery-upload" className="flex items-center gap-2 cursor-pointer bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></svg>
-                                        {uploading ? "Bekleyin..." : "Galeriden Seç"}
-                                    </Label>
-                                    <Input
-                                        id="gallery-upload"
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        disabled={uploading}
-                                    />
+                                <div className="absolute bottom-2 right-2 bg-black/50 text-white p-2 rounded-md backdrop-blur-sm shadow-sm text-xs flex items-center gap-2 hover:bg-black/70">
+                                    <Camera className="w-4 h-4" /> Değiştir
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-500 text-center">
-                                Dosyalarınız web için otomatik sıkıştırılarak (WebP) depolanır.
-                            </p>
+                            <input type="file" className="hidden" ref={coverInputRef} onChange={(e) => handleUpload(e, 'coverImage')} accept="image/jpeg, image/png, image/webp" />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Profil Resmi */}
+                        <div className="flex items-center gap-6">
+                            <div 
+                                className="relative w-24 h-24 rounded-full bg-slate-200 border-4 border-white shadow-lg flex-shrink-0 cursor-pointer overflow-hidden"
+                                onClick={() => profileInputRef.current?.click()}
+                            >
+                                {formData.image ? (
+                                    <img src={formData.image} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-slate-400">
+                                        <Camera className="w-8 h-8" />
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition flex items-center justify-center text-transparent hover:text-white">
+                                    <Camera className="w-6 h-6" />
+                                </div>
+                            </div>
                             <div>
-                                <Label>Ad Soyad</Label>
-                                <Input
-                                    value={formData.fullName}
-                                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                    required
+                                <h3 className="font-medium">Profil Fotoğrafı / Kurum Logosu</h3>
+                                <p className="text-sm text-muted-foreground mt-1">Yüzünüzü net gösteren veya kurumsal kimliğinizi yansıtan, güven verici bir görsel kullanın.</p>
+                            </div>
+                            <input type="file" className="hidden" ref={profileInputRef} onChange={(e) => handleUpload(e, 'image')} accept="image/jpeg, image/png, image/webp" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Temel Bilgiler */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Genel Hakkında</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Kısa Biyografi (Bio)</Label>
+                            <Textarea 
+                                rows={5}
+                                placeholder="Kendinizden veya acentenizden kısaca bahsedin. Umrecilere ne gibi avantajlar sunduğunuzu açıklayın."
+                                value={formData.bio}
+                                onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>Bulunduğunuz Şehir</Label>
+                                <Input 
+                                    placeholder="Örn: İstanbul" 
+                                    value={formData.city}
+                                    onChange={(e) => setFormData({...formData, city: e.target.value})}
                                 />
                             </div>
-                             <div>
-                                 <Label>Telefon (WhatsApp)</Label>
-                                 <PhoneInput
-                                     international
-                                     defaultCountry="TR"
-                                     value={formData.phone}
-                                     onChange={(val) => setFormData({ ...formData, phone: val || "" })}
-                                     inputComponent={Input}
-                                     className="px-0 [&>input]:h-9 [&>input]:text-base md:[&>input]:text-sm"
-                                     required
-                                 />
-                             </div>
+                            {isOrganization && (
+                                <div className="space-y-2">
+                                    <Label>Bölge/Şube</Label>
+                                    <Input 
+                                        placeholder="Örn: Fatih Şubesi" 
+                                        value={formData.agencyCity}
+                                        onChange={(e) => setFormData({...formData, agencyCity: e.target.value})}
+                                    />
+                                </div>
+                            )}
                         </div>
+                    </CardContent>
+                </Card>
 
-                        <div>
-                            <Label>Şehir</Label>
-                            <Input
-                                value={formData.city}
-                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label>Faaliyet/Merkez Şehri</Label>
-                            <Select
-                                value={formData.agencyCity}
-                                onValueChange={(value) => setFormData({ ...formData, agencyCity: value })}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Şehir seçiniz" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {cities.map((cityName) => (
-                                        <SelectItem key={cityName} value={cityName}>
-                                            {cityName}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                {/* Rehber / Acente Ekstra Bilgiler */}
+                {(isGuide || isOrganization) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Mesleki Detaylar (Güven Artırıcılar)</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {isOrganization && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>TÜRSAB Belge Numarası</Label>
+                                        <Input 
+                                            placeholder="Örn: 12345" 
+                                            value={formData.tursabNumber}
+                                            onChange={(e) => setFormData({...formData, tursabNumber: e.target.value})}
+                                        />
+                                        <p className="text-xs text-muted-foreground">TÜRSAB numarası onaylı işletmeler platformda Trust Score avantajı kazanır.</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Kuruluş Yılı</Label>
+                                        <Input 
+                                            type="number"
+                                            placeholder="Örn: 2010" 
+                                            value={formData.establishmentYear}
+                                            onChange={(e) => setFormData({...formData, establishmentYear: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                            )}
 
-                        <div>
-                            <Label>Hakkında (Biyografi)</Label>
-                            <Textarea
-                                rows={4}
-                                value={formData.bio}
-                                placeholder="Kendinizi ve tecrübelerinizi tanıtın..."
-                                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                                required
-                            />
-                        </div>
+                            {isGuide && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label>Tecrübe Yılı</Label>
+                                        <Input 
+                                            type="number"
+                                            placeholder="Örn: 8" 
+                                            value={formData.experienceYears}
+                                            onChange={(e) => setFormData({...formData, experienceYears: e.target.value})}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Konuşulan Diller (Virgülle Ayırın)</Label>
+                                        <Input 
+                                            placeholder="Türkçe, Arapça, İngilizce" 
+                                            value={formData.languagesSpoken}
+                                            onChange={(e) => setFormData({...formData, languagesSpoken: e.target.value})}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label>Uzmanlık Alanları (Virgülle Ayırın)</Label>
+                                        <Input 
+                                            placeholder="Mekke Tarihi, Hac İrşad, Engelli Birey Refakati" 
+                                            value={formData.specialties}
+                                            onChange={(e) => setFormData({...formData, specialties: e.target.value})}
+                                        />
+                                    </div>
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label>Video Tanıtım Linki (Youtube - Opsiyonel)</Label>
+                                        <Input 
+                                            placeholder="https://youtube.com/watch?v=..." 
+                                            value={formData.videoIntroduction}
+                                            onChange={(e) => setFormData({...formData, videoIntroduction: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
 
-
-
-                        <div className="pt-4">
-                            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={saving}>
-                                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                                {saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
-                            </Button>
-                        </div>
-                    </form>
+                <div className="flex justify-end gap-4 mt-8 pb-10">
+                    <Button variant="outline" onClick={() => window.history.back()}>İptal</Button>
+                    <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+                        {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {saving ? 'Kaydediliyor...' : 'Vitrin Bilgilerini Kaydet'}
+                    </Button>
                 </div>
             </div>
         </DashboardLayout>

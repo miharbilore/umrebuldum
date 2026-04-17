@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, Settings, UserPen, Eye } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -63,9 +63,21 @@ export function UserMenu() {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                    <Link href={`/rehber/${session.user.id}-profil`} className="cursor-pointer">
+                        <Eye className="mr-2 h-4 w-4" />
+                        <span>Açık Profilimi Gör</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link href={session.user.role === "ADMIN" ? "/admin/settings" : "/dashboard/profile"} className="cursor-pointer">
+                        <UserPen className="mr-2 h-4 w-4" />
+                        <span>Profilimi Düzenle</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                     <Link href={session.user.role === "ADMIN" ? "/admin/settings" : "/dashboard/settings"} className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>Ayarlar</span>
+                        <span>Hesap Ayarları</span>
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

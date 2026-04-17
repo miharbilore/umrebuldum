@@ -103,6 +103,10 @@ model User {
   agencyCity         String?
   bio                String? @db.Text
   photo              String?
+  coverImage         String?
+  tursabNumber       String?
+  establishmentYear  Int?
+  socialLinks        Json?
 
   trustScore        Int       @default(50)
   trustScoreVersion Int       @default(0)
@@ -169,6 +173,11 @@ model GuideProfile {
 
   averageRating Decimal @default(0.0) @db.Decimal(3, 2)
   reviewCount   Int     @default(0)
+
+  languagesSpoken   Json?
+  experienceYears   Int?
+  specialties       Json?
+  videoIntroduction String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

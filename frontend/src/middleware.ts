@@ -1,27 +1,23 @@
 import { NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
+import { auth } from "@/lib/auth"
 
-export default async function middleware(req: any) {
+export default auth((req) => {
     const { nextUrl } = req
-    const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
-    const isApiRoute = nextUrl.pathname.startsWith("/api");
-    const isStaticAsset = nextUrl.pathname.startsWith("/_next") || nextUrl.pathname.includes(".");
+    const isLoggedIn = !!req.auth
+    const user = req.auth?.user
+    const role = user?.role
 
+    const isApiRoute = nextUrl.pathname.startsWith("/api")
+    const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth")
+    const isStaticAsset = nextUrl.pathname.startsWith("/_next") || nextUrl.pathname.includes(".")
+
+    // 1. Auth API routes and static assets should never be intercepted by the guard logic
     if (isApiAuthRoute || isStaticAsset) {
-        return null;
+        return NextResponse.next()
     }
-
-    const token = await getToken({
-        req,
-        secret: process.env.AUTH_SECRET,
-    });
-
-    const isLoggedIn = !!token
-    const role = token?.role;
 
     const onboardingPath = "/onboarding"
     const loginPath = "/login"
-
 
     const publicRoutes = [
         "/", "/login", "/register", "/about", "/contact", "/faq",
@@ -36,36 +32,35 @@ export default async function middleware(req: any) {
     const isAuthRoute = nextUrl.pathname === loginPath;
     const isOnboardingRoute = nextUrl.pathname === onboardingPath;
 
-    // API routes
+    // 2. API Routes Protection
     if (isApiRoute) {
         if (nextUrl.pathname.startsWith('/api/admin')) {
             if (!isLoggedIn || role !== 'ADMIN') {
                 return new NextResponse(
                     JSON.stringify({ error: "Forbidden", code: "FORBIDDEN" }),
-                    { status: 403 }
+                    { status: 403, headers: { "Content-Type": "application/json" } }
                 );
             }
         }
-        return null;
+        return NextResponse.next()
     }
 
-
-    // Logged-in
-    if (isLoggedIn) {
+    // 3. Logged-in State Logic
+    if (isLoggedIn && user) {
         const isBanned = role === "BANNED";
 
         if (isBanned) {
-            if (isPublicRoute || isPublicBrowsing) return null;
+            if (isPublicRoute || isPublicBrowsing) return NextResponse.next();
             return NextResponse.redirect(new URL("/", nextUrl));
         }
 
         // Force onboarding if role is missing, or phone is missing/empty
-        const noPhone = !token.phone || String(token.phone).trim() === "";
+        const noPhone = !user.phone || String(user.phone).trim() === "";
         const needsOnboarding = !role || noPhone;
 
         if (needsOnboarding) {
-            if (isOnboardingRoute) return null;
-            if (isPublicRoute || isPublicBrowsing) return null;
+            if (isOnboardingRoute || isApiRoute) return NextResponse.next();
+            if (isPublicRoute || isPublicBrowsing) return NextResponse.next();
             return NextResponse.redirect(new URL(onboardingPath, nextUrl));
         }
 
@@ -75,20 +70,24 @@ export default async function middleware(req: any) {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
 
+        // Logged in users shouldn't see the login page
         if (isAuthRoute) {
             if (role === "ADMIN") return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
 
+        // Admin checks
         if (nextUrl.pathname.startsWith("/admin") && role !== "ADMIN") {
             return NextResponse.redirect(new URL("/", nextUrl));
         }
 
+        // Dashboard/Settings exception for admins
         if (nextUrl.pathname.startsWith("/dashboard") && role === "ADMIN") {
-            if (nextUrl.pathname === "/dashboard/settings") return null;
+            if (nextUrl.pathname === "/dashboard/settings") return NextResponse.next();
             return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
         }
 
+        // Role-based path protection
         if (nextUrl.pathname.startsWith("/guide") && role !== "GUIDE" && role !== "ORGANIZATION") {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
@@ -97,15 +96,18 @@ export default async function middleware(req: any) {
             return NextResponse.redirect(new URL("/dashboard", nextUrl));
         }
     }
-
-    // Guest
+    // 4. Guest Logic
     else {
-        if (isPublicRoute || isPublicBrowsing) return null;
-        return NextResponse.redirect(new URL(loginPath, nextUrl));
+        if (isPublicRoute || isPublicBrowsing) return NextResponse.next();
+        
+        // Redirect to login if trying to access protected content
+        const searchParams = new URLSearchParams(nextUrl.search);
+        searchParams.set("callbackUrl", nextUrl.pathname);
+        return NextResponse.redirect(new URL(`${loginPath}?${searchParams.toString()}`, nextUrl));
     }
 
-    return null;
-}
+    return NextResponse.next()
+})
 
 export const config = {
     matcher: ["/((?!.+\\.[\\w]+$|_next).*)"],

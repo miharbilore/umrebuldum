@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -69,8 +69,8 @@ export default function SettingsPage() {
                 {/* Profile Settings */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Profil Ayarları</CardTitle>
-                        <CardDescription>Kişisel bilgilerinizi ve profil görünümünüzü yönetin.</CardDescription>
+                        <CardTitle>Hesap Bilgileri</CardTitle>
+                        <CardDescription>Sisteme giriş yaptığınız ve iletişim için kullandığınız temel bilgileriniz.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
