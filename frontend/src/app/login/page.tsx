@@ -61,8 +61,7 @@ export default function LoginPage() {
                 }
             } else {
                 toast.success("Giriş başarılı!")
-                router.push("/dashboard")
-                router.refresh()
+                window.location.href = "/dashboard"
             }
         } catch (error) {
             toast.error("Bir hata oluştu.")

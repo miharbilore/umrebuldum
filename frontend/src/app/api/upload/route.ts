@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { auth } from "@/lib/auth";
@@ -6,6 +6,11 @@ import { requireAuth } from "@/lib/api-guards";
 import { rateLimit } from "@/lib/rate-limit";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { uploadToVault } from "@/lib/s3-client";
+import sharp from "sharp";
+
+// ── Image Optimization Config ─────────────────────────────────────────────
+const TARGET_SIZE = 400;
+const WEBP_QUALITY = 80;
 
 // ── Security constants ──────────────────────────────────────────────────────
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -61,6 +66,32 @@ function sanitizeFilename(raw: string): string {
         .substring(0, 200);            // cap length
 }
 
+/** 
+ * Optimizes an image buffer using Sharp. 
+ * Target: 400x400 center crop, WebP format.
+ */
+async function optimizeImage(buffer: Buffer, skipCrop: boolean = false): Promise<{ buffer: Buffer; extension: string }> {
+    try {
+        let pipeline = sharp(buffer);
+        
+        if (!skipCrop) {
+            pipeline = pipeline.resize(TARGET_SIZE, TARGET_SIZE, {
+                fit: "cover",
+                position: "center"
+            });
+        }
+
+        const optimizedBuffer = await pipeline
+            .webp({ quality: WEBP_QUALITY })
+            .toBuffer();
+
+        return { buffer: optimizedBuffer, extension: ".webp" };
+    } catch (err) {
+        console.warn("[Sharp Fallback] Optimization failed, using original:", err);
+        return { buffer, extension: "" }; // Empty extension means keep original
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
@@ -80,6 +111,7 @@ export async function POST(req: Request) {
 
         const formData = await req.formData();
         const file = formData.get("file") as File;
+        const intent = formData.get("intent") as string;
 
         if (!file) {
             return NextResponse.json({ error: "No file received." }, { status: 400 });
@@ -101,7 +133,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+        let buffer = Buffer.from(await file.arrayBuffer());
 
         // VULN-8c: Deep magic-byte validation — prevent MIME spoofing
         const detectedType = detectMimeFromBytes(buffer);
@@ -112,14 +144,26 @@ export async function POST(req: Request) {
             );
         }
 
+        // ── IMAGE OPTIMIZATION (SHARP) ───────────────────────────────────────
+        // Skip cropping for KYC (Passport/ID) to preserve vital information
+        const skipCrop = intent === "kyc";
+        const result = await optimizeImage(buffer, skipCrop);
+        const finalBuffer = result.buffer;
+        
         // VULN-8c: Sanitize filename — prevent path traversal
-        const sanitized = sanitizeFilename(file.name);
+        let sanitized = sanitizeFilename(file.name);
+        
+        // Use .webp extension if optimized
+        if (result.extension === ".webp") {
+            const extPos = sanitized.lastIndexOf(".");
+            const baseName = extPos > 0 ? sanitized.substring(0, extPos) : sanitized;
+            sanitized = `${baseName}.webp`;
+        }
 
         // Vault Upload Branch (Private KYC)
-        const intent = formData.get("intent") as string;
         if (intent === "kyc") {
             const vaultKey = `kyc/${session!.user.id}/${Date.now()}_${sanitized}`;
-            await uploadToVault(vaultKey, buffer, file.type);
+            await uploadToVault(vaultKey, finalBuffer, result.extension === ".webp" ? "image/webp" : file.type);
 
             return NextResponse.json({
                 success: true,
@@ -140,7 +184,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
         }
 
-        await writeFile(filePath, buffer);
+        await writeFile(filePath, finalBuffer);
 
         return NextResponse.json({
             success: true,

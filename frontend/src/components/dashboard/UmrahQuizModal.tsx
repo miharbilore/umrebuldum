@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
+    DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -124,6 +126,8 @@ export function UmrahQuizModal({ isOpen, onClose }: UmrahQuizModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[480px] border-none bg-white p-0 overflow-hidden rounded-[2rem] shadow-2xl transition-all">
+                <DialogTitle className="sr-only">Umre Mini Sınavı Dialog</DialogTitle>
+                <DialogDescription className="sr-only">Umre bilginizi tazeleyerek token kazanabileceğiniz mini sınav arayüzü</DialogDescription>
                 {step === "intro" && (
                     <div className="p-8 text-center bg-gradient-to-b from-blue-50/50 to-white">
                         <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-200">

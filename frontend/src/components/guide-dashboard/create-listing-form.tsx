@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { categoryImages } from "@/lib/categoryImages";
+import { cities } from "@/lib/data/cities";
 
 export function CreateListingForm() {
     const router = useRouter();
@@ -35,24 +36,37 @@ export function CreateListingForm() {
     const [selectedPredefinedImage, setSelectedPredefinedImage] = useState<string | undefined>(undefined);
     const [customImageFile, setCustomImageFile] = useState<File | null>(null);
     const [customImagePreview, setCustomImagePreview] = useState<string | null>(null);
+    const [departureCities, setDepartureCities] = useState<Array<{ id: string; name: string; airport: string }>>([]);
 
     useEffect(() => {
         let isMounted = true;
 
-        const fetchCategories = async () => {
+        const fetchData = async () => {
             try {
-                const res = await fetch("/api/listing-categories");
-                if (!res.ok) return;
-                const data = await res.json();
-                if (isMounted && Array.isArray(data?.data)) {
-                    setCategories(data.data);
+                const [catRes, cityRes] = await Promise.all([
+                    fetch("/api/listing-categories"),
+                    fetch("/api/departure-cities")
+                ]);
+
+                if (catRes.ok) {
+                    const catData = await catRes.json();
+                    if (isMounted && Array.isArray(catData?.data)) {
+                        setCategories(catData.data);
+                    }
+                }
+                
+                if (cityRes.ok) {
+                    const cityData = await cityRes.json();
+                    if (isMounted && Array.isArray(cityData)) {
+                        setDepartureCities(cityData);
+                    }
                 }
             } catch (err) {
-                console.error("Kategori listesi alınamadı:", err);
+                console.error("Veriler alınamadı:", err);
             }
         };
 
-        fetchCategories();
+        fetchData();
         return () => {
             isMounted = false;
         };
@@ -250,22 +264,31 @@ export function CreateListingForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                        <label className="block text-sm font-medium mb-1">Kalkış Şehri</label>
+                        <Select value={departureCity} onValueChange={setDepartureCity} required>
+                            <SelectTrigger className="min-h-11">
+                                <SelectValue placeholder="Seçiniz" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {departureCities.length === 0 ? (
+                                    <SelectItem value="loading" disabled>Yükleniyor...</SelectItem>
+                                ) : (
+                                    departureCities.map((city) => (
+                                        <SelectItem key={city.id} value={city.name}>
+                                            {city.name}
+                                        </SelectItem>
+                                    ))
+                                )}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium mb-1">Rehber Şehri (Konum)</label>
                         <Input
                             className="min-h-11"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
                             placeholder="Örn: Mekke / Medine"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Kalkış Şehri</label>
-                        <Input
-                            className="min-h-11"
-                            value={departureCity}
-                            onChange={(e) => setDepartureCity(e.target.value)}
-                            placeholder="Örn: İstanbul"
                             required
                         />
                     </div>

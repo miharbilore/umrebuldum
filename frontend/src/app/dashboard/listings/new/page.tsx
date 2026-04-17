@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -41,6 +41,7 @@ export default function NewListingPage() {
     // Dynamic Data State
     const [airlines, setAirlines] = useState<any[]>([]);
     const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
+    const [departureCities, setDepartureCities] = useState<Array<{ id: string; name: string; airport: string }>>([]);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -73,15 +74,22 @@ export default function NewListingPage() {
     useEffect(() => {
         const fetchFormData = async () => {
             try {
-                const [airlinesRes, categoriesRes] = await Promise.all([
+                const [airlinesRes, categoriesRes, cityRes] = await Promise.all([
                     fetch('/api/airlines'),
-                    fetch('/api/listing-categories')
+                    fetch('/api/listing-categories'),
+                    fetch('/api/departure-cities')
                 ]);
                 if (airlinesRes.ok) setAirlines(await airlinesRes.json());
                 if (categoriesRes.ok) {
                     const data = await categoriesRes.json();
                     if (Array.isArray(data?.data)) {
                         setCategories(data.data);
+                    }
+                }
+                if (cityRes.ok) {
+                    const cityData = await cityRes.json();
+                    if (Array.isArray(cityData)) {
+                        setDepartureCities(cityData);
                     }
                 }
             } catch (err) {
@@ -246,11 +254,15 @@ export default function NewListingPage() {
                                     <Select onValueChange={(v) => handleSelectChange("departureCityId", v)}>
                                         <SelectTrigger><SelectValue placeholder="Seçiniz" /></SelectTrigger>
                                         <SelectContent>
-                                            {cities.map((cityName) => (
-                                                <SelectItem key={cityName} value={cityName}>
-                                                    {cityName}
-                                                </SelectItem>
-                                            ))}
+                                            {departureCities.length === 0 ? (
+                                                <SelectItem value="loading" disabled>Yükleniyor...</SelectItem>
+                                            ) : (
+                                                departureCities.map((city) => (
+                                                    <SelectItem key={city.id} value={city.name}>
+                                                        {city.name}
+                                                    </SelectItem>
+                                                ))
+                                            )}
                                         </SelectContent>
                                     </Select>
                                 </div>

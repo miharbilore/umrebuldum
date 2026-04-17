@@ -322,6 +322,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             title,
             description,
             city,
+            departureCity,
             quota,
             departureCityId,
             meetingCity,
@@ -338,7 +339,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             category,
         } = body;
 
-        if (!title || !departureCityId) {
+        if (!title || (!departureCityId && !departureCity)) {
             throw new AppError("Eksik alanlar mevcut.", ERROR_CODES.INVALID_QUERY, 400);
         }
         if (!legalConsent) {
@@ -371,16 +372,20 @@ export const POST = withErrorHandler(async (req: Request) => {
         });
         if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        const sanitizedDepartureCity = sanitizeCityName(String(departureCityId || "")) || "";
-        const departureCityRecord = await prisma.departureCity.findFirst({
+        const sanitizedDepartureCity = sanitizeCityName(String(departureCity || departureCityId || "")) || "";
+        
+        let departureCityRecord = await prisma.departureCity.findFirst({
             where: {
                 OR: [
                     { id: sanitizedDepartureCity },
-                    { name: { equals: sanitizedDepartureCity } }
+                    { name: sanitizedDepartureCity }
                 ]
             }
         });
-        if (!departureCityRecord) return NextResponse.json({ error: "Invalid Departure City" }, { status: 400 });
+
+        if (!departureCityRecord) {
+            return NextResponse.json({ error: "Lütfen listeden geçerli bir kalkış şehri seçiniz." }, { status: 400 });
+        }
 
         // Upsert GuideProfile just to ensure relation exists, data is managed in User
         await prisma.guideProfile.upsert({

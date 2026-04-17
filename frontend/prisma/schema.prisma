@@ -1,6 +1,3 @@
-// Prisma Schema for UmreBuldum Marketplace
-// Production-Ready Clean Version
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,127 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── ENUMS (Single Source of Truth) ─────────
-enum PackageTier {
-  FREEMIUM
-  PREMIUM
-  PLUS
-  PRO
-  BUSINESS
-  BUSINESS_PLUS
-}
-
-enum UserRole {
-  USER
-  GUIDE
-  ORGANIZATION
-  ADMIN
-  BANNED
-}
-
-enum ApprovalStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum TransactionStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-}
-
-enum PaymentProvider {
-  STRIPE
-  PAYTR
-  IYZICO
-}
-
-enum LedgerEntryType {
-  PURCHASE
-  CONSUME
-  REFUND
-  ADJUSTMENT
-}
-
-// ─── CORE MODELS ─────────────────────────────────────────────
-
 model User {
-  id                     String    @id @default(cuid())
+  id                     String                @id @default(cuid())
   name                   String?
-  email                  String?   @unique
+  email                  String?               @unique
   emailVerified          DateTime?
   image                  String?
   passwordHash           String?
-  role                   UserRole  @default(USER)
+  phone                  String?               @unique
+  role                   UserRole              @default(USER)
   previousRole           UserRole?
-  phone                  String?   @unique
+  packageType            PackageTier           @default(FREEMIUM)
+  packageExpiry          DateTime?
+  isApproved             Boolean               @default(false)
+  isVerified             Boolean               @default(false)
+  contactConsent         Boolean               @default(false)
   verificationCode       String?
   verificationExpiry     DateTime?
-  isVerified             Boolean   @default(false)
-  isPhoneVerified        Boolean   @default(false)
-  contactConsent         Boolean   @default(false)
+  fullName               String?
+  city                   String?               @default("İstanbul")
+  bio                    String?               @db.Text
+  photo                  String?
+  trustScore             Int                   @default(50)
+  completedTrips         Int                   @default(0)
+  isMuted                Boolean               @default(false)
+  mutedUntil             DateTime?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  tokenBalance           Int                   @default(0) @map("availableBalance")
+  avgResponseHours       Float                 @default(24)
+  isIdentityVerified     Boolean               @default(false)
+  lastPlanChangeAt       DateTime?
+  planFreezeUntil        DateTime?
+  trustScoreVersion      Int                   @default(0)
+  isTwoFactorEnabled     Boolean               @default(false)
   twoFactorSecret        String?
-  isTwoFactorEnabled     Boolean   @default(false)
   twoFactorRecoveryCodes Json?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-
-  accounts           Account[]
-  sessions           Session[]
-  guideProfile       GuideProfile?
-  stripeTransactions Transaction[]
-
-  // Chat Relations
-  guideConversations Conversation[] @relation("GuideConversations")
-  userConversations  Conversation[] @relation("UserConversations")
-  messages           Message[]
-  offers             Offer[]
-
-  // --- Token Account (unified balance) ---
-  tokenBalance     Int         @default(0) @map("availableBalance")
-  packageType      PackageTier @default(FREEMIUM)
-  packageExpiry    DateTime?
-  lastPlanChangeAt DateTime?
-  planFreezeUntil  DateTime?
-
-  // --- SSOT Identity & Profile ---
-  isIdentityVerified Boolean @default(false)
-  isApproved         Boolean @default(false)
-  fullName           String?
-  city               String? @default("İstanbul")
-  agencyCity         String?
-  bio                String? @db.Text
-  photo              String?
-  coverImage         String?
-  tursabNumber       String?
-  establishmentYear  Int?
-  socialLinks        Json?
-
-  trustScore        Int       @default(50)
-  trustScoreVersion Int       @default(0)
-  completedTrips    Int       @default(0)
-  avgResponseHours  Float     @default(24.0)
-  isMuted           Boolean   @default(false)
-  mutedUntil        DateTime?
-
-  tokenTransactions    TokenTransaction[]
-  activeBoosts         ActiveBoost[]
-  identityApplications IdentityApplication[]
-  reviewsReceived      Review[]              @relation("GuideReviews")
-  reviewsGiven         Review[]              @relation("UserReviews")
-  riskScore            RiskScore?
-  autoReplenish        AutoReplenishConfig?
-  creditLine           EnterpriseCreditLine?
-  performanceTier      PerformanceTier?
-  savedCards           SavedCard[]
-  notifications        Notification[]
-  
-  // Quiz Module
-  hasCompletedQuiz   Boolean   @default(false)
-  quizAttempts       Int       @default(0)
-  lastQuizAttempt    DateTime?
+  isPhoneVerified        Boolean               @default(false)
+  agencyCity             String?
+  hasCompletedQuiz       Boolean               @default(false)
+  lastQuizAttempt        DateTime?
+  quizAttempts           Int                   @default(0)
+  coverImage             String?
+  establishmentYear      Int?
+  socialLinks            Json?
+  tursabNumber           String?
+  accounts               Account[]
+  activeBoosts           ActiveBoost[]
+  autoReplenish          AutoReplenishConfig?
+  guideConversations     Conversation[]        @relation("GuideConversations")
+  userConversations      Conversation[]        @relation("UserConversations")
+  creditLine             EnterpriseCreditLine?
+  guideProfile           GuideProfile?
+  identityApplications   IdentityApplication[]
+  messages               Message[]
+  notifications          Notification[]
+  offers                 Offer[]
+  performanceTier        PerformanceTier?
+  reviewsReceived        Review[]              @relation("GuideReviews")
+  reviewsGiven           Review[]              @relation("UserReviews")
+  riskScore              RiskScore?
+  savedCards             SavedCard[]
+  sessions               Session[]
+  tokenTransactions      TokenTransaction[]
+  stripeTransactions     Transaction[]
 
   @@map("users")
 }
@@ -151,6 +91,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId], map: "accounts_userId_fkey")
   @@map("accounts")
 }
 
@@ -161,29 +102,25 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "sessions_userId_fkey")
   @@map("sessions")
 }
 
 model GuideProfile {
-  id     String @id @default(cuid())
-  userId String @unique
-
-  quotaTarget  Int @default(100)
-  currentCount Int @default(0)
-
-  averageRating Decimal @default(0.0) @db.Decimal(3, 2)
-  reviewCount   Int     @default(0)
-
-  languagesSpoken   Json?
+  id                String         @id @default(cuid())
+  userId            String         @unique
+  quotaTarget       Int            @default(100)
+  currentCount      Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  averageRating     Decimal        @default(0.00) @db.Decimal(3, 2)
+  reviewCount       Int            @default(0)
   experienceYears   Int?
+  languagesSpoken   Json?
   specialties       Json?
   videoIntroduction String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  listings GuideListing[]
+  listings          GuideListing[]
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("guide_profiles")
 }
@@ -208,130 +145,118 @@ model Airline {
 }
 
 model GuideListing {
-  id          String @id @default(cuid())
-  guideId     String
-  title       String
-  description String @db.Text
-  city        String
-  category    String?
-  categoryRef ListingCategory? @relation(fields: [category], references: [slug])
-
-  departureCityId String?
-  departureCity   DepartureCity? @relation(fields: [departureCityId], references: [id])
-
-  meetingCity   String?
-  extraServices Json     @default("[]")
-  hotelName     String?
-  airlineId     String?
-  airline       Airline? @relation(fields: [airlineId], references: [id])
-
-  // Pricing fields (Converted to Decimal for safe monetary math)
-  pricingDouble   Decimal @default(0) @db.Decimal(10, 2)
-  pricingTriple   Decimal @default(0) @db.Decimal(10, 2)
-  pricingQuad     Decimal @default(0) @db.Decimal(10, 2)
-  pricingCurrency String  @default("SAR")
-
-  quota            Int       @default(30)
-  filled           Int       @default(0)
-  active           Boolean   @default(true)
-  deletedAt        DateTime?
-  isFeatured       Boolean   @default(false)
-  startDate        DateTime
-  departureDateEnd DateTime?
-  endDate          DateTime
-  returnDateEnd    DateTime?
-  totalDays        Int       @default(10)
-
-  approvalStatus   ApprovalStatus @default(PENDING)
-  rejectionReason  String?        @db.Text
-  urgencyTag       String?
-  legalConsent     Boolean        @default(false)
-  consentTimestamp DateTime?
-  image            String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-
-  guide             GuideProfile         @relation(fields: [guideId], references: [userId], onDelete: Cascade)
-  tourDays          TourDay[]
+  id                String               @id @default(cuid())
+  guideId           String
+  title             String
+  description       String               @db.Text
+  city              String
+  departureCityId   String?
+  meetingCity       String?
+  extraServices     Json
+  hotelName         String?
+  airlineId         String?
+  pricingDouble     Decimal              @default(0.00) @db.Decimal(10, 2)
+  pricingTriple     Decimal              @default(0.00) @db.Decimal(10, 2)
+  pricingQuad       Decimal              @default(0.00) @db.Decimal(10, 2)
+  pricingCurrency   String               @default("SAR")
+  quota             Int                  @default(30)
+  filled            Int                  @default(0)
+  active            Boolean              @default(true)
+  deletedAt         DateTime?
+  isFeatured        Boolean              @default(false)
+  startDate         DateTime
+  departureDateEnd  DateTime?
+  endDate           DateTime
+  returnDateEnd     DateTime?
+  totalDays         Int                  @default(10)
+  approvalStatus    ApprovalStatus       @default(PENDING)
+  rejectionReason   String?              @db.Text
+  urgencyTag        String?
+  legalConsent      Boolean              @default(false)
+  consentTimestamp  DateTime?
+  image             String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  category          String?
   activeBoosts      ActiveBoost[]
+  airline           Airline?             @relation(fields: [airlineId], references: [id])
+  categoryRef       ListingCategory?     @relation(fields: [category], references: [slug])
+  departureCity     DepartureCity?       @relation(fields: [departureCityId], references: [id])
+  guide             GuideProfile         @relation(fields: [guideId], references: [userId], onDelete: Cascade)
   boostCounter      ListingBoostCounter?
-  ListingImpression ListingImpression[]
   ListingClick      ListingClick[]
+  ListingImpression ListingImpression[]
   seoMeta           ListingSeo?
+  tourDays          TourDay[]
 
   @@index([guideId])
   @@index([approvalStatus, active])
   @@index([departureCityId])
   @@index([startDate, endDate])
   @@index([category])
-  @@index([deletedAt]) // Added index for soft deletes
+  @@index([deletedAt])
+  @@index([airlineId], map: "guide_listings_airlineId_fkey")
   @@map("guide_listings")
 }
 
 model ListingCategory {
-  slug        String @id
+  slug        String         @id
   name        String
-  description String? @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  listings GuideListing[]
+  description String?        @db.Text
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  listings    GuideListing[]
 
   @@map("listing_categories")
 }
 
 model ListingSeo {
-  listingId String @id
+  listingId String       @id
   city      String?
   duration  Int?
   hotelType String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  listing   GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([city])
   @@map("listing_seo")
 }
 
 model TourDay {
-  id          String @id @default(cuid())
+  id          String       @id @default(cuid())
   listingId   String
   day         Int
   city        String
-  title       String @default("")
-  description String @db.Text
-
-  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  title       String       @default("")
+  description String       @db.Text
+  listing     GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([listingId])
   @@map("tour_days")
 }
 
 model UmrahRequest {
-  id            String   @id @default(cuid())
-  userEmail     String
-  departureCity String
-  peopleCount   Int
-  dateRange     String
-  roomType      String   @default("4-kisilik")
-  budget        Decimal? @db.Decimal(10, 2)
-  note          String?  @db.Text
-
-  contactViaEmail Boolean @default(false)
-  contactViaPhone Boolean @default(false)
-  contactViaChat  Boolean @default(true)
-
-  createdAt DateTime  @default(now())
-  status    String    @default("open")
-  deletedAt DateTime?
-
-  interests     RequestInterest[]
-  favorites     RequestFavorite[]
-  conversations Conversation[]
-  reviews       Review[]          @relation("DemandReviews")
-  routingLog    LeadRoutingLog?
-  offers        Offer[]
+  id              String            @id @default(cuid())
+  userEmail       String
+  departureCity   String
+  peopleCount     Int
+  dateRange       String
+  roomType        String            @default("4-kisilik")
+  budget          Decimal?          @db.Decimal(10, 2)
+  note            String?           @db.Text
+  contactViaEmail Boolean           @default(false)
+  contactViaPhone Boolean           @default(false)
+  contactViaChat  Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  status          String            @default("open")
+  deletedAt       DateTime?
+  conversations   Conversation[]
+  routingLog      LeadRoutingLog?
+  offers          Offer[]
+  favorites       RequestFavorite[]
+  interests       RequestInterest[]
+  reviews         Review[]          @relation("DemandReviews")
 
   @@index([userEmail])
   @@index([status])
@@ -340,30 +265,28 @@ model UmrahRequest {
 }
 
 model LeadRoutingLog {
-  id             String   @id @default(cuid())
-  requestId      String   @unique
-  currentWave    Int      @default(1)
-  status         String   @default("ROUTING")
-  offersReceived Int      @default(0)
-  dispatchedTo   Json     @default("[]")
+  id             String       @id @default(cuid())
+  requestId      String       @unique
+  currentWave    Int          @default(1)
+  status         String       @default("ROUTING")
+  offersReceived Int          @default(0)
+  dispatchedTo   Json
   nextWaveAt     DateTime
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  request UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  request        UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@index([status, nextWaveAt])
   @@map("lead_routing_logs")
 }
 
 model RequestInterest {
-  id         String   @id @default(cuid())
+  id         String       @id @default(cuid())
   requestId  String
   guideEmail String
   threadId   String?
-  createdAt  DateTime @default(now())
-
-  request UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now())
+  request    UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@unique([requestId, guideEmail])
   @@index([guideEmail])
@@ -371,19 +294,18 @@ model RequestInterest {
 }
 
 model Offer {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   guideId   String
   requestId String
-  price     Decimal  @db.Decimal(10, 2)
-  currency  String   @default("SAR")
-  message   String?  @db.Text
-  status    String   @default("pending")
+  price     Decimal      @db.Decimal(10, 2)
+  currency  String       @default("SAR")
+  message   String?      @db.Text
+  status    String       @default("pending")
   expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  guide   User         @relation(fields: [guideId], references: [id], onDelete: Cascade)
-  request UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  guide     User         @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  request   UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@unique([guideId, requestId])
   @@index([guideId])
@@ -393,29 +315,27 @@ model Offer {
 }
 
 model RequestFavorite {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   requestId String
   userId    String
-  createdAt DateTime @default(now())
-
-  request UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+  request   UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
 
   @@unique([requestId, userId])
   @@map("request_favorites")
 }
 
 model Conversation {
-  id            String   @id @default(cuid())
-  requestId     String
+  id            String       @id @default(cuid())
   guideId       String
   userId        String
-  createdAt     DateTime @default(now())
-  lastMessageAt DateTime @default(now())
-
-  request  UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  guide    User         @relation("GuideConversations", fields: [guideId], references: [id], onDelete: Cascade)
-  user     User         @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  createdAt     DateTime     @default(now())
+  lastMessageAt DateTime     @default(now())
+  requestId     String
+  guide         User         @relation("GuideConversations", fields: [guideId], references: [id], onDelete: Cascade)
+  request       UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user          User         @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
+  messages      Message[]
 
   @@unique([requestId, guideId])
   @@index([userId])
@@ -424,21 +344,20 @@ model Conversation {
 }
 
 model Message {
-  id             String   @id @default(cuid())
+  id             String          @id @default(cuid())
   conversationId String
   senderId       String
   role           UserRole
-  body           String   @db.Text
-  blocked        Boolean  @default(false)
-  createdAt      DateTime @default(now())
-
+  body           String          @db.Text
+  blocked        Boolean         @default(false)
+  createdAt      DateTime        @default(now())
   conversation   Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
   moderationLogs ModerationLog[]
 
   @@index([conversationId])
   @@index([senderId])
-  @@index([createdAt]) // Added for performance
+  @@index([createdAt])
   @@map("messages")
 }
 
@@ -447,8 +366,7 @@ model ModerationLog {
   messageId String
   reason    String
   createdAt DateTime @default(now())
-
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@index([messageId])
   @@map("moderation_logs")
@@ -457,14 +375,14 @@ model ModerationLog {
 model CreditPackage {
   id            String   @id @default(cuid())
   name          String
-  slug          String   @default("FREEMIUM")
   credits       Int
   priceTRY      Decimal  @db.Decimal(10, 2)
-  monthlyPrice  Decimal  @default(0) @db.Decimal(10, 2)
+  features      Json
   billingPeriod Int      @default(1)
+  monthlyPrice  Decimal  @default(0.00) @db.Decimal(10, 2)
   roleTarget    UserRole @default(GUIDE)
+  slug          String   @default("FREEMIUM")
   sortOrder     Int      @default(0)
-  features      Json     @default("{}")
 
   @@unique([slug, billingPeriod, roleTarget])
   @@map("credit_packages")
@@ -493,11 +411,10 @@ model Transaction {
   provider    PaymentProvider   @default(IYZICO)
   status      TransactionStatus @default(PENDING)
   sessionId   String?
-  providerRef String?
-  metadata    Json?
   createdAt   DateTime          @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata    Json?
+  providerRef String?
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([sessionId])
@@ -517,77 +434,72 @@ model SavedCard {
   expiryYear  Int
   isDefault   Boolean         @default(false)
   createdAt   DateTime        @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, cardToken])
   @@index([userId])
   @@map("saved_cards")
 }
 
-// ÔöÇÔöÇÔöÇ Token Economy (Single Ledger) ÔöÇÔöÇÔöÇ
-
 model TokenTransaction {
   id              String          @id @default(cuid())
   userId          String?
-  accountId       String          @default("SYSTEM")
-  counterpartyId  String          @default("SYSTEM")
   entryType       LedgerEntryType
   amount          Int
   referenceId     String?
   idempotencyKey  String
   adminId         String?
   reasonCode      String?
+  createdAt       DateTime        @default(now())
   expiresAt       DateTime?
   remainingAmount Int?
-  createdAt       DateTime        @default(now())
+  accountId       String          @default("SYSTEM")
+  counterpartyId  String          @default("SYSTEM")
+  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([idempotencyKey, userId]) // Fixed idempotency risk
+  @@unique([idempotencyKey, userId])
   @@index([accountId])
   @@index([userId, createdAt])
+  @@index([userId])
   @@map("token_ledger_entries")
 }
 
 model AutoReplenishConfig {
-  id              String    @id @default(cuid())
-  userId          String    @unique
-  status          String    @default("ACTIVE")
-  threshold       Int       @default(20)
-  packageId       String    @default("medium")
-  monthlyCap      Int       @default(500)
-  monthlySpent    Int       @default(0)
-  monthlyResetAt  DateTime  @default(now())
-  cooldownMinutes Int       @default(60)
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  status          String              @default("ACTIVE")
+  threshold       Int                 @default(20)
+  packageId       String              @default("medium")
+  monthlyCap      Int                 @default(500)
+  monthlySpent    Int                 @default(0)
+  monthlyResetAt  DateTime            @default(now())
+  cooldownMinutes Int                 @default(60)
   lastTriggeredAt DateTime?
-  failCount       Int       @default(0)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  user User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs TokenReplenishLog[]
+  failCount       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs            TokenReplenishLog[]
 
   @@index([status])
   @@map("auto_replenish_configs")
 }
 
 model TokenReplenishLog {
-  id             String   @id @default(cuid())
+  id             String              @id @default(cuid())
   configId       String
   userId         String
   tokensGranted  Int
-  priceTRY       Decimal  @db.Decimal(10, 2)
+  priceTRY       Decimal             @db.Decimal(10, 2)
   packageId      String
   balanceBefore  Int
   balanceAfter   Int
   triggerSource  String
-  status         String   @default("SUCCESS")
-  failReason     String?  @db.Text
+  status         String              @default("SUCCESS")
+  failReason     String?             @db.Text
   idempotencyKey String
-  createdAt      DateTime @default(now())
-
-  config AutoReplenishConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  createdAt      DateTime            @default(now())
+  config         AutoReplenishConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
 
   @@unique([idempotencyKey, userId])
   @@index([userId, createdAt])
@@ -596,27 +508,26 @@ model TokenReplenishLog {
 }
 
 model ActiveBoost {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   listingId      String
   userId         String
   effectivePower Float
-  boostType      String   @default("BASIC")
   expiresAt      DateTime
-  createdAt      DateTime @default(now())
-
-  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  boostType      String       @default("BASIC")
+  listing        GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([listingId, expiresAt])
+  @@index([userId], map: "active_boosts_userId_fkey")
   @@map("active_boosts")
 }
 
 model ListingBoostCounter {
-  listingId       String   @id
-  boostCount24h   Int      @default(0)
-  windowStartedAt DateTime @default(now())
-
-  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId       String       @id
+  boostCount24h   Int          @default(0)
+  windowStartedAt DateTime     @default(now())
+  listing         GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@map("listing_boost_counters")
 }
@@ -635,26 +546,21 @@ model WebhookEvent {
 }
 
 model IdentityApplication {
-  id     String         @id @default(cuid())
-  userId String
-  status ApprovalStatus @default(PENDING)
-
-  idDocumentUrl  String  @db.Text
-  certificateUrl String? @db.Text
-  contactEmail   String
-  note           String? @db.Text
-
+  id              String         @id @default(cuid())
+  userId          String
+  status          ApprovalStatus @default(PENDING)
+  idDocumentUrl   String         @db.Text
+  certificateUrl  String?        @db.Text
+  contactEmail    String
+  note            String?        @db.Text
   reviewedBy      String?
   reviewedAt      DateTime?
-  rejectionReason String?   @db.Text
-  revokedReason   String?   @db.Text
-
-  packageAtApply String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rejectionReason String?        @db.Text
+  revokedReason   String?        @db.Text
+  packageAtApply  String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -663,33 +569,29 @@ model IdentityApplication {
 }
 
 model Review {
-  id             String @id @default(cuid())
-  guideId        String
-  reviewerUserId String
-  requestId      String
-
+  id                   String         @id @default(cuid())
+  guideId              String
+  reviewerUserId       String
+  requestId            String
   ratingCommunication  Int
   ratingKnowledge      Int
   ratingOrganization   Int
   ratingTimeManagement Int
-  overallRating        Decimal @db.Decimal(2, 1)
+  overallRating        Decimal        @db.Decimal(2, 1)
+  positiveTags         Json
+  negativeTags         Json
+  comment              String?        @db.VarChar(500)
+  status               ApprovalStatus @default(PENDING)
+  isVerified           Boolean        @default(true)
+  ipHash               String?
+  userAgentHash        String?
+  createdAt            DateTime       @default(now())
+  approvedAt           DateTime?
+  deletedAt            DateTime?
+  guide                User           @relation("GuideReviews", fields: [guideId], references: [id], onDelete: Cascade)
+  request              UmrahRequest   @relation("DemandReviews", fields: [requestId], references: [id], onDelete: Cascade)
+  reviewer             User           @relation("UserReviews", fields: [reviewerUserId], references: [id], onDelete: Cascade)
 
-  positiveTags Json           @default("[]")
-  negativeTags Json           @default("[]")
-  comment      String?        @db.VarChar(500)
-  status       ApprovalStatus @default(PENDING)
-  isVerified   Boolean        @default(true)
-
-  ipHash        String?
-  userAgentHash String?
-  createdAt     DateTime     @default(now())
-  approvedAt    DateTime?
-  deletedAt     DateTime?
-  guide         User         @relation("GuideReviews", fields: [guideId], references: [id], onDelete: Cascade)
-  reviewer      User         @relation("UserReviews", fields: [reviewerUserId], references: [id], onDelete: Cascade)
-  request       UmrahRequest @relation("DemandReviews", fields: [requestId], references: [id], onDelete: Cascade)
-
-  // Tied to IP Hash + Device to prevent spam
   @@unique([requestId, reviewerUserId, ipHash])
   @@index([guideId])
   @@index([reviewerUserId])
@@ -714,8 +616,7 @@ model RiskScore {
   probationBaseline Json?
   escalationCount   Int       @default(0)
   updatedAt         DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("risk_scores")
 }
@@ -768,15 +669,14 @@ model FraudReviewTicket {
 }
 
 model ListingImpression {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   listingId   String
   userId      String?
   source      String
   position    Int
   searchQuery String?
-  createdAt   DateTime @default(now())
-
-  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  listing     GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([listingId, createdAt])
   @@index([userId, createdAt])
@@ -784,15 +684,14 @@ model ListingImpression {
 }
 
 model ListingClick {
-  id           String   @id @default(cuid())
+  id           String       @id @default(cuid())
   listingId    String
   userId       String?
   source       String
   impressionId String?
   dwellTimeMs  Int?
-  createdAt    DateTime @default(now())
-
-  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  createdAt    DateTime     @default(now())
+  listing      GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@index([listingId, createdAt])
   @@index([userId])
@@ -862,21 +761,20 @@ model DynamicPriceEvent {
 }
 
 model EnterpriseCreditLine {
-  id                   String   @id @default(cuid())
-  userId               String   @unique
-  creditLimit          Int      @default(500)
-  usedCredit           Int      @default(0)
-  billingCycleDays     Int      @default(30)
-  interestRate         Float    @default(0.0)
-  status               String   @default("ACTIVE")
+  id                   String                  @id @default(cuid())
+  userId               String                  @unique
+  creditLimit          Int                     @default(500)
+  usedCredit           Int                     @default(0)
+  billingCycleDays     Int                     @default(30)
+  interestRate         Float                   @default(0)
+  status               String                  @default("ACTIVE")
   nextBillingAt        DateTime
-  gracePeriodDays      Int      @default(7)
-  consecutiveLateCount Int      @default(0)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-
-  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions CreditLineTransaction[]
+  gracePeriodDays      Int                     @default(7)
+  consecutiveLateCount Int                     @default(0)
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  transactions         CreditLineTransaction[]
+  user                 User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([nextBillingAt])
@@ -884,18 +782,17 @@ model EnterpriseCreditLine {
 }
 
 model CreditLineTransaction {
-  id             String   @id @default(cuid())
+  id             String               @id @default(cuid())
   creditLineId   String
   userId         String
   type           String
   amount         Int
   balanceBefore  Int
   balanceAfter   Int
-  note           String?  @db.Text
+  note           String?              @db.Text
   idempotencyKey String
-  createdAt      DateTime @default(now())
-
-  creditLine EnterpriseCreditLine @relation(fields: [creditLineId], references: [id], onDelete: Cascade)
+  createdAt      DateTime             @default(now())
+  creditLine     EnterpriseCreditLine @relation(fields: [creditLineId], references: [id], onDelete: Cascade)
 
   @@unique([idempotencyKey, userId])
   @@index([creditLineId, createdAt])
@@ -917,8 +814,7 @@ model PerformanceTier {
   tierChangedAt     DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([currentTier])
   @@index([compositeScore])
@@ -998,8 +894,7 @@ model Notification {
   isRead      Boolean  @default(false)
   referenceId String?
   createdAt   DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
   @@index([createdAt])
@@ -1020,4 +915,47 @@ model TestLog {
   @@index([scenarioName])
   @@index([createdAt])
   @@map("test_logs")
+}
+
+enum PackageTier {
+  FREEMIUM
+  PREMIUM
+  PLUS
+  PRO
+  BUSINESS
+  BUSINESS_PLUS
+}
+
+enum UserRole {
+  USER
+  GUIDE
+  ORGANIZATION
+  ADMIN
+  BANNED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYTR
+  IYZICO
+}
+
+enum LedgerEntryType {
+  PURCHASE
+  CONSUME
+  REFUND
+  ADJUSTMENT
 }

@@ -65,6 +65,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (body.startDate !== undefined) safeData.startDate = new Date(body.startDate);
         if (body.endDate !== undefined) safeData.endDate = new Date(body.endDate);
         if (body.urgencyTag !== undefined) safeData.urgencyTag = body.urgencyTag;
+        if (body.category !== undefined) safeData.category = body.category === "" ? null : body.category;
         // Guide can deactivate their own listing
         if (body.active === false && session.user.role !== 'ADMIN') safeData.active = false;
         // Admin can set active freely
