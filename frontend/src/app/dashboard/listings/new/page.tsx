@@ -40,6 +40,7 @@ export default function NewListingPage() {
 
     // Dynamic Data State
     const [airlines, setAirlines] = useState<any[]>([]);
+    const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -49,6 +50,7 @@ export default function NewListingPage() {
         meetingCity: "",
         hotelName: "",
         airlineId: "", // Changed from airline string
+        category: "",
         quota: "30",
         startDate: "",
         departureDateEnd: "",
@@ -69,16 +71,25 @@ export default function NewListingPage() {
     });
 
     useEffect(() => {
-        const fetchAirlines = async () => {
+        const fetchFormData = async () => {
             try {
-                const airlinesRes = await fetch('/api/airlines');
+                const [airlinesRes, categoriesRes] = await Promise.all([
+                    fetch('/api/airlines'),
+                    fetch('/api/listing-categories')
+                ]);
                 if (airlinesRes.ok) setAirlines(await airlinesRes.json());
+                if (categoriesRes.ok) {
+                    const data = await categoriesRes.json();
+                    if (Array.isArray(data?.data)) {
+                        setCategories(data.data);
+                    }
+                }
             } catch (err) {
                 console.error("Failed to fetch form data", err);
                 toast.error("Form verileri yüklenirken hata oluştu.");
             }
         };
-        fetchAirlines();
+        fetchFormData();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -146,6 +157,7 @@ export default function NewListingPage() {
 
         const payload = {
             ...formData,
+            category: formData.category || null,
             pricing: {
                 double: parseFloat(formData.pricing.double) || 0,
                 triple: parseFloat(formData.pricing.triple) || 0,
@@ -206,6 +218,26 @@ export default function NewListingPage() {
                             <div>
                                 <Label>Tur Başlığı</Label>
                                 <Input name="title" placeholder="Örn: 15 Günlük Ramazan Umresi" value={formData.title} onChange={handleChange} required />
+                            </div>
+
+                            <div>
+                                <Label>Tur Kategorisi (Opsiyonel)</Label>
+                                <Select onValueChange={(v) => handleSelectChange("category", v)}>
+                                    <SelectTrigger><SelectValue placeholder="Seçiniz (Opsiyonel)" /></SelectTrigger>
+                                    <SelectContent>
+                                        {categories.length === 0 ? (
+                                            <SelectItem value="loading" disabled>
+                                                Kategori bulunamadı
+                                            </SelectItem>
+                                        ) : (
+                                            categories.map((category) => (
+                                                <SelectItem key={category.slug} value={category.slug}>
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))
+                                        )}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

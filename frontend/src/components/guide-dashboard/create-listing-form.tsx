@@ -1,14 +1,22 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 export function CreateListingForm() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [categories, setCategories] = useState<Array<{ slug: string; name: string }>>([]);
     const [title, setTitle] = useState("");
     const [city, setCity] = useState("");
     const [departureCity, setDepartureCity] = useState("");
@@ -18,6 +26,29 @@ export function CreateListingForm() {
     const [price, setPrice] = useState("");
     const [quota, setQuota] = useState("30");
     const [extraServices, setExtraServices] = useState<string[]>([]);
+    const [category, setCategory] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchCategories = async () => {
+            try {
+                const res = await fetch("/api/listing-categories");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (isMounted && Array.isArray(data?.data)) {
+                    setCategories(data.data);
+                }
+            } catch (err) {
+                console.error("Kategori listesi alınamadı:", err);
+            }
+        };
+
+        fetchCategories();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const servicesList = ["Otel Dahil", "Transfer", "Rehberlik", "7/24 Destek", "Bayan Rehber"];
 
@@ -37,6 +68,7 @@ export function CreateListingForm() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     title,
+                    category: category ?? null,
                     city,
                     departureCity,
                     meetingCity,
@@ -60,6 +92,7 @@ export function CreateListingForm() {
 
             toast.success("Listing created!");
             setTitle("");
+            setCategory(undefined);
             setCity("");
             setDepartureCity("");
             setMeetingCity("");
@@ -87,6 +120,28 @@ export function CreateListingForm() {
                         placeholder="Örn: Ramazan Umresi"
                         required
                     />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium mb-1">Tur Kategorisi (Opsiyonel)</label>
+                    <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Kategori seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {categories.length === 0 ? (
+                                <SelectItem value="loading" disabled>
+                                    Kategori bulunamadı
+                                </SelectItem>
+                            ) : (
+                                categories.map((item) => (
+                                    <SelectItem key={item.slug} value={item.slug}>
+                                        {item.name}
+                                    </SelectItem>
+                                ))
+                            )}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

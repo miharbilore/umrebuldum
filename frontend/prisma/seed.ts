@@ -123,37 +123,22 @@ async function main() {
     // ─── Seed Listing Categories (SEO + Filtering) ─────────────────────────
 
     const listingCategories = [
-        {
-            slug: "ramazan-umre",
-            name: "Ramazan Umresi",
-            description: "Ramazan ayına özel umre turları",
-        },
-        {
-            slug: "ekonomik-umre",
-            name: "Ekonomik Umre",
-            description: "Uygun bütçeli umre programları",
-        },
-        {
-            slug: "vip-umre",
-            name: "VIP Umre",
-            description: "Lüks konaklama ve özel hizmetler",
-        },
-        {
-            slug: "aile-umre",
-            name: "Aile Umresi",
-            description: "Ailelere uygun paketler",
-        },
-        {
-            slug: "kisa-umre",
-            name: "Kısa Umre",
-            description: "7-10 günlük kısa programlar",
-        },
+        { slug: "ekonomik-umre", name: "Ekonomik Umre" },
+        { slug: "standart-umre", name: "Standart Umre" },
+        { slug: "vip-umre", name: "VIP Umre" },
+        { slug: "5-yildiz-umre", name: "5 Yıldız Otel Umre" },
+        { slug: "ramazan-umresi", name: "Ramazan Umresi" },
+        { slug: "soguk-sezon-umre", name: "Kış Dönemi Umre" },
+        { slug: "yaz-umresi", name: "Yaz Umresi" },
+        { slug: "kisa-sureli-umre", name: "7-10 Gün Umre" },
+        { slug: "uzun-sureli-umre", name: "14+ Gün Umre" },
+        { slug: "aile-umresi", name: "Aileye Uygun Umre" },
     ];
 
     for (const category of listingCategories) {
         await prisma.listingCategory.upsert({
             where: { slug: category.slug },
-            update: { name: category.name, description: category.description },
+            update: {},
             create: category,
         });
     }
