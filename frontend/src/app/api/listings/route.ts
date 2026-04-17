@@ -335,6 +335,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             tourPlan,
             urgencyTag,
             legalConsent,
+            category,
         } = body;
 
         if (!title || !departureCityId) {
@@ -438,6 +439,7 @@ export const POST = withErrorHandler(async (req: Request) => {
                 title,
                 description: description || "",
                 city: city || "",
+                category: category || null,
                 departureCityId: departureCityRecord.id,
                 meetingCity: meetingCity || null,
                 extraServices: Array.isArray(extraServices) ? extraServices : [],

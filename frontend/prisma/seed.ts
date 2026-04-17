@@ -119,6 +119,31 @@ async function main() {
         });
     }
     console.log("✅ Seeded airlines");
+
+    // ─── Seed Listing Categories (SEO + Filtering) ─────────────────────────
+
+    const listingCategories = [
+        { slug: "ekonomik-umre", name: "Ekonomik Umre" },
+        { slug: "standart-umre", name: "Standart Umre" },
+        { slug: "vip-umre", name: "VIP Umre" },
+        { slug: "5-yildiz-umre", name: "5 Yıldız Otel Umre" },
+        { slug: "ramazan-umresi", name: "Ramazan Umresi" },
+        { slug: "soguk-sezon-umre", name: "Kış Dönemi Umre" },
+        { slug: "yaz-umresi", name: "Yaz Umresi" },
+        { slug: "kisa-sureli-umre", name: "7-10 Gün Umre" },
+        { slug: "uzun-sureli-umre", name: "14+ Gün Umre" },
+        { slug: "aile-umresi", name: "Aileye Uygun Umre" },
+    ];
+
+    for (const category of listingCategories) {
+        await prisma.listingCategory.upsert({
+            where: { slug: category.slug },
+            update: {},
+            create: category,
+        });
+    }
+
+    console.log("✅ Seeded listing categories");
 }
 
 main()
