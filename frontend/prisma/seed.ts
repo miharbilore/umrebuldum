@@ -39,7 +39,7 @@ async function main() {
         await prisma.creditPackage.upsert({
             where: { id: pkg.id },
             update: { features: pkg.features, credits: pkg.credits, priceTRY: pkg.priceTRY },
-            create: pkg,
+            create: { ...pkg, slug: pkg.id.toLowerCase() },
         });
     }
 
@@ -128,11 +128,12 @@ async function main() {
         { slug: "vip-umre", name: "VIP Umre" },
         { slug: "5-yildiz-umre", name: "5 Yıldız Otel Umre" },
         { slug: "ramazan-umresi", name: "Ramazan Umresi" },
-        { slug: "soguk-sezon-umre", name: "Kış Dönemi Umre" },
+        { slug: "soguk-sezon-umre", name: "Soğuk Sezon (Kış) Umresi" },
         { slug: "yaz-umresi", name: "Yaz Umresi" },
-        { slug: "kisa-sureli-umre", name: "7-10 Gün Umre" },
-        { slug: "uzun-sureli-umre", name: "14+ Gün Umre" },
-        { slug: "aile-umresi", name: "Aileye Uygun Umre" },
+        { slug: "kisa-sureli-umre", name: "Kısa Süreli Umre" },
+        { slug: "uzun-sureli-umre", name: "Uzun Süreli Umre" },
+        { slug: "aile-umresi", name: "Aile Umresi" },
+        { slug: "genclere-ozel-umre", name: "Gençlere Özel Umre" },
     ];
 
     for (const category of listingCategories) {
