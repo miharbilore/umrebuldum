@@ -67,33 +67,28 @@ export default function ProfileEditingPage() {
         if (!file) return;
 
         const uploadPromise = async () => {
-            // 1. Get Presigned URL
-            const res = await fetch('/api/upload/s3', {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // 1. Upload to local API
+            const res = await fetch('/api/upload', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    filename: file.name,
-                    contentType: file.type,
-                    folder: type === 'image' ? 'avatars' : 'covers'
-                })
+                body: formData
             });
 
-            if (!res.ok) throw new Error("URL alınamadı");
-            const { signedUrl, publicUrl } = await res.json();
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.error || "Yükleme başarısız");
+            }
+            
+            const data = await res.json();
+            
+            if (!data.success || !data.url) {
+                throw new Error("Yükleme başarısız");
+            }
 
-            // 2. Upload to S3
-            const uploadRes = await fetch(signedUrl, {
-                method: 'PUT',
-                body: file,
-                headers: {
-                    'Content-Type': file.type
-                }
-            });
-
-            if (!uploadRes.ok) throw new Error("Yükleme başarısız");
-
-            // 3. Update local state
-            setFormData(prev => ({ ...prev, [type]: publicUrl }));
+            // 2. Update local state
+            setFormData(prev => ({ ...prev, [type]: data.url }));
             
             return "Fotoğraf yüklendi";
         };
