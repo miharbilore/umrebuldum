@@ -204,6 +204,8 @@ model GuideListing {
   title       String
   description String @db.Text
   city        String
+  category    String?
+  categoryRef ListingCategory? @relation(fields: [category], references: [slug])
 
   departureCityId String?
   departureCity   DepartureCity? @relation(fields: [departureCityId], references: [id])
@@ -246,13 +248,41 @@ model GuideListing {
   boostCounter      ListingBoostCounter?
   ListingImpression ListingImpression[]
   ListingClick      ListingClick[]
+  seoMeta           ListingSeo?
 
   @@index([guideId])
   @@index([approvalStatus, active])
   @@index([departureCityId])
   @@index([startDate, endDate])
+  @@index([category])
   @@index([deletedAt]) // Added index for soft deletes
   @@map("guide_listings")
+}
+
+model ListingCategory {
+  slug        String @id
+  name        String
+  description String? @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  listings GuideListing[]
+
+  @@map("listing_categories")
+}
+
+model ListingSeo {
+  listingId String @id
+  city      String?
+  duration  Int?
+  hotelType String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  listing GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([city])
+  @@map("listing_seo")
 }
 
 model TourDay {

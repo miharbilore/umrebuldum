@@ -119,6 +119,46 @@ async function main() {
         });
     }
     console.log("✅ Seeded airlines");
+
+    // ─── Seed Listing Categories (SEO + Filtering) ─────────────────────────
+
+    const listingCategories = [
+        {
+            slug: "ramazan-umre",
+            name: "Ramazan Umresi",
+            description: "Ramazan ayına özel umre turları",
+        },
+        {
+            slug: "ekonomik-umre",
+            name: "Ekonomik Umre",
+            description: "Uygun bütçeli umre programları",
+        },
+        {
+            slug: "vip-umre",
+            name: "VIP Umre",
+            description: "Lüks konaklama ve özel hizmetler",
+        },
+        {
+            slug: "aile-umre",
+            name: "Aile Umresi",
+            description: "Ailelere uygun paketler",
+        },
+        {
+            slug: "kisa-umre",
+            name: "Kısa Umre",
+            description: "7-10 günlük kısa programlar",
+        },
+    ];
+
+    for (const category of listingCategories) {
+        await prisma.listingCategory.upsert({
+            where: { slug: category.slug },
+            update: { name: category.name, description: category.description },
+            create: category,
+        });
+    }
+
+    console.log("✅ Seeded listing categories");
 }
 
 main()
