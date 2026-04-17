@@ -49,5 +49,6 @@ next-env.d.ts
 
 # Miscellaneous
 /scratch/
+/public/uploads/
 *.log
 /tmp/
