@@ -1,93 +1,24 @@
-﻿import type { NextAuthConfig } from "next-auth"
+import type { NextAuthConfig } from "next-auth"
 
 export const authConfig = {
     pages: {
         signIn: "/login",
     },
     callbacks: {
-        async jwt({ token, user, account, trigger, session }) {
-            // Handle client-side updates (e.g. update({ role: ... }))
+        async jwt({ token, user, trigger, session }) {
+            // Handle client-side updates
             if (trigger === "update" && session) {
-                // SECURITY: Never accept role from client-side updates.
-                // Only allow safe fields (e.g., requires_onboarding flag).
                 if (typeof session.requires_onboarding === "boolean") {
                     token.requires_onboarding = session.requires_onboarding;
                 }
-                // Role changes MUST go through /api/set-role or /api/choose-role.
-                // Re-read role from DB to ensure it's authoritative.
-                if (token.email) {
-                    try {
-                        const { prisma } = await import("@/lib/prisma");
-                        const dbUser = await prisma.user.findUnique({
-                            where: { email: token.email as string },
-                            select: { role: true }
-                        });
-                        if (dbUser?.role) {
-                            token.role = dbUser.role;
-                            token.requires_onboarding = false;
-                        }
-                    } catch (e) {
-                        console.error("DB role refresh failed:", e);
-                    }
-                }
             }
 
-            // On sign-in: read role from the user object (set by authorize() or adapter)
             if (user) {
                 token.role = (user as any).role || null;
+                token.packageType = (user as any).packageType || null;
+                token.tokenBalance = (user as any).tokenBalance || 0;
+                token.phone = (user as any).phone || null;
                 token.requires_onboarding = !token.role;
-
-                // ─── OAuth First-Login Stub ────────────────────────────────
-                // When a user signs in via OAuth (Google/Facebook/Apple) for
-                // the first time, the PrismaAdapter creates a DB user but
-                // does NOT set a role. We detect this and assign "USER" as
-                // the default role so the session is immediately usable.
-                if (!token.role && account && ["google", "facebook", "apple"].includes(account.provider)) {
-                    try {
-                        const { prisma } = await import("@/lib/prisma");
-                        const email = token.email as string;
-
-                        // Check if user already has a role in DB
-                        const dbUser = await prisma.user.findUnique({
-                            where: { email },
-                            select: { id: true, role: true },
-                        });
-
-                        if (dbUser && !dbUser.role) {
-                            // First-time OAuth user → assign default USER role
-                            await prisma.user.update({
-                                where: { id: dbUser.id },
-                                data: { role: "USER", isVerified: true },
-                            });
-                            token.role = "USER";
-                            token.requires_onboarding = true; // Still needs onboarding for role selection
-                            console.log(`[OAuth] Default USER role assigned to ${email} (${account.provider})`);
-                        } else if (dbUser?.role) {
-                            token.role = dbUser.role;
-                            token.requires_onboarding = false;
-                        }
-                    } catch (e) {
-                        console.error("[OAuth] Role assignment failed:", e);
-                    }
-                }
-                // ──────────────────────────────────────────────────────────
-            }
-
-            // If token still has no role, try to read from DB (handles token refresh)
-            if (!token.role && token.email) {
-                try {
-                    const { prisma } = await import("@/lib/prisma");
-                    const dbUser = await prisma.user.findUnique({
-                        where: { email: token.email as string },
-                        select: { role: true }
-                    });
-                    if (dbUser?.role) {
-                        token.role = dbUser.role;
-                        token.requires_onboarding = false;
-                    }
-                } catch (e) {
-                    console.error("DB role lookup failed:", e);
-                }
             }
 
             if (!token.role) token.requires_onboarding = true;
@@ -103,35 +34,20 @@ export const authConfig = {
                 if (token.sub) {
                     (session.user as any).id = token.sub;
                 }
-
-                // ── Taze packageType ve tokenBalance'ı DB'den çek ──────────
-                // JWT çerezi eski paket bilgisi taşıyabilir; her session okumada
-                // User tablosundan güncel veriyi alarak "stale session" sorununu önlüyoruz.
-                if (token.sub) {
-                    try {
-                        const { prisma } = await import("@/lib/prisma");
-                        const dbUser = await prisma.user.findUnique({
-                            where: { id: token.sub },
-                            select: { packageType: true, tokenBalance: true },
-                        });
-                        if (dbUser) {
-                            (session.user as any).packageType = dbUser.packageType ?? "FREEMIUM";
-                            (session.user as any).tokenBalance = dbUser.tokenBalance ?? 0;
-                        }
-                    } catch (e) {
-                        console.error("[Session] packageType/tokenBalance refresh failed:", e);
-                    }
-                }
+                
+                (session.user as any).packageType = token.packageType ?? "FREEMIUM";
+                (session.user as any).tokenBalance = token.tokenBalance ?? 0;
+                (session.user as any).phone = token.phone ?? null;
             }
             return session;
         },
         authorized() {
-            // Let proxy.ts handle all redirect logic
+            // Let proxy.ts / middleware.ts handle all redirect logic
             return true;
         },
         async redirect({ url, baseUrl }) {
             return url.startsWith(baseUrl) ? url : baseUrl;
         }
     },
-    providers: [], // Providers added in auth.ts
+    providers: [], 
 } satisfies NextAuthConfig

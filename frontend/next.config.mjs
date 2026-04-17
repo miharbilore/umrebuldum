@@ -19,7 +19,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google-analytics.com https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://umrebuldum.com https://*.stripe.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://umrebuldum.com https://*.stripe.com https://ui-avatars.com https://*.amazonaws.com",
       "font-src 'self' https://fonts.gstatic.com",
       "frame-src https://js.stripe.com https://www.paytr.com https://www.google.com",
       "connect-src 'self' https://api.stripe.com https://www.paytr.com https://api.resend.com",
@@ -44,6 +44,14 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'umrebuldum.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com',
       },
     ],
   },
