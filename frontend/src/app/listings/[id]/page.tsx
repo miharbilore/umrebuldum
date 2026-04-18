@@ -8,9 +8,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { buildListingSlug } from "@/lib/slug";
-
-const DEFAULT_LISTING_IMAGE = "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80";
-const DEFAULT_LISTING_CURRENCY = "SAR";
+import { DEFAULT_LISTING_CURRENCY, DEFAULT_LISTING_IMAGE } from "@/lib/constants";
 
 // ─── Trust Engine UI Components ─────────────────────────────────────────
 import { StarRating } from "@/components/ui/StarRating";

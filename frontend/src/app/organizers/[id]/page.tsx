@@ -3,6 +3,11 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { normalizeSlug } from "@/lib/slug";
 
+/**
+ * Normalize organizer slugs by preserving the leading ID portion (if present)
+ * and normalizing the remaining slug text. If no slug parts exist, the full
+ * value is normalized as-is.
+ */
 const normalizeOrganizerSlug = (slugParam: string) => {
     const [idPart, ...slugParts] = slugParam.split("-");
     if (slugParts.length === 0) {
