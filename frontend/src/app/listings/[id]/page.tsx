@@ -140,6 +140,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     const isPremium = listing.guide?.package !== 'FREEMIUM';
     const canonicalUrl = `https://umrebuldum.com/listings/${expectedSlug}`;
     const schemaImage = listing.image || DEFAULT_LISTING_IMAGE;
+    const pricingCurrency = listing.pricing?.currency ?? DEFAULT_LISTING_CURRENCY;
     const listingSchema = {
         "@context": "https://schema.org",
         "@type": "Tour",
@@ -151,7 +152,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         offers: {
             "@type": "Offer",
             price: listing.price,
-            priceCurrency: listing.pricing?.currency || DEFAULT_LISTING_CURRENCY,
+            priceCurrency: pricingCurrency,
             availability: listing.active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             url: canonicalUrl,
         },
