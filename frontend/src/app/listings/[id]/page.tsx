@@ -145,7 +145,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
         "@type": "Tour",
         name: listing.title,
         description: listing.description,
-        image: schemaImage ? [schemaImage] : undefined,
+        image: [schemaImage],
         startDate: listing.startDate,
         endDate: listing.endDate,
         offers: {

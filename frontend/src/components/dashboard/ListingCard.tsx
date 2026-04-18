@@ -52,7 +52,7 @@ export function ListingCard({ listing, onAction, guideImage }: ListingCardProps)
                     )}
                     {/* Guide Avatar Overlay */}
                     {guideImage && (
-                        <div className="absolute bottom-0 right-0 w-8 h-8 rounded-tl-lg bg-white p-0.5 relative">
+                        <div className="absolute bottom-0 right-0 w-8 h-8 rounded-tl-lg bg-white p-0.5">
                             <Image src={guideImage} alt="Guide" fill className="rounded-md object-cover border border-gray-200" sizes="32px" />
                         </div>
                     )}
