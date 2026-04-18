@@ -2,10 +2,12 @@
 import Link from "next/link"
 import { Shield, Eye, Users, HeartHandshake, Award, Globe } from "lucide-react"
 
-export const metadata: Metadata = {
-    title: "Hakkımızda | Umrebuldum",
-    description:
-        "Umrebuldum, hac ve umre yolculuğunuzda size rehberlik eden, güvenilir acenteleri ve en uygun turları bir araya getiren dijital bir platformdur.",
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Hakkımızda | Umrebuldum",
+        description:
+            "Umrebuldum, hac ve umre yolculuğunuzda size rehberlik eden, güvenilir acenteleri ve en uygun turları bir araya getiren dijital bir platformdur.",
+    };
 }
 
 const values = [

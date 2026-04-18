@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useState, useRef } from 'react';
+import Image from "next/image";
 import { toJpeg } from 'html-to-image';
 import { QRCodeSVG } from 'qrcode.react';
 import { Download, Loader2, Share2, MapPin, Calendar, Star } from 'lucide-react';
@@ -74,11 +75,12 @@ export function BannerGenerator({ listing }: { listing: ListingProps }) {
               {/* IMAGE HEADER */}
               <div className="h-2/5 w-full bg-gray-300 relative border-b-4 border-blue-600">
                 {listing.thumbnail ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
+                  <Image
                     src={listing.thumbnail}
                     alt={listing.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="320px"
                     crossOrigin="anonymous"
                   />
                 ) : (

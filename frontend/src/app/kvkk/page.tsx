@@ -1,10 +1,12 @@
 ﻿import { Metadata } from "next";
 import { Shield, FileText } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "KVKK Aydınlatma Metni | Umrebuldum",
-    description: "6698 Sayılı Kişisel Verilerin Korunması Kanunu uyarınca aydınlatma metnimiz.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "KVKK Aydınlatma Metni | Umrebuldum",
+        description: "6698 Sayılı Kişisel Verilerin Korunması Kanunu uyarınca aydınlatma metnimiz.",
+    };
+}
 
 export default function KvkkPage() {
     return (

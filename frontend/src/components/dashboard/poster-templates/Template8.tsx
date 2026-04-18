@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import React from 'react';
+import Image from "next/image";
 import { Calendar, Phone, User, CheckCircle2, Navigation } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -16,10 +17,12 @@ export function Template8({ data, id, showWatermark = true }: { data: PosterData
         >
             {/* Background Image very faint */}
             <div className="absolute inset-0 z-0">
-                <img
+                <Image
                     src={bgImage}
                     alt="Umrah"
-                    className="w-full h-full object-cover opacity-20 filter grayscale"
+                    fill
+                    className="object-cover opacity-20 filter grayscale"
+                    sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#312e81]/80 to-[#1e1b4b]" />
             </div>

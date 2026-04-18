@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Camera, Image as ImageIcon, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useRouter } from "next/navigation";
 
@@ -166,7 +167,7 @@ export default function ProfileEditingPage() {
                                 onClick={() => coverInputRef.current?.click()}
                             >
                                 {formData.coverImage ? (
-                                    <img src={formData.coverImage} alt="Cover" className="w-full h-full object-cover" />
+                                    <Image src={formData.coverImage} alt="Cover" fill className="object-cover" sizes="(max-width: 768px) 100vw, 720px" />
                                 ) : (
                                     <div className="text-center text-slate-500">
                                         <ImageIcon className="mx-auto h-8 w-8 mb-2" />
@@ -187,7 +188,7 @@ export default function ProfileEditingPage() {
                                 onClick={() => profileInputRef.current?.click()}
                             >
                                 {formData.image ? (
-                                    <img src={formData.image} alt="Avatar" className="w-full h-full object-cover" />
+                                    <Image src={formData.image} alt="Avatar" fill className="object-cover" sizes="96px" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-slate-400">
                                         <Camera className="w-8 h-8" />

@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Calendar, Check, ShieldCheck, Star, Phone, MessageCircle, Info } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { buildListingSlug } from "@/lib/slug";
+import { DEFAULT_LISTING_CURRENCY, DEFAULT_LISTING_IMAGE } from "@/lib/constants";
 
 // ─── Trust Engine UI Components ─────────────────────────────────────────
 import { StarRating } from "@/components/ui/StarRating";
@@ -78,25 +82,99 @@ async function getListing(id: string) {
     };
 }
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+    const { id: slugParam } = await params;
+    const listingId = slugParam.split("-")[0];
+    const listing = await getListing(listingId);
+
+    if (!listing) {
+        return {
+            title: "İlan Bulunamadı | Umrebuldum",
+            description: "Aradığınız ilan bulunamadı.",
+        };
+    }
+
+    const canonical = `https://umrebuldum.com/listings/${buildListingSlug(listing.id, listing.title)}`;
+    const description = listing.description?.slice(0, 160) || "Umrebuldum onaylı umre turu ilanı.";
+    const metaImage = listing.image || DEFAULT_LISTING_IMAGE;
+
+    return {
+        title: `${listing.title} | Umrebuldum`,
+        description,
+        alternates: {
+            canonical,
+        },
+        openGraph: {
+            type: "article",
+            url: canonical,
+            title: listing.title,
+            description,
+            images: metaImage ? [metaImage] : [],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: listing.title,
+            description,
+            images: metaImage ? [metaImage] : [],
+        },
+    };
+}
+
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const listing = await getListing(id);
+    const { id: slugParam } = await params;
+    const listingId = slugParam.split("-")[0];
+    const listing = await getListing(listingId);
 
     if (!listing) {
         notFound();
     }
 
+    const expectedSlug = buildListingSlug(listing.id, listing.title);
+    if (slugParam !== expectedSlug) {
+        permanentRedirect(`/listings/${expectedSlug}`);
+    }
+
     const isIdentityVerified = listing.guide?.isIdentityVerified;
     const isPremium = listing.guide?.package !== 'FREEMIUM';
+    const canonicalUrl = `https://umrebuldum.com/listings/${expectedSlug}`;
+    const schemaImage = listing.image || DEFAULT_LISTING_IMAGE;
+    const pricingCurrency = listing.pricing?.currency ?? DEFAULT_LISTING_CURRENCY;
+    const listingSchema = {
+        "@context": "https://schema.org",
+        "@type": "Tour",
+        name: listing.title,
+        description: listing.description,
+        image: [schemaImage],
+        startDate: listing.startDate,
+        endDate: listing.endDate,
+        offers: {
+            "@type": "Offer",
+            price: listing.price,
+            priceCurrency: pricingCurrency,
+            availability: listing.active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            url: canonicalUrl,
+        },
+        provider: listing.guide ? {
+            "@type": "TravelAgency",
+            name: listing.guide.fullName,
+        } : undefined,
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
+            />
             {/* Header Image */}
             <div className="relative h-[400px] w-full">
-                <img
-                    src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80"
+                <Image
+                    src={listing.image || DEFAULT_LISTING_IMAGE}
                     alt={listing.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                    priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
@@ -252,9 +330,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
                         {/* Guide Card */}
                         <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-24">
                             <div className="flex items-center gap-4 mb-6">
-                                <div className="w-16 h-16 rounded-full bg-gray-100 overflow-hidden border-2 border-white shadow-sm">
+                                <div className="w-16 h-16 rounded-full bg-gray-100 overflow-hidden border-2 border-white shadow-sm relative">
                                     {listing.guide?.photo ? (
-                                        <img src={listing.guide.photo} alt="" className="w-full h-full object-cover" />
+                                        <Image src={listing.guide.photo} alt="" fill className="object-cover" sizes="64px" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-gray-300">
                                             <UserIcon className="w-8 h-8" />

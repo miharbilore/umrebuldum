@@ -2,10 +2,12 @@ import { Metadata } from "next";
 import { Gavel } from "lucide-react";
 import { TermsContent } from "@/components/policies-content";
 
-export const metadata: Metadata = {
-    title: "Kullanım Koşulları | Umrebuldum",
-    description: "Umrebuldum platformunu kullanırken uymanız gereken kurallar, kullanıcı yükümlülükleri ve yasal sorumluluklar.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Kullanım Koşulları | Umrebuldum",
+        description: "Umrebuldum platformunu kullanırken uymanız gereken kurallar, kullanıcı yükümlülükleri ve yasal sorumluluklar.",
+    };
+}
 
 export default function TermsPage() {
     return (

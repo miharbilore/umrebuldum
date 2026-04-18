@@ -9,44 +9,46 @@ import HybridChatbot from "@/components/HybridChatbot";
 import "./globals.css";
 import 'react-phone-number-input/style.css'
 
-export const metadata: Metadata = {
-  title: {
-    default: "Umrebuldum - Güvenilir Umre Turları",
-    template: "%s | Umrebuldum",
-  },
-  description: "Güvenilir Umre turlarını keşfedin. Fiyatları karşılaştırın, yorumları okuyun ve turları inceleyin.",
-  keywords: [
-    "Umre",
-    "Umre turu",
-    "hac",
-    "Mekke",
-    "Medine",
-    "Kabe",
-    "İslami seyahat",
-    "Türkiye Umre turları",
-    "Umre seyahati",
-  ],
-  authors: [{ name: "Umrebuldum" }],
-  creator: "Umrebuldum",
-  openGraph: {
-    type: "website",
-    locale: "tr_TR",
-    url: "https://umrebuldum.com",
-    siteName: "Umrebuldum",
-    title: "Umrebuldum - Güvenilir Umre Turları",
-    description: "Güvenilir Umre turlarını keşfedin. Fiyatları karşılaştırın ve turları inceleyin.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Umrebuldum - Güvenilir Umre Turları",
-    description: "Güvenilir Umre turlarını keşfedin. Fiyatları karşılaştırın ve turları inceleyin.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  generator: 'v0.app'
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: {
+      default: "Umrebuldum - Güvenilir Umre Turları",
+      template: "%s | Umrebuldum",
+    },
+    description: "Güvenilir Umre turlarını keşfedin. Fiyatları karşılaştırın, yorumları okuyun ve turları inceleyin.",
+    keywords: [
+      "Umre",
+      "Umre turu",
+      "hac",
+      "Mekke",
+      "Medine",
+      "Kabe",
+      "İslami seyahat",
+      "Türkiye Umre turları",
+      "Umre seyahati",
+    ],
+    authors: [{ name: "Umrebuldum" }],
+    creator: "Umrebuldum",
+    openGraph: {
+      type: "website",
+      locale: "tr_TR",
+      url: "https://umrebuldum.com",
+      siteName: "Umrebuldum",
+      title: "Umrebuldum - Güvenilir Umre Turları",
+      description: "Güvenilir Umre turlarını keşfedin. Fiyatları karşılaştırın ve turları inceleyin.",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Umrebuldum - Güvenilir Umre Turları",
+      description: "Güvenilir Umre turlarını keşfedin. Fiyatları karşılaştırın ve turları inceleyin.",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    generator: 'v0.app'
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [

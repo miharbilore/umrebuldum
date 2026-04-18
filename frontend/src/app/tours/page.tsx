@@ -9,10 +9,25 @@ import { sanitizeCityName } from "@/lib/city-utils";
 import { ApprovalStatus, Prisma } from "@prisma/client";
 import { rankListings, scoreListing, detectQueryIntent } from "@/modules/ranking/ranking-engine";
 
-export const metadata: Metadata = {
-  title: "Umre Turları | UmreBuldum",
-  description: "Türkiye'nin en güvenilir umre tur karşılaştırma platformu",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Umre Turları | UmreBuldum",
+    description: "Türkiye'nin en güvenilir umre tur karşılaştırma platformu",
+    alternates: {
+      canonical: "https://umrebuldum.com/tours",
+    },
+    openGraph: {
+      title: "Umre Turları | UmreBuldum",
+      description: "Türkiye'nin en güvenilir umre tur karşılaştırma platformu",
+      url: "https://umrebuldum.com/tours",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Umre Turları | UmreBuldum",
+      description: "Türkiye'nin en güvenilir umre tur karşılaştırma platformu",
+    },
+  };
+}
 
 export default async function ToursPage({ searchParams }: { searchParams: Promise<any> }) {
   const resolvedParams = await searchParams;
@@ -226,9 +241,25 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
   const enrichedListings = fetchResult?.data || [];
   const totalCount = fetchResult?.metadata?.totalCount || 0;
+  const toursSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Umre Turları",
+    serviceType: "Umre Turu",
+    url: "https://umrebuldum.com/tours",
+    provider: {
+      "@type": "Organization",
+      name: "Umrebuldum",
+      url: "https://umrebuldum.com",
+    },
+  };
 
   return (
     <main className="min-h-screen bg-gray-50/50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(toursSchema) }}
+      />
       <HeroSection />
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">

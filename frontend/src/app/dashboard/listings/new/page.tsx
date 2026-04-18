@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 import { Plus, Trash2, Check, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
@@ -424,8 +425,7 @@ export default function NewListingPage() {
                                             className={`cursor-pointer border-2 rounded-xl overflow-hidden aspect-video relative transition-all ${formData.image === bg.url ? 'border-blue-600 shadow-md ring-2 ring-blue-600/20' : 'border-gray-200 hover:border-blue-400'
                                                 }`}
                                         >
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={bg.url} alt={bg.label} className="w-full h-full object-cover" />
+                                            <Image src={bg.url} alt={bg.label} fill className="object-cover" sizes="(max-width: 1024px) 50vw, 25vw" />
                                             <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1.5 text-center">
                                                 <span className="text-[10px] text-white font-medium truncate block">{bg.label}</span>
                                             </div>

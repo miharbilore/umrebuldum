@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import React from 'react';
+import Image from "next/image";
 import { Calendar, Phone, User, CheckCircle2 } from 'lucide-react';
 
 interface PosterTemplateProps {
@@ -39,10 +40,12 @@ export function PosterTemplate({ data, id }: PosterTemplateProps) {
 
             {/* Hero Image */}
             <div className="relative h-[600px] w-full">
-                <img
+                <Image
                     src={data.image || "https://images.unsplash.com/photo-1565552629477-ff72852894c9?w=1080&q=80"}
                     alt="Umrah"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
                 />
                 <div
                     className="absolute inset-0"

@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import React from 'react';
+import Image from "next/image";
 import { Calendar, Phone, User, CheckCircle2, Navigation } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -16,10 +17,12 @@ export function Template10({ data, id, showWatermark = true }: { data: PosterDat
         >
             {/* Background Full Cover with gradient Map */}
             <div className="absolute inset-0 z-0">
-                <img
+                <Image
                     src={bgImage}
                     alt="Umrah"
-                    className="w-full h-full object-cover opacity-40 mix-blend-luminosity"
+                    fill
+                    className="object-cover opacity-40 mix-blend-luminosity"
+                    sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/90 to-slate-900/60" />
             </div>

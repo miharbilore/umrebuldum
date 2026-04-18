@@ -11,6 +11,10 @@ export const categoryImages: Record<string, string[]> = {
         "/images/categories/vip-1.webp",
         "/images/categories/vip-2.webp"
     ],
+    "5-yildiz-umre": [
+        "/images/categories/5-yildiz-1.webp",
+        "/images/categories/5-yildiz-2.webp"
+    ],
     "ramazan-umresi": [
         "/images/categories/ramazan-1.webp",
         "/images/categories/ramazan-2.webp"
