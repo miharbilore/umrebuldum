@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { StarRating } from '@/components/ui/StarRating';
+import Image from "next/image";
 
 /**
  * ReviewCard — Displays a single customer review with rating, comment, tags, and date.
@@ -42,10 +43,13 @@ export function ReviewCard({ review, showSubRatings = false }: ReviewCardProps) 
                 {/* Avatar */}
                 <div className="flex-shrink-0">
                     {review.reviewer?.image ? (
-                        <img
+                        <Image
                             src={review.reviewer.image}
                             alt={reviewerName}
-                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-100"
+                            width={40}
+                            height={40}
+                            className="rounded-full object-cover border-2 border-gray-100"
+                            sizes="40px"
                         />
                     ) : (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">

@@ -1,4 +1,5 @@
-﻿import { Star, Zap, Crown, CheckCircle, TrendingUp, Sparkles } from 'lucide-react';
+import { Star, Zap, Crown, CheckCircle, TrendingUp, Sparkles } from 'lucide-react';
+import Image from "next/image";
 
 // ============================================
 // FEATURED LISTING BADGES
@@ -101,9 +102,9 @@ export function ListingCardPro({
             </div>
 
             {/* Image */}
-            <div className="aspect-[4/3] bg-gray-100 overflow-hidden">
+            <div className="aspect-[4/3] bg-gray-100 overflow-hidden relative">
                 {image ? (
-                    <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <Image src={image} alt={title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 1024px) 100vw, 33vw" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                         <Star className="w-12 h-12" />

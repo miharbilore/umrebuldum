@@ -1,5 +1,6 @@
-﻿import Link from 'next/link';
-import { MoreHorizontal, Star, Share2, Trash2, Edit, Eye, EyeOff, LayoutTemplate, Download, Image, Sparkles, MoreVertical, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import Image from "next/image";
+import { MoreHorizontal, Star, Share2, Trash2, Edit, Eye, EyeOff, LayoutTemplate, Download, Image as ImageIcon, Sparkles, MoreVertical, AlertCircle } from 'lucide-react';
 import { BannerGenerator } from '../guides/BannerGenerator';
 import { generatePDF } from './pdf-generator';
 import { useState } from 'react';
@@ -43,16 +44,16 @@ export function ListingCard({ listing, onAction, guideImage }: ListingCardProps)
                 {/* Thumbnail */}
                 <div className="w-20 h-20 rounded-lg bg-gray-200 flex-shrink-0 overflow-hidden relative group">
                     {listing.thumbnail ? (
-                        <img src={listing.thumbnail} alt="" className="w-full h-full object-cover" />
+                        <Image src={listing.thumbnail} alt="" fill className="object-cover" sizes="80px" />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Image className="w-8 h-8" />
+                            <ImageIcon className="w-8 h-8" />
                         </div>
                     )}
                     {/* Guide Avatar Overlay */}
                     {guideImage && (
-                        <div className="absolute bottom-0 right-0 w-8 h-8 rounded-tl-lg bg-white p-0.5">
-                            <img src={guideImage} alt="Guide" className="w-full h-full rounded-md object-cover border border-gray-200" />
+                        <div className="absolute bottom-0 right-0 w-8 h-8 rounded-tl-lg bg-white p-0.5 relative">
+                            <Image src={guideImage} alt="Guide" fill className="rounded-md object-cover border border-gray-200" sizes="32px" />
                         </div>
                     )}
                     {listing.isFeatured && (

@@ -1,10 +1,12 @@
 ﻿import { Metadata } from "next";
 import { ListChecks, AlertTriangle, Building2, CheckCircle2 } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "İlan Yayınlama Şartları | Umrebuldum",
-    description: "Organizatörlerin ve acentelerin Umrebuldum platformunda ilan yayınlarken uyması gereken şeffaflık kuralları.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "İlan Yayınlama Şartları | Umrebuldum",
+        description: "Organizatörlerin ve acentelerin Umrebuldum platformunda ilan yayınlarken uyması gereken şeffaflık kuralları.",
+    };
+}
 
 export default function ListingTermsPage() {
     return (

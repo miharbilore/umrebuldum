@@ -2,10 +2,12 @@ import { Metadata } from "next"
 import { Copyleft } from "lucide-react"
 import { RefundPolicyContent } from "@/components/policies-content"
 
-export const metadata: Metadata = {
-    title: "İade ve İptal Politikası | Umrebuldum",
-    description:
-        "Umrebuldum platformu üzerinden satın alınan üyelik paketleri ve ilan edilen tur rezervasyonlarının iptal koşulları hakkında bilgi.",
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "İade ve İptal Politikası | Umrebuldum",
+        description:
+            "Umrebuldum platformu üzerinden satın alınan üyelik paketleri ve ilan edilen tur rezervasyonlarının iptal koşulları hakkında bilgi.",
+    };
 }
 
 export default function RefundPolicyPage() {

@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { MessageCircleQuestion, CreditCard, PlaneTakeoff, ShieldAlert } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "Sık Sorulan Sorular | Umrebuldum",
-    description: "Umre turları, rezervasyon süreçleri, vize işlemleri ve ödeme seçenekleri hakkında merak ettiğiniz tüm soruların profesyonel cevapları.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Sık Sorulan Sorular | Umrebuldum",
+        description: "Umre turları, rezervasyon süreçleri, vize işlemleri ve ödeme seçenekleri hakkında merak ettiğiniz tüm soruların profesyonel cevapları.",
+    };
+}
 
 export default function FAQPage() {
     return (

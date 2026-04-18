@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import Image from "next/image";
 import { MapPin, Calendar, Star, ShieldCheck, Flame, Plane, Check } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { buildListingSlug } from "@/lib/slug";
 
 interface ListingCardProps {
     listing: {
@@ -60,16 +62,18 @@ export function ListingCard({ listing }: ListingCardProps) {
     const buttonClass = isIdentityVerified ? "bg-teal-600 hover:bg-teal-700" : "bg-cyan-600 hover:bg-cyan-700";
 
     return (
-        <Link href={`/listings/${listing.id}`} className="block h-full">
+        <Link href={`/listings/${buildListingSlug(listing.id, listing.title)}`} className="block h-full">
             <div className={`bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 h-full flex flex-col group ${cardBorder}`}>
 
                 {/* Image Header */}
                 <div className="relative h-48 bg-gray-100 rounded-t-xl overflow-hidden">
                     {/* Placeholder or Actual Image */}
-                    <img
+                    <Image
                         src={listing.image || listing.posterImages?.[0] || "/stock/kabe-1.png"}
                         alt={listing.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 1024px) 100vw, 33vw"
                     />
 
                     {/* Overlays */}

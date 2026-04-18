@@ -1,10 +1,12 @@
 ﻿import { Metadata } from "next";
 import { FileCheck, MailCheck, BellPlus } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "Açık Rıza Metni | Umrebuldum",
-    description: "Elektronik ticari ileti gönderimine ilişkin onay ve rıza beyanınız.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Açık Rıza Metni | Umrebuldum",
+        description: "Elektronik ticari ileti gönderimine ilişkin onay ve rıza beyanınız.",
+    };
+}
 
 export default function ConsentPage() {
     return (

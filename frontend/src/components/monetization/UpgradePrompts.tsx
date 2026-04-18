@@ -1,4 +1,5 @@
-﻿import { Crown, Zap, TrendingUp, Gift, ArrowRight } from 'lucide-react';
+import { Crown, Zap, TrendingUp, Gift, ArrowRight } from 'lucide-react';
+import Image from "next/image";
 
 // ============================================
 // UPGRADE CTA BANNER (Sticky)
@@ -175,7 +176,7 @@ export function Testimonial({ quote, author, company, image, metric }: Testimoni
 
             <div className="flex items-center gap-3">
                 {image ? (
-                    <img src={image} alt={author} className="w-10 h-10 rounded-full object-cover" />
+                    <Image src={image} alt={author} width={40} height={40} className="rounded-full object-cover" sizes="40px" />
                 ) : (
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-semibold">
                         {author.charAt(0)}

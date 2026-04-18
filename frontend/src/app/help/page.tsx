@@ -3,10 +3,12 @@ import Link from "next/link";
 import { HelpCircle, FileText, PhoneCall, Mail, BookOpen, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export const metadata: Metadata = {
-    title: "Yardım Merkezi | Umrebuldum",
-    description: "Umrebuldum Yardım Merkezi. Platform kullanımı, turlar, acenteler ve teknik konularda destek alın.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Yardım Merkezi | Umrebuldum",
+        description: "Umrebuldum Yardım Merkezi. Platform kullanımı, turlar, acenteler ve teknik konularda destek alın.",
+    };
+}
 
 export default function HelpCenterPage() {
     return (

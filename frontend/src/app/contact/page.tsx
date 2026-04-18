@@ -5,16 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "İletişim | Umrebuldum",
-  description:
-    "Umrebuldum ile iletişime geçin. Kullanıcılar ve acenteler için 7/24 destek hattımız, e-posta adreslerimiz ve ofis bilgilerimiz.",
-  openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
     title: "İletişim | Umrebuldum",
     description:
       "Umrebuldum ile iletişime geçin. Kullanıcılar ve acenteler için 7/24 destek hattımız, e-posta adreslerimiz ve ofis bilgilerimiz.",
-  },
-};
+    openGraph: {
+      title: "İletişim | Umrebuldum",
+      description:
+        "Umrebuldum ile iletişime geçin. Kullanıcılar ve acenteler için 7/24 destek hattımız, e-posta adreslerimiz ve ofis bilgilerimiz.",
+    },
+  };
+}
 
 const contactInfo = [
   {

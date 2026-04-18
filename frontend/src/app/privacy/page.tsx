@@ -1,10 +1,12 @@
 ﻿import { Metadata } from "next";
 import { ShieldCheck, Lock, EyeOff } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "Gizlilik Politikası | Umrebuldum",
-    description: "Kişisel verilerinizin toplanması, kullanımı ve korunmasına ilişkin Umrebuldum gizlilik taahhüdü.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Gizlilik Politikası | Umrebuldum",
+        description: "Kişisel verilerinizin toplanması, kullanımı ve korunmasına ilişkin Umrebuldum gizlilik taahhüdü.",
+    };
+}
 
 export default function PrivacyPolicyPage() {
     return (

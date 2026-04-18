@@ -1,10 +1,12 @@
 ﻿import { Metadata } from "next";
 import { Cookie, Settings2 } from "lucide-react";
 
-export const metadata: Metadata = {
-    title: "Çerez Politikası | Umrebuldum",
-    description: "Sitemizde kullanılan çerezler, kullanım amaçları ve yönetimi hakkında bilgilendirme.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Çerez Politikası | Umrebuldum",
+        description: "Sitemizde kullanılan çerezler, kullanım amaçları ve yönetimi hakkında bilgilendirme.",
+    };
+}
 
 export default function CookiesPolicyPage() {
     return (

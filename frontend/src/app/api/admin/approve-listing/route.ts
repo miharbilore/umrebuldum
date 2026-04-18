@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
 import { logAdminAction } from "@/lib/admin-audit";
+import { buildListingSlug } from "@/lib/slug";
 
 /**
  * APPROVE-ONLY endpoint.
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
             { previousStatus: listing.approvalStatus }
         );
 
-        console.log(`[EMAIL] To Guide: "İlanınız onaylandı." Link: /listings/${listing.id}`);
+        console.log(`[EMAIL] To Guide: "İlanınız onaylandı." Link: /listings/${buildListingSlug(listing.id, listing.title)}`);
 
         return NextResponse.json({ success: true, status: 'APPROVED' });
 

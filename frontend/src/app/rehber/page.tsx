@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 import { Map, MapPin, Compass, Lightbulb, ChevronRight, BookOpen, Star, Sparkles, Navigation, Globe2, BookMarked } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export const metadata: Metadata = {
-  title: 'Umre Rehberi Hub',
-  description: 'Umre yolculuğunuzda size rehberlik edecek tüm içeriklere tek bir noktadan ulaşın.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Umre Rehberi Hub',
+    description: 'Umre yolculuğunuzda size rehberlik edecek tüm içeriklere tek bir noktadan ulaşın.',
+  };
+}
 
 const guideOptions = [
   {
