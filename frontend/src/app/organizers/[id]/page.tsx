@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { normalizeSlug } from "@/lib/slug";
 
-const buildOrganizerSlug = (slugParam: string) => {
+const normalizeOrganizerSlug = (slugParam: string) => {
     const [idPart, ...slugParts] = slugParam.split("-");
     if (slugParts.length === 0) {
         return normalizeSlug(slugParam);
@@ -14,7 +14,7 @@ const buildOrganizerSlug = (slugParam: string) => {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id: slugParam } = await params;
-    const normalizedSlug = buildOrganizerSlug(slugParam);
+    const normalizedSlug = normalizeOrganizerSlug(slugParam);
     const canonical = `https://umrebuldum.com/organizers/${normalizedSlug || slugParam}`;
 
     return {
@@ -39,8 +39,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function OrganizerProfile({ params }: { params: Promise<{ id: string }> }) {
     const { id: slugParam } = await params;
-    const normalizedSlug = buildOrganizerSlug(slugParam);
-    if (normalizedSlug && normalizedSlug !== slugParam) {
+    const normalizedSlug = normalizeOrganizerSlug(slugParam);
+    if (normalizedSlug.length > 0 && normalizedSlug !== slugParam) {
         permanentRedirect(`/organizers/${normalizedSlug}`);
     }
 
