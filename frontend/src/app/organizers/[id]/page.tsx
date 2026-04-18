@@ -5,7 +5,7 @@ import { normalizeSlug } from "@/lib/slug";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id: slugParam } = await params;
-    const normalizedSlug = normalizeSlug(slugParam || "");
+    const normalizedSlug = normalizeSlug(slugParam);
     const canonical = `https://umrebuldum.com/organizers/${normalizedSlug || slugParam}`;
 
     return {
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function OrganizerProfile({ params }: { params: Promise<{ id: string }> }) {
     const { id: slugParam } = await params;
-    const normalizedSlug = normalizeSlug(slugParam || "");
+    const normalizedSlug = normalizeSlug(slugParam);
     if (normalizedSlug && normalizedSlug !== slugParam) {
         permanentRedirect(`/organizers/${normalizedSlug}`);
     }

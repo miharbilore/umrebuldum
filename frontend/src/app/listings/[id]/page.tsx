@@ -9,6 +9,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { buildListingSlug } from "@/lib/slug";
 
+const DEFAULT_LISTING_IMAGE = "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80";
+const DEFAULT_LISTING_CURRENCY = "SAR";
+
 // ─── Trust Engine UI Components ─────────────────────────────────────────
 import { StarRating } from "@/components/ui/StarRating";
 import { TrustBadge } from "@/components/ui/TrustBadge";
@@ -95,7 +98,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
     const canonical = `https://umrebuldum.com/listings/${buildListingSlug(listing.id, listing.title)}`;
     const description = listing.description?.slice(0, 160) || "Umrebuldum onaylı umre turu ilanı.";
-    const metaImage = listing.image || "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80";
+    const metaImage = listing.image || DEFAULT_LISTING_IMAGE;
 
     return {
         title: `${listing.title} | Umrebuldum`,
@@ -136,18 +139,19 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     const isIdentityVerified = listing.guide?.isIdentityVerified;
     const isPremium = listing.guide?.package !== 'FREEMIUM';
     const canonicalUrl = `https://umrebuldum.com/listings/${expectedSlug}`;
+    const schemaImage = listing.image || DEFAULT_LISTING_IMAGE;
     const listingSchema = {
         "@context": "https://schema.org",
         "@type": "Tour",
         name: listing.title,
         description: listing.description,
-        image: listing.image ? [listing.image] : undefined,
+        image: schemaImage ? [schemaImage] : undefined,
         startDate: listing.startDate,
         endDate: listing.endDate,
         offers: {
             "@type": "Offer",
             price: listing.price,
-            priceCurrency: listing.pricing?.currency || "SAR",
+            priceCurrency: listing.pricing?.currency || DEFAULT_LISTING_CURRENCY,
             availability: listing.active ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             url: canonicalUrl,
         },
@@ -166,7 +170,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             {/* Header Image */}
             <div className="relative h-[400px] w-full">
                 <Image
-                    src={listing.image || "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80"}
+                    src={listing.image || DEFAULT_LISTING_IMAGE}
                     alt={listing.title}
                     fill
                     className="object-cover"
