@@ -16,7 +16,7 @@ export function Template10({ data, id, showWatermark = true }: { data: PosterDat
             }}
         >
             {/* Background Full Cover with gradient Map */}
-            <div className="absolute inset-0 z-0 relative">
+            <div className="absolute inset-0 z-0">
                 <Image
                     src={bgImage}
                     alt="Umrah"

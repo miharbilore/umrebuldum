@@ -2,7 +2,6 @@ const TURKISH_CHAR_MAP: Record<string, string> = {
   "ç": "c",
   "ğ": "g",
   "ı": "i",
-  "i̇": "i",
   "ö": "o",
   "ş": "s",
   "ü": "u",
@@ -13,6 +12,8 @@ export function normalizeSlug(input: string): string {
   const normalized = input
     .trim()
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[çğıöşü]/g, (char) => TURKISH_CHAR_MAP[char] || char)
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")

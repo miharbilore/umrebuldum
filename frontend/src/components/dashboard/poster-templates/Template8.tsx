@@ -16,7 +16,7 @@ export function Template8({ data, id, showWatermark = true }: { data: PosterData
             }}
         >
             {/* Background Image very faint */}
-            <div className="absolute inset-0 z-0 relative">
+            <div className="absolute inset-0 z-0">
                 <Image
                     src={bgImage}
                     alt="Umrah"
