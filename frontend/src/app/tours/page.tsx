@@ -4,6 +4,7 @@ import { ToursGrid } from "@/components/tours-grid";
 import { ToursSort } from "@/components/tours-sort";
 import { ToursFilter } from "@/components/tours-filter";
 import { Metadata } from "next";
+import Script from "next/script";
 import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
 import { sanitizeCityName } from "@/lib/city-utils";
 import { ApprovalStatus, Prisma } from "@prisma/client";
@@ -256,7 +257,8 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
   return (
     <main className="min-h-screen bg-gray-50/50">
-      <script
+      <Script
+        id="tours-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(toursSchema) }}
       />

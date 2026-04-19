@@ -16,7 +16,7 @@ async function runAdminTests() {
     });
 
     const testEmail = `test-admin-${Date.now()}@example.com`;
-    let user = await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             name: "Admin Test Guide",
             email: testEmail,
@@ -57,6 +57,7 @@ async function runAdminTests() {
                 filled: 0,
                 active: true,
                 approvalStatus: 'PENDING',
+                extraServices: [],
                 startDate: new Date(),
                 endDate: new Date(),
             }
@@ -103,6 +104,7 @@ async function runAdminTests() {
                 filled: 0,
                 active: true,
                 approvalStatus: 'PENDING',
+                extraServices: [],
                 startDate: new Date(),
                 endDate: new Date(),
             }
@@ -151,8 +153,8 @@ async function runAdminTests() {
 
         console.log(`PASS: User Record isIdentityVerified -> ${updatedUser.isIdentityVerified}`);
 
-    } catch (err: any) {
-        console.error('TEST FAILED:', err.message);
+    } catch (err: unknown) {
+        console.error('TEST FAILED:', err instanceof Error ? err.message : String(err));
     } finally {
         // Cleanup
         console.log("\nCleaning up test data...");

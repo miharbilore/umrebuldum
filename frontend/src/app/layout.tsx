@@ -84,12 +84,12 @@ export default async function RootLayout({
             <Header />
             <main className="flex-1 bg-gray-50">{children}</main>
             <Footer />
-            <NewsletterPopup />
-            <HybridChatbot />
-            <Analytics />
-            <Toaster position="top-right" richColors closeButton />
           </Providers>
         </SmoothScrollProvider>
+        <NewsletterPopup />
+        <HybridChatbot />
+        <Analytics />
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

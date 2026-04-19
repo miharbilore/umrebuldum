@@ -3,9 +3,10 @@ import { PackageSystem } from "@/lib/package-system";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Calendar, Check, ShieldCheck, Star, Phone, MessageCircle, Info } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Check, ShieldCheck, Star, Phone, MessageCircle, Info, User as UserIcon } from "lucide-react";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
+import Script from "next/script";
 import Image from "next/image";
 import { buildListingSlug } from "@/lib/slug";
 import { DEFAULT_LISTING_CURRENCY, DEFAULT_LISTING_IMAGE } from "@/lib/constants";
@@ -161,8 +162,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
-            <script
+        <main className="min-h-screen bg-gray-50/50">
+            <Script
+                id="listing-schema"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(listingSchema) }}
             />

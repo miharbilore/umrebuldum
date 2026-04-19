@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -27,7 +27,7 @@ async function main() {
     const durations = ["7 Günlük", "14 Günlük", "15 Günlük", "20 Günlük", "28 Günlük"];
     const concepts = ["Ekonomik", "Lüks", "5 Yıldızlı", "Kabe Manzaralı", "Sömestr", "Ramazan"];
 
-    const seoPages: any[] = [];
+    const seoPages: Prisma.SeoLandingPageCreateManyInput[] = [];
     const currentYear = new Date().getFullYear();
 
     // Strategy 1: City + Duration (e.g., "İstanbul Çıkışlı 15 Günlük Umre Turları")

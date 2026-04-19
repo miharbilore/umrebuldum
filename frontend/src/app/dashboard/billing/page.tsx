@@ -1,4 +1,3 @@
-﻿
 "use client";
 
 import { CreditBalance } from "@/components/guide-dashboard/credit-balance";
@@ -6,16 +5,17 @@ import { CreditPackages } from "@/components/dashboard/credit-packages";
 import { AutoReplenishSettings } from "@/components/dashboard/auto-replenish-settings";
 import { SavedCards } from "@/components/dashboard/SavedCards";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { toast } from "sonner";
-import { Suspense } from "react";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { ShieldCheck, CreditCard, Zap, Settings2 } from "lucide-react";
 
 function BillingContent() {
     const searchParams = useSearchParams();
 
     useEffect(() => {
         if (searchParams.get("success")) {
-            toast.success("Ödeme başarılı! Kredileriniz hesabınıza tanımlandı.");
+            toast.success("Ödeme başarılı! Tokenlar bakiyenize tanımlandı.");
         }
         if (searchParams.get("canceled")) {
             toast.error("Ödeme iptal edildi.");
@@ -23,42 +23,85 @@ function BillingContent() {
     }, [searchParams]);
 
     return (
-        <div className="container mx-auto py-10 px-4 max-w-5xl">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Ödemeler ve Kredi</h1>
-                <p className="text-muted-foreground mt-2">
-                    Kredi bakiyenizi yönetin ve yeni paketler satın alın.
-                </p>
-            </div>
+        <DashboardLayout>
+            <div className="min-h-screen bg-slate-50/50 pb-20">
+                <div className="container mx-auto py-10 px-4 max-w-6xl">
+                    {/* Header Section */}
+                    <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest mb-4">
+                                <ShieldCheck className="w-3 h-3" width={12} height={12} />
+                                Güvenli Ödeme Merkezi
+                            </div>
+                            <h1 className="text-4xl font-black tracking-tight text-slate-900 leading-none">
+                                Ödemeler ve <span className="text-[#FFB800]">Tokenlar</span>
+                            </h1>
+                            <p className="text-slate-500 mt-4 font-bold max-w-xl">
+                                Üyelik paketlerinizi yönetin, token bakiyenizi takip edin ve ödeme yöntemlerinizi güvenle saklayın.
+                            </p>
+                        </div>
+                    </div>
 
-            <div className="mb-10">
-                <h2 className="text-xl font-semibold mb-4">Mevcut Bakiye</h2>
-                <CreditBalance />
-            </div>
+                    {/* Main Stats (Token Balance) */}
+                    <CreditBalance />
 
-            <div className="mb-10">
-                <h2 className="text-xl font-semibold mb-4">Kayıtlı Kartlarım</h2>
-                <SavedCards />
-            </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Left Column: Packages */}
+                        <div className="lg:col-span-2 space-y-8">
+                            <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <div className="p-2 bg-blue-50 rounded-xl">
+                                        <Zap className="h-5 w-5 text-blue-600 fill-blue-600" width={20} height={20} />
+                                    </div>
+                                    <h2 className="text-2xl font-black text-slate-900 leading-none">Token Paketleri</h2>
+                                </div>
+                                <CreditPackages />
+                            </div>
+                        </div>
 
-            <div className="mb-10">
-                <h2 className="text-xl font-semibold mb-4">Otomatik Yükleme Ayarları</h2>
-                <AutoReplenishSettings />
-            </div>
+                        {/* Right Column: Cards & Settings */}
+                        <div className="space-y-8">
+                            {/* Saved Cards */}
+                            <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-slate-50 rounded-xl">
+                                        <CreditCard className="h-5 w-5 text-slate-600" width={20} height={20} />
+                                    </div>
+                                    <h2 className="text-xl font-black text-slate-900 leading-none">Kayıtlı Kartlar</h2>
+                                </div>
+                                <SavedCards />
+                            </div>
 
-            <div>
-                <h2 className="text-xl font-semibold mb-4">Kredi Paketleri</h2>
-                <CreditPackages />
+                            {/* Auto Replenish Settings */}
+                            <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-full -z-10 group-hover:bg-[#FFB800]/5 transition-colors" />
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-amber-50 rounded-xl">
+                                        <Settings2 className="h-5 w-5 text-[#FFB800]" width={20} height={20} />
+                                    </div>
+                                    <h2 className="text-xl font-black text-slate-900 leading-none">Otomatik Yükleme</h2>
+                                </div>
+                                <AutoReplenishSettings />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </DashboardLayout>
     );
 }
 
 export default function BillingPage() {
     return (
-        <Suspense fallback={<div>Yükleniyor...</div>}>
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-slate-200 border-t-[#FFB800] rounded-full animate-spin" />
+                    <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Yükleniyor...</p>
+                </div>
+            </div>
+        }>
             <BillingContent />
         </Suspense>
     );
 }
-

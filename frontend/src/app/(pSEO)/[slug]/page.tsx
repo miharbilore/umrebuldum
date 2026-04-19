@@ -4,6 +4,7 @@
 // and renders the highly indexed landing page with JSON-LD.
 
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 import { prisma } from '@/lib/prisma';
 import { PseoSchemaGenerator } from '@/lib/pseo-schema';
 // Note: Depending on actual RankingEngine export path, we'd import it here to fetch listings.
@@ -95,9 +96,9 @@ export default async function PseoLandingPage({ params: rawParams }: { params: {
     return (
         <main className="min-h-screen bg-neutral-50 pb-20">
             {/* Inject Structured Data */}
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqs) }} />
-            {rating && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rating) }} />}
+            <Script id="pset-breadcrumbs" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+            <Script id="pseo-faqs" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqs) }} />
+            {rating && <Script id="pseo-rating" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(rating) }} />}
 
             {/* Header Section */}
             <div className="bg-primary-900 text-white py-16 px-4">

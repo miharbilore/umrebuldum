@@ -1,13 +1,14 @@
-﻿
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Check, CreditCard, Tag, Loader2, X, Zap, Crown, Building2 } from "lucide-react";
+import { Check, CreditCard, Tag, Loader2, X, Zap, Crown, Building2, Shield, Star } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { PaymentCheckout } from "@/components/dashboard/PaymentCheckout";
+import { cn } from "@/lib/utils";
 
 interface CreditPackage {
     id: string;
@@ -33,15 +34,15 @@ interface CouponState {
 type BillingTab = 1 | 3 | 12;
 
 const PERIOD_LABELS: Record<number, string> = { 1: "Aylık", 3: "3 Aylık", 12: "Yıllık" };
-const PERIOD_SAVINGS: Record<number, string> = { 1: "", 3: "%7 Tasarruf", 12: "%14 Tasarruf" };
+const PERIOD_SAVINGS: Record<number, string> = { 1: "", 3: "%7 Avantaj", 12: "%14 Avantaj" };
 
-const TIER_STYLES: Record<string, { border: string; bg: string; badge: string; popular?: boolean }> = {
-    FREEMIUM:      { border: "border-slate-200", bg: "bg-white", badge: "bg-slate-100 text-slate-600" },
-    PREMIUM:       { border: "border-blue-200", bg: "bg-gradient-to-b from-blue-50/50 to-white", badge: "bg-blue-100 text-blue-700" },
-    PLUS:          { border: "border-amber-300", bg: "bg-gradient-to-b from-amber-50/50 to-white", badge: "bg-amber-100 text-amber-800", popular: true },
-    PRO:           { border: "border-violet-300", bg: "bg-gradient-to-b from-violet-50/50 to-white", badge: "bg-violet-100 text-violet-800" },
-    BUSINESS:      { border: "border-emerald-300", bg: "bg-gradient-to-b from-emerald-50/50 to-white", badge: "bg-emerald-100 text-emerald-700", popular: true },
-    BUSINESS_PLUS: { border: "border-purple-300", bg: "bg-gradient-to-b from-purple-50/50 to-white", badge: "bg-purple-100 text-purple-800" },
+const TIER_STYLES: Record<string, { border: string; bg: string; badge: string; popular?: boolean; iconColor: string }> = {
+    FREEMIUM:      { border: "border-slate-200", bg: "bg-white", badge: "bg-slate-100 text-slate-600", iconColor: "text-slate-400" },
+    PREMIUM:       { border: "border-blue-200", bg: "bg-white", badge: "bg-blue-50 text-blue-700", iconColor: "text-blue-500" },
+    PLUS:          { border: "border-[#FFB800]/30", bg: "bg-white", badge: "bg-amber-50 text-amber-800", popular: true, iconColor: "text-[#FFB800]" },
+    PRO:           { border: "border-violet-300", bg: "bg-white", badge: "bg-violet-50 text-violet-800", iconColor: "text-violet-500" },
+    BUSINESS:      { border: "border-emerald-300", bg: "bg-white", badge: "bg-emerald-50 text-[#059669]", popular: true, iconColor: "text-[#059669]" },
+    BUSINESS_PLUS: { border: "border-purple-300", bg: "bg-white", badge: "bg-purple-50 text-purple-800", iconColor: "text-purple-600" },
 };
 
 function getTierStyle(slug: string) {
@@ -53,17 +54,13 @@ function buildFeatureList(featsObj: any): string[] {
     if (Array.isArray(featsObj)) return featsObj;
 
     const list: string[] = [];
-    if (featsObj.maxListings) list.push(`Maksimum ${featsObj.maxListings} İlan Hakkı`);
-    if (featsObj.listingDays) list.push(`${featsObj.listingDays} Gün İlan Süresi`);
-    if (featsObj.maxBoosts) list.push(`Aylık ${featsObj.maxBoosts} Öne Çıkarma`);
-    if (featsObj.phoneVisible) list.push("Telefon Numarası Görünürlüğü");
-    if (featsObj.spotlightEligible) list.push("Vitrin İlanı (Spotlight)");
+    if (featsObj.maxListings) list.push(`${featsObj.maxListings} Aktif İlan Hakkı`);
+    if (featsObj.listingDays) list.push(`${featsObj.listingDays} Gün Yayın Süresi`);
+    if (featsObj.maxBoosts) list.push(`${featsObj.maxBoosts} Öne Çıkarma Hakkı`);
+    if (featsObj.phoneVisible) list.push("Telefon Numarası Gösterimi");
+    if (featsObj.spotlightEligible) list.push("Vitrin İlanı Erişimi");
     if (featsObj.priorityRanking) list.push("Öncelikli Sıralama");
-    if (featsObj.trustBoost) list.push("Güven Puanı Desteği");
-    if (featsObj.identityVerificationEligible) list.push("Kimlik Doğrulama İzni");
-    if (featsObj.canCreatePoster) list.push("Afiş/Poster Oluşturma");
-    if (featsObj.posterQuality && featsObj.posterQuality !== "LOW") list.push(`${featsObj.posterQuality} Kalite Medya`);
-    if (featsObj.canCreatePoster && featsObj.watermark === false) list.push("Filigransız Tasarım");
+    if (featsObj.canCreatePoster) list.push("Afiş Motoru Kullanımı");
     return list;
 }
 
@@ -73,7 +70,7 @@ export function CreditPackages() {
 
     const [packages, setPackages] = useState<CreditPackage[]>([]);
     const [loading, setLoading] = useState<string | null>(null);
-    const [billingTab, setBillingTab] = useState<BillingTab>(1);
+    const [billingTab, setBillingTab] = useState<BillingTab>(12); // Default to Annual for better conversion
     const [checkoutPkg, setCheckoutPkg] = useState<CreditPackage | null>(null);
 
     const [coupon, setCoupon] = useState<CouponState>({
@@ -103,19 +100,15 @@ export function CreditPackages() {
         })();
     }, []);
 
-    // Filter by role and billing period
     const isOrg = role === "ORGANIZATION";
     const displayPackages = packages.filter(pkg => {
         const forOrg = pkg.roleTarget === "ORGANIZATION";
-        // FREEMIUM: show only period 1, match role
         if (pkg.slug === "FREEMIUM") {
             return pkg.billingPeriod === 1 && (isOrg ? forOrg : !forOrg);
         }
-        // Paid: match role and selected billing period
         return (isOrg ? forOrg : !forOrg) && pkg.billingPeriod === billingTab;
     });
 
-    // Coupon validation
     const validateCoupon = async () => {
         if (!coupon.code.trim()) return;
         setCoupon((prev) => ({ ...prev, checking: true }));
@@ -156,33 +149,31 @@ export function CreditPackages() {
         setCheckoutPkg(pkg);
     };
 
-    // Check if there are paid packages to show tabs
     const hasPaidPackages = packages.some(p => p.priceTRY > 0 && (isOrg ? p.roleTarget === "ORGANIZATION" : p.roleTarget === "GUIDE"));
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-10">
             {/* Billing Period Tabs */}
             {hasPaidPackages && (
                 <div className="flex items-center justify-center">
-                    <div className="inline-flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                    <div className="inline-flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 shadow-inner">
                         {([1, 3, 12] as BillingTab[]).map((period) => (
                             <button
                                 key={period}
                                 onClick={() => setBillingTab(period)}
-                                className={`
-                                    relative px-5 py-2 rounded-lg text-sm font-medium transition-all
-                                    ${billingTab === period
-                                        ? "bg-white shadow-sm text-slate-900"
-                                        : "text-slate-500 hover:text-slate-700"
-                                    }
-                                `}
+                                className={cn(
+                                    "relative px-6 py-2.5 rounded-xl text-sm font-black transition-all min-h-[44px]",
+                                    billingTab === period
+                                        ? "bg-white shadow-md text-slate-900"
+                                        : "text-slate-500 hover:text-slate-900"
+                                )}
                             >
                                 {PERIOD_LABELS[period]}
                                 {PERIOD_SAVINGS[period] && (
-                                    <span className={`
-                                        ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full
-                                        ${billingTab === period ? "bg-green-100 text-green-700" : "bg-green-50 text-green-600"}
-                                    `}>
+                                    <span className={cn(
+                                        "ml-2 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tight",
+                                        billingTab === period ? "bg-emerald-100 text-[#059669]" : "bg-white text-slate-400"
+                                    )}>
                                         {PERIOD_SAVINGS[period]}
                                     </span>
                                 )}
@@ -192,50 +183,8 @@ export function CreditPackages() {
                 </div>
             )}
 
-            {/* Coupon Input Section */}
-            <div className="rounded-xl border bg-gradient-to-r from-amber-50 to-orange-50 p-4 dark:from-amber-950/20 dark:to-orange-950/20">
-                <div className="flex items-center gap-2 mb-2">
-                    <Tag className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-amber-800 dark:text-amber-200">İndirim Kuponu</span>
-                </div>
-                <div className="flex gap-2">
-                    <Input
-                        placeholder="Kupon kodunu girin..."
-                        value={coupon.code}
-                        onChange={(e) =>
-                            setCoupon((prev) => ({
-                                ...prev,
-                                code: e.target.value.toUpperCase(),
-                                valid: null,
-                                message: "",
-                            }))
-                        }
-                        className="flex-1 uppercase tracking-wider bg-white dark:bg-gray-900"
-                        disabled={coupon.valid === true}
-                    />
-                    {coupon.valid === true ? (
-                        <Button variant="outline" size="icon" onClick={clearCoupon}>
-                            <X className="h-4 w-4" />
-                        </Button>
-                    ) : (
-                        <Button
-                            onClick={validateCoupon}
-                            disabled={!coupon.code.trim() || coupon.checking}
-                            variant="secondary"
-                        >
-                            {coupon.checking ? <Loader2 className="h-4 w-4 animate-spin" /> : "Uygula"}
-                        </Button>
-                    )}
-                </div>
-                {coupon.message && (
-                    <p className={`text-xs mt-2 ${coupon.valid ? "text-green-600" : "text-red-500"}`}>
-                        {coupon.message}
-                    </p>
-                )}
-            </div>
-
             {/* Package Grid */}
-            <div className={`grid gap-5 ${displayPackages.length <= 3 ? "md:grid-cols-3" : "md:grid-cols-2 lg:grid-cols-4"}`}>
+            <div className={`grid gap-6 ${displayPackages.length <= 3 ? "md:grid-cols-3" : "md:grid-cols-2 lg:grid-cols-4"}`}>
                 {displayPackages.map((pkg) => {
                     const discountedPrice = getDiscountedPrice(pkg.priceTRY);
                     const hasDiscount = coupon.valid && coupon.discountPercent > 0;
@@ -247,123 +196,122 @@ export function CreditPackages() {
                     return (
                         <div
                             key={pkg.id}
-                            className={`
-                                relative flex flex-col justify-between rounded-2xl border-2 p-6 
-                                transition-all hover:shadow-lg hover:-translate-y-0.5
-                                ${style.border} ${style.bg}
-                                ${style.popular && !isFree ? "ring-2 ring-primary/20 shadow-md" : "shadow-sm"}
-                            `}
+                            className={cn(
+                                "relative flex flex-col justify-between rounded-[2rem] border-2 p-8 transition-all hover:shadow-2xl hover:-translate-y-1 bg-white",
+                                style.border,
+                                style.popular && !isFree ? "ring-2 ring-[#FFB800]/20 shadow-xl" : "shadow-sm"
+                            )}
                         >
                             {/* Popular badge */}
                             {style.popular && !isFree && (
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-bold text-primary-foreground shadow-sm flex items-center gap-1">
-                                    <Zap className="h-3 w-3" /> En Popüler
+                                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-[#FFB800] px-6 py-1.5 text-[10px] font-black text-black shadow-lg flex items-center gap-1.5 uppercase tracking-widest border-2 border-white">
+                                    <Star className="h-3 w-3 fill-black" width={12} height={12} /> En Popüler
                                 </div>
                             )}
 
                             {/* Discount badge */}
                             {hasDiscount && !isFree && (
-                                <div className="absolute -top-3 right-3 rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                    %{coupon.discountPercent} İndirim
+                                <div className="absolute -top-3.5 right-6 rounded-full bg-[#059669] px-4 py-1.5 text-[10px] font-black text-white shadow-lg border-2 border-white">
+                                    %{coupon.discountPercent} İNDİRİM
                                 </div>
                             )}
 
-                            <div className="mb-4">
-                                {/* Tier badge */}
-                                <div className="flex items-center gap-2 mb-3">
-                                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${style.badge}`}>
+                            <div>
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className={cn("text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full", style.badge)}>
                                         {pkg.slug.replace("_", " ")}
                                     </span>
+                                    <div className={cn("p-2 rounded-xl bg-slate-50", style.iconColor)}>
+                                        <Zap className="w-5 h-5" width={20} height={20} />
+                                    </div>
                                 </div>
 
-                                <h3 className="text-lg font-bold text-gray-900">
+                                <h3 className="text-xl font-black text-slate-900 mb-4 leading-tight">
                                     {pkg.name.replace(/ — .*$/, "")}
                                 </h3>
 
                                 {/* Price */}
-                                <div className="mt-3">
+                                <div className="mb-6">
                                     {isFree ? (
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-3xl font-extrabold text-gray-900">Ücretsiz</span>
-                                        </div>
+                                        <div className="text-3xl font-black text-slate-900 tracking-tight">Ücretsiz</div>
                                     ) : (
-                                        <>
-                                            <div className="flex items-baseline gap-1">
+                                        <div className="space-y-1">
+                                            <div className="flex items-baseline gap-1.5">
                                                 {hasDiscount ? (
                                                     <>
-                                                        <span className="text-sm text-gray-400 line-through">
-                                                            {pkg.priceTRY.toLocaleString('tr-TR')}₺
+                                                        <span className="text-sm text-slate-300 line-through font-bold">
+                                                            ₺{pkg.priceTRY.toLocaleString('tr-TR')}
                                                         </span>
-                                                        <span className="text-3xl font-extrabold text-green-600">
-                                                            {Math.round(discountedPrice).toLocaleString('tr-TR')}
+                                                        <span className="text-4xl font-black text-[#059669]">
+                                                            ₺{Math.round(discountedPrice).toLocaleString('tr-TR')}
                                                         </span>
-                                                        <span className="text-sm font-medium text-green-600">₺</span>
                                                     </>
                                                 ) : (
-                                                    <>
-                                                        <span className="text-3xl font-extrabold text-gray-900">
-                                                            {pkg.priceTRY.toLocaleString('tr-TR')}
-                                                        </span>
-                                                        <span className="text-sm font-medium text-gray-500">₺</span>
-                                                    </>
+                                                    <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                                        ₺{pkg.priceTRY.toLocaleString('tr-TR')}
+                                                    </span>
                                                 )}
+                                                <span className="text-xs font-bold text-slate-400 ml-1">/{PERIOD_LABELS[billingTab]}</span>
                                             </div>
                                             {perMonth && (
-                                                <p className="text-xs text-slate-500 mt-0.5">
-                                                    aylık ~{perMonth.toLocaleString('tr-TR')}₺
+                                                <p className="text-[10px] font-black text-[#059669] uppercase tracking-wider bg-emerald-50 px-2 py-0.5 rounded w-fit">
+                                                    AYLIK ~{perMonth.toLocaleString('tr-TR')}₺ AVANTAJ
                                                 </p>
                                             )}
-                                        </>
+                                        </div>
                                     )}
                                 </div>
 
-                                {/* Credits */}
-                                <div className="mt-2 flex items-center gap-1.5 text-sm">
-                                    <CreditCard className="h-3.5 w-3.5 text-amber-500" />
-                                    <span className="font-semibold text-amber-700">{pkg.credits}</span>
-                                    <span className="text-gray-500">Kredi</span>
+                                {/* Tokens */}
+                                <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
+                                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                                        <Zap className="h-5 w-5 text-[#FFB800] fill-[#FFB800]" width={20} height={20} />
+                                    </div>
+                                    <div>
+                                        <div className="text-lg font-black text-slate-900 leading-none">{pkg.credits} Token</div>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Hediye Bakiyesi</p>
+                                    </div>
+                                </div>
+
+                                {/* Features */}
+                                <div className="space-y-3 mb-10 pt-4 border-t border-slate-50">
+                                    {featuresList.length > 0 ? (
+                                        featuresList.map((feature, idx) => (
+                                            <div key={idx} className="flex items-start gap-3 group">
+                                                <Check className="h-4 w-4 text-[#059669] mt-0.5 shrink-0" width={16} height={16} />
+                                                <span className="text-xs font-bold text-slate-600 transition-colors group-hover:text-slate-900">{feature}</span>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-xs text-slate-400 italic">Temel Özellikler</p>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Features */}
-                            <ul className="mb-6 space-y-2 text-sm text-gray-600 flex-1">
-                                {featuresList.length > 0 ? (
-                                    featuresList.map((feature, idx) => (
-                                        <li key={idx} className="flex items-start gap-2">
-                                            <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                            <span>{feature}</span>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <li className="flex items-center gap-2 text-gray-400 italic">
-                                        <span>Temel Özellikler</span>
-                                    </li>
-                                )}
-                            </ul>
-
                             {/* Buy button */}
                             {isFree ? (
-                                <div className="w-full mt-4 text-center py-2.5 text-sm font-medium text-slate-400 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                                    Mevcut Paketiniz
+                                <div className="w-full mt-4 text-center py-4 text-xs font-black text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-100 uppercase tracking-widest">
+                                    Aktif Paketin
                                 </div>
                             ) : (
                                 <Button
                                     onClick={() => handleBuy(pkg)}
                                     disabled={loading !== null}
-                                    className={`w-full mt-4 h-11 text-sm font-semibold ${
+                                    className={cn(
+                                        "w-full min-h-[56px] text-sm font-black rounded-2xl transition-all shadow-lg active:scale-95",
                                         style.popular
-                                            ? "bg-primary hover:bg-primary/90 shadow-md shadow-primary/20"
-                                            : "bg-gray-900 hover:bg-gray-800 text-white"
-                                    }`}
+                                            ? "bg-[#FFB800] hover:bg-[#E6A600] text-black shadow-[#FFB800]/20"
+                                            : "bg-slate-900 hover:bg-black text-white"
+                                    )}
                                 >
                                     {loading === pkg.id ? (
                                         <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> İşleniyor...</>
                                     ) : (
                                         <>
-                                            <CreditCard className="mr-2 h-4 w-4" />
+                                            <CreditCard className="mr-2 h-4 w-4" width={16} height={16} />
                                             {hasDiscount
-                                                ? `${Math.round(discountedPrice).toLocaleString('tr-TR')}₺ ile Satın Al`
-                                                : "Satın Al"}
+                                                ? `${Math.round(discountedPrice).toLocaleString('tr-TR')}₺ ile Başlat`
+                                                : "Hemen Başlat"}
                                         </>
                                     )}
                                 </Button>
@@ -371,6 +319,56 @@ export function CreditPackages() {
                         </div>
                     );
                 })}
+            </div>
+
+            {/* Coupon Input Section */}
+            <div className="rounded-[2rem] border bg-white p-8 shadow-sm border-slate-100 max-w-2xl mx-auto">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-amber-50 rounded-xl">
+                        <Tag className="h-5 w-5 text-amber-600" width={20} height={20} />
+                    </div>
+                    <div>
+                        <h4 className="text-lg font-black text-slate-900 leading-none">İndirim Kuponu</h4>
+                        <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">Ekstra Avantaj Yakalayın</p>
+                    </div>
+                </div>
+                <div className="flex gap-3">
+                    <Input
+                        placeholder="KODU BURAYA YAZIN..."
+                        value={coupon.code}
+                        onChange={(e) =>
+                            setCoupon((prev) => ({
+                                ...prev,
+                                code: e.target.value.toUpperCase(),
+                                valid: null,
+                                message: "",
+                            }))
+                        }
+                        className="h-14 rounded-2xl uppercase tracking-widest bg-slate-50 border-slate-100 font-bold focus:ring-[#FFB800]/20"
+                        disabled={coupon.valid === true}
+                    />
+                    {coupon.valid === true ? (
+                        <Button variant="outline" className="h-14 w-14 rounded-2xl" onClick={clearCoupon}>
+                            <X className="h-5 w-5" width={20} height={20} />
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={validateCoupon}
+                            disabled={!coupon.code.trim() || coupon.checking}
+                            className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-black text-white font-black uppercase text-xs tracking-widest"
+                        >
+                            {coupon.checking ? <Loader2 className="h-5 w-5 animate-spin" /> : "Uygula"}
+                        </Button>
+                    )}
+                </div>
+                {coupon.message && (
+                    <p className={cn(
+                        "text-[10px] font-black mt-3 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wider",
+                        coupon.valid ? "bg-emerald-50 text-[#059669] border border-emerald-100" : "bg-red-50 text-red-500 border border-red-100"
+                    )}>
+                        {coupon.message}
+                    </p>
+                )}
             </div>
 
             {/* Payment Checkout Modal */}

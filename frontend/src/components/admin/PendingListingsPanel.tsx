@@ -1,8 +1,30 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { CheckCircle, XCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { 
+    CheckCircle, 
+    XCircle, 
+    Loader2, 
+    AlertTriangle, 
+    Search,
+    MapPin,
+    Calendar,
+    ArrowUpRight
+} from 'lucide-react';
+import { 
+    Table, 
+    TableBody, 
+    TableCell, 
+    TableHead, 
+    TableHeader, 
+    TableRow 
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SmartAvatar } from "@/components/ui/smart-avatar";
+import { toast } from "sonner";
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -24,23 +46,21 @@ export default function PendingListingsPanel() {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [rejectModal, setRejectModal] = useState<{ listingId: string; title: string } | null>(null);
     const [rejectReason, setRejectReason] = useState('');
-    const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     async function handleApprove(listingId: string) {
         setActionLoading(listingId);
-        setFeedback(null);
         try {
             const res = await fetch('/api/admin/approve-listing', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ listingId, action: 'APPROVE', reason: 'Admin approved' }),
+                body: JSON.stringify({ listingId, action: 'APPROVE', reason: 'Admin onayladı' }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Onay başarısız');
-            setFeedback({ type: 'success', message: `İlan onaylandı` });
+            toast.success("İlan başarıyla onaylandı ve yayına alındı.");
             mutate();
         } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+            toast.error(err.message);
         } finally {
             setActionLoading(null);
         }
@@ -49,7 +69,6 @@ export default function PendingListingsPanel() {
     async function handleReject() {
         if (!rejectModal || !rejectReason.trim()) return;
         setActionLoading(rejectModal.listingId);
-        setFeedback(null);
         try {
             const res = await fetch('/api/admin/reject-listing', {
                 method: 'POST',
@@ -58,12 +77,12 @@ export default function PendingListingsPanel() {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Red başarısız');
-            setFeedback({ type: 'success', message: `İlan reddedildi` });
+            toast.success("İlan reddedildi.");
             setRejectModal(null);
             setRejectReason('');
             mutate();
         } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+            toast.error(err.message);
         } finally {
             setActionLoading(null);
         }
@@ -71,25 +90,24 @@ export default function PendingListingsPanel() {
 
     if (isLoading) {
         return (
-            <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-gray-800 rounded-lg animate-pulse" />
-                ))}
+            <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl border-2 border-dashed border-gray-100">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                <p className="text-sm text-muted-foreground font-medium">İlanlar taranıyor...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                <div>
-                    <p className="text-red-400 font-medium">Veri yüklenemedi</p>
-                    <p className="text-red-400/70 text-sm">Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin.</p>
+            <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-destructive/20 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-6 h-6 text-destructive" />
                 </div>
-                <button onClick={() => mutate()} className="ml-auto px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md text-sm transition-colors">
-                    Tekrar Dene
-                </button>
+                <div>
+                    <h4 className="font-bold text-destructive">Bağlantı Hatası</h4>
+                    <p className="text-sm text-destructive/80 italic">Veritabanı ile iletişim kurulurken bir sorun oluştu.</p>
+                </div>
+                <Button variant="outline" className="ml-auto" onClick={() => mutate()}>Yeniden Dene</Button>
             </div>
         );
     }
@@ -97,124 +115,176 @@ export default function PendingListingsPanel() {
     const listings: PendingListing[] = data?.listings || [];
 
     return (
-        <div className="space-y-4">
-            {feedback && (
-                <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${feedback.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    }`}>
-                    {feedback.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                    {feedback.message}
+        <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+            <CardHeader className="border-b bg-white/50 px-6 py-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <CardTitle className="text-lg font-bold flex items-center gap-2">
+                            Onay Bekleyen İlanlar
+                            <Badge variant="secondary" className="rounded-full px-2 py-0">
+                                {listings.length}
+                            </Badge>
+                        </CardTitle>
+                        <p className="text-xs text-muted-foreground mt-1">Yayınlanmadan önce admin incelemesi gereken yeni tur ilanları.</p>
+                    </div>
                 </div>
-            )}
+            </CardHeader>
+            <CardContent className="p-0">
+                {listings.length === 0 ? (
+                    <div className="text-center py-20 bg-white/20">
+                        <div className="h-16 w-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-4 border border-emerald-100">
+                            <CheckCircle className="w-8 h-8" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">Hepsi Temiz!</h3>
+                        <p className="text-sm text-gray-500 mt-1 max-w-xs mx-auto">Bekleyen herhangi bir ilan kalmadı. Tüm talepler işlendi.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                                    <TableHead className="w-[300px]">İlan Başlığı / Güzergah</TableHead>
+                                    <TableHead>Rehber Bilgileri</TableHead>
+                                    <TableHead>Ekonomik Veri</TableHead>
+                                    <TableHead>Gönderim</TableHead>
+                                    <TableHead className="text-right">Aksiyon</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {listings.map((listing) => (
+                                    <tr key={listing.id} className="hover:bg-white transition-all group">
+                                        <TableCell>
+                                            <div className="flex flex-col gap-1.5">
+                                                <span className="font-bold text-gray-900 leading-tight group-hover:text-primary transition-colors">
+                                                    {listing.title}
+                                                </span>
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                                                    <Badge variant="outline" className="px-1.5 py-0 border-gray-200 bg-gray-50 uppercase text-[10px]">
+                                                        {listing.departureCity}
+                                                    </Badge>
+                                                    <ArrowUpRight className="w-3 h-3" />
+                                                    <Badge variant="outline" className="px-1.5 py-0 border-gray-200 bg-gray-50 uppercase text-[10px]">
+                                                        {listing.city}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <SmartAvatar name={listing.guideName} size={32} />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-semibold">{listing.guideName}</span>
+                                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                                        <div className={`h-1.5 w-1.5 rounded-full ${listing.trustScore >= 70 ? 'bg-success' : 'bg-warning'}`} />
+                                                        <span className="text-[10px] text-muted-foreground">Güven: %{listing.trustScore}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-sm font-bold text-gray-900 tabular-nums">
+                                                    {listing.price?.toLocaleString('tr-TR')} SAR
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">4 Kişilik Fiyat</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs font-medium text-gray-600">
+                                                    {new Date(listing.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short' })}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground">Tarihinde İletildi</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex items-center justify-end gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-8 border-success/30 text-success hover:bg-success hover:text-white transition-all font-semibold"
+                                                    onClick={() => handleApprove(listing.id)}
+                                                    disabled={actionLoading === listing.id}
+                                                >
+                                                    {actionLoading === listing.id ? <Loader2 className="w-3 h-3 animate-spin mr-1.5" /> : <CheckCircle className="w-3 h-3 mr-1.5" />}
+                                                    Onayla
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-8 border-destructive/30 text-destructive hover:bg-destructive hover:text-white transition-all font-semibold"
+                                                    onClick={() => setRejectModal({ listingId: listing.id, title: listing.title })}
+                                                    disabled={actionLoading === listing.id}
+                                                >
+                                                    <XCircle className="w-3 h-3 mr-1.5" />
+                                                    Red
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </tr>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
+            </CardContent>
 
-            {listings.length === 0 ? (
-                <div className="text-center py-12">
-                    <CheckCircle className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                    <p className="text-gray-400">Bekleyen ilan yok</p>
-                    <p className="text-gray-600 text-sm mt-1">Tüm ilanlar onaylanmış durumda.</p>
-                </div>
-            ) : (
-                <div className="overflow-x-auto rounded-lg border border-gray-800">
-                    <table className="w-full text-sm">
-                        <thead className="bg-gray-900 text-gray-400 text-xs uppercase tracking-wider">
-                            <tr>
-                                <th className="px-4 py-3 text-left font-medium">İlan</th>
-                                <th className="px-4 py-3 text-left font-medium">Rehber / Org</th>
-                                <th className="px-4 py-3 text-left font-medium">Fiyat</th>
-                                <th className="px-4 py-3 text-left font-medium">Tarih</th>
-                                <th className="px-4 py-3 text-left font-medium">Güven Puanı</th>
-                                <th className="px-4 py-3 text-right font-medium">İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-800">
-                            {listings.map((listing) => (
-                                <tr key={listing.id} className="hover:bg-gray-900/50 transition-colors">
-                                    <td className="px-4 py-3">
-                                        <div>
-                                            <p className="font-medium text-gray-200">{listing.title}</p>
-                                            <p className="text-xs text-gray-500">{listing.departureCity} → {listing.city}</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <p className="text-gray-300">{listing.guideName}</p>
-                                        <p className="text-xs text-gray-500">{listing.guideEmail}</p>
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-300 font-medium">
-                                        {listing.price?.toLocaleString('tr-TR')} ₺
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-400 text-xs">
-                                        {new Date(listing.createdAt).toLocaleDateString('tr-TR')}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${listing.trustScore >= 70 ? 'bg-emerald-500/10 text-emerald-400' :
-                                                listing.trustScore >= 40 ? 'bg-yellow-500/10 text-yellow-400' :
-                                                    'bg-red-500/10 text-red-400'
-                                            }`}>
-                                            {listing.trustScore}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => handleApprove(listing.id)}
-                                                disabled={actionLoading === listing.id}
-                                                className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-md text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                {actionLoading === listing.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3 h-3" />}
-                                                Onayla
-                                            </button>
-                                            <button
-                                                onClick={() => setRejectModal({ listingId: listing.id, title: listing.title })}
-                                                disabled={actionLoading === listing.id}
-                                                className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
-                                            >
-                                                <XCircle className="w-3 h-3" />
-                                                Reddet
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* Reject Reason Modal */}
+            {/* Reject Reason Modal - Using a simple overlay or shadcn Dialog if available, 
+                let's keep the user's logic but update the UI */}
             {rejectModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/70" onClick={() => { setRejectModal(null); setRejectReason(''); }} />
-                    <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
-                        <h3 className="text-lg font-bold text-white mb-1">İlanı Reddet</h3>
-                        <p className="text-sm text-gray-400 mb-4">"{rejectModal.title}" ilanı reddedilecek.</p>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                            Red Sebebi <span className="text-red-400">*</span>
-                        </label>
-                        <textarea
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="Red sebebini yazınız..."
-                            rows={3}
-                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50"
-                        />
-                        <div className="flex justify-end gap-2 mt-4">
-                            <button
-                                onClick={() => { setRejectModal(null); setRejectReason(''); }}
-                                className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors"
-                            >
-                                İptal
-                            </button>
-                            <button
-                                onClick={handleReject}
-                                disabled={!rejectReason.trim() || actionLoading === rejectModal.listingId}
-                                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-600/50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5"
-                            >
-                                {actionLoading === rejectModal.listingId && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                                Reddet
-                            </button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in transition-all">
+                    <div className="relative bg-white border border-gray-200 rounded-2xl p-6 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-10 w-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+                                <XCircle className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900 leading-tight">İlanı Reddet</h3>
+                                <p className="text-xs text-muted-foreground mt-0.5">Lütfen rehbere iletilmek üzere nedenini belirtin.</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100 italic text-xs text-gray-600">
+                                "{rejectModal.title}"
+                            </div>
+
+                            <div className="space-y-1.5 text-left">
+                                <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                    Red Sebebi <span className="text-destructive">*</span>
+                                </label>
+                                <textarea
+                                    value={rejectReason}
+                                    onChange={(e) => setRejectReason(e.target.value)}
+                                    placeholder="Örn: Görseller uygunsuz, fiyat bilgisi hatalı..."
+                                    rows={3}
+                                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3 pt-2">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => { setRejectModal(null); setRejectReason(''); }}
+                                    className="text-gray-500 hover:bg-gray-100"
+                                >
+                                    İptal
+                                </Button>
+                                <Button
+                                    onClick={handleReject}
+                                    disabled={!rejectReason.trim() || actionLoading === rejectModal.listingId}
+                                    className="bg-destructive hover:bg-destructive/90 text-white font-bold"
+                                >
+                                    {actionLoading === rejectModal.listingId && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                                    İlanı Reddet
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-        </div>
+        </Card>
+    );
+}
     );
 }
