@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
-import { Compass, BookOpen, Sparkles, Navigation, ArrowRight, Star, MapPin } from 'lucide-react';
+import { Compass, BookOpen, Sparkles, Navigation, ArrowRight, MapPin, BookOpenCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -19,16 +19,14 @@ const CATEGORY_META: Record<string, { label: string; color: string; bg: string; 
   GEZI: { label: 'Gezi Rehberi', color: 'text-emerald-700', bg: 'bg-emerald-50', icon: MapPin },
   YASAM: { label: 'Yaşam Rehberi', color: 'text-blue-700', bg: 'bg-blue-50', icon: Sparkles },
   SIYER: { label: 'Siyer & Tarih', color: 'text-amber-700', bg: 'bg-amber-50', icon: BookOpen },
+  DUA: { label: 'Dualar', color: 'text-rose-700', bg: 'bg-rose-50', icon: Navigation },
 };
 
 export default async function RehberHubPage() {
-  // HOTFIX: Prisma Client Windows'daki dosya kilidi (EPERM) nedeniyle güncellenemediği için 
-  // geçici olarak raw query kullanıyoruz. Tablo veritabanında mevcut olduğu için bu güvenlidir.
-  const articles: any[] = await prisma.$queryRaw`
-    SELECT * FROM guide_articles 
-    WHERE isPublished = 1 
-    ORDER BY createdAt DESC
-  `;
+  const articles = await prisma.guideArticle.findMany({
+    where: { isPublished: true },
+    orderBy: { createdAt: 'desc' },
+  });
 
   return (
     <main className="min-h-screen bg-slate-50/50 pb-24">
@@ -59,31 +57,26 @@ export default async function RehberHubPage() {
 
       {/* Featured Options / Categories */}
       <section className="container mx-auto px-4 -mt-20 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Sanal Tur Card (Special Case) */}
-            <div className="group bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
-                <div className="relative h-48">
-                    <Image src="/images/tour/mekke/mescid-i-haram.jpg" alt="Sanal Tur" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute top-4 right-4 bg-[#FFB800] text-black text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">YENİ</div>
-                </div>
-                <div className="p-8">
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="p-2 bg-amber-50 rounded-xl text-amber-600">
-                            <Star className="w-5 h-5 fill-current" />
-                        </div>
-                        <h3 className="text-2xl font-black text-slate-900">Sanal Tur & Mekanlar</h3>
-                    </div>
-                    <p className="text-slate-500 font-medium mb-8 leading-relaxed">
-                        Kutsal toprakları gitmeden önce keşfedin. 30'dan fazla mekanın hikayesi ve görseli burada.
-                    </p>
-                    <Button asChild className="w-full h-14 rounded-2xl bg-[#FFB800] hover:bg-[#E6A600] text-black font-black uppercase text-xs tracking-widest shadow-lg shadow-[#FFB800]/20">
-                        <Link href="/umre-rehberi/sanal-tur">Hemen Keşfet <Navigation className="w-4 h-4 ml-2" /></Link>
-                    </Button>
-                </div>
+        {articles.length === 0 ? (
+          /* ─── Empty State Fallback ─── */
+          <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl p-12 md:p-16 text-center max-w-2xl mx-auto">
+            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-8">
+              <BookOpenCheck className="w-10 h-10 text-amber-500" />
             </div>
-
-            {/* Hub Articles */}
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-4">
+              Rehber İçerikleri Çok Yakında!
+            </h2>
+            <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md mx-auto mb-8">
+              Bu rehber içeriği yakında eklenecektir. Uzman ekibimiz sizin için en kapsamlı umre rehberini hazırlıyor.
+            </p>
+            <div className="flex items-center justify-center gap-2 text-sm text-amber-600 font-black uppercase tracking-widest">
+              <Sparkles className="w-4 h-4" />
+              Takipte Kalın
+            </div>
+          </div>
+        ) : (
+          /* ─── Article Grid ─── */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article) => {
                 const meta = CATEGORY_META[article.category] || CATEGORY_META.GEZI;
                 const Icon = meta.icon;
@@ -116,7 +109,8 @@ export default async function RehberHubPage() {
                     </Link>
                 );
             })}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* Info Banner */}
