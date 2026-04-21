@@ -240,7 +240,7 @@ export function LimitReachedModal({ type, currentUsage, limit, onUpgrade, onClos
         poster: {
             title: 'Günlük Afiş Limitine Ulaştınız',
             description: 'Bugün için afiş üretim hakkınız bitti.',
-            benefit: 'PLUS ile sınırsız afiş oluşturun',
+            benefit: 'PREMIUM ile sınırsız afiş oluşturun',
             icon: '🎨',
         },
         // Listing limits removed per backend alignment rules
@@ -320,7 +320,7 @@ export function VerifiedOrganizerBadge({ level, showLabel = true }: VerifiedOrga
                     <CheckCircle className="w-4 h-4 -ml-1" />
                 </div>
             ),
-            label: 'Kurumsal Acente',
+            label: 'Business Acente',
             className: 'text-emerald-600',
         },
         premium: {

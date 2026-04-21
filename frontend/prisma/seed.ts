@@ -3,47 +3,55 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-    // Seed default credit packages with dynamic features
+    // Seed default credit packages (4 approved tiers)
     const packages = [
         { 
-            id: "PLUS", 
-            name: "Plus Paket", 
-            credits: 70, 
-            priceTRY: 299,
-            features: ["14 İlan Eşdeğeri", "Öne Çıkarma Desteği", "Afiş/Poster Kullanımı"]
+            id: "FREEMIUM_GUIDE_1", 
+            name: "Freemium", 
+            credits: 15, 
+            priceTRY: 0,
+            slug: "FREEMIUM",
+            roleTarget: "GUIDE" as const,
+            features: { maxListings: 1, listingDays: 30, maxBoosts: 0, phoneVisible: false, canCreatePoster: false, priorityRanking: false, identityVerificationEligible: false }
+        },
+        { 
+            id: "PREMIUM", 
+            name: "Premium Paket", 
+            credits: 50, 
+            priceTRY: 199,
+            slug: "PREMIUM",
+            roleTarget: "GUIDE" as const,
+            features: { maxListings: 3, listingDays: 60, maxBoosts: 1, phoneVisible: true, canCreatePoster: true, priorityRanking: false, identityVerificationEligible: true }
         },
         { 
             id: "PRO", 
             name: "Pro Paket", 
-            credits: 105, 
+            credits: 200, 
             priceTRY: 699,
-            features: ["21 İlan Eşdeğeri", "Öne Çıkarma Desteği", "Afiş/Poster Kullanımı"]
-        },
-        { 
-            id: "VIP", 
-            name: "VIP Paket", 
-            credits: 150, 
-            priceTRY: 1499,
-            features: ["30 İlan Eşdeğeri", "7/24 Destek", "Afiş/Poster Kullanımı"]
+            slug: "PRO",
+            roleTarget: "GUIDE" as const,
+            features: { maxListings: 15, listingDays: 180, maxBoosts: 5, phoneVisible: true, canCreatePoster: true, priorityRanking: true, identityVerificationEligible: true, spotlightEligible: true }
         },
         { 
             id: "BUSINESS", 
-            name: "Kurumsal Paket", 
-            credits: 350, 
-            priceTRY: 2999,
-            features: ["70 İlan Eşdeğeri", "Hızlı Onay", "Kurumsal Fatura"]
+            name: "Business Paket", 
+            credits: 500, 
+            priceTRY: 1299,
+            slug: "BUSINESS",
+            roleTarget: "ORGANIZATION" as const,
+            features: { maxListings: 30, listingDays: 180, maxBoosts: 10, phoneVisible: true, canCreatePoster: true, priorityRanking: true, identityVerificationEligible: true, spotlightEligible: true }
         },
     ];
 
     for (const pkg of packages) {
         await prisma.creditPackage.upsert({
             where: { id: pkg.id },
-            update: { features: pkg.features, credits: pkg.credits, priceTRY: pkg.priceTRY },
-            create: { ...pkg, slug: pkg.id.toLowerCase() },
+            update: { name: pkg.name, features: pkg.features, credits: pkg.credits, priceTRY: pkg.priceTRY, slug: pkg.slug, roleTarget: pkg.roleTarget },
+            create: { id: pkg.id, name: pkg.name, credits: pkg.credits, priceTRY: pkg.priceTRY, slug: pkg.slug, roleTarget: pkg.roleTarget, features: pkg.features },
         });
     }
 
-    console.log("✅ Seeded dynamic credit packages");
+    console.log("✅ Seeded credit packages (4 approved tiers)");
 
     // ─── Seed Departure Cities ──────────────────────────────────────────────
 

@@ -66,7 +66,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             <div className={`bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 h-full flex flex-col group ${cardBorder}`}>
 
                 {/* Image Header */}
-                <div className="relative h-48 bg-gray-100 rounded-t-xl overflow-hidden">
+                <div className="relative aspect-video bg-gray-100 rounded-t-xl overflow-hidden">
                     {/* Placeholder or Actual Image */}
                     <Image
                         src={listing.image || listing.posterImages?.[0] || "/stock/kabe-1.png"}
@@ -74,6 +74,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 1024px) 100vw, 33vw"
+                        priority={listing.isFeatured}
                     />
 
                     {/* Overlays */}

@@ -20,7 +20,7 @@ export async function GET() {
         // Manual secondary sorting to ensure GUIDE is strictly first if alphabetical fails to meet expectations
         const sortedPackages = packages.sort((a, b) => {
             if (a.roleTarget === b.roleTarget) {
-                return a.priceTRY - b.priceTRY;
+                return Number(a.priceTRY) - Number(b.priceTRY);
             }
             return a.roleTarget === 'GUIDE' ? -1 : 1;
         });

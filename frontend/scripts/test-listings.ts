@@ -69,6 +69,7 @@ async function runListingTests() {
                 approvalStatus: 'PENDING', // TC-LIS-02 verification
                 legalConsent: mockPayload.legalConsent,
                 consentTimestamp: new Date(),
+                extraServices: [],
             }
         });
 

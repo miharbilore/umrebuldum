@@ -60,6 +60,7 @@ async function runSearchTests() {
                 approvalStatus: 'APPROVED',
                 startDate: new Date('2026-05-01'),
                 endDate: new Date('2026-05-15'),
+                extraServices: [],
             }
         });
 
@@ -78,6 +79,7 @@ async function runSearchTests() {
                 approvalStatus: 'APPROVED',
                 startDate: new Date('2026-06-01'),
                 endDate: new Date('2026-06-15'),
+                extraServices: [],
             }
         });
 

@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import { MessageSquare, X, Send, Bot, User, Phone } from 'lucide-react';
+import { CONTACT_WHATSAPP_NUMBER } from '@/lib/constants';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -31,7 +32,7 @@ export default function HybridChatbot() {
     const initializedRef = useRef(false);
     const { data: templates } = useSWR('/api/chatbot', fetcher); // For free chat fallback & SSS
 
-    const WHATSAPP_NUMBER = '905551234567'; // Change this appropriately
+    const WHATSAPP_NUMBER = CONTACT_WHATSAPP_NUMBER;
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -57,7 +57,7 @@ export interface PackageLimits {
 }
 
 export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
-    // ── Rehber/Kurumsal FREEMIUM ────────────────────────────────
+    // ── FREEMIUM (Ücretsiz Başlangıç) ────────────────────────────
     FREEMIUM: {
         maxListings: 1,
         listingDays: 30,
@@ -71,7 +71,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         featuredEligible: false,
         priorityRanking: false,
         trustBoost: false,
-        identityVerificationEligible: true,
+        identityVerificationEligible: false,
         spotlightEligible: false,
         posterQuality: "LOW",
         canCreatePoster: false,
@@ -120,7 +120,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         watermark: false,
         aiGenerator: true,
     },
-    // ── Kurumsal ────────────────────────────────────────────────
+    // ── BUSINESS (Kurumsal/Acente) ───────────────────────────────
     BUSINESS: {
         maxListings: 30,
         listingDays: 180,

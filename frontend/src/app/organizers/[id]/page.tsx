@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 import { normalizeSlug } from "@/lib/slug";
+import Script from "next/script";
 
 /**
  * Normalize organizer slugs by preserving the leading ID portion (if present)
@@ -58,7 +59,8 @@ export default async function OrganizerProfile({ params }: { params: Promise<{ i
 
     return (
         <div className="container py-12">
-            <script
+            <Script
+                id="organizer-schema"
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(organizerSchema) }}
             />

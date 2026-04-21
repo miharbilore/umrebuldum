@@ -45,10 +45,8 @@ const TOGGLE_FEATURES = [
 const TIER_COLORS: Record<string, { gradient: string; border: string; badge: string }> = {
     FREEMIUM:      { gradient: "from-slate-50 to-gray-50", border: "border-slate-200", badge: "bg-slate-100 text-slate-700" },
     PREMIUM:       { gradient: "from-blue-50 to-indigo-50", border: "border-blue-200", badge: "bg-blue-100 text-blue-700" },
-    PLUS:          { gradient: "from-amber-50 to-orange-50", border: "border-amber-300", badge: "bg-amber-100 text-amber-800" },
     PRO:           { gradient: "from-violet-50 to-purple-50", border: "border-violet-300", badge: "bg-violet-100 text-violet-800" },
     BUSINESS:      { gradient: "from-emerald-50 to-teal-50", border: "border-emerald-300", badge: "bg-emerald-100 text-emerald-700" },
-    BUSINESS_PLUS: { gradient: "from-purple-50 to-fuchsia-50", border: "border-purple-300", badge: "bg-purple-100 text-purple-800" },
 };
 
 function getTierColor(slug: string) {
@@ -461,7 +459,7 @@ export function PackageManager() {
                                 className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500/20 outline-none"
                             >
                                 <option value="GUIDE">REHBER</option>
-                                <option value="ORGANIZATION">KURUMSAL</option>
+                                <option value="ORGANIZATION">BUSINESS</option>
                             </select>
                         </div>
                         <div className="space-y-1.5">
@@ -516,7 +514,7 @@ export function PackageManager() {
                         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm">
                             <Building2 className="h-3.5 w-3.5 text-white" />
                         </div>
-                        <h3 className="text-sm font-bold text-slate-800">Kurumsal Paketler</h3>
+                        <h3 className="text-sm font-bold text-slate-800">Business Paketler</h3>
                     </div>
                     <div className="grid gap-4 lg:grid-cols-2">
                         {groupBySlug(corpPackages).map(([slug, variants]) =>

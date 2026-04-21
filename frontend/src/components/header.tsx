@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X, Phone, User, LogOut, LayoutDashboard, Settings, Map, Compass, BookOpen, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserMenu } from "@/components/user-menu";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/brand/logo";
+import { CONTACT_PHONE_NUMBER, CONTACT_PHONE_DISPLAY } from "@/lib/constants";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,6 +20,19 @@ export function Header() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // ── Mobil menü açıkken arka plan scroll kilidini aktif et ──────────
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    // Cleanup: bileşen unmount olursa scroll'u geri aç
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/" });
@@ -39,12 +53,7 @@ export function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-400 shadow-sm shrink-0">
-            <span className="text-xl font-bold text-black font-serif">U</span>
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-foreground">
-            Umrebuldum
-          </span>
+          <Logo size="md" showText />
         </Link>
 
         {/* Desktop Navigation */}
@@ -87,11 +96,11 @@ export function Header() {
         {/* Desktop Actions */}
         <div className="hidden lg:flex items-center gap-4">
           <a
-            href="tel:+908501234567"
+            href={`tel:${CONTACT_PHONE_NUMBER}`}
             className="hidden xl:flex items-center gap-2 text-sm font-medium text-foreground/80 mr-4 transition-colors hover:text-primary"
           >
             <Phone className="h-4 w-4" />
-            0850 123 45 67
+            {CONTACT_PHONE_DISPLAY}
           </a>
 
           {/* Teklif Al - Only for USERS or Guests */}

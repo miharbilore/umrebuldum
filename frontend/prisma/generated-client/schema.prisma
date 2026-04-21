@@ -1,0 +1,983 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated-client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String                @id @default(cuid())
+  name                   String?
+  email                  String?               @unique
+  slug                   String?               @unique
+  emailVerified          DateTime?
+  image                  String?
+  passwordHash           String?
+  phone                  String?               @unique
+  role                   UserRole              @default(USER)
+  previousRole           UserRole?
+  packageType            PackageTier           @default(FREEMIUM)
+  packageExpiry          DateTime?
+  isApproved             Boolean               @default(false)
+  isVerified             Boolean               @default(false)
+  contactConsent         Boolean               @default(false)
+  verificationCode       String?
+  verificationExpiry     DateTime?
+  fullName               String?
+  city                   String?               @default("İstanbul")
+  bio                    String?               @db.Text
+  photo                  String?
+  trustScore             Int                   @default(50)
+  completedTrips         Int                   @default(0)
+  isMuted                Boolean               @default(false)
+  mutedUntil             DateTime?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  tokenBalance           Int                   @default(0) @map("availableBalance")
+  avgResponseHours       Float                 @default(24)
+  isIdentityVerified     Boolean               @default(false)
+  lastPlanChangeAt       DateTime?
+  planFreezeUntil        DateTime?
+  trustScoreVersion      Int                   @default(0)
+  isTwoFactorEnabled     Boolean               @default(false)
+  twoFactorSecret        String?
+  twoFactorRecoveryCodes Json?
+  isPhoneVerified        Boolean               @default(false)
+  agencyCity             String?
+  hasCompletedQuiz       Boolean               @default(false)
+  lastQuizAttempt        DateTime?
+  quizAttempts           Int                   @default(0)
+  coverImage             String?
+  establishmentYear      Int?
+  socialLinks            Json?
+  tursabNumber           String?
+  accounts               Account[]
+  activeBoosts           ActiveBoost[]
+  autoReplenish          AutoReplenishConfig?
+  guideConversations     Conversation[]        @relation("GuideConversations")
+  userConversations      Conversation[]        @relation("UserConversations")
+  creditLine             EnterpriseCreditLine?
+  guideProfile           GuideProfile?
+  identityApplications   IdentityApplication[]
+  messages               Message[]
+  notifications          Notification[]
+  offers                 Offer[]
+  performanceTier        PerformanceTier?
+  reviewsReceived        Review[]              @relation("GuideReviews")
+  reviewsGiven           Review[]              @relation("UserReviews")
+  riskScore              RiskScore?
+  savedCards             SavedCard[]
+  sessions               Session[]
+  tokenTransactions      TokenTransaction[]
+  stripeTransactions     Transaction[]
+  authoredArticles       GuideArticle[]        @relation("AuthorArticles")
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId], map: "accounts_userId_fkey")
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "sessions_userId_fkey")
+  @@map("sessions")
+}
+
+model GuideProfile {
+  id                String         @id @default(cuid())
+  userId            String         @unique
+  quotaTarget       Int            @default(100)
+  currentCount      Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  averageRating     Decimal        @default(0.00) @db.Decimal(3, 2)
+  reviewCount       Int            @default(0)
+  experienceYears   Int?
+  languagesSpoken   Json?
+  specialties       Json?
+  videoIntroduction String?
+  listings          GuideListing[]
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("guide_profiles")
+}
+
+model DepartureCity {
+  id       String         @id @default(cuid())
+  name     String         @unique
+  airport  String
+  priority Boolean        @default(false)
+  listings GuideListing[]
+
+  @@map("departure_cities")
+}
+
+model Airline {
+  id                String         @id @default(cuid())
+  name              String         @unique
+  isCharterFriendly Boolean        @default(false)
+  listings          GuideListing[]
+
+  @@map("airlines")
+}
+
+model GuideListing {
+  id                String               @id @default(cuid())
+  guideId           String
+  title             String
+  description       String               @db.Text
+  city              String
+  departureCityId   String?
+  meetingCity       String?
+  extraServices     Json
+  hotelName         String?
+  airlineId         String?
+  pricingDouble     Decimal              @default(0.00) @db.Decimal(10, 2)
+  pricingTriple     Decimal              @default(0.00) @db.Decimal(10, 2)
+  pricingQuad       Decimal              @default(0.00) @db.Decimal(10, 2)
+  pricingCurrency   String               @default("SAR")
+  quota             Int                  @default(30)
+  filled            Int                  @default(0)
+  active            Boolean              @default(true)
+  deletedAt         DateTime?
+  isFeatured        Boolean              @default(false)
+  startDate         DateTime
+  departureDateEnd  DateTime?
+  endDate           DateTime
+  returnDateEnd     DateTime?
+  totalDays         Int                  @default(10)
+  approvalStatus    ApprovalStatus       @default(PENDING)
+  rejectionReason   String?              @db.Text
+  urgencyTag        String?
+  legalConsent      Boolean              @default(false)
+  consentTimestamp  DateTime?
+  image             String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  category          String?
+  activeBoosts      ActiveBoost[]
+  airline           Airline?             @relation(fields: [airlineId], references: [id])
+  categoryRef       ListingCategory?     @relation(fields: [category], references: [slug])
+  departureCity     DepartureCity?       @relation(fields: [departureCityId], references: [id])
+  guide             GuideProfile         @relation(fields: [guideId], references: [userId], onDelete: Cascade)
+  boostCounter      ListingBoostCounter?
+  ListingClick      ListingClick[]
+  ListingImpression ListingImpression[]
+  seoMeta           ListingSeo?
+  tourDays          TourDay[]
+
+  @@index([guideId])
+  @@index([approvalStatus, active])
+  @@index([departureCityId])
+  @@index([startDate, endDate])
+  @@index([category])
+  @@index([deletedAt])
+  @@index([airlineId], map: "guide_listings_airlineId_fkey")
+  @@map("guide_listings")
+}
+
+model ListingCategory {
+  slug        String         @id
+  name        String
+  description String?        @db.Text
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  listings    GuideListing[]
+
+  @@map("listing_categories")
+}
+
+model ListingSeo {
+  listingId String       @id
+  city      String?
+  duration  Int?
+  hotelType String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  listing   GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([city])
+  @@map("listing_seo")
+}
+
+model TourDay {
+  id          String       @id @default(cuid())
+  listingId   String
+  day         Int
+  city        String
+  title       String       @default("")
+  description String       @db.Text
+  listing     GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+  @@map("tour_days")
+}
+
+model UmrahRequest {
+  id              String            @id @default(cuid())
+  userEmail       String
+  departureCity   String
+  peopleCount     Int
+  dateRange       String
+  roomType        String            @default("4-kisilik")
+  budget          Decimal?          @db.Decimal(10, 2)
+  note            String?           @db.Text
+  contactViaEmail Boolean           @default(false)
+  contactViaPhone Boolean           @default(false)
+  contactViaChat  Boolean           @default(true)
+  createdAt       DateTime          @default(now())
+  status          String            @default("open")
+  deletedAt       DateTime?
+  conversations   Conversation[]
+  routingLog      LeadRoutingLog?
+  offers          Offer[]
+  favorites       RequestFavorite[]
+  interests       RequestInterest[]
+  reviews         Review[]          @relation("DemandReviews")
+
+  @@index([userEmail])
+  @@index([status])
+  @@index([departureCity])
+  @@map("umrah_requests")
+}
+
+model LeadRoutingLog {
+  id             String       @id @default(cuid())
+  requestId      String       @unique
+  currentWave    Int          @default(1)
+  status         String       @default("ROUTING")
+  offersReceived Int          @default(0)
+  dispatchedTo   Json
+  nextWaveAt     DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  request        UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextWaveAt])
+  @@map("lead_routing_logs")
+}
+
+model RequestInterest {
+  id         String       @id @default(cuid())
+  requestId  String
+  guideEmail String
+  threadId   String?
+  createdAt  DateTime     @default(now())
+  request    UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, guideEmail])
+  @@index([guideEmail])
+  @@map("request_interests")
+}
+
+model Offer {
+  id        String       @id @default(cuid())
+  guideId   String
+  requestId String
+  price     Decimal      @db.Decimal(10, 2)
+  currency  String       @default("SAR")
+  message   String?      @db.Text
+  status    String       @default("pending")
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  guide     User         @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  request   UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([guideId, requestId])
+  @@index([guideId])
+  @@index([requestId])
+  @@index([status])
+  @@map("offers")
+}
+
+model RequestFavorite {
+  id        String       @id @default(cuid())
+  requestId String
+  userId    String
+  createdAt DateTime     @default(now())
+  request   UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, userId])
+  @@map("request_favorites")
+}
+
+model Conversation {
+  id            String       @id @default(cuid())
+  guideId       String
+  userId        String
+  createdAt     DateTime     @default(now())
+  lastMessageAt DateTime     @default(now())
+  requestId     String
+  guide         User         @relation("GuideConversations", fields: [guideId], references: [id], onDelete: Cascade)
+  request       UmrahRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user          User         @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
+  messages      Message[]
+
+  @@unique([requestId, guideId])
+  @@index([userId])
+  @@index([guideId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String          @id @default(cuid())
+  conversationId String
+  senderId       String
+  role           UserRole
+  body           String          @db.Text
+  blocked        Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  conversation   Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  moderationLogs ModerationLog[]
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+model ModerationLog {
+  id        String   @id @default(cuid())
+  messageId String
+  reason    String
+  createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("moderation_logs")
+}
+
+model CreditPackage {
+  id            String   @id @default(cuid())
+  name          String
+  credits       Int
+  priceTRY      Decimal  @db.Decimal(10, 2)
+  features      Json
+  billingPeriod Int      @default(1)
+  monthlyPrice  Decimal  @default(0.00) @db.Decimal(10, 2)
+  roleTarget    UserRole @default(GUIDE)
+  slug          String   @default("FREEMIUM")
+  sortOrder     Int      @default(0)
+
+  @@unique([slug, billingPeriod, roleTarget])
+  @@map("credit_packages")
+}
+
+model Coupon {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Int
+  maxUses         Int      @default(100)
+  usedCount       Int      @default(0)
+  expiresAt       DateTime
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  @@index([code])
+  @@map("coupons")
+}
+
+model Transaction {
+  id          String            @id @default(cuid())
+  userId      String
+  role        UserRole
+  credits     Int
+  amountTRY   Decimal           @db.Decimal(10, 2)
+  provider    PaymentProvider   @default(IYZICO)
+  status      TransactionStatus @default(PENDING)
+  sessionId   String?
+  createdAt   DateTime          @default(now())
+  metadata    Json?
+  providerRef String?
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([providerRef])
+  @@map("transactions")
+}
+
+model SavedCard {
+  id          String          @id @default(cuid())
+  userId      String
+  provider    PaymentProvider
+  cardToken   String
+  userToken   String?
+  last4       String
+  brand       String
+  expiryMonth Int
+  expiryYear  Int
+  isDefault   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, cardToken])
+  @@index([userId])
+  @@map("saved_cards")
+}
+
+model TokenTransaction {
+  id              String          @id @default(cuid())
+  userId          String?
+  entryType       LedgerEntryType
+  amount          Int
+  referenceId     String?
+  idempotencyKey  String
+  adminId         String?
+  reasonCode      String?
+  createdAt       DateTime        @default(now())
+  expiresAt       DateTime?
+  remainingAmount Int?
+  accountId       String          @default("SYSTEM")
+  counterpartyId  String          @default("SYSTEM")
+  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([idempotencyKey, userId])
+  @@index([accountId])
+  @@index([userId, createdAt])
+  @@index([userId])
+  @@map("token_ledger_entries")
+}
+
+model AutoReplenishConfig {
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  status          String              @default("ACTIVE")
+  threshold       Int                 @default(20)
+  packageId       String              @default("medium")
+  monthlyCap      Int                 @default(500)
+  monthlySpent    Int                 @default(0)
+  monthlyResetAt  DateTime            @default(now())
+  cooldownMinutes Int                 @default(60)
+  lastTriggeredAt DateTime?
+  failCount       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs            TokenReplenishLog[]
+
+  @@index([status])
+  @@map("auto_replenish_configs")
+}
+
+model TokenReplenishLog {
+  id             String              @id @default(cuid())
+  configId       String
+  userId         String
+  tokensGranted  Int
+  priceTRY       Decimal             @db.Decimal(10, 2)
+  packageId      String
+  balanceBefore  Int
+  balanceAfter   Int
+  triggerSource  String
+  status         String              @default("SUCCESS")
+  failReason     String?             @db.Text
+  idempotencyKey String
+  createdAt      DateTime            @default(now())
+  config         AutoReplenishConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@unique([idempotencyKey, userId])
+  @@index([userId, createdAt])
+  @@index([configId])
+  @@map("token_replenish_logs")
+}
+
+model ActiveBoost {
+  id             String       @id @default(cuid())
+  listingId      String
+  userId         String
+  effectivePower Float
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+  boostType      String       @default("BASIC")
+  listing        GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, expiresAt])
+  @@index([userId], map: "active_boosts_userId_fkey")
+  @@map("active_boosts")
+}
+
+model ListingBoostCounter {
+  listingId       String       @id
+  boostCount24h   Int          @default(0)
+  windowStartedAt DateTime     @default(now())
+  listing         GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("listing_boost_counters")
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  eventType   String
+  processedAt DateTime @default(now())
+  status      String   @default("processed")
+  error       String?  @db.Text
+
+  @@index([processedAt])
+  @@index([status])
+  @@map("webhook_events")
+}
+
+model IdentityApplication {
+  id              String         @id @default(cuid())
+  userId          String
+  status          ApprovalStatus @default(PENDING)
+  idDocumentUrl   String         @db.Text
+  certificateUrl  String?        @db.Text
+  contactEmail    String
+  note            String?        @db.Text
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  rejectionReason String?        @db.Text
+  revokedReason   String?        @db.Text
+  packageAtApply  String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([status, createdAt])
+  @@map("identity_applications")
+}
+
+model Review {
+  id                   String         @id @default(cuid())
+  guideId              String
+  reviewerUserId       String
+  requestId            String
+  ratingCommunication  Int
+  ratingKnowledge      Int
+  ratingOrganization   Int
+  ratingTimeManagement Int
+  overallRating        Decimal        @db.Decimal(2, 1)
+  positiveTags         Json
+  negativeTags         Json
+  comment              String?        @db.VarChar(500)
+  status               ApprovalStatus @default(PENDING)
+  isVerified           Boolean        @default(true)
+  ipHash               String?
+  userAgentHash        String?
+  createdAt            DateTime       @default(now())
+  approvedAt           DateTime?
+  deletedAt            DateTime?
+  guide                User           @relation("GuideReviews", fields: [guideId], references: [id], onDelete: Cascade)
+  request              UmrahRequest   @relation("DemandReviews", fields: [requestId], references: [id], onDelete: Cascade)
+  reviewer             User           @relation("UserReviews", fields: [reviewerUserId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, reviewerUserId, ipHash])
+  @@index([guideId])
+  @@index([reviewerUserId])
+  @@index([requestId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+model RiskScore {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  urs               Float     @default(0)
+  tier              String    @default("GREEN")
+  behaviorScore     Float     @default(0)
+  transactionScore  Float     @default(0)
+  networkScore      Float     @default(0)
+  historyScore      Float     @default(0)
+  signals           Json?
+  whitelistedUntil  DateTime?
+  probationUntil    DateTime?
+  probationBaseline Json?
+  escalationCount   Int       @default(0)
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("risk_scores")
+}
+
+model RiskEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  eventType String
+  severity  String
+  metadata  Json
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([eventType])
+  @@map("risk_events")
+}
+
+model DeviceFingerprint {
+  id          String   @id @default(cuid())
+  userId      String
+  fingerprint String
+  ipAddress   String
+  userAgent   String   @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([fingerprint])
+  @@index([ipAddress])
+  @@map("device_fingerprints")
+}
+
+model FraudReviewTicket {
+  id              String    @id @default(cuid())
+  userId          String
+  agencyId        String?
+  riskTier        String
+  ursScore        Float
+  triggerReason   String    @db.Text
+  signals         Json
+  status          String    @default("OPEN")
+  resolution      String?
+  reviewerAdminId String?
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("fraud_review_tickets")
+}
+
+model ListingImpression {
+  id          String       @id @default(cuid())
+  listingId   String
+  userId      String?
+  source      String
+  position    Int
+  searchQuery String?
+  createdAt   DateTime     @default(now())
+  listing     GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, createdAt])
+  @@index([userId, createdAt])
+  @@map("listing_impressions")
+}
+
+model ListingClick {
+  id           String       @id @default(cuid())
+  listingId    String
+  userId       String?
+  source       String
+  impressionId String?
+  dwellTimeMs  Int?
+  createdAt    DateTime     @default(now())
+  listing      GuideListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, createdAt])
+  @@index([userId])
+  @@map("listing_clicks")
+}
+
+model VelocityCounter {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  windowKey String
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, action, windowKey])
+  @@index([userId, action])
+  @@index([createdAt])
+  @@map("velocity_counters")
+}
+
+model CancellationRecord {
+  id                  String   @id @default(cuid())
+  userId              String
+  counterpartyId      String
+  requestId           String?
+  listingId           String?
+  cancelledBy         String
+  reason              String?  @db.Text
+  severity            String
+  daysBeforeDeparture Int?
+  trustPenalty        Int      @default(0)
+  isForceMajeure      Boolean  @default(false)
+  createdAt           DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([counterpartyId])
+  @@map("cancellation_records")
+}
+
+model SLAMetric {
+  id         String   @id @default(cuid())
+  userId     String
+  metricType String
+  valueMs    Int
+  createdAt  DateTime @default(now())
+
+  @@index([userId, metricType, createdAt])
+  @@map("sla_metrics")
+}
+
+model DynamicPriceEvent {
+  id              String   @id @default(cuid())
+  userId          String
+  action          String
+  baseCost        Int
+  finalCost       Int
+  multiplier      Float
+  surgeReason     String
+  discountApplied String?
+  idempotencyKey  String
+  createdAt       DateTime @default(now())
+
+  @@unique([idempotencyKey, userId])
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("dynamic_price_events")
+}
+
+model EnterpriseCreditLine {
+  id                   String                  @id @default(cuid())
+  userId               String                  @unique
+  creditLimit          Int                     @default(500)
+  usedCredit           Int                     @default(0)
+  billingCycleDays     Int                     @default(30)
+  interestRate         Float                   @default(0)
+  status               String                  @default("ACTIVE")
+  nextBillingAt        DateTime
+  gracePeriodDays      Int                     @default(7)
+  consecutiveLateCount Int                     @default(0)
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  transactions         CreditLineTransaction[]
+  user                 User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([nextBillingAt])
+  @@map("enterprise_credit_lines")
+}
+
+model CreditLineTransaction {
+  id             String               @id @default(cuid())
+  creditLineId   String
+  userId         String
+  type           String
+  amount         Int
+  balanceBefore  Int
+  balanceAfter   Int
+  note           String?              @db.Text
+  idempotencyKey String
+  createdAt      DateTime             @default(now())
+  creditLine     EnterpriseCreditLine @relation(fields: [creditLineId], references: [id], onDelete: Cascade)
+
+  @@unique([idempotencyKey, userId])
+  @@index([creditLineId, createdAt])
+  @@index([userId])
+  @@map("credit_line_transactions")
+}
+
+model PerformanceTier {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  currentTier       String    @default("BRONZE")
+  monthlyRevenue30d Float     @default(0)
+  conversionRate30d Float     @default(0)
+  responseScore30d  Float     @default(0)
+  compositeScore    Float     @default(0)
+  discountPercent   Float     @default(0)
+  bonusTokens       Int       @default(0)
+  lastEvaluatedAt   DateTime  @default(now())
+  tierChangedAt     DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([currentTier])
+  @@index([compositeScore])
+  @@map("performance_tiers")
+}
+
+model SpotlightPlacement {
+  id             String   @id @default(cuid())
+  listingId      String
+  userId         String
+  city           String
+  slotIndex      Int
+  startsAt       DateTime
+  expiresAt      DateTime
+  rotationGroup  String
+  impressions    Int      @default(0)
+  clicks         Int      @default(0)
+  tokenCost      Int
+  status         String   @default("ACTIVE")
+  idempotencyKey String
+  createdAt      DateTime @default(now())
+
+  @@unique([idempotencyKey, userId])
+  @@index([city, status, startsAt])
+  @@index([userId, createdAt])
+  @@index([rotationGroup, city])
+  @@index([listingId])
+  @@map("spotlight_placements")
+}
+
+model SeoLandingPage {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  pageType        String
+  targetKeyword   String
+  h1Title         String
+  metaTitle       String
+  metaDescription String
+  contentHtml     String?  @db.Text
+  searchParams    Json
+  isIndexed       Boolean  @default(true)
+  viewCount       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([pageType])
+  @@map("seo_landing_pages")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
+}
+
+model ChatbotTemplate {
+  id        String   @id @default(cuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chatbot_templates")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   @default("IN_APP")
+  title       String
+  message     String   @db.Text
+  isRead      Boolean  @default(false)
+  referenceId String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model TestLog {
+  id           String   @id @default(cuid())
+  scenarioName String
+  status       String   @default("PENDING")
+  errorMessage String?  @db.Text
+  testerName   String
+  duration     Int?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([status])
+  @@index([scenarioName])
+  @@index([createdAt])
+  @@map("test_logs")
+}
+
+enum PackageTier {
+  FREEMIUM
+  PREMIUM
+  PRO
+  BUSINESS
+}
+
+enum UserRole {
+  USER
+  GUIDE
+  ORGANIZATION
+  ADMIN
+  BANNED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  STRIPE
+  PAYTR
+  IYZICO
+}
+
+enum LedgerEntryType {
+  PURCHASE
+  CONSUME
+  REFUND
+  ADJUSTMENT
+}
+
+model GuideArticle {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  excerpt        String   @db.Text
+  content        String   @db.LongText
+  coverImage     String
+  category       String // e.g., "GEZI", "YASAM", "SIYER"
+  youtubeVideoId String? // YouTube video ID for embedded player
+  authorId       String?
+  isPublished    Boolean  @default(true)
+  viewCount      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  author         User?    @relation("AuthorArticles", fields: [authorId], references: [id])
+
+  @@index([category])
+  @@index([isPublished])
+  @@map("guide_articles")
+}

@@ -29,10 +29,8 @@ type BillingPeriod = 1 | 3 | 12;
 const SLUG_METADATA: Record<string, any> = {
     FREEMIUM: { icon: Users, color: 'gray', desc: 'Sistemi tanımak isteyenler için tamamen ücretsiz başlangıç paketi.' },
     PREMIUM: { icon: Star, color: 'blue', desc: 'Profesyonel rehberler için en ideal standart paket.' },
-    PLUS: { icon: Zap, color: 'amber', desc: 'Daha fazla ilan ve yüksek görünürlük isteyen rehberler için.' },
     PRO: { icon: Rocket, color: 'emerald', desc: 'Yüksek hacimli rehberlik hizmetleri için tam donanımlı paket.', popular: true },
-    BUSINESS: { icon: Building2, color: 'indigo', desc: 'Küçük ve orta ölçekli acenteler için kapsamlı çözüm.' },
-    BUSINESS_PLUS: { icon: Shield, color: 'purple', desc: 'Büyük acenteler için limitsiz kurumsal deneyim.' },
+    BUSINESS: { icon: Building2, color: 'indigo', desc: 'Acenteler ve kurumsal yapılar için kapsamlı çözüm.' },
 };
 
 const DEFAULT_METADATA = { icon: Package, color: 'slate', desc: 'Özel üyelik avantajları.' };
@@ -47,8 +45,8 @@ const FAQS = [
         a: 'Tokenlar; yeni ilan yayınlama, ilan sürelerini uzatma, vitrin ilanı alma veya müşterilere doğrudan teklif verme işlemlerinde kullanılan platform para birimidir.'
     },
     {
-        q: 'Kurumsal paketin avantajı nedir?',
-        a: 'Kurumsal paketler, birden fazla rehberle çalışan acenteler için yüksek ilan limiti ve gelişmiş raporlama özellikleri sunar.'
+        q: 'Business paketin avantajı nedir?',
+        a: 'Business paketler, birden fazla rehberle çalışan acenteler için yüksek ilan limiti ve gelişmiş raporlama özellikleri sunar.'
     },
     {
         q: 'Ödemeler güvenli mi?',
@@ -160,7 +158,7 @@ export default function PricingClient() {
                             const isRoleMismatch = (userRole === 'GUIDE' && pkg.roleTarget === 'ORGANIZATION') ||
                                                  (userRole === 'ORGANIZATION' && pkg.roleTarget === 'GUIDE');
                             
-                            const roleText = pkg.roleTarget === 'ORGANIZATION' ? 'Sadece Kurumsal' : 'Sadece Rehberler';
+                            const roleText = pkg.roleTarget === 'ORGANIZATION' ? 'Sadece Business' : 'Sadece Rehberler';
 
                             return (
                                 <div key={pkg.id} className={cn(
@@ -187,7 +185,7 @@ export default function PricingClient() {
                                         <div className="flex items-center gap-2 mb-2">
                                             <h3 className="text-2xl font-black text-slate-900 leading-none">{pkg.name}</h3>
                                             {pkg.roleTarget === 'ORGANIZATION' && (
-                                                <Building2 className="w-4 h-4 text-slate-400" width={16} height={16} title="Kurumsal Paket" />
+                                                <Building2 className="w-4 h-4 text-slate-400" width={16} height={16} title="Business Paket" />
                                             )}
                                         </div>
                                         <p className="text-slate-500 text-sm leading-relaxed mb-6 h-10 font-medium">

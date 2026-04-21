@@ -17,6 +17,16 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TermsContent, RefundPolicyContent } from '@/components/policies-content';
 
+// ── Tip Tanımları ───────────────────────────────────────────────────────
+interface CheckoutPackageData {
+    id: string;
+    name: string;
+    priceTRY: number;
+    billingPeriod: number;
+    slug?: string;
+    features?: Record<string, unknown>;
+}
+
 export default function CheckoutPage() {
     const searchParams = useSearchParams();
     const pkgId = searchParams.get('pkg');
@@ -24,8 +34,9 @@ export default function CheckoutPage() {
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(!!pkgId);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
-    const [packageData, setPackageData] = useState<any>(null);
+    const [packageData, setPackageData] = useState<CheckoutPackageData | null>(null);
     const [viewingPolicy, setViewingPolicy] = useState<'terms' | 'refund' | null>(null);
+
 
     // Load package data if ID is present
     useEffect(() => {
@@ -34,8 +45,8 @@ export default function CheckoutPage() {
             try {
                 const res = await fetch('/api/packages');
                 if (res.ok) {
-                    const all = await res.json();
-                    const found = all.find((p: any) => p.id === pkgId);
+                    const all: CheckoutPackageData[] = await res.json();
+                    const found = all.find((p) => p.id === pkgId);
                     setPackageData(found);
                 }
             } catch (err) {

@@ -11,7 +11,9 @@ async function runTests() {
         filled: 0,
         quota: 30,
         price: 1500,
-        city: 'Mecca'
+        city: 'Mecca',
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 7 * 86400000)
     };
 
     const baseGuide: RankingGuideInput = {

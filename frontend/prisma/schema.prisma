@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated-client"
 }
 
 datasource db {
@@ -11,6 +12,7 @@ model User {
   id                     String                @id @default(cuid())
   name                   String?
   email                  String?               @unique
+  slug                   String?               @unique
   emailVerified          DateTime?
   image                  String?
   passwordHash           String?
@@ -921,10 +923,8 @@ model TestLog {
 enum PackageTier {
   FREEMIUM
   PREMIUM
-  PLUS
   PRO
   BUSINESS
-  BUSINESS_PLUS
 }
 
 enum UserRole {
@@ -969,6 +969,7 @@ model GuideArticle {
   content         String   @db.LongText
   coverImage      String
   category        String   // e.g., "GEZI", "YASAM", "SIYER"
+  youtubeVideoId  String?  // YouTube video ID for embedded player
   authorId        String?
   isPublished     Boolean  @default(true)
   viewCount       Int      @default(0)

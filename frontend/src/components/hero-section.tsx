@@ -1,10 +1,12 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { HERO_BACKGROUND_IMAGE } from "@/lib/constants";
 import {
   Select,
   SelectContent,
@@ -46,14 +48,17 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden min-h-[90vh] flex items-center">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1920&q=80')",
-        }}
-      >
+      {/* Background Image — next/image ile LCP optimizasyonu */}
+      <div className="absolute inset-0">
+        <Image
+          src={HERO_BACKGROUND_IMAGE}
+          alt="Kabe ve Harem-i Şerif manzarası"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+          quality={80}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 

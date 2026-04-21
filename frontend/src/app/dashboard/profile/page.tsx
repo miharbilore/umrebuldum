@@ -34,6 +34,7 @@ export default function ProfileEditingPage() {
         experienceYears: "",
         specialties: "", // Comma separated
         videoIntroduction: "",
+        slug: "",
     });
 
     const profileInputRef = useRef<HTMLInputElement>(null);
@@ -56,6 +57,7 @@ export default function ProfileEditingPage() {
                         experienceYears: data.experienceYears || "",
                         specialties: (data.specialties || []).join(", "),
                         videoIntroduction: data.videoIntroduction || "",
+                        slug: data.slug || "",
                     });
                 }
                 setLoading(false);
@@ -119,7 +121,8 @@ export default function ProfileEditingPage() {
             if (res.ok) {
                 toast.success("Profiliniz başarıyla güncellendi. Açık Profilinizde görünür olacaktır.");
                 setTimeout(() => {
-                    router.push(`/rehber/${session?.user?.id}-profil`);
+                    const targetPath = formData.slug ? `/rehber/${formData.slug}` : `/rehber/${session?.user?.id}-profil`;
+                    router.push(targetPath);
                 }, 1000);
             } else {
                 toast.error("Güncelleme başarısız.");

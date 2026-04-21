@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 import { z } from "zod";
+import { slugify } from "@/lib/slug";
 
 const profileSchema = z.object({
     fullName: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
@@ -117,7 +118,9 @@ export async function PUT(req: Request) {
                 city: city,
                 agencyCity: agencyCity ?? null,
                 bio: bio,
-                photo: photo
+                photo: photo,
+                // Only set slug if it doesn't exist yet
+                slug: user.slug ? undefined : slugify(fullName)
             }
         });
 

@@ -1,4 +1,4 @@
-﻿import { redis } from "@/lib/redis";
+import { redis } from "@/lib/redis";
 import * as crypto from "crypto";
 // import * as Sentry from "@sentry/nextjs";
 const Sentry = {
@@ -42,15 +42,22 @@ export async function fetchCachedListings(
     if (!redis) return null;
     try {
       const cached = await redis.get(cacheKey);
-      if (typeof cached === "string") {
-        return JSON.parse(cached); // try-catch wraps this implicitly inside outer try-catch
+      if (cached) {
+        if (process.env.NODE_ENV === "development") {
+          console.debug(`[Cache] HIT for ${cacheKey}`);
+        }
+        return typeof cached === "string" ? JSON.parse(cached) : cached;
       }
-      return cached; // if upstash returned object directly
-    } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.error(`[Redis] Corrupt cache parsing for ${cacheKey}`, err);
-      }
-      // Never crash on JSON parse fail -> treat as miss
+      return null;
+    } catch (err: any) {
+      // LOGGING FOR DIAGNOSTICS
+      console.error(`[Redis] ERROR during READ for ${cacheKey}:`, {
+        message: err.message,
+        name: err.name,
+        stack: err.stack,
+        cause: err.cause
+      });
+      // Fallback: treat as miss
       return null;
     }
   };
@@ -69,8 +76,16 @@ export async function fetchCachedListings(
     
     // Attempt Redis SETNX lock
     try {
-      if (redis) acquiredLock = Boolean(await redis.set(lockKey, "1", { nx: true, ex: 3 }));
-    } catch { /* Suppress redis faults */ }
+      if (redis) {
+        acquiredLock = Boolean(await redis.set(lockKey, "1", { nx: true, ex: 3 }));
+      }
+    } catch (err: any) {
+      console.error(`[Redis] LOCK ERROR for ${lockKey}:`, {
+        message: err.message,
+        cause: err.cause
+      });
+      // Continue anyway, we'll just hit the DB
+    }
 
     // If we missed the lock, someone else is fetching the database RIGHT NOW across the serverless fleet.
     if (!acquiredLock && redis) {
@@ -92,8 +107,16 @@ export async function fetchCachedListings(
       if (redis) {
         // ALWAYS JSON.stringify defensively.
         await redis.setex(cacheKey, ttlSeconds, JSON.stringify(freshData));
+        if (process.env.NODE_ENV === "development") {
+          console.debug(`[Cache] POPULATED ${cacheKey}`);
+        }
       }
-    } catch { /* Ignore write fails */ }
+    } catch (err: any) {
+      console.error(`[Redis] WRITE ERROR for ${cacheKey}:`, {
+        message: err.message,
+        cause: err.cause
+      });
+    }
 
     return freshData;
   };

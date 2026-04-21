@@ -22,6 +22,7 @@ export async function GET(req: Request) {
             image: user.image,
             coverImage: user.coverImage,
             bio: user.bio,
+            slug: user.slug,
             city: user.city,
             agencyCity: user.agencyCity,
             tursabNumber: user.tursabNumber,

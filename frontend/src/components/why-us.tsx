@@ -1,4 +1,4 @@
-﻿import { Shield, CreditCard, HeadphonesIcon, Award } from "lucide-react";
+import { Shield, CreditCard, HeadphonesIcon, Award } from "lucide-react";
 
 const features = [
   {
@@ -29,7 +29,7 @@ const features = [
 
 export function WhyUs() {
   return (
-    <section className="bg-secondary py-20 sm:py-28">
+    <section className="bg-slate-50 py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">

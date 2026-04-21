@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @deprecated LEGACY TIER CONFIG — only used by Poster system for backward-compat.
  * For all new code, use PackageSystem from /lib/package-system.ts
  *
@@ -10,8 +10,9 @@
 
 export const TIERS = {
     FREEMIUM: 'freemium',
-    PLUS: 'plus',
+    PREMIUM: 'premium',
     PRO: 'pro',
+    BUSINESS: 'business',
 } as const;
 
 export type TierType = typeof TIERS[keyof typeof TIERS];
@@ -51,7 +52,7 @@ export interface TierDisplayConfig {
 export const TIER_DISPLAY_CONFIG: Record<TierType, TierDisplayConfig> = {
     [TIERS.FREEMIUM]: {
         id: TIERS.FREEMIUM,
-        name: 'Ücretsiz', // Backend'den gelen isim kullanılmalı ama fallback olarak burada
+        name: 'Ücretsiz',
         price: '₺0',
         description: 'Başlangıç paketi',
         cta: 'Mevcut Plan',
@@ -63,16 +64,16 @@ export const TIER_DISPLAY_CONFIG: Record<TierType, TierDisplayConfig> = {
         ],
         popular: false
     },
-    [TIERS.PLUS]: {
-        id: TIERS.PLUS,
-        name: 'PLUS',
-        price: '₺299/ay',
+    [TIERS.PREMIUM]: {
+        id: TIERS.PREMIUM,
+        name: 'PREMIUM',
+        price: '₺199/ay',
         description: 'Bireysel rehberler için',
-        cta: 'PLUS\'a Yükselt',
+        cta: 'PREMIUM\'a Yükselt',
         features: [
             'Sınırsız Poster',
             'Yüksek Kalite (%85)',
-            'Watermark Yok 🚫',
+            'Watermark (Filigranlı)',
             'Acil Durum Ekranı 🆘',
             'Rehber Bilgileri',
             'Karekod (QR)'
@@ -82,17 +83,34 @@ export const TIER_DISPLAY_CONFIG: Record<TierType, TierDisplayConfig> = {
     [TIERS.PRO]: {
         id: TIERS.PRO,
         name: 'PRO',
-        price: '₺999/ay',
-        description: 'Acenteler ve şirketler için',
+        price: '₺699/ay',
+        description: 'Profesyonel rehberler için',
         cta: 'PRO\'ya Yükselt',
         features: [
             'Sınırsız Poster',
             'Maksimum Kalite (%100)',
             'Watermark Yok 🚫',
             'Acil Durum Ekranı 🆘',
-            'Kurumsal Logo & Branding',
+            'Tüm Şablonlara Erişim',
             'YouTube Embed',
             'Analytics Entegrasyonu'
+        ],
+        popular: false
+    },
+    [TIERS.BUSINESS]: {
+        id: TIERS.BUSINESS,
+        name: 'BUSINESS',
+        price: '₺1.299/ay',
+        description: 'Acenteler ve kurumsal yapılar için',
+        cta: 'BUSINESS\'a Yükselt',
+        features: [
+            'Sınırsız Poster',
+            'Maksimum Kalite (%100)',
+            'Watermark Yok 🚫',
+            'Business Logo & Branding',
+            'YouTube Embed',
+            'Analytics Entegrasyonu',
+            'Sınırsız Afiş Motoru'
         ],
         popular: false
     }

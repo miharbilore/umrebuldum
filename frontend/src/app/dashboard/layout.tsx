@@ -1,6 +1,13 @@
-﻿import { auth } from "@/lib/auth";
+import type { Metadata } from "next";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import React from "react";
+
+// ── Dashboard sayfalarının hiçbiri Google tarafından indexlenmemeli ──────
+export const metadata: Metadata = {
+    title: "Panelim | Umrebuldum",
+    robots: { index: false, follow: false },
+};
 
 export default async function DashboardLayout({
     children,

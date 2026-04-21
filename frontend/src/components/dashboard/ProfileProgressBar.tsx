@@ -36,7 +36,7 @@ export function ProfileProgressBar() {
                 exit={{ height: 0, opacity: 0 }}
                 className="overflow-hidden"
             >
-                <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-4 sm:p-6 text-white shadow-lg border-b border-white/10">
+                <div className="relative bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 p-4 sm:p-6 text-white shadow-lg border-b border-white/10">
                     <div className="container mx-auto max-w-7xl">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                             
@@ -44,11 +44,11 @@ export function ProfileProgressBar() {
                             <div className="flex flex-col gap-2 w-full md:w-auto">
                                 <div className="flex items-center gap-2">
                                     <div className="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
-                                        <CheckCircle2 className="w-5 h-5 text-blue-100" />
+                                        <CheckCircle2 className="w-5 h-5 text-teal-100" />
                                     </div>
                                     <h3 className="font-semibold text-lg">Profilinizi Tamamlayın</h3>
                                 </div>
-                                <p className="text-blue-100 text-sm max-w-md">
+                                <p className="text-teal-100 text-sm max-w-md">
                                     Profiliniz <span className="font-bold text-white">%{percentage}</span> oranında dolu. 
                                     Güven skorunuzu ({trustScore}/100) artırmak için bilgilerinizi tamamlayın.
                                 </p>
@@ -57,7 +57,7 @@ export function ProfileProgressBar() {
                             {/* Center: Progress Bar */}
                             <div className="flex-1 w-full max-w-xl px-2">
                                 <div className="space-y-2">
-                                    <div className="flex justify-between text-xs font-medium text-blue-50">
+                                    <div className="flex justify-between text-xs font-medium text-teal-50">
                                         <span>İlerleme</span>
                                         <span>%{percentage}</span>
                                     </div>
@@ -78,7 +78,7 @@ export function ProfileProgressBar() {
                                     <Link href={missingStep.link} className="w-full sm:w-auto">
                                         <Button 
                                             variant="secondary" 
-                                            className="w-full bg-white text-blue-700 hover:bg-blue-50 border-none font-bold group shadow-md"
+                                            className="w-full bg-white text-teal-700 hover:bg-teal-50 border-none font-bold group shadow-md"
                                         >
                                             {missingStep.label}
                                             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -90,13 +90,13 @@ export function ProfileProgressBar() {
                                     className="p-1 hover:bg-white/10 rounded-full transition-colors hidden sm:block"
                                     aria-label="Kapat"
                                 >
-                                    <X className="w-4 h-4 text-blue-200" />
+                                    <X className="w-4 h-4 text-teal-200" />
                                 </button>
                             </div>
                         </div>
 
                         {/* Visual Trust Indicator */}
-                        <div className="mt-4 flex items-center gap-4 text-xs text-blue-100/80 border-t border-white/10 pt-4">
+                        <div className="mt-4 flex items-center gap-4 text-xs text-teal-100/80 border-t border-white/10 pt-4">
                             <div className="flex items-center gap-1.5">
                                 <ShieldCheck className="w-3.5 h-3.5" />
                                 <span>Doğrulanmış profiller %70 daha fazla ilgi görür.</span>
