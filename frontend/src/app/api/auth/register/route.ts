@@ -9,9 +9,9 @@ import { verificationCodeTemplate } from "@/lib/email/email-templates";
 
 // Validation Schema
 const registerSchema = z.object({
-    name: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
+    name: z.string().trim().min(1, "Ad Soyad alanını doldurmanız zorunludur").min(2, "Ad Soyad en az 2 karakter olmalıdır"),
     email: z.string().email("Geçerli bir e-posta adresi giriniz"),
-    phone: z.string().regex(/^\+[1-9]\d{1,14}$/, "Geçerli bir uluslararası telefon numarası giriniz (Örn: +90555...)"),
+    phone: z.string().trim().min(1, "Telefon numarası zorunludur").regex(/^\+[1-9]\d{1,14}$/, "Geçerli bir uluslararası telefon numarası giriniz (Örn: +90555...)"),
     password: z.string()
         .min(8, "Şifre en az 8 karakter olmalıdır")
         .regex(/[A-Z]/, "Şifre en az bir büyük harf içermelidir")

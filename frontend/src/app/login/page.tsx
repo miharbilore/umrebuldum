@@ -15,6 +15,7 @@ import { toast } from "sonner"
 import { PasswordInput } from "@/components/auth/password-input"
 import { cn } from "@/lib/utils"
 import PhoneInput from 'react-phone-number-input'
+import { Logo } from "@/components/brand/logo";
 
 export default function LoginPage() {
     const router = useRouter()
@@ -72,6 +73,21 @@ export default function LoginPage() {
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (!regName.trim()) {
+            toast.error("Ad Soyad alanını doldurmanız zorunludur")
+            return
+        }
+
+        if (regName.trim().length < 2) {
+            toast.error("Ad Soyad en az 2 karakter olmalıdır")
+            return
+        }
+
+        if (!regPhone || regPhone.trim().length === 0) {
+            toast.error("Telefon numarası zorunludur")
+            return
+        }
 
         if (regPassword !== regConfirmPassword) {
             toast.error("Şifreler eşleşmiyor")
@@ -141,7 +157,10 @@ export default function LoginPage() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-50/50 px-4 py-10 dark:bg-gray-950">
             <Card className="w-full max-w-lg shadow-lg border-muted/40">
-                <CardHeader className="text-center space-y-1">
+                <CardHeader className="text-center space-y-4">
+                    <div className="flex justify-center">
+                        <Logo size="lg" />
+                    </div>
                     <CardTitle className="text-2xl font-bold tracking-tight">Umrebuldum</CardTitle>
                     <CardDescription>
                         Manevi yolculuğunuza buradan başlayın

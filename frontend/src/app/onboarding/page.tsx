@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { User, Map, Building2, CheckCircle2, Loader2, Phone, Mail } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { Logo } from "@/components/brand/logo";
 
 const roleThemes = {
     USER: {
@@ -117,11 +118,15 @@ export default function OnboardingPage() {
             return
         }
         if (!phone.trim()) {
-            toast.error("Telefon numarası zorunludur.")
+            toast.error("Telefon numarası zorunludur")
             return
         }
         if (!name.trim()) {
-            toast.error("Ad Soyad alanı zorunludur.")
+            toast.error("Ad Soyad alanını doldurmanız zorunludur")
+            return
+        }
+        if (name.trim().length < 2) {
+            toast.error("Ad Soyad en az 2 karakter olmalıdır")
             return
         }
 
@@ -173,8 +178,8 @@ export default function OnboardingPage() {
 
                 {/* Header */}
                 <div className="flex flex-col space-y-2 text-center">
-                    <div className="mx-auto mb-2 w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">U</span>
+                    <div className="flex justify-center mb-2">
+                        <Logo size="lg" />
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
                         Profilinizi Tamamlayın

@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/api-guards"
@@ -22,12 +22,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Geçersiz rol seçimi" }, { status: 400 })
         }
 
-        if (!phone || phone.trim().length < 7) {
+        if (!phone || phone.trim().length === 0) {
             return NextResponse.json({ error: "Telefon numarası zorunludur" }, { status: 400 })
         }
 
-        if (!name || name.trim().length < 2) {
-            return NextResponse.json({ error: "Ad Soyad zorunludur" }, { status: 400 })
+        if (!name || name.trim().length === 0) {
+            return NextResponse.json({ error: "Ad Soyad alanını doldurmanız zorunludur" }, { status: 400 })
+        }
+
+        if (name.trim().length < 2) {
+            return NextResponse.json({ error: "Ad Soyad en az 2 karakter olmalıdır" }, { status: 400 })
         }
 
         // Find the user — ID is guaranteed non-null after requireAuth

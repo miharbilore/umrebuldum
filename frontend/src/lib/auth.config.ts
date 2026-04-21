@@ -18,6 +18,7 @@ export const authConfig = {
                 token.packageType = (user as any).packageType || null;
                 token.tokenBalance = (user as any).tokenBalance || 0;
                 token.phone = (user as any).phone || null;
+                token.fullName = (user as any).fullName || (user as any).name || null;
                 token.requires_onboarding = !token.role;
             }
 
@@ -38,6 +39,7 @@ export const authConfig = {
                 (session.user as any).packageType = token.packageType ?? "FREEMIUM";
                 (session.user as any).tokenBalance = token.tokenBalance ?? 0;
                 (session.user as any).phone = token.phone ?? null;
+                (session.user as any).fullName = token.fullName ?? null;
             }
             return session;
         },
