@@ -48,6 +48,10 @@ model User {
   isPhoneVerified        Boolean               @default(false)
   agencyCity             String?
   hasCompletedQuiz       Boolean               @default(false)
+  quizPassed             Boolean               @default(false)
+  hasClaimedQuizBonus    Boolean               @default(false)
+  profileCompletedAt     DateTime?
+  hasClaimedProfileBonus Boolean               @default(false)
   onboardingCompleted    Boolean               @default(false)
   lastQuizAttempt        DateTime?
   quizAttempts           Int                   @default(0)
