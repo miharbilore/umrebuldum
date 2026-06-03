@@ -75,6 +75,7 @@ export async function POST(req: Request) {
                 where: { id: userId },
                 data: {
                     role,
+                    packageType: 'FREEMIUM', // Varsayılan paket
                     name,
                     fullName: name,
                     phone,
@@ -93,14 +94,14 @@ export async function POST(req: Request) {
             }
         })
 
-        // 3. Grant 5 Tokens Reward only for GUIDE or ORGANIZATION
+        // 3. Grant 15 Tokens Reward only for GUIDE or ORGANIZATION
         let reward = null;
         if (role === 'GUIDE' || role === 'ORGANIZATION') {
             reward = await grantToken({
                 userId,
-                amount: 5,
+                amount: 15,
                 type: "INITIAL_BALANCE",
-                reason: "Onboarding Tamamlama Ödülü",
+                reason: "Başlangıç Paketi (Hoşgeldin Bonusu)",
                 idempotencyKey: rewardIdempotencyKey
             });
         }

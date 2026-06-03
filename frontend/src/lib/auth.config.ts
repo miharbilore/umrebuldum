@@ -8,14 +8,36 @@ export const authConfig = {
         async jwt({ token, user, trigger, session }) {
             // 1. Handle client-side updates or session refreshes
             if (trigger === "update") {
-                // Priority: Use values from the update payload directly
-                if (session) {
-                    if (session.role) token.role = session.role;
-                    if (session.fullName) token.fullName = session.fullName;
-                    if (session.name) token.fullName = session.name;
-                    if (session.phone) token.phone = session.phone;
-                    if (session.city) token.city = session.city;
-                    if (session.packageType) token.packageType = session.packageType;
+                // Fetch the most recent data from the database to ensure session is 100% accurate
+                if (token.sub || token.id) {
+                    try {
+                        // Dynamic import to prevent Edge runtime crashes in middleware
+                        const { prisma } = await import("@/lib/prisma");
+                        const userId = (token.sub || token.id) as string;
+                        const dbUser = await prisma.user.findUnique({
+                            where: { id: userId },
+                            select: { role: true, packageType: true, fullName: true, name: true, phone: true, city: true }
+                        });
+
+                        if (dbUser) {
+                            token.role = dbUser.role || null;
+                            token.packageType = dbUser.packageType || "FREEMIUM";
+                            token.fullName = dbUser.fullName || dbUser.name || null;
+                            token.phone = dbUser.phone || null;
+                            token.city = dbUser.city || null;
+                        }
+                    } catch (err) {
+                        console.error("Failed to fetch fresh user data during session update:", err);
+                        // Fallback to client session payload if DB fetch fails
+                        if (session) {
+                            if (session.role) token.role = session.role;
+                            if (session.fullName) token.fullName = session.fullName;
+                            if (session.name) token.fullName = session.name;
+                            if (session.phone) token.phone = session.phone;
+                            if (session.city) token.city = session.city;
+                            if (session.packageType) token.packageType = session.packageType;
+                        }
+                    }
                 }
             }
 
@@ -32,10 +54,10 @@ export const authConfig = {
             // 3. Final Onboarding Flag (matches middleware logic)
             // A user needs onboarding if they lack a role, phone, or city
             // ADMIN users are always exempt from onboarding
-            const isServiceRole = token.role === "GUIDE" || token.role === "ORGANIZATION" || token.role === "USER";
             const hasRequiredFields = !!(token.role && token.phone && token.city);
             
-            token.requires_onboarding = isServiceRole && !hasRequiredFields;
+            // Eğer kullanıcının henüz bir rolü yoksa kesinlikle onboarding'e gitmelidir
+            token.requires_onboarding = !token.role || !hasRequiredFields;
             
             // Safety: Banned users are not "needs onboarding", they are just blocked
             if (token.role === "BANNED" || token.role === "ADMIN") token.requires_onboarding = false;
