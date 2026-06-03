@@ -8,6 +8,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { requireTokens } from "@/core/guards/token.guard";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { safeErrorMessage } from "@/lib/safe-error";
+import { getPackageFeatures } from "@/config/package-features";
 
 /**
  * POST /api/guide/offer
@@ -62,16 +63,15 @@ export async function POST(req: Request) {
             return tokenGuardRes.error!;
         }
 
-        // 1. Business Rule: Must have at least 1 active listing to send offers
+        // 1. Business Rule (Dependency Lock): Must have at least 1 active listing to send offers
         const activeListingsCount = await prisma.guideListing.count({
-            where: { guideId: guideUser.id, active: true, approvalStatus: "APPROVED" }
+            where: { guideId: guideUser.id, active: true, approvalStatus: "APPROVED", deletedAt: null }
         });
 
         if (activeListingsCount === 0) {
             return NextResponse.json({
-                error: "ACTIVE_LISTING_REQUIRED",
-                message: "Teklif verebilmek için önce yayında olan (onaylanmış) en az bir ilanınız olmalıdır."
-            }, { status: 400 });
+                error: "Teklif verebilmek için en az bir aktif ilanınız bulunmalıdır. Lütfen önce bir ilan oluşturun."
+            }, { status: 403 });
         }
 
         // Check for existing offer (idempotent)
@@ -84,11 +84,16 @@ export async function POST(req: Request) {
 
         const offerExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours
 
+        // 2. Config-driven offer cost (from package-features.ts, not hardcoded)
+        const packageFeatures = getPackageFeatures(guideUser.packageType);
+        const offerCost = packageFeatures.offerCost;
+
         const spendResult = await spendToken({
             userId: guideUser.id,
             action: "OFFER_SEND",
             relatedId: `offer_send_${guideUser.id}_${requestId}`,
             reason: `Offer sent to request ${requestId}`,
+            overrideCost: offerCost,
         });
 
         if (!spendResult.ok) {
