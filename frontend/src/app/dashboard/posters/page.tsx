@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { AlertCircle, Lock } from 'lucide-react';
+import { getPackageFeatures } from '@/config/package-features';
 
 export default async function PostersPage() {
     const session = await auth();
@@ -12,6 +13,7 @@ export default async function PostersPage() {
 
     const packageType = session.user.packageType || "FREEMIUM";
     const limits = await PackageSystem.getLimits(packageType);
+    const features = getPackageFeatures(packageType);
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
@@ -36,14 +38,14 @@ export default async function PostersPage() {
                 </div>
             </div>
 
-            {!limits.canCreatePoster ? (
+            {!features.hasPosterGenerator ? (
                 <div className="mt-8 flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
                     <div className="h-16 w-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
                         <Lock className="h-8 w-8" />
                     </div>
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Bu Özellik Paketinizde Bulunmuyor</h2>
                     <p className="text-gray-500 max-w-md mx-auto mb-6">
-                        Ücretsiz (Freemium) paket kullanıcıları afiş oluşturma özelliğine erişemezler. İlanlarınıza dikkat çekici afişler oluşturmak için lütfen paket izinlerinizi yükseltin.
+                        Afiş oluşturma özelliği mevcut paketinizde bulunmamaktadır. Lütfen paketinizi yükseltin.
                     </p>
                     <a href="/dashboard/billing" className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
                         Paketi Yükselt
