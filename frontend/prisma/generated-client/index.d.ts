@@ -5545,6 +5545,7 @@ export namespace Prisma {
     isPhoneVerified: boolean | null
     agencyCity: string | null
     hasCompletedQuiz: boolean | null
+    onboardingCompleted: boolean | null
     lastQuizAttempt: Date | null
     quizAttempts: number | null
     coverImage: string | null
@@ -5591,6 +5592,7 @@ export namespace Prisma {
     isPhoneVerified: boolean | null
     agencyCity: string | null
     hasCompletedQuiz: boolean | null
+    onboardingCompleted: boolean | null
     lastQuizAttempt: Date | null
     quizAttempts: number | null
     coverImage: string | null
@@ -5638,6 +5640,7 @@ export namespace Prisma {
     isPhoneVerified: number
     agencyCity: number
     hasCompletedQuiz: number
+    onboardingCompleted: number
     lastQuizAttempt: number
     quizAttempts: number
     coverImage: number
@@ -5707,6 +5710,7 @@ export namespace Prisma {
     isPhoneVerified?: true
     agencyCity?: true
     hasCompletedQuiz?: true
+    onboardingCompleted?: true
     lastQuizAttempt?: true
     quizAttempts?: true
     coverImage?: true
@@ -5753,6 +5757,7 @@ export namespace Prisma {
     isPhoneVerified?: true
     agencyCity?: true
     hasCompletedQuiz?: true
+    onboardingCompleted?: true
     lastQuizAttempt?: true
     quizAttempts?: true
     coverImage?: true
@@ -5800,6 +5805,7 @@ export namespace Prisma {
     isPhoneVerified?: true
     agencyCity?: true
     hasCompletedQuiz?: true
+    onboardingCompleted?: true
     lastQuizAttempt?: true
     quizAttempts?: true
     coverImage?: true
@@ -5935,6 +5941,7 @@ export namespace Prisma {
     isPhoneVerified: boolean
     agencyCity: string | null
     hasCompletedQuiz: boolean
+    onboardingCompleted: boolean
     lastQuizAttempt: Date | null
     quizAttempts: number
     coverImage: string | null
@@ -6002,6 +6009,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: boolean
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: boolean
     quizAttempts?: boolean
     coverImage?: boolean
@@ -6072,6 +6080,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: boolean
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: boolean
     quizAttempts?: boolean
     coverImage?: boolean
@@ -6168,6 +6177,7 @@ export namespace Prisma {
       isPhoneVerified: boolean
       agencyCity: string | null
       hasCompletedQuiz: boolean
+      onboardingCompleted: boolean
       lastQuizAttempt: Date | null
       quizAttempts: number
       coverImage: string | null
@@ -6602,6 +6612,7 @@ export namespace Prisma {
     readonly isPhoneVerified: FieldRef<"User", 'Boolean'>
     readonly agencyCity: FieldRef<"User", 'String'>
     readonly hasCompletedQuiz: FieldRef<"User", 'Boolean'>
+    readonly onboardingCompleted: FieldRef<"User", 'Boolean'>
     readonly lastQuizAttempt: FieldRef<"User", 'DateTime'>
     readonly quizAttempts: FieldRef<"User", 'Int'>
     readonly coverImage: FieldRef<"User", 'String'>
@@ -53970,6 +53981,7 @@ export namespace Prisma {
     isPhoneVerified: 'isPhoneVerified',
     agencyCity: 'agencyCity',
     hasCompletedQuiz: 'hasCompletedQuiz',
+    onboardingCompleted: 'onboardingCompleted',
     lastQuizAttempt: 'lastQuizAttempt',
     quizAttempts: 'quizAttempts',
     coverImage: 'coverImage',
@@ -54916,6 +54928,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFilter<"User"> | boolean
     agencyCity?: StringNullableFilter<"User"> | string | null
     hasCompletedQuiz?: BoolFilter<"User"> | boolean
+    onboardingCompleted?: BoolFilter<"User"> | boolean
     lastQuizAttempt?: DateTimeNullableFilter<"User"> | Date | string | null
     quizAttempts?: IntFilter<"User"> | number
     coverImage?: StringNullableFilter<"User"> | string | null
@@ -54984,6 +54997,7 @@ export namespace Prisma {
     isPhoneVerified?: SortOrder
     agencyCity?: SortOrderInput | SortOrder
     hasCompletedQuiz?: SortOrder
+    onboardingCompleted?: SortOrder
     lastQuizAttempt?: SortOrderInput | SortOrder
     quizAttempts?: SortOrder
     coverImage?: SortOrderInput | SortOrder
@@ -55055,6 +55069,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFilter<"User"> | boolean
     agencyCity?: StringNullableFilter<"User"> | string | null
     hasCompletedQuiz?: BoolFilter<"User"> | boolean
+    onboardingCompleted?: BoolFilter<"User"> | boolean
     lastQuizAttempt?: DateTimeNullableFilter<"User"> | Date | string | null
     quizAttempts?: IntFilter<"User"> | number
     coverImage?: StringNullableFilter<"User"> | string | null
@@ -55123,6 +55138,7 @@ export namespace Prisma {
     isPhoneVerified?: SortOrder
     agencyCity?: SortOrderInput | SortOrder
     hasCompletedQuiz?: SortOrder
+    onboardingCompleted?: SortOrder
     lastQuizAttempt?: SortOrderInput | SortOrder
     quizAttempts?: SortOrder
     coverImage?: SortOrderInput | SortOrder
@@ -55179,6 +55195,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolWithAggregatesFilter<"User"> | boolean
     agencyCity?: StringNullableWithAggregatesFilter<"User"> | string | null
     hasCompletedQuiz?: BoolWithAggregatesFilter<"User"> | boolean
+    onboardingCompleted?: BoolWithAggregatesFilter<"User"> | boolean
     lastQuizAttempt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     quizAttempts?: IntWithAggregatesFilter<"User"> | number
     coverImage?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -59107,6 +59124,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -59175,6 +59193,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -59243,6 +59262,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59311,6 +59331,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59379,6 +59400,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -59427,6 +59449,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59475,6 +59498,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -64096,6 +64120,7 @@ export namespace Prisma {
     isPhoneVerified?: SortOrder
     agencyCity?: SortOrder
     hasCompletedQuiz?: SortOrder
+    onboardingCompleted?: SortOrder
     lastQuizAttempt?: SortOrder
     quizAttempts?: SortOrder
     coverImage?: SortOrder
@@ -64153,6 +64178,7 @@ export namespace Prisma {
     isPhoneVerified?: SortOrder
     agencyCity?: SortOrder
     hasCompletedQuiz?: SortOrder
+    onboardingCompleted?: SortOrder
     lastQuizAttempt?: SortOrder
     quizAttempts?: SortOrder
     coverImage?: SortOrder
@@ -64199,6 +64225,7 @@ export namespace Prisma {
     isPhoneVerified?: SortOrder
     agencyCity?: SortOrder
     hasCompletedQuiz?: SortOrder
+    onboardingCompleted?: SortOrder
     lastQuizAttempt?: SortOrder
     quizAttempts?: SortOrder
     coverImage?: SortOrder
@@ -71075,6 +71102,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -71142,6 +71170,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -71225,6 +71254,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -71292,6 +71322,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -71359,6 +71390,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -71426,6 +71458,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -71509,6 +71542,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -71576,6 +71610,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -71735,6 +71770,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -71802,6 +71838,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -71940,6 +71977,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -72007,6 +72045,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -73791,6 +73830,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -73858,6 +73898,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -73990,6 +74031,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -74057,6 +74099,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -74283,6 +74326,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -74350,6 +74394,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -74471,6 +74516,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -74538,6 +74584,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -74651,6 +74698,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -74718,6 +74766,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -74851,6 +74900,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -74918,6 +74968,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -75024,6 +75075,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -75091,6 +75143,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -75225,6 +75278,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -75292,6 +75346,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -75441,6 +75496,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -75508,6 +75564,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -75591,6 +75648,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -75658,6 +75716,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -75725,6 +75784,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -75792,6 +75852,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -75875,6 +75936,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -75942,6 +76004,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -76009,6 +76072,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -76076,6 +76140,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -76159,6 +76224,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -76226,6 +76292,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -76293,6 +76360,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -76360,6 +76428,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -76483,6 +76552,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -76550,6 +76620,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -76819,6 +76890,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -76886,6 +76958,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77062,6 +77135,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -77129,6 +77203,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -77376,6 +77451,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77443,6 +77519,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77526,6 +77603,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -77593,6 +77671,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -77660,6 +77739,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77727,6 +77807,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77848,6 +77929,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77915,6 +77997,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -77998,6 +78081,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -78065,6 +78149,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -78198,6 +78283,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -78265,6 +78351,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -78332,6 +78419,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -78399,6 +78487,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -78482,6 +78571,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -78549,6 +78639,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79010,6 +79101,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -79077,6 +79169,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -79192,6 +79285,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79259,6 +79353,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79402,6 +79497,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -79469,6 +79565,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -79552,6 +79649,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79619,6 +79717,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79686,6 +79785,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -79753,6 +79853,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -79836,6 +79937,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79903,6 +80005,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -79970,6 +80073,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -80037,6 +80141,7 @@ export namespace Prisma {
     isPhoneVerified?: boolean
     agencyCity?: string | null
     hasCompletedQuiz?: boolean
+    onboardingCompleted?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
     coverImage?: string | null
@@ -80120,6 +80225,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
@@ -80187,6 +80293,7 @@ export namespace Prisma {
     isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
     agencyCity?: NullableStringFieldUpdateOperationsInput | string | null
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompleted?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null

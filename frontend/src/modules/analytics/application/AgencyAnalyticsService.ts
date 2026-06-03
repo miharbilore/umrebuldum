@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Agency Analytics Service (FOMO Engine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Agency Analytics Service (FOMO Engine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Generates the data required for the Agency Dashboard. Intentionally structured
 // to expose limitations on the FREE tier, driving the "Conversion Up" strategy.
 
@@ -38,7 +38,7 @@ export class AgencyAnalyticsService {
         // Advanced Metrics (Gated for FREE users)
         let topKeywords: Array<{ query: string, count: number }> = [];
         let avgDwellTime = 0;
-        const isPremiumDataUnlocked = ["PREMIUM", "PLUS", "PRO", "BUSINESS", "BUSINESS_PLUS"].includes(pkg);
+        const isPremiumDataUnlocked = ["PREMIUM", "PRO", "BUSINESS"].includes(pkg);
 
         if (isPremiumDataUnlocked) {
             // Unlock Search Keywords

@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 import { rateLimit } from "@/lib/rate-limit";
@@ -203,7 +203,9 @@ export async function POST(req: Request) {
             credits: pkg.credits,
             email: user.email || "",
             role: user.role || "GUIDE",
-            successUrl: `${baseUrl}/dashboard/billing?success=true`,
+            successUrl: gateway.provider === "paytr" 
+                ? `${baseUrl}/api/paytr/success` 
+                : `${baseUrl}/dashboard/billing?success=true`,
             cancelUrl: `${baseUrl}/dashboard/billing?canceled=true`,
             internalTxId: pendingTx.id,
             couponCode: couponCode || undefined,

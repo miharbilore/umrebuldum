@@ -241,7 +241,7 @@ export function CreateListingForm() {
                         <span className="text-xs text-gray-500">Veya Cihazınızdan Yükleyin:</span>
                         {customImagePreview ? (
                             <div className="relative aspect-video max-w-sm rounded overflow-hidden border">
-                                <Image src={customImagePreview} alt="Yüklenen görsel önizleme" fill className="object-cover" />
+                                <Image src={customImagePreview} alt="Yüklenen görsel önizleme" fill className="object-cover" sizes="300px" />
                                 <div className="absolute top-2 right-2">
                                     <Button type="button" variant="destructive" size="sm" onClick={clearCustomImage} className="min-h-11">
                                         Temizle

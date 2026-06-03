@@ -1,113 +1,84 @@
-﻿import React from 'react';
-import { Calendar, Phone, User, CheckCircle2, Navigation } from 'lucide-react';
-import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
+import React from 'react';
+import { Phone, User, CheckCircle2, Hotel, ShieldCheck } from 'lucide-react';
+import { PosterData } from '../poster-generator/types';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
 
-export function Template6({ data, id, showWatermark = true }: { data: PosterData; id?: string, showWatermark?: boolean }) {
+export function Template6({ data, id }: { data: PosterData; id?: string }) {
     const bgImage = STOCK_BACKGROUNDS.find(b => b.id === data.backgroundImage)?.url || STOCK_BACKGROUNDS[0].url;
 
     return (
         <div
             id={id}
-            className="w-full h-full relative overflow-hidden bg-emerald-950 flex flex-col font-sans template-container"
+            className="w-[1080px] h-[1350px] relative overflow-hidden bg-white flex flex-col items-center text-center text-slate-900"
             style={{
-                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Arial, sans-serif',
+                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Inter, sans-serif'
             }}
         >
-            {/* Split screen: Top Left Text, Bottom Right Image */}
-            <div className="absolute inset-x-0 bottom-0 h-[60%] w-full flex justify-end">
+            {/* === BACKGROUND LAYER === */}
+            <div className="absolute inset-0 z-0">
                 <div
-                    className="w-[85%] h-full rounded-tl-[120px] bg-cover bg-center shadow-2xl overflow-hidden relative"
+                    className="absolute inset-0 bg-cover bg-center grayscale opacity-[0.02]"
                     style={{ backgroundImage: `url(${bgImage})` }}
-                >
-                    <div className="absolute inset-0 bg-emerald-950/40 mix-blend-multiply" />
-                </div>
+                />
             </div>
 
-            {/* Content Container */}
-            <div className="flex-1 flex flex-col z-10 p-16">
-
-                {/* Header Phase */}
-                <div className="max-w-xl">
-                    <div className="w-20 h-2 bg-emerald-500 mb-8 rounded-full" />
-                    <div className="text-emerald-400 tracking-[0.4em] text-sm font-bold uppercase mb-4">Güzide Yolculuk</div>
-                    <h1 className="text-7xl font-bold text-white tracking-tight leading-tight mb-8">
-                        {data.title}
-                    </h1>
-
-                    <div className="flex items-center gap-4 text-2xl font-medium text-emerald-100 mb-12 bg-white/5 w-max px-6 py-4 rounded-3xl backdrop-blur-sm border border-white/10">
-                        <Calendar className="w-8 h-8 text-emerald-500" />
-                        {data.date}
-                    </div>
+            {/* === CONTENT LAYER === */}
+            <div className="relative z-10 flex flex-col h-full w-full px-32 py-32 items-center">
+                
+                {/* ── TOP: Brand ── */}
+                <div className="mb-24 shrink-0">
+                    <div className="text-slate-300 text-sm font-black tracking-[0.8em] uppercase">UMREBULDUM</div>
                 </div>
 
-                {/* 3 Column Data Phase - Vertical Left side */}
-                <div className="flex-1 flex flex-col justify-center space-y-6 max-w-sm mb-12">
+                {/* ── HERO: Centered Typography ── */}
+                <div className="mb-24 shrink-0 max-w-[800px]">
+                    <h1 className="text-[110px] font-bold leading-none tracking-tighter text-slate-900 mb-10 uppercase">
+                        {data.title}
+                    </h1>
+                    <div className="h-[2px] w-20 bg-[#d4af37]/40 mx-auto mb-10" />
+                    <p className="text-2xl text-slate-400 font-medium tracking-[0.2em] uppercase italic">
+                        {data.date}
+                    </p>
+                </div>
+
+                {/* ── PRICE SECTION: Minimalist Vertical ── */}
+                <div className="flex-1 flex flex-col justify-center gap-12 w-full max-w-[500px]">
                     {[
-                        { title: "4 KİŞİLİK ODA", price: data.price4Person },
-                        { title: "3 KİŞİLİK ODA", price: data.price3Person },
-                        { title: "2 KİŞİLİK ODA", price: data.price2Person }
-                    ].map((col, i) => (
-                        <div key={i} className="flex items-center gap-6 bg-emerald-900/50 backdrop-blur-md border border-emerald-500/20 p-5 rounded-3xl">
-                            <div className="w-16 h-16 rounded-full bg-emerald-800 flex flex-col justify-center items-center text-emerald-300 font-bold border border-emerald-500/30">
-                                <span className="text-2xl">{col.title.charAt(0)}</span>
-                                <span className="text-[10px] uppercase">Kişi</span>
-                            </div>
-                            <div>
-                                <div className="text-emerald-100 text-xs tracking-widest uppercase mb-1">{col.title} Kişi Başı</div>
-                                <div className="text-3xl font-bold text-white">{col.price}</div>
-                            </div>
+                        { label: "4 Kişilik Oda", price: data.price4Person },
+                        { label: "3 Kişilik Oda", price: data.price3Person },
+                        { label: "2 Kişilik Oda", price: data.price2Person }
+                    ].map((tier, idx) => (
+                        <div key={idx} className="flex flex-col items-center">
+                            <span className="text-[64px] font-bold text-slate-900 tracking-tighter leading-none mb-2">{tier.price}</span>
+                            <span className="text-slate-400 text-xs font-black uppercase tracking-[0.3em]">{tier.label}</span>
                         </div>
                     ))}
                 </div>
 
-                {/* Info and Guide Footer */}
-                <div className="mt-auto bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-[40px] flex justify-between items-center w-[95%] shadow-2xl">
-                    <div className="space-y-4 text-emerald-50 w-1/3 border-r border-white/10 pr-6">
-                        <div className="flex items-center gap-3">
-                            <Navigation className="w-5 h-5 text-emerald-400" />
-                            <span>Mekke: <b className="font-bold">{data.hotelMecca}</b></span>
+                {/* ── FOOTER: Centered Info ── */}
+                <div className="mt-auto flex flex-col items-center w-full max-w-[650px] pr-24"> 
+                    {/* pr-24 to push away from QR zone a bit more even if centered */}
+                    <div className="flex flex-col items-center gap-6">
+                        <div className="relative">
+                            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100 shadow-sm">
+                                <User className="w-12 h-12 text-slate-300" />
+                                {data.isIdentityVerified && (
+                                    <div className="absolute top-0 right-0 bg-emerald-500 text-white p-1.5 rounded-full shadow-lg border-2 border-white">
+                                        <ShieldCheck className="w-4 h-4" />
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Navigation className="w-5 h-5 text-emerald-400" />
-                            <span>Medine: <b className="font-bold">{data.hotelMedina}</b></span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 w-1/3 px-6">
-                        <div className="w-16 h-16 rounded-full bg-emerald-800 border-2 border-emerald-500 flex items-center justify-center overflow-hidden">
-                            <User className="w-8 h-8 text-emerald-300" />
-                        </div>
-                        <div>
-                            <div className="text-emerald-300 text-[10px] tracking-widest uppercase font-bold mb-1">Rehberimiz</div>
-                            <div className="text-2xl font-bold text-white leading-none mb-1">{data.guideName}</div>
-                            {data.isIdentityVerified && (
-                                <div className="text-emerald-400 text-[10px] uppercase tracking-widest flex items-center gap-1 font-bold">
-                                    <CheckCircle2 className="w-3 h-3" /> Kimlik Onaylı Rehber
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end w-1/3">
-                        <div className="flex flex-col items-end">
-                            <div className="text-emerald-300 text-[10px] tracking-widest uppercase font-bold mb-1">İletişim Hattı</div>
-                            <div className="flex items-center gap-3 text-3xl font-bold text-white bg-emerald-500 px-6 py-3 rounded-full shadow-lg shadow-emerald-500/30">
-                                <Phone className="w-6 h-6" />
-                                {data.guidePhone}
+                        <div className="flex flex-col items-center">
+                            <span className="text-4xl font-bold text-slate-900 tracking-tight mb-2 uppercase">{data.guideName}</span>
+                            <div className="flex items-center gap-3 text-2xl font-medium text-slate-400 tracking-widest">
+                                <Phone className="w-4 h-4 opacity-40" />
+                                <span>{data.guidePhone}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {showWatermark && (
-                <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden opacity-5">
-                    <div className="text-[120px] font-black text-white/50 -rotate-12 whitespace-nowrap">
-                        UMREBULDUM
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

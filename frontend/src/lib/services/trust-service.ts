@@ -21,62 +21,59 @@ export interface ProfileCompletionResult {
  * 4. Visual (10%): photo (10%)
  * 5. Verification (20%): isIdentityVerified (20%)
  */
-export function calculateProfileCompletion(user: Partial<User>): ProfileCompletionResult {
-    let score = 0;
-    const steps: { label: string; link: string; completed: boolean; weight: number }[] = [];
+/**
+ * Calculates profile completion percentage based on specific user requirements.
+ * 
+ * Logic:
+ * 1. Role & Name present: 40%
+ * 2. Phone & City present: 60%
+ * 3. Bio & Identity Application present: 80%
+ * 4. approvalStatus === 'APPROVED': 100%
+ */
+export function calculateProfileCompletion(user: any): ProfileCompletionResult {
+    let percentage = 0;
+    let missingStep = null;
 
-    // 1. Identity (20%)
-    const hasFullName = !!user.fullName && user.fullName.length > 2;
-    const hasCity = !!user.city;
-    score += hasFullName ? 10 : 0;
-    score += hasCity ? 10 : 0;
+    const hasRoleAndName = !!(user.role && user.fullName);
+    const hasPhoneAndCity = !!(user.phone && user.city);
+    const hasBioAndDocs = !!(user.bio && user.identityApplications?.length > 0);
     
-    steps.push({ label: "Ad Soyad", link: "/dashboard/profile", completed: hasFullName, weight: 10 });
-    steps.push({ label: "Yaşadığınız Şehir", link: "/dashboard/profile", completed: hasCity, weight: 10 });
+    // Check for approved status from the latest application
+    const latestApp = user.identityApplications?.[0];
+    const isApproved = user.isApproved || latestApp?.status === "APPROVED";
+    const isPending = latestApp?.status === "PENDING";
 
-    // 2. Communication (20%)
-    const hasPhone = !!user.phone && user.phone.length > 5;
-    const isPhoneVerified = !!user.isPhoneVerified;
-    score += hasPhone ? 10 : 0;
-    score += isPhoneVerified ? 10 : 0;
-
-    steps.push({ label: "Telefon Numarası", link: "/dashboard/profile", completed: hasPhone, weight: 10 });
-    steps.push({ label: "Telefon Doğrulama", link: "/dashboard/settings", completed: isPhoneVerified, weight: 10 });
-
-    // 3. Professionalism (30%)
-    const isGuideOrOrg = user.role === UserRole.GUIDE || user.role === UserRole.ORGANIZATION;
-    if (isGuideOrOrg) {
-        const hasAgencyCity = !!user.agencyCity;
-        const hasBio = !!user.bio && user.bio.length >= 50;
-        score += hasAgencyCity ? 15 : 0;
-        score += hasBio ? 15 : 0;
-        steps.push({ label: "Faaliyet Şehri", link: "/dashboard/profile", completed: hasAgencyCity, weight: 15 });
-        steps.push({ label: "Hakkımda (Bio)", link: "/dashboard/profile", completed: hasBio, weight: 15 });
+    if (hasRoleAndName) {
+        percentage = 40;
+        missingStep = { label: "İletişim Bilgilerini Tamamla", link: "/dashboard/profile" };
     } else {
-        const hasBio = !!user.bio && user.bio.length >= 20;
-        score += hasBio ? 30 : 0;
-        steps.push({ label: "Kısa Bilgi (Bio)", link: "/dashboard/profile", completed: hasBio, weight: 30 });
+        return {
+            percentage: 0,
+            missingStep: { label: "Temel Bilgileri Gir", link: "/dashboard/profile" }
+        };
     }
 
-    // 4. Visual (10%)
-    const hasPhoto = !!user.photo || !!user.image;
-    score += hasPhoto ? 10 : 0;
-    steps.push({ label: "Profil Fotoğrafı", link: "/dashboard/profile", completed: hasPhoto, weight: 10 });
+    if (hasPhoneAndCity) {
+        percentage = 60;
+        missingStep = { label: "Özgeçmiş ve Belgeleri Yükle", link: "/dashboard/profile" };
+    }
 
-    // 5. Verification (20%)
-    const isIdentityVerified = !!user.isIdentityVerified;
-    score += isIdentityVerified ? 20 : 0;
-    steps.push({ label: "Kimlik Onayı", link: "/dashboard/settings", completed: isIdentityVerified, weight: 20 });
+    if (hasBioAndDocs) {
+        percentage = 80;
+        missingStep = { label: "Onay Bekleniyor", link: "/dashboard/settings" };
+    }
 
-    // Find the most "valuable" missing step for the Smart CTA
-    const missing = steps
-        .filter(s => !s.completed)
-        .sort((a, b) => b.weight - a.weight)[0];
+    if (isApproved) {
+        percentage = 100;
+        missingStep = null;
+    }
 
     return {
-        percentage: Math.min(score, 100),
-        missingStep: missing ? { label: missing.label, link: missing.link } : null
-    };
+        percentage,
+        missingStep,
+        // Adding extra info for the UI
+        approvalStatus: isApproved ? "APPROVED" : (isPending ? "PENDING" : "NONE")
+    } as any;
 }
 
 /**

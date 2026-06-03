@@ -1,16 +1,11 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { AuthenticatedUser } from "./auth-service";
 
 // ─── Server-Side API Guards ─────────────────────────────────────────────
 // Every guard returns a NextResponse error OR null. 
 // If null → guard passed, continue.
 
-type Session = {
-    user: {
-        email?: string | null;
-        role?: string;
-        name?: string | null;
-    }
-} | null;
+type Session = any;
 
 
 /**

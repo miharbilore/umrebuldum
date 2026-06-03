@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
@@ -12,7 +12,9 @@ import { buildListingSlug } from "@/lib/slug";
 export async function POST(req: Request) {
     try {
         const session = await auth();
-        const guard = requireAdmin(session);
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        
+        const guard = requireAdmin(session as any);
         if (guard) return guard;
 
         const { listingId, reason } = await req.json();

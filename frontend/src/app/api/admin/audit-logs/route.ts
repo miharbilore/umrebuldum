@@ -1,11 +1,12 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
 
 export async function GET(req: Request) {
     try {
         const session = await auth();
-        const guard = requireAdmin(session);
+        if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const guard = requireAdmin(session as any);
         if (guard) return guard;
 
         const { searchParams } = new URL(req.url);

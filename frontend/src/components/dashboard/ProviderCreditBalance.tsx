@@ -13,7 +13,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export const CREDIT_BALANCE_KEY = "/api/guide/credits";
 
-export function CreditBalance() {
+export function ProviderCreditBalance() {
     const [isQuizOpen, setIsQuizOpen] = useState(false);
     const { data: session, status } = useSession();
     const { data: balanceData, isLoading: balLoading } = useSWR(CREDIT_BALANCE_KEY, fetcher);

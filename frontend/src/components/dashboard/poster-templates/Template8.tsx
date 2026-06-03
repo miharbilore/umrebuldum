@@ -1,120 +1,89 @@
 import React from 'react';
-import Image from "next/image";
-import { Calendar, Phone, User, CheckCircle2, Navigation } from 'lucide-react';
-import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
+import { Phone, User, CheckCircle2, ShieldCheck, MapPin } from 'lucide-react';
+import { PosterData } from '../poster-generator/types';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
 
-export function Template8({ data, id, showWatermark = true }: { data: PosterData; id?: string, showWatermark?: boolean }) {
+export function Template8({ data, id }: { data: PosterData; id?: string }) {
     const bgImage = STOCK_BACKGROUNDS.find(b => b.id === data.backgroundImage)?.url || STOCK_BACKGROUNDS[0].url;
 
     return (
         <div
             id={id}
-            className="w-full h-full relative overflow-hidden bg-[#1e1b4b] flex flex-col font-sans template-container"
+            className="w-[1080px] h-[1350px] relative overflow-hidden bg-black flex flex-col text-white"
             style={{
-                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Arial, sans-serif',
+                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Inter, sans-serif'
             }}
         >
-            {/* Background Image very faint */}
+            {/* === FULL BACKGROUND IMAGE === */}
             <div className="absolute inset-0 z-0">
-                <Image
-                    src={bgImage}
-                    alt="Umrah"
-                    fill
-                    className="object-cover opacity-20 filter grayscale"
-                    sizes="100vw"
+                <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
+                    style={{ backgroundImage: `url(${bgImage})` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] via-[#312e81]/80 to-[#1e1b4b]" />
+                {/* Intense dark gradient for text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent" />
             </div>
 
-            {/* Content Container */}
-            <div className="flex-1 flex flex-col z-10 p-12 relative">
+            {/* === CONTENT LAYER === */}
+            <div className="relative z-10 flex flex-col h-full px-20 py-20">
+                
+                {/* ── TOP: Brand & Urgency ── */}
+                <div className="flex items-center justify-between mb-auto shrink-0">
+                    <div className="text-white/80 text-sm font-bold tracking-[0.5em] uppercase border-b border-white/20 pb-2">UmreBuldum</div>
+                    {data.urgencyText && (
+                        <div className="px-6 py-2 bg-red-600/90 backdrop-blur-md text-white font-black text-lg rounded-xl border border-white/20 shadow-2xl uppercase tracking-widest">
+                            {data.urgencyText}
+                        </div>
+                    )}
+                </div>
 
-                {/* Header Frame */}
-                <div className="border border-indigo-500/30 rounded-[40px] p-12 mb-10 text-center bg-[#1e1b4b]/50 backdrop-blur-md shadow-2xl relative">
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white px-6 py-2 rounded-full text-xs uppercase tracking-[0.3em] font-bold shadow-lg shadow-indigo-500/50">
-                        Vip Organizasyon
-                    </div>
-
-                    <h1 className="text-6xl font-light text-white tracking-widest uppercase mb-8 leading-tight">
+                {/* ── HERO: Massive Title ── */}
+                <div className="mb-12 shrink-0">
+                    <h1 className="text-[120px] font-black leading-[0.85] tracking-tighter uppercase drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] mb-6">
                         {data.title}
                     </h1>
-
-                    <div className="flex justify-center items-center gap-3 text-2xl font-light text-indigo-200">
-                        <Calendar className="w-6 h-6 text-indigo-400" />
-                        Gidiş: <strong className="font-bold text-white">{data.date}</strong>
+                    <div className="flex items-center gap-4 text-2xl font-bold italic text-[#d4af37] tracking-widest drop-shadow-lg">
+                        <MapPin className="w-6 h-6" />
+                        <span>{data.date}</span>
                     </div>
                 </div>
 
-                {/* 3 Column Data Phase */}
-                <div className="grid grid-cols-3 gap-6 mb-10">
+                {/* ── MINIMAL PRICES ── */}
+                <div className="grid grid-cols-3 gap-8 mb-16 shrink-0 max-w-[800px]">
                     {[
-                        { title: "4 KİŞİLİK ODA", price: data.price4Person, active: false },
-                        { title: "3 KİŞİLİK ODA", price: data.price3Person, active: true },
-                        { title: "2 KİŞİLİK ODA", price: data.price2Person, active: false }
-                    ].map((col, i) => (
-                        <div key={i} className={`rounded-3xl p-8 text-center flex flex-col items-center justify-center border transition-all ${col.active ? 'bg-indigo-600 border-indigo-400 shadow-xl shadow-indigo-600/30 transform scale-105' : 'bg-[#312e81]/50 border-indigo-500/20 backdrop-blur-md'}`}>
-                            <div className={`text-[11px] font-bold tracking-[0.2em] mb-4 uppercase ${col.active ? 'text-indigo-100' : 'text-indigo-300'}`}>{col.title}</div>
-                            <div className={`text-5xl font-black ${col.active ? 'text-white' : 'text-indigo-100'}`}>{col.price}</div>
+                        { label: "4 Kişilik", price: data.price4Person },
+                        { label: "3 Kişilik", price: data.price3Person },
+                        { label: "2 Kişilik", price: data.price2Person }
+                    ].map((tier, idx) => (
+                        <div key={idx} className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl">
+                            <div className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-1">{tier.label}</div>
+                            <div className="text-3xl font-black">{tier.price}</div>
                         </div>
                     ))}
                 </div>
 
-                <div className="flex-1" />
-
-                {/* Bottom Details Row */}
-                <div className="flex items-end justify-between gap-8">
-                    {/* Hotels and Features */}
-                    <div className="flex-1 bg-white/5 backdrop-blur-md rounded-[40px] p-8 border border-white/10 space-y-6">
-                        <div className="text-indigo-300 text-xs font-bold uppercase tracking-widest border-b border-indigo-500/20 pb-4 mb-4">
-                            Dahil Hizmetlerimiz
-                        </div>
-                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-indigo-100 text-sm font-medium">
-                            <div className="flex items-center gap-3">
-                                <Navigation className="w-5 h-5 text-indigo-400" /> Mekke: {data.hotelMecca}
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-indigo-400" /> Vize & Ulaşım İçi Transferler
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Navigation className="w-5 h-5 text-indigo-400" /> Medine: {data.hotelMedina}
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-indigo-400" /> Tur Rehberliği Eğitimleri
-                            </div>
+                {/* ── FOOTER: Minimal ── */}
+                <div className="flex items-center gap-6 max-w-[650px]">
+                    <div className="relative">
+                        <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
+                            <User className="w-10 h-10 text-white" />
+                            {data.isIdentityVerified && (
+                                <div className="absolute -top-2 -right-2 bg-emerald-500 p-1.5 rounded-full shadow-lg border-2 border-black">
+                                    <ShieldCheck className="w-4 h-4" />
+                                </div>
+                            )}
                         </div>
                     </div>
-
-                    {/* Guide Card */}
-                    <div className="w-[350px] bg-indigo-500/10 backdrop-blur-xl rounded-[40px] p-8 border border-indigo-400/30 flex flex-col items-center text-center shadow-2xl">
-                        <div className="w-20 h-20 rounded-full bg-[#1e1b4b] border-2 border-indigo-400 flex items-center justify-center mb-6 shadow-inner">
-                            <User className="w-10 h-10 text-indigo-300" />
-                        </div>
-                        <div className="text-indigo-200 text-[10px] tracking-widest font-bold uppercase mb-2">Tur Sorumlusu</div>
-                        <div className="text-3xl font-light text-white mb-2">{data.guideName}</div>
-
-                        {data.isIdentityVerified && (
-                            <div className="text-emerald-400 text-[10px] uppercase tracking-widest flex items-center gap-1.5 font-bold bg-emerald-950/50 px-3 py-1.5 rounded-full mb-6 border border-emerald-500/30">
-                                <CheckCircle2 className="w-3.5 h-3.5" /> Kimlik Onaylı Rehber
-                            </div>
-                        )}
-                        {!data.isIdentityVerified && <div className="h-6 mb-6" />}
-
-                        <div className="w-full bg-white text-indigo-900 py-4 rounded-2xl flex items-center justify-center gap-3 text-2xl font-bold shadow-lg shadow-white/10 mt-auto">
-                            <Phone className="w-6 h-6" />
-                            {data.guidePhone}
+                    <div className="flex flex-col">
+                        <span className="text-3xl font-black uppercase tracking-tight">{data.guideName}</span>
+                        <div className="flex items-center gap-2 text-xl font-bold text-white/70">
+                            <Phone className="w-4 h-4 text-[#d4af37]" />
+                            <span>{data.guidePhone}</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {showWatermark && (
-                <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden opacity-[0.05]">
-                    <div className="text-[150px] font-black text-white/50 -rotate-45 whitespace-nowrap">
-                        UMREBULDUM
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

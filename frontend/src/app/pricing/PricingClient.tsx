@@ -185,7 +185,7 @@ export default function PricingClient() {
                                         <div className="flex items-center gap-2 mb-2">
                                             <h3 className="text-2xl font-black text-slate-900 leading-none">{pkg.name}</h3>
                                             {pkg.roleTarget === 'ORGANIZATION' && (
-                                                <Building2 className="w-4 h-4 text-slate-400" width={16} height={16} title="Business Paket" />
+                                                <Building2 className="w-4 h-4 text-slate-400" width={16} height={16} />
                                             )}
                                         </div>
                                         <p className="text-slate-500 text-sm leading-relaxed mb-6 h-10 font-medium">
@@ -252,7 +252,7 @@ export default function PricingClient() {
                                                 <Lock className="w-4 h-4" width={16} height={16} /> {roleText}
                                             </span>
                                         ) : (
-                                            <Link href={session ? `/checkout?pkg=${pkg.id}&period=${pkg.billingPeriod || 1}` : "/login"}>
+                                            <Link href={session ? `/dashboard/billing` : "/login"}>
                                                 {pkg.slug === 'FREEMIUM' ? 'Şimdi Dene' : 'Hemen Başlat'}
                                                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" width={20} height={20} />
                                             </Link>
@@ -309,7 +309,7 @@ export default function PricingClient() {
                                                 {isFreemium ? (
                                                     <span className="text-[10px] tracking-tight">Paket Gerekli</span>
                                                 ) : (
-                                                    <Link href={session ? `/checkout?tokenPkg=${tokenPkg.id}` : "/login"}>
+                                                    <Link href={session ? `/dashboard/billing` : "/login"}>
                                                         Satın Al
                                                     </Link>
                                                 )}

@@ -1,4 +1,4 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { LedgerEntryType } from "@prisma/client";
 
 export class TokenService {
@@ -61,7 +61,7 @@ export class TokenService {
         // or rely on isolation levels.
 
         // Ensure isolation if no transaction is provided
-        const executionClient = tx ? async (work: any) => work(tx) : (work: any) => prisma.$transaction(work, { isolationLevel: 'RepeatableRead' });
+        const executionClient = tx ? async (work: any) => work(tx) : (work: any) => prisma.$transaction(work, { isolationLevel: 'Serializable' });
 
         return await executionClient(async (txClient: any) => {
             // STEP 0: Check if Ledger Entry Exists (Idempotency Lock)

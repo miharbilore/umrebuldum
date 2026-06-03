@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Grant Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Grant Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Handles all token credit operations: purchases, admin grants, onboarding, refunds.
 // SINGLE entry point for adding tokens to any user account.
 //
@@ -9,7 +9,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { withSerializableRetry } from "@/lib/with-retry";
-import { LedgerEntryType } from "@prisma/client";
+import { LedgerEntryType, Prisma } from "../../../../prisma/generated-client";
 import { EventBus } from "@/core/events/event-bus";
 import { TOKEN_EXPIRY_DAYS } from "@/lib/package-system";
 
@@ -20,6 +20,7 @@ export interface GrantTokenInput {
     reason: string;
     relatedId?: string;
     idempotencyKey: string; // MANDATORY â€” no optional
+    tx?: Prisma.TransactionClient;
 }
 
 export interface GrantTokenResult {
@@ -45,8 +46,7 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
     }
 
     try {
-        const result = await withSerializableRetry(() =>
-            prisma.$transaction(async (tx) => {
+        const executeLogic = async (tx: any) => {
                 // â”€â”€ (1) Idempotency check INSIDE the transaction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 const existing = await tx.tokenTransaction.findUnique({
                     where: { idempotencyKey_userId: { idempotencyKey: `${input.idempotencyKey}_credit`, userId: input.userId } },
@@ -116,11 +116,13 @@ export async function grantToken(input: GrantTokenInput): Promise<GrantTokenResu
                 });
 
                 return { newBalance: user.tokenBalance, alreadyProcessed: false };
-            }, {
+        };
+        const result = input.tx 
+            ? await executeLogic(input.tx)
+            : await withSerializableRetry(() => prisma.$transaction(executeLogic, {
                 isolationLevel: "Serializable",
                 timeout: 10_000,
-            })
-        );
+            }));
 
         // Fire event outside transaction (fire-and-forget)
         if (!result.alreadyProcessed) {

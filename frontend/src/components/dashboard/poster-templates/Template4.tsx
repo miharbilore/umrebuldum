@@ -1,127 +1,140 @@
-﻿import React from 'react';
-import { Phone, User, CheckCircle2, Navigation } from 'lucide-react';
-import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
+import React from 'react';
+import { Phone, User, CheckCircle2, Hotel, ShieldCheck, Star } from 'lucide-react';
+import { PosterData } from '../poster-generator/types';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
 
-export function Template4({ data, id, showWatermark = true }: { data: PosterData; id?: string, showWatermark?: boolean }) {
+export function Template4({ data, id }: { data: PosterData; id?: string }) {
     const bgImage = STOCK_BACKGROUNDS.find(b => b.id === data.backgroundImage)?.url || STOCK_BACKGROUNDS[0].url;
 
     return (
         <div
             id={id}
-            className="w-full h-full relative overflow-hidden bg-slate-50 flex flex-col font-sans template-container"
+            className="w-[1080px] h-[1350px] relative overflow-hidden bg-[#050505] flex flex-col text-white"
             style={{
-                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Arial, sans-serif'
+                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Inter, sans-serif'
             }}
         >
-            {/* Split Header Layout - Top 40% Image */}
-            <div className="h-[40%] w-full relative">
+            {/* === BACKGROUND LAYER === */}
+            <div className="absolute inset-0 z-0">
                 <div
-                    className="absolute inset-0 bg-cover bg-center"
+                    className="absolute inset-0 bg-cover bg-center brightness-50 contrast-125 scale-110"
                     style={{ backgroundImage: `url(${bgImage})` }}
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(212,175,55,0.15)_0%,_transparent_60%)]" />
+            </div>
 
-                {/* Emerald Overlay */}
-                <div className="absolute inset-0 bg-emerald-900/60 mix-blend-multiply" />
+            {/* Bold Luxury Borders */}
+            <div className="absolute inset-8 border-[12px] border-[#d4af37]/40 z-10 pointer-events-none" />
+            <div className="absolute inset-14 border-2 border-[#d4af37]/60 z-10 pointer-events-none" />
 
-                {/* Content over image */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12">
-                    <div className="w-16 h-1 bg-emerald-400 mb-6" />
-                    <h1 className="text-6xl font-black text-white tracking-widest uppercase mb-4 drop-shadow-xl">
+            {/* === CONTENT LAYER === */}
+            <div className="relative z-20 flex flex-col h-full px-24 py-24">
+                
+                {/* ── TOP: Luxury Seal ── */}
+                <div className="flex flex-col items-center mb-16 shrink-0">
+                    <div className="w-20 h-20 border-2 border-[#d4af37] rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+                        <Star className="w-10 h-10 text-[#d4af37] fill-[#d4af37]/20" />
+                    </div>
+                    <div className="text-[#d4af37] text-lg font-black tracking-[0.5em] uppercase">Mübarek Yolculuk</div>
+                    <div className="h-1 w-32 bg-[#d4af37] mt-4 shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
+                </div>
+
+                {/* ── HERO: Dramatic Title ── */}
+                <div className="text-center mb-16 shrink-0">
+                    <h1 className="text-[110px] font-black leading-none tracking-tighter uppercase text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] mb-4">
                         {data.title}
                     </h1>
-                    <div className="text-emerald-100/80 tracking-[0.2em] uppercase text-sm font-bold">Premium Umre Organizasyonu</div>
+                    <div className="inline-block px-8 py-3 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent text-black font-black text-xl uppercase tracking-widest italic shadow-2xl">
+                        {data.date}
+                    </div>
                 </div>
 
-                {/* Diagonal Cut */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-slate-50" style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0)' }}></div>
-            </div>
-
-            {/* Body */}
-            <div className="flex-1 px-16 pt-8 pb-12 flex flex-col relative z-10">
-
-                {/* 3 Pricing Cards Container */}
-                <div className="grid grid-cols-3 gap-8 mb-10 w-full">
-                    {[
-                        { title: "4 KİŞİLİK ODA", price: data.price4Person, isMain: false },
-                        { title: "3 KİŞİLİK ODA", price: data.price3Person, isMain: true },
-                        { title: "2 KİŞİLİK ODA", price: data.price2Person, isMain: false }
-                    ].map((col, i) => (
-                        <div key={i} className={`flex flex-col rounded-3xl overflow-hidden transition-all ${col.isMain ? 'bg-slate-900 text-white shadow-2xl scale-105 transform z-20 border border-slate-700' : 'bg-white text-slate-800 shadow-xl border border-slate-200'}`}>
-                            <div className={`py-4 text-center text-xs font-bold tracking-widest ${col.isMain ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                                {col.title}
-                            </div>
-                            <div className="flex-1 p-8 flex flex-col items-center text-center">
-                                <div className="text-sm font-semibold opacity-60 mb-1">Kişi Başı</div>
-                                <div className={`text-4xl font-black ${col.isMain ? 'text-emerald-400' : 'text-slate-900'} mb-6`}>{col.price}</div>
-
-                                <div className={`w-full h-px ${col.isMain ? 'bg-slate-700' : 'bg-slate-200'} mb-6`} />
-
-                                <div className="space-y-4 text-sm font-medium w-full text-left">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-1.5 rounded-full ${col.isMain ? 'bg-slate-800 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
-                                            <Navigation className="w-3 h-3" />
-                                        </div>
-                                        {data.hotelMecca}
+                {/* ── PRICE SECTION: Dramatic Shadow Cards ── */}
+                <div className="flex-1 flex flex-col min-h-0 mb-16">
+                    <div className="grid grid-cols-3 gap-10 flex-1 min-h-0">
+                        {[
+                            { label: "4 Kişilik", price: data.price4Person, active: false },
+                            { label: "2 Kişilik", price: data.price2Person, active: true },
+                            { label: "3 Kişilik", price: data.price3Person, active: false }
+                        ].map((tier, idx) => (
+                            <div key={idx} 
+                                className={`relative flex flex-col border-t-8 ${tier.active ? 'border-[#d4af37] bg-[#111]' : 'border-white/20 bg-black/40'} p-10 rounded-b-3xl shadow-[0_40px_70px_-15px_rgba(0,0,0,0.9)] transition-all duration-500 overflow-hidden`}>
+                                
+                                {tier.active && (
+                                    <div className="absolute -right-12 -top-12 w-24 h-24 bg-[#d4af37] rotate-45 flex items-end justify-center pb-2">
+                                        <Star className="w-5 h-5 text-black" />
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-1.5 rounded-full ${col.isMain ? 'bg-slate-800 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
-                                            <Navigation className="w-3 h-3" />
-                                        </div>
-                                        {data.hotelMedina}
+                                )}
+
+                                <div className="text-[#d4af37] text-sm font-black uppercase tracking-[0.2em] mb-6">{tier.label} Oda</div>
+                                <div className="text-6xl font-black text-white mb-8 tracking-tighter">{tier.price}</div>
+                                
+                                <div className="mt-auto space-y-4 pt-8 border-t border-white/5">
+                                    <div className="flex items-center gap-3 text-sm text-slate-300 font-bold">
+                                        <CheckCircle2 className="w-5 h-5 text-[#d4af37]" />
+                                        <span>Full Program</span>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`p-1.5 rounded-full ${col.isMain ? 'bg-slate-800 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
-                                            <CheckCircle2 className="w-3 h-3" />
-                                        </div>
-                                        Ulaşım ve Vize
+                                    <div className="flex items-center gap-3 text-sm text-slate-300 font-bold">
+                                        <CheckCircle2 className="w-5 h-5 text-[#d4af37]" />
+                                        <span>Lüks Otel</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
-                <div className="flex-1" />
-
-                {/* Footer Info Box */}
-                <div className="bg-slate-900 rounded-[2rem] p-8 flex items-center justify-between shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[100px] opacity-20 pointer-events-none" />
-
-                    <div className="flex items-center gap-5 relative z-10 w-1/2 border-r border-slate-700 pr-8">
-                        <div className="bg-slate-800 p-4 rounded-2xl text-emerald-400">
-                            <User className="w-8 h-8" />
-                        </div>
-                        <div>
-                            <div className="text-slate-400 text-xs tracking-widest uppercase mb-1 font-bold">Tur Yetkilisi</div>
-                            <div className="text-2xl font-black text-white">{data.guideName}</div>
-                            {data.isIdentityVerified && (
-                                <div className="text-emerald-400 text-[11px] uppercase tracking-widest mt-1 font-bold flex items-center gap-1.5">
-                                    <CheckCircle2 className="w-3.5 h-3.5" /> Kimlik Onaylı Rehber
-                                </div>
-                            )}
+                {/* ── HOTEL INFO ── */}
+                <div className="grid grid-cols-2 gap-12 mb-16 shrink-0 max-w-[850px]">
+                    <div className="relative group">
+                        <div className="flex items-center gap-6 p-6 bg-[#111] border-2 border-white/5 rounded-3xl shadow-2xl group-hover:border-[#d4af37]/50 transition-all">
+                            <div className="w-16 h-16 bg-[#d4af37] rounded-2xl flex items-center justify-center shrink-0 shadow-[0_10px_20px_rgba(212,175,55,0.2)]">
+                                <Hotel className="w-9 h-9 text-black" />
+                            </div>
+                            <div className="min-w-0">
+                                <div className="text-[#d4af37] text-[10px] font-black uppercase tracking-[0.3em] mb-1">Mekke-i Mükerreme</div>
+                                <div className="text-2xl font-black truncate text-white uppercase tracking-tight">{data.hotelMecca}</div>
+                            </div>
                         </div>
                     </div>
-
-                    <div className="relative z-10 pl-8 flex items-center justify-end w-1/2 gap-4">
-                        <div className="bg-emerald-500 p-4 rounded-2xl text-white shadow-lg shadow-emerald-500/20">
-                            <Phone className="w-8 h-8" />
+                    <div className="relative group">
+                        <div className="flex items-center gap-6 p-6 bg-[#111] border-2 border-white/5 rounded-3xl shadow-2xl group-hover:border-[#d4af37]/50 transition-all">
+                            <div className="w-16 h-16 bg-[#d4af37] rounded-2xl flex items-center justify-center shrink-0 shadow-[0_10px_20px_rgba(212,175,55,0.2)]">
+                                <Hotel className="w-9 h-9 text-black" />
+                            </div>
+                            <div className="min-w-0">
+                                <div className="text-[#d4af37] text-[10px] font-black uppercase tracking-[0.3em] mb-1">Medine-i Münevvere</div>
+                                <div className="text-2xl font-black truncate text-white uppercase tracking-tight">{data.hotelMedina}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div className="text-slate-400 text-xs tracking-widest uppercase mb-1 font-bold">Rezervasyon & Bilgi</div>
-                            <div className="text-3xl font-black text-white">{data.guidePhone}</div>
+                    </div>
+                </div>
+
+                {/* ── FOOTER: Professional Guide ── */}
+                <div className="mt-auto pt-10 flex items-center gap-10 max-w-[750px]">
+                    <div className="relative">
+                        <div className="w-24 h-24 bg-gradient-to-br from-[#d4af37] to-[#8a6d1d] rounded-3xl p-1 shadow-[0_20px_40px_rgba(0,0,0,0.5)]">
+                            <div className="w-full h-full bg-[#050505] rounded-2xl flex items-center justify-center overflow-hidden">
+                                <User className="w-12 h-12 text-[#d4af37]" />
+                            </div>
+                        </div>
+                        {data.isIdentityVerified && (
+                            <div className="absolute -top-3 -right-3 bg-[#d4af37] text-black p-2 rounded-full shadow-2xl border-4 border-[#050505]">
+                                <ShieldCheck className="w-5 h-5" />
+                            </div>
+                        )}
+                    </div>
+                    <div className="min-w-0">
+                        <div className="text-[#d4af37] text-xs font-black uppercase tracking-[0.5em] mb-2">Tur Rehberi</div>
+                        <div className="text-5xl font-black text-white uppercase tracking-tighter truncate mb-2">{data.guideName}</div>
+                        <div className="flex items-center gap-4 text-3xl font-bold text-slate-400">
+                            <Phone className="w-6 h-6 text-[#d4af37] shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
+                            <span>{data.guidePhone}</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {showWatermark && (
-                <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden opacity-5">
-                    <div className="text-8xl font-black text-slate-900 -rotate-45 whitespace-nowrap">
-                        UMREBULDUM PREMIUM
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { PackageSystem } from "@/lib/package-system";
 import { requireSupply } from "@/lib/api-guards";
 import { rateLimit } from "@/lib/rate-limit";
-import { Prisma, ApprovalStatus, PackageTier } from "@prisma/client";
+import { Prisma, ApprovalStatus, PackageTier } from "../../../../prisma/generated-client";
 import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { rankListings, scoreListing, detectQueryIntent } from "@/modules/ranking/ranking-engine";
@@ -420,7 +420,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             await spendToken({
                 userId: user.id,
                 action: 'LISTING_CREATE',
-                relatedId: `listing-create-${Date.now()}`,
+                relatedId: `listing_create_${user.id}_${Date.now()}`,
                 reason: 'Yeni ilan oluşturma',
             });
         } catch (error: any) {

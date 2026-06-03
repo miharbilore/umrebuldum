@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
-import { CreditBalance, CREDIT_BALANCE_KEY } from "@/components/guide-dashboard/credit-balance";
+import { ProviderCreditBalance as CreditBalance, CREDIT_BALANCE_KEY } from "@/components/dashboard/ProviderCreditBalance";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSWRConfig as useConfiguredSWR } from "swr";

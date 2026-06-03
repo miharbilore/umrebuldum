@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Spend Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Spend Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Atomic token deduction with SERIALIZABLE isolation.
 // This is the SINGLE entry point for all token spending.
 //
@@ -32,6 +32,7 @@ export interface SpendTokenInput {
     relatedId?: string;
     reason: string;
     overrideCost?: number;
+    tx?: any; // Optional Prisma Transaction Client
 }
 
 export interface SpendTokenResult {
@@ -65,8 +66,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
     }
 
     try {
-        const result = await withSerializableRetry(() =>
-            prisma.$transaction(async (tx) => {
+        const executeLogic = async (tx: any) => {
                 const generatedKey = TokenService.generateIdempotencyKey(input.userId, input.action, input.relatedId);
 
                 // â”€â”€ STEP 1 (READ): Idempotency check â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -83,6 +83,7 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                         newBalance: -1, // Caller should rely on db check if needed
                         cost: 0,
                         error: "ALREADY_PROCESSED",
+                        alreadyProcessed: true,
                     };
                 }
 
@@ -180,11 +181,13 @@ export async function spendToken(input: SpendTokenInput): Promise<SpendTokenResu
                     newBalance: currentBalance - cost,
                     alreadyProcessed: false,
                 };
-            }, {
+        };
+        const result = input.tx 
+            ? await executeLogic(input.tx)
+            : await withSerializableRetry(() => prisma.$transaction(executeLogic, {
                 isolationLevel: "Serializable",
                 timeout: 10_000,
-            })
-        );
+            }));
 
         // â”€â”€ POST-TX: Event emission (fire-and-forget) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Outside transaction â†’ cannot cause rollback.

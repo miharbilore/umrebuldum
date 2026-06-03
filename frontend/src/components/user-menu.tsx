@@ -63,7 +63,14 @@ export function UserMenu() {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link href={`/rehber/${session.user.id}-profil`} className="cursor-pointer">
+                    <Link 
+                        href={
+                            session.user.role === 'ORGANIZATION' 
+                                ? `/organizers/${session.user.slug || session.user.id}` 
+                                : `/guide/${session.user.slug || session.user.id}`
+                        } 
+                        className="cursor-pointer"
+                    >
                         <Eye className="mr-2 h-4 w-4" />
                         <span>Açık Profilimi Gör</span>
                     </Link>

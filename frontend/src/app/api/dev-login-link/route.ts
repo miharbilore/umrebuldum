@@ -1,10 +1,12 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
 export async function GET(request: Request) {
+    // CRITICAL: This endpoint is strictly for local development only.
+    // We return 404 in production to hide the existence of the endpoint.
     if (process.env.NODE_ENV !== "development") {
-        return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+        return new NextResponse(null, { status: 404 });
     }
 
     try {

@@ -221,7 +221,7 @@ export function RequestPriorityUpsell({ onUpgrade, variant = 'card' }: RequestPr
 // ============================================
 
 // PricingTable component has been moved to BackendSyncedComponents.tsx
-// to align with backend tiers (FREE/PLUS/PRO).
+// to align with backend tiers (FREEMIUM | PREMIUM | PRO | BUSINESS).
 
 // ============================================
 // LIMIT REACHED MODAL

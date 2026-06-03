@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Ranking Service (v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Ranking Service (v3) ───────────────────────────────────────────────
 // Wires the 6-factor ranking engine with Prisma data layer.
 // Uses percentage-capped boost and trust-gated tiers.
 
@@ -38,21 +38,21 @@ export class RankingService {
   }): Promise<{ listings: RankedListing[]; total: number }> {
     const { city, limit = 20, offset = 0, userId } = options;
 
-    // â”€â”€ 1. Fetch approved, active listings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const where: any = {
-      approvalStatus: "APPROVED",
+    // ── 1. Fetch approved, active listings ──────────────────────
+    const where = {
+      approvalStatus: "APPROVED" as const,
       active: true,
-    };
+    } as Record<string, unknown>;
     if (city) where.city = city;
 
-    const [rawListings, total] = await Promise.all([
-      prisma.guideListing.findMany({
-        where,
+    // GuideListing → GuideProfile (guide) → User (user)
+    // trustScore, isIdentityVerified, completedTrips etc. live on User
+    const includeArg = {
+      guide: {
         include: {
-          guide: {
+          user: {
             select: {
               id: true,
-              userId: true,
               trustScore: true,
               isIdentityVerified: true,
               completedTrips: true,
@@ -61,15 +61,23 @@ export class RankingService {
               bio: true,
               photo: true,
               city: true,
-              user: { select: { packageType: true } },
+              packageType: true,
+              avgResponseHours: true,
             },
           },
-          activeBoosts: {
-            where: { expiresAt: { gt: new Date() } },
-            select: { effectivePower: true, boostType: true },
-          },
-        } as any,
-        // Fetch more than needed â€” we'll sort in app after scoring
+        },
+      },
+      activeBoosts: {
+        where: { expiresAt: { gt: new Date() } },
+        select: { effectivePower: true, boostType: true },
+      },
+    };
+
+    const [rawListings, total] = await Promise.all([
+      prisma.guideListing.findMany({
+        where,
+        include: includeArg,
+        // Fetch more than needed — we'll sort in app after scoring
         take: Math.min(limit + offset + 50, 200),
       }),
       prisma.guideListing.count({ where }),
@@ -79,11 +87,11 @@ export class RankingService {
       return { listings: [], total: 0 };
     }
 
-    // â”€â”€ 2. Batch load conversion metrics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const listingIds = rawListings.map((l: any) => l.id);
+    // ── 2. Batch load conversion metrics ────────────────────────
+    const listingIds = rawListings.map(l => l.id);
     const conversionMap = await getBatchConversionMetrics(listingIds);
 
-    // â”€â”€ 3. Load personalization data (if authenticated) â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 3. Load personalization data (if authenticated) ─────────
     let personalization: PersonalizationInput | null = null;
     if (userId) {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000);
@@ -118,7 +126,7 @@ export class RankingService {
       };
     }
 
-    // â”€â”€ 4. Detect query intent â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 4. Detect query intent ──────────────────────────────────
     const intent = detectQueryIntent({
       sortBy: options.sortBy,
       priceMin: options.priceMin,
@@ -128,9 +136,15 @@ export class RankingService {
       ratingMin: options.ratingMin,
     });
 
-    // â”€â”€ 5. Score each listing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const scoringResults = rawListings.map((l: any) => {
-      const guide = l.guide;
+    // ── 5. Score each listing ───────────────────────────────────
+    const scoringResults = rawListings.map(l => {
+      // GuideListing.guide = GuideProfile; GuideProfile.user = User
+      const guideProfile = l.guide;
+      const user = guideProfile.user;
+
+      // Ensure valid date range for ranking calculations
+      const startDate = l.startDate || new Date();
+      const endDate = l.endDate || new Date(startDate.getTime() + 30 * 24 * 3600 * 1000);
 
       // Build listing input
       const listingInput: RankingListingInput = {
@@ -138,46 +152,43 @@ export class RankingService {
         type: "GUIDE_PROFILE",
         createdAt: l.createdAt,
         updatedAt: l.updatedAt,
-        filled: l.currentCount || 0,
-        quota: l.quotaTarget || 0,
-        price: l.price || 0,
+        filled: l.filled || 0,
+        quota: l.quota || 0,
+        price: Number(l.pricingDouble) || 0,
         city: l.city || "",
+        startDate,
+        endDate,
       };
 
-      // Build guide input
-      const reviews = guide.reviewsReceived || [];
-      const avgRating = reviews.length > 0
-        ? reviews.reduce((sum: number, r: any) => sum + Number(r.overallRating), 0) / reviews.length
-        : 0;
-
+      // Build guide input — User fields via guideProfile.user
       const guideInput: RankingGuideInput = {
-        userId: guide.id,
-        packageType: guide.packageType || "FREEMIUM",
-        isIdentityVerified: (guide as any).isIdentityVerified || false,
-        trustScore: guide.trustScore || 50,
-        completedTrips: guide.completedTrips || 0,
+        userId: guideProfile.userId,
+        packageType: user.packageType || "FREEMIUM",
+        isIdentityVerified: user.isIdentityVerified || false,
+        trustScore: user.trustScore || 50,
+        completedTrips: user.completedTrips || 0,
         profileCompleteness: calculateProfileCompleteness({
-          fullName: guide.fullName,
-          phone: guide.phone,
-          bio: guide.bio,
-          photo: guide.photo,
-          city: guide.city,
-          isIdentityVerified: (guide as any).isIdentityVerified,
+          fullName: user.fullName,
+          phone: user.phone,
+          bio: user.bio,
+          photo: user.photo,
+          city: user.city,
+          isIdentityVerified: user.isIdentityVerified,
         }),
-        avgResponseHours: guide.avgResponseHours || 24,
+        avgResponseHours: user.avgResponseHours || 24,
         recentActivityCount: 10, // TODO: compute from velocity counters
-        riskTier: guide.riskScore?.tier || "GREEN",
-        avgReviewRating: avgRating,
-        reviewCount: reviews.length,
+        riskTier: "GREEN", // riskScore relation not included in this query
+        avgReviewRating: 0, // reviews not included in this query
+        reviewCount: 0,
         concentrationPenalty: 0, // Set by daily batch job (batchConcentrationAnalysis)
         accountAgeDays: 365,
         totalListingsCreated: 1,
       };
 
       // Build boost input
-      const activeBoosts = l.boosts || [];
+      const activeBoosts = l.activeBoosts || [];
       const topBoost = activeBoosts.length > 0
-        ? activeBoosts.reduce((best: any, b: any) => b.effectivePower > best.effectivePower ? b : best)
+        ? activeBoosts.reduce((best, b) => b.effectivePower > best.effectivePower ? b : best)
         : null;
 
       const boostInput: RankingBoostInput = {
@@ -193,23 +204,23 @@ export class RankingService {
       return scoreListing(listingInput, guideInput, boostInput, conversion, personalization, intent);
     });
 
-    // â”€â”€ 6. Rank with EMA smoothing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 6. Rank with EMA smoothing ──────────────────────────────
     const ranked = rankListings(scoringResults);
 
-    // â”€â”€ 7. Apply diversity penalty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    const guideMap = new Map(rawListings.map((l: any) => [l.id, l.guide?.id ?? ""]));
+    // ── 7. Apply diversity penalty ─────────────────────────────
+    const guideMap = new Map(rawListings.map(l => [l.id, l.guide?.userId ?? ""]));
     const diversified = applyDiversityPenalty(ranked, id => guideMap.get(id) ?? "");
 
     // Re-sort after diversity penalty
     diversified.sort((a, b) => b.finalScore - a.finalScore);
     diversified.forEach((r, idx) => { r.position = idx + 1; });
 
-    // â”€â”€ 8. Paginate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 8. Paginate ─────────────────────────────────────────────
     const paginated = diversified.slice(offset, offset + limit);
 
-    // â”€â”€ 8. Enrich with listing data for response â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 8. Enrich with listing data for response ────────────────
     const enrichedMap = new Map(
-      rawListings.map((l: any) => [l.id, l])
+      rawListings.map(l => [l.id, l])
     );
 
     const enriched = paginated.map(r => ({

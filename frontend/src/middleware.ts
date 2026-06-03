@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server"
 import NextAuth from "next-auth"
 import { authConfig } from "@/lib/auth.config"
+import { 
+    isPublicPath, 
+    isPublicBrowsing, 
+    getRedirectUrl, 
+    createForbiddenResponse,
+    ONBOARDING_PATH,
+    LOGIN_PATH,
+    DASHBOARD_PATH,
+    ADMIN_DASHBOARD_PATH
+} from "@/lib/middleware-utils"
 
 const { auth } = NextAuth(authConfig)
 
@@ -14,105 +24,77 @@ export default auth((req) => {
     const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth")
     const isStaticAsset = nextUrl.pathname.startsWith("/_next") || nextUrl.pathname.includes(".")
 
-    // 1. Auth API routes and static assets should never be intercepted by the guard logic
+    // 1. Static and Auth API Bypass
     if (isApiAuthRoute || isStaticAsset) {
         return NextResponse.next()
     }
 
-    const onboardingPath = "/onboarding"
-    const loginPath = "/login"
-
-    const publicRoutes = [
-        "/", "/login", "/register", "/about", "/contact", "/faq",
-        "/terms", "/privacy", "/help", "/kvkk", "/cookies",
-        "/listing-terms", "/refund-policy", "/consent",
-        "/auth/verify", "/forgot-password", "/reset-password",
-        "/rehber", "/sanal-tur", "/yasam-rehberi", "/umre-rehber.html", "/pricing"
-    ];
-
-    const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-    const isPublicBrowsing = nextUrl.pathname.startsWith("/tours") || nextUrl.pathname.startsWith("/listings/");
-    const isAuthRoute = nextUrl.pathname === loginPath;
-    const isOnboardingRoute = nextUrl.pathname === onboardingPath;
-
-    // 2. API Routes Protection
+    // 2. API Protection Layer
     if (isApiRoute) {
         if (nextUrl.pathname.startsWith('/api/admin')) {
-            if (!isLoggedIn || role !== 'ADMIN') {
-                return new NextResponse(
-                    JSON.stringify({ error: "Forbidden", code: "FORBIDDEN" }),
-                    { status: 403, headers: { "Content-Type": "application/json" } }
-                );
-            }
+            if (!isLoggedIn || role !== 'ADMIN') return createForbiddenResponse()
         }
         return NextResponse.next()
     }
 
-    // 3. Logged-in State Logic
+    // 3. Authenticated User Flow
     if (isLoggedIn && user) {
-        const isBanned = role === "BANNED";
-
-        if (isBanned) {
-            if (isPublicRoute || isPublicBrowsing) return NextResponse.next();
-            return NextResponse.redirect(new URL("/", nextUrl));
+        // A. Banned Check
+        if (role === "BANNED") {
+            if (isPublicPath(nextUrl.pathname) || isPublicBrowsing(nextUrl.pathname)) return NextResponse.next()
+            return NextResponse.redirect(getRedirectUrl("/", nextUrl))
         }
 
-        // Force onboarding if role is missing, or phone/fullName is missing/empty
-        const noPhone = !user.phone || String(user.phone).trim() === "";
-        const noName = !(user as any).fullName || String((user as any).fullName).trim() === "";
-        const needsOnboarding = !role || noPhone || noName;
+        // B. Public Access Check (Allow public routes without further checks)
+        if (isPublicPath(nextUrl.pathname) || isPublicBrowsing(nextUrl.pathname)) {
+            return NextResponse.next()
+        }
+
+        // C. Onboarding Check
+        const needsOnboarding = !!user.requires_onboarding
+        const isOnboardingRoute = nextUrl.pathname === ONBOARDING_PATH
 
         if (needsOnboarding) {
-            if (isOnboardingRoute || isApiRoute) return NextResponse.next();
-            if (isPublicRoute || isPublicBrowsing) return NextResponse.next();
-            return NextResponse.redirect(new URL(onboardingPath, nextUrl));
+            if (isOnboardingRoute) return NextResponse.next()
+            return NextResponse.redirect(getRedirectUrl(ONBOARDING_PATH, nextUrl))
         }
 
-        // User has completed onboarding — redirect away from /onboarding
-        if (isOnboardingRoute) {
-            if (role === "ADMIN") return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
-            return NextResponse.redirect(new URL("/dashboard", nextUrl));
+        // D. Auth/Onboarding Page Guard (Redirect away if already finished)
+        if (isOnboardingRoute || nextUrl.pathname === LOGIN_PATH) {
+            const dest = role === "ADMIN" ? ADMIN_DASHBOARD_PATH : DASHBOARD_PATH
+            return NextResponse.redirect(getRedirectUrl(dest, nextUrl))
         }
 
-        // Logged in users shouldn't see the login page
-        if (isAuthRoute) {
-            if (role === "ADMIN") return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
-            return NextResponse.redirect(new URL("/dashboard", nextUrl));
-        }
-
-        // Admin checks
+        // D. Role-Based Access Control (RBAC)
+        // Admin Paths
         if (nextUrl.pathname.startsWith("/admin") && role !== "ADMIN") {
-            return NextResponse.redirect(new URL("/", nextUrl));
+            return NextResponse.redirect(getRedirectUrl("/", nextUrl))
         }
-
-        // Dashboard/Settings exception for admins
-        if (nextUrl.pathname.startsWith("/dashboard") && role === "ADMIN") {
-            if (nextUrl.pathname === "/dashboard/settings") return NextResponse.next();
-            return NextResponse.redirect(new URL("/admin/dashboard", nextUrl));
+        // Dashboard Admin Override
+        if (nextUrl.pathname.startsWith(DASHBOARD_PATH) && role === "ADMIN") {
+            if (nextUrl.pathname === `${DASHBOARD_PATH}/settings`) return NextResponse.next()
+            return NextResponse.redirect(getRedirectUrl(ADMIN_DASHBOARD_PATH, nextUrl))
         }
-
-        // Role-based path protection
+        // Guide/Org Paths
         if (nextUrl.pathname.startsWith("/guide") && role !== "GUIDE" && role !== "ORGANIZATION") {
-            return NextResponse.redirect(new URL("/dashboard", nextUrl));
+            return NextResponse.redirect(getRedirectUrl(DASHBOARD_PATH, nextUrl))
         }
-
         if (nextUrl.pathname.startsWith("/org") && role !== "ORGANIZATION") {
-            return NextResponse.redirect(new URL("/dashboard", nextUrl));
+            return NextResponse.redirect(getRedirectUrl(DASHBOARD_PATH, nextUrl))
         }
-    }
-    // 4. Guest Logic
+    } 
+    // 4. Guest Flow
     else {
-        if (isPublicRoute || isPublicBrowsing) return NextResponse.next();
+        if (isPublicPath(nextUrl.pathname) || isPublicBrowsing(nextUrl.pathname)) return NextResponse.next()
         
-        // Redirect to login if trying to access protected content
-        const searchParams = new URLSearchParams(nextUrl.search);
-        searchParams.set("callbackUrl", nextUrl.pathname);
-        return NextResponse.redirect(new URL(`${loginPath}?${searchParams.toString()}`, nextUrl));
+        const searchParams = new URLSearchParams(nextUrl.search)
+        searchParams.set("callbackUrl", nextUrl.pathname)
+        return NextResponse.redirect(getRedirectUrl(`${LOGIN_PATH}?${searchParams.toString()}`, nextUrl))
     }
 
     return NextResponse.next()
 })
 
 export const config = {
-    matcher: ["/((?!.+\\.[\\w]+$|_next).*)"],
+    matcher: ["/((?!api/auth|.+\\.[\\w]+$|_next).*)"],
 }

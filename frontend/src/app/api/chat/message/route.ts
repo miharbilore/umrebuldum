@@ -1,8 +1,8 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "../../../../../prisma/generated-client";
 import { containsProfanity } from "@/lib/bannedWords";
 import { rateLimit } from "@/lib/rate-limit";
 import { emailService } from "@/lib/email/email-service";

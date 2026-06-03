@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Lead Matching Engine (Wave-Based Distribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Lead Matching Engine (Wave-Based Distribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Controls which agencies receive notifications for new customer leads based
 // on chronological waves. Prioritizes premium plans and high SLA agencies first.
 
@@ -34,6 +34,7 @@ export class LeadMatchingService {
                 requestId,
                 currentWave: 1,
                 status: "ROUTING",
+                dispatchedTo: [],
                 nextWaveAt: new Date(Date.now() + this.WAVE_TIMINGS.WAVE_2_HOURS * 3600000), // Next wave in 1 hours
             }
         });
@@ -132,13 +133,13 @@ export class LeadMatchingService {
 
             switch (wave) {
                 case 1:
-                    // Wave 1: Vanguard (Top Tiers, Gold+, < 2h SLA)
-                    return ["PRO", "BUSINESS", "BUSINESS_PLUS"].includes(pkg) &&
+                    // Wave 1: Vanguard (Top Tiers: BUSINESS, PRO | Gold+, < 2h SLA)
+                    return ["BUSINESS", "PRO"].includes(pkg) &&
                         ["GOLD", "PLATINUM"].includes(perf) &&
                         slaHours <= 2.0;
                 case 2:
-                    // Wave 2: Core (Pro+, Silver+, < 12h SLA)
-                    return ["PRO", "PLUS", "PREMIUM", "BUSINESS", "BUSINESS_PLUS"].includes(pkg) &&
+                    // Wave 2: Core (BUSINESS, PRO, PREMIUM | Silver+, < 12h SLA)
+                    return ["BUSINESS", "PRO", "PREMIUM"].includes(pkg) &&
                         ["SILVER", "GOLD", "PLATINUM"].includes(perf) &&
                         slaHours <= 12.0;
                 case 3:

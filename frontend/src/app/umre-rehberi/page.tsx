@@ -38,6 +38,7 @@ export default async function RehberHubPage() {
           fill
           className="object-cover"
           priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/40 to-slate-50/50" />
         
@@ -85,7 +86,13 @@ export default async function RehberHubPage() {
                     <Link key={article.id} href={`/umre-rehberi/${article.slug}`} className="group">
                         <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl overflow-hidden h-full flex flex-col hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
                             <div className="relative h-48">
-                                <Image src={article.coverImage} alt={article.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                                <Image 
+                                    src={article.coverImage} 
+                                    alt={article.title} 
+                                    fill 
+                                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                             </div>
                             <div className="p-8 flex-1 flex flex-col">

@@ -1,7 +1,8 @@
 'use client';
 
 import useSWR from 'swr';
-import { ArrowUpRight, ArrowDownRight, Wallet, Loader2, History, Zap, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowUpRight, ArrowDownRight, Wallet, Loader2, History, Zap, ShieldCheck, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';

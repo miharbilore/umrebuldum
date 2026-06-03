@@ -12,8 +12,8 @@ import { tr } from 'date-fns/locale';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { StatCards } from '@/components/dashboard/StatCards';
 import { QuickActions } from '@/components/dashboard/QuickActions';
-import { CreditBalance } from '@/components/guide-dashboard/credit-balance';
-import { MyOffers } from "@/components/guide-dashboard/my-offers";
+import { ProviderCreditBalance } from '@/components/dashboard/ProviderCreditBalance';
+import { ProviderOffers } from "@/components/dashboard/ProviderOffers";
 import { MyRequests } from "@/components/pilgrim-dashboard/my-requests";
 
 // ── SWR Fetcher ─────────────────────────────────────────────────────────
@@ -48,7 +48,7 @@ function ProviderDashboard({ userName, roleLabel, emoji }: { userName: string; r
                 <h1 className="text-2xl font-bold text-gray-900">Merhaba, {userName || roleLabel} {emoji}</h1>
                 <p className="text-gray-500 mt-1">{roleLabel} paneliniz ve bugünkü özetiniz.</p>
             </div>
-            <CreditBalance />
+            <ProviderCreditBalance />
             <StatCards stats={stats} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
@@ -66,7 +66,7 @@ function ProviderDashboard({ userName, roleLabel, emoji }: { userName: string; r
                     </div>
                 </div>
                 <div>
-                    <MyOffers />
+                    <ProviderOffers />
                 </div>
             </div>
             <QuickActions />

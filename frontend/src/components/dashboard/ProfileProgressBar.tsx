@@ -95,6 +95,18 @@ export function ProfileProgressBar() {
                             </div>
                         </div>
 
+                        {/* Pending Approval Warning */}
+                        {data.completion.approvalStatus === "PENDING" && (
+                            <div className="mt-4 p-3 bg-amber-400/20 border border-amber-400/30 rounded-xl flex items-center gap-3 text-amber-50">
+                                <div className="p-1.5 bg-amber-400 rounded-lg">
+                                    <ShieldCheck className="w-4 h-4 text-amber-900" />
+                                </div>
+                                <p className="text-sm font-medium">
+                                    Hesabınız İnceleme Aşamasında. Onaylandıktan sonra profiliniz %100 tamamlanacaktır.
+                                </p>
+                            </div>
+                        )}
+
                         {/* Visual Trust Indicator */}
                         <div className="mt-4 flex items-center gap-4 text-xs text-teal-100/80 border-t border-white/10 pt-4">
                             <div className="flex items-center gap-1.5">

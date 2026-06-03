@@ -1,4 +1,4 @@
-﻿
+
 "use client";
 
 import useSWR from "swr";
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export function MyOffers() {
+export function ProviderOffers() {
     const { data, isLoading } = useSWR('/api/guide/offers', fetcher);
 
     if (isLoading) return <div className="animate-pulse h-32 bg-gray-100 rounded-xl"></div>;

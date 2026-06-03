@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import * as bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 import { AuthRateLimit } from "@/lib/auth-rate-limit";
@@ -21,7 +21,7 @@ const registerSchema = z.object({
 });
 
 export async function POST(req: Request) {
-    console.log("Register API Hit");
+    console.log(">>> [Register API] Request received");
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
 
@@ -47,9 +47,10 @@ export async function POST(req: Request) {
 
         if (!validation.success) {
             await AuthRateLimit.recordFailure(ip, rawEmail);
-            console.error("Validation failed:", JSON.stringify(validation.error.format()));
+            const errorFormatted = validation.error.format();
+            console.error(">>> [Register API] Validation failed:", JSON.stringify(errorFormatted, null, 2));
             return NextResponse.json(
-                { error: "Geçersiz veriler", details: validation.error.format() },
+                { error: "Geçersiz veriler", details: errorFormatted },
                 { status: 400 }
             );
         }
@@ -142,9 +143,13 @@ export async function POST(req: Request) {
                 return user;
             });
             console.log("Prisma Transaction Successful.");
-        } catch (dbError) {
-            console.error("Database transaction failed:", dbError);
-            return NextResponse.json({ error: "Veritabanı kayıt hatası", details: dbError }, { status: 500 });
+        } catch (dbError: any) {
+            console.error(">>> [Register API] Database transaction failed:", dbError);
+            return NextResponse.json({ 
+                error: "Veritabanı kayıt hatası", 
+                details: dbError?.message || String(dbError),
+                stack: process.env.NODE_ENV === "development" ? dbError?.stack : undefined
+            }, { status: 500 });
         }
 
         // This guarantees: SUM(ledger) == tokenBalance for all users.

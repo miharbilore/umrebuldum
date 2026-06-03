@@ -1,7 +1,7 @@
-﻿import React from 'react';
-import { Phone, User, CheckCircle2, Award } from 'lucide-react';
-import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
-import { STOCK_BACKGROUNDS, FRAME_STYLES, FONT_STYLES } from '@/components/dashboard/poster-generator/poster-assets';
+import React from 'react';
+import { Phone, User, CheckCircle2, Hotel, ShieldCheck } from 'lucide-react';
+import { PosterData } from '../poster-generator/types';
+import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
 
 export function Template1({ data, id, showWatermark = true }: { data: PosterData; id?: string, showWatermark?: boolean }) {
 
@@ -10,116 +10,154 @@ export function Template1({ data, id, showWatermark = true }: { data: PosterData
     return (
         <div
             id={id}
-            className="w-full h-full relative overflow-hidden bg-white flex flex-col justify-end template-container"
+            className="w-[1080px] h-[1350px] relative overflow-hidden bg-[#020617] flex flex-col text-white"
             style={{
-                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Arial, sans-serif'
+                fontFamily: data.fontStyle === 'font-serif' ? 'Georgia, serif' : data.fontStyle === 'font-display' ? 'Impact, sans-serif' : 'Inter, sans-serif'
             }}
         >
-            {/* Background Image Layer (Top Half/Full Bleed) */}
+            {/* === BACKGROUND LAYER === */}
+            <div className="absolute inset-0 z-0">
+                <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${bgImage})` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/90 to-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent" />
+            </div>
+
+            {/* Subtle Islamic geometric pattern */}
             <div
-                className="absolute inset-x-0 top-0 bottom-[40%] bg-cover bg-center"
-                style={{ backgroundImage: `url(${bgImage})` }}
+                className="absolute inset-0 z-0 opacity-[0.04] pointer-events-none"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l2.5 12.5L45 15l-12.5 2.5L30 30l-2.5-12.5L15 15l12.5-2.5z' fill='%23d4af37' fill-rule='evenodd'/%3E%3C/svg%3E")` }}
             />
 
-            {/* Gradient Transition */}
-            <div className="absolute inset-x-0 top-[30%] bottom-[40%] bg-gradient-to-b from-transparent to-[#1a1814]" />
+            {/* === CONTENT LAYER === */}
+            <div className="relative z-10 flex flex-col h-full px-16 pt-12 pb-14">
 
-            {/* Ornate Frame Layer (Bottom Half) */}
-            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end">
-                {/* SVG Ornate Frame Path (Simulating the wavy gold border) */}
-                <div className={`w-full h-[60%] bg-[#1a1814] relative ${data.frameStyle === 'frame-modern' ? 'border-t-8 border-dashed border-[#d4af37]' :
-                        data.frameStyle === 'frame-gold' ? 'border-4 border-double border-[#d4af37] m-4 rounded-xl' :
-                            'border-t-4 border-[#d4af37]'
-                    }`}>
-                    {/* Hanging Lanterns (Decorative) */}
-                    <div className="absolute -top-16 left-8 text-[#d4af37] opacity-80">
-                        <svg width="40" height="auto" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 8H9L12 2ZM7 10H17L16 18H8L7 10Z" /></svg>
+                {/* ── TOP: Brand ── */}
+                <div className="flex flex-col items-center mb-8 shrink-0">
+                    <div className="text-[#d4af37] text-xl font-bold tracking-[0.4em] uppercase mb-3 flex items-center gap-3">
+                        <span className="h-[1px] w-10 bg-[#d4af37]/40" />
+                        UmreBuldum
+                        <span className="h-[1px] w-10 bg-[#d4af37]/40" />
                     </div>
-                    <div className="absolute -top-24 right-8 text-[#d4af37] opacity-80">
-                        <svg width="40" height="auto" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 8H9L12 2ZM7 10H17L16 18H8L7 10Z" /></svg>
+                    <div className="h-px w-full bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent" />
+                </div>
+
+                {/* ── HERO: Title ── */}
+                <div className="text-center mb-10 shrink-0">
+                    <div className="inline-flex items-center gap-2 px-5 py-1.5 border border-[#d4af37]/25 rounded-full bg-[#d4af37]/10 mb-4">
+                        <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
+                        <span className="text-xs font-bold tracking-[0.2em] text-[#d4af37] uppercase">Güvenilir & Huzurlu Yolculuk</span>
                     </div>
+                    {/* Clamped title: max 3 lines, responsive sizing */}
+                    <h1 className="text-[76px] font-black leading-[0.95] tracking-tight uppercase text-white"
+                        style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {data.title}
+                    </h1>
+                    <p className="text-xl text-slate-400 font-light tracking-[0.15em] italic uppercase mt-4">
+                        Kutlu Topraklarda Buluşuyoruz • {data.date}
+                    </p>
+                </div>
 
-                    <div className="p-12 relative h-full flex flex-col">
-
-                        {/* Title and Base Price Row */}
-                        <div className="flex justify-between items-end border-b border-[#d4af37]/30 pb-6 mb-8">
-                            <h1 className="text-6xl font-black text-[#d4af37] tracking-tight w-2/3 leading-none uppercase">
-                                {data.title}
-                            </h1>
-                            <div className="text-right">
-                                <div className="text-6xl font-black text-white">{data.price4Person}</div>
-                                <div className="text-lg text-slate-300 italic mt-2">'dan başlayan fiyatlar</div>
+                {/* ── HOTEL INFO: Mekke / Medine ── */}
+                <div className="grid grid-cols-2 gap-8 mb-10 shrink-0">
+                    <div className="relative bg-[#0f172a]/60 border border-white/5 p-6 rounded-2xl overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-[#d4af37]/60" />
+                        <div className="flex items-center gap-5 pl-2">
+                            <div className="w-14 h-14 bg-[#d4af37] rounded-xl flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(212,175,55,0.15)]">
+                                <Hotel className="w-7 h-7 text-[#020617]" />
+                            </div>
+                            <div className="min-w-0">
+                                <div className="text-[11px] font-bold text-[#d4af37] uppercase tracking-[0.25em] mb-0.5">Mekke-i Mükerreme</div>
+                                <div className="text-2xl font-black truncate">{data.hotelMecca}</div>
                             </div>
                         </div>
-
-                        {/* Agency Description (Hardcoded placeholder based on mockup) */}
-                        <p className="text-slate-300 text-lg text-center mx-auto max-w-2xl mb-10">
-                            İnanç, tevekkül ve bağlılık dolu bir yolculuğu kolaylaştırıyoruz. Sizi en güzel şekilde ağırlamak için buradayız.
-                        </p>
-
-                        <div className="flex items-center justify-center my-4 mb-10">
-                            <div className="h-px w-24 bg-[#d4af37]"></div>
-                            <span className="mx-4 text-[#d4af37] font-bold text-xl px-6 py-2 border border-[#d4af37] rounded-full">Paket Seçeneklerimiz</span>
-                            <div className="h-px w-24 bg-[#d4af37]"></div>
-                        </div>
-
-                        {/* Pricing Columns */}
-                        <div className="grid grid-cols-3 gap-6 mb-auto">
-                            {[
-                                { title: "4 KİŞİLİK ODA", price: data.price4Person, mecca: data.hotelMecca, medina: data.hotelMedina },
-                                { title: "3 KİŞİLİK ODA", price: data.price3Person, mecca: data.hotelMecca, medina: data.hotelMedina },
-                                { title: "2 KİŞİLİK ODA", price: data.price2Person, mecca: data.hotelMecca, medina: data.hotelMedina }
-                            ].map((col, i) => (
-                                <div key={i} className="bg-[#2c2822] border-2 border-[#d4af37] rounded-xl overflow-hidden flex flex-col text-center shadow-2xl relative">
-                                    <div className="bg-[#d4af37] text-[#1a1814] py-4 rounded-b-[40px] px-4 font-black">
-                                        <div className="text-sm tracking-widest opacity-80">{col.title}</div>
-                                        <div className="text-4xl mt-1">{col.price}</div>
-                                    </div>
-                                    <div className="p-6 text-white space-y-4 font-medium text-lg flex-1">
-                                        <div className="border-b border-white/10 pb-2">{col.medina}</div>
-                                        <div className="border-b border-white/10 pb-2">{col.mecca}</div>
-                                        <div className="border-b border-white/10 pb-2">Vize & Uçak Bileti</div>
-                                        <div className="text-[#d4af37]">Lüks Servis</div>
-                                    </div>
-                                </div>
-                            ))}
+                    </div>
+                    <div className="relative bg-[#0f172a]/60 border border-white/5 p-6 rounded-2xl overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-[#d4af37]/60" />
+                        <div className="flex items-center gap-5 pl-2">
+                            <div className="w-14 h-14 bg-[#d4af37] rounded-xl flex items-center justify-center shrink-0 shadow-[0_0_16px_rgba(212,175,55,0.15)]">
+                                <Hotel className="w-7 h-7 text-[#020617]" />
+                            </div>
+                            <div className="min-w-0">
+                                <div className="text-[11px] font-bold text-[#d4af37] uppercase tracking-[0.25em] mb-0.5">Medine-i Münevvere</div>
+                                <div className="text-2xl font-black truncate">{data.hotelMedina}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Footer Bar */}
-                <div className="h-24 bg-[#d4af37] w-full flex items-center justify-between px-10 relative z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-                    <div className="text-[#1a1814] font-black text-2xl tracking-widest">
-                        UMREBULDUM.COM
+                {/* ── PRICE SECTION ── */}
+                <div className="flex-1 flex flex-col min-h-0">
+                    <div className="flex items-center gap-5 mb-6 shrink-0">
+                        <span className="text-base font-bold tracking-[0.25em] text-[#d4af37] uppercase">Konaklama Seçenekleri</span>
+                        <div className="h-px flex-1 bg-gradient-to-r from-[#d4af37]/25 to-transparent" />
                     </div>
-                    <div className="bg-white px-8 py-3 rounded-full shadow-lg absolute left-1/2 -translate-x-1/2 -top-6 border-4 border-[#d4af37] flex flex-col items-center">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">İrtibat Numarası</span>
-                        <div className="flex items-center gap-2 text-2xl font-black text-[#1a1814]">
-                            <Phone className="w-5 h-5" /> {data.guidePhone}
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-end text-[#1a1814]">
-                        <div className="font-black text-2xl uppercase flex items-center gap-2">
-                            <User className="w-6 h-6" /> {data.guideName}
-                        </div>
-                        {data.isIdentityVerified && (
-                            <div className="flex items-center gap-1 text-sm font-bold bg-[#1a1814] text-white px-3 py-1 rounded-full mt-1">
-                                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                                Kimlik Onaylı Rehber
+                    <div className="grid grid-cols-3 gap-6 flex-1 min-h-0 max-w-[750px]">
+                        {[
+                            { label: "4 Kişilik Oda", price: data.price4Person },
+                            { label: "3 Kişilik Oda", price: data.price3Person },
+                            { label: "2 Kişilik Oda", price: data.price2Person }
+                        ].map((tier, idx) => (
+                            <div key={idx} className="relative flex flex-col bg-[#0a0f1e] border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                                {/* Gold accent top stripe */}
+                                <div className="h-1 w-full bg-gradient-to-r from-[#d4af37]/60 via-[#d4af37] to-[#d4af37]/60 shrink-0" />
+                                <div className="p-7 flex flex-col flex-1">
+                                    <div className="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-2">{tier.label}</div>
+                                    <div className="text-[44px] font-black text-white leading-none mb-4">{tier.price}</div>
+                                    <div className="mt-auto space-y-2.5 pt-5 border-t border-white/5">
+                                        <div className="flex items-center gap-2 text-sm text-slate-300">
+                                            <CheckCircle2 className="w-4 h-4 text-[#d4af37] shrink-0" />
+                                            <span>Full Program</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm text-slate-300">
+                                            <CheckCircle2 className="w-4 h-4 text-[#d4af37] shrink-0" />
+                                            <span>Özel Transfer</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        )}
+                        ))}
+                    </div>
+                </div>
+
+                {/* ── FOOTER: Guide Info ── */}
+                {/* QR Safe Zone Protection: pr-[300px] ensures no overlap with bottom-right QR */}
+                <div className="mt-10 shrink-0 pr-[300px]">
+                    <div className="h-px w-full bg-gradient-to-r from-[#d4af37]/30 via-white/5 to-transparent mb-6" />
+                    <div className="flex items-center gap-6">
+                        <div className="relative shrink-0">
+                            <div className="w-20 h-20 bg-gradient-to-br from-[#d4af37] to-[#b8860b] rounded-2xl p-[3px] shadow-xl">
+                                <div className="w-full h-full bg-[#020617] rounded-[13px] flex items-center justify-center">
+                                    <User className="w-10 h-10 text-[#d4af37]" />
+                                </div>
+                            </div>
+                            {data.isIdentityVerified && (
+                                <div className="absolute -top-2 -right-2 bg-emerald-500 text-[#020617] p-1 rounded-full shadow-lg border-2 border-[#020617]">
+                                    <ShieldCheck className="w-4 h-4" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="min-w-0">
+                            <div className="text-[#d4af37] text-[11px] font-bold uppercase tracking-[0.3em] mb-0.5">Tur Rehberi</div>
+                            <div className="text-3xl font-black uppercase tracking-tight truncate">{data.guideName}</div>
+                            <div className="flex items-center gap-2 text-xl font-bold text-slate-400 mt-0.5">
+                                <Phone className="w-4 h-4 text-[#d4af37] shrink-0" />
+                                <span className="truncate">{data.guidePhone}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Watermark Filter */}
-            {showWatermark && (
-                <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden mix-blend-overlay opacity-30">
-                    <div className="text-8xl font-black text-white/50 -rotate-45 whitespace-nowrap transform scale-150">
-                        UMREBULDUM UMREBULDUM UMREBULDUM
-                    </div>
-                </div>
-            )}
+            {/* Watermark is handled globally by PosterBuilder — do not duplicate here */}
         </div>
     );
 }

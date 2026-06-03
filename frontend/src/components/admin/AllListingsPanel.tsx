@@ -10,7 +10,8 @@ import {
     Eye, 
     Calendar,
     Users,
-    ArrowUpRight
+    ArrowUpRight,
+    MapPin
 } from 'lucide-react';
 import { 
     Table, 

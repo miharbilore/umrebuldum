@@ -39,20 +39,9 @@ const GUIDE_PACKAGES: PkgDef[] = [
     }
   },
   {
-    slug: "PLUS", name: "Plus",
-    credits: 100, monthlyPrice: 399,
-    roleTarget: "GUIDE", sortOrder: 2,
-    features: {
-      maxListings: 5, listingDays: 90, maxBoosts: 3, boostDays: 5,
-      phoneVisible: true, spotlightEligible: true, priorityRanking: true,
-      trustBoost: false, identityVerificationEligible: true,
-      canCreatePoster: true, watermark: false, posterQuality: "NORMAL"
-    }
-  },
-  {
     slug: "PRO", name: "Pro",
     credits: 200, monthlyPrice: 699,
-    roleTarget: "GUIDE", sortOrder: 3,
+    roleTarget: "GUIDE", sortOrder: 2,
     features: {
       maxListings: 15, listingDays: 180, maxBoosts: 5, boostDays: 7,
       phoneVisible: true, spotlightEligible: true, priorityRanking: true,
@@ -80,17 +69,6 @@ const CORP_PACKAGES: PkgDef[] = [
     roleTarget: "ORGANIZATION", sortOrder: 11,
     features: {
       maxListings: 30, listingDays: 180, maxBoosts: 10, boostDays: 7,
-      phoneVisible: true, spotlightEligible: true, priorityRanking: true,
-      trustBoost: true, identityVerificationEligible: true,
-      canCreatePoster: true, watermark: false, posterQuality: "HIGH"
-    }
-  },
-  {
-    slug: "BUSINESS_PLUS", name: "Kurumsal Plus",
-    credits: 1000, monthlyPrice: 2499,
-    roleTarget: "ORGANIZATION", sortOrder: 12,
-    features: {
-      maxListings: 100, listingDays: 365, maxBoosts: 30, boostDays: 14,
       phoneVisible: true, spotlightEligible: true, priorityRanking: true,
       trustBoost: true, identityVerificationEligible: true,
       canCreatePoster: true, watermark: false, posterQuality: "HIGH"

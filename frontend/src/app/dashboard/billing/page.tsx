@@ -1,6 +1,6 @@
 "use client";
 
-import { CreditBalance } from "@/components/guide-dashboard/credit-balance";
+import { ProviderCreditBalance as CreditBalance } from "@/components/dashboard/ProviderCreditBalance";
 import { CreditPackages } from "@/components/dashboard/credit-packages";
 import { AutoReplenishSettings } from "@/components/dashboard/auto-replenish-settings";
 import { SavedCards } from "@/components/dashboard/SavedCards";

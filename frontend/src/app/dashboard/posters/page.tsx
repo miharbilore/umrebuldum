@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { PackageSystem } from '@/lib/package-system';
 import { PosterBuilder } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { auth } from '@/lib/auth';
@@ -12,6 +12,16 @@ export default async function PostersPage() {
 
     const packageType = session.user.packageType || "FREEMIUM";
     const limits = await PackageSystem.getLimits(packageType);
+
+    const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { name: true, image: true }
+    });
+
+    const initialData = {
+        guideName: user?.name || "",
+        guideImage: user?.image || ""
+    };
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -43,6 +53,7 @@ export default async function PostersPage() {
                 <PosterBuilder
                     packageType={packageType}
                     limits={limits}
+                    initialData={initialData}
                 />
             )}
         </div>

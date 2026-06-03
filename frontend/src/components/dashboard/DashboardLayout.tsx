@@ -21,26 +21,15 @@ const pilgrimItems: NavItem[] = [
     { label: 'Ayarlar', href: '/dashboard/settings', icon: <Settings className="w-5 h-5" /> },
 ];
 
-// GUIDE sidebar: Dashboard, Listings, Market, Credits, Profile
-const guideItems: NavItem[] = [
-    { label: 'Ana Sayfa', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { label: 'İlanlarım', href: '/dashboard/listings', icon: <FileText className="w-5 h-5" /> },
-    { label: 'Talep Pazarı', href: '/dashboard/market', icon: <MessageSquare className="w-5 h-5" /> }, // Renamed & Relinked
-    { label: 'Kredi Geçmişi', href: '/dashboard/credits', icon: <History className="w-5 h-5" /> },
-    { label: 'Profilim', href: '/dashboard/profile', icon: <User className="w-5 h-5" /> },
-    { label: 'Afiş Merkezi', href: '/dashboard/posters', icon: <Sparkles className="w-5 h-5" /> },
-    // Placeholders
-    { label: 'Rapor İndir (Yakında)', href: '#', icon: <FileText className="w-5 h-5 text-gray-400" /> },
-];
-
-// ORGANIZATION sidebar: Same as Guide roughly
-const organizerItems: NavItem[] = [
+// PROVIDER sidebar: Dashboard, Listings, Market, Credits, Profile (Shared by GUIDE & ORGANIZATION)
+const providerItems: NavItem[] = [
     { label: 'Ana Sayfa', href: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: 'İlanlarım', href: '/dashboard/listings', icon: <FileText className="w-5 h-5" /> },
     { label: 'Talep Pazarı', href: '/dashboard/market', icon: <MessageSquare className="w-5 h-5" /> },
     { label: 'Kredi Geçmişi', href: '/dashboard/credits', icon: <History className="w-5 h-5" /> },
     { label: 'Profilim', href: '/dashboard/profile', icon: <User className="w-5 h-5" /> },
     { label: 'Afiş Merkezi', href: '/dashboard/posters', icon: <Sparkles className="w-5 h-5" /> },
+    { label: 'Rapor İndir (Yakında)', href: '#', icon: <FileText className="w-5 h-5 text-gray-400" /> },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -54,12 +43,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     if (role === 'USER') {
         navItems = pilgrimItems;
         panelTitle = "Umreci Paneli";
-    } else if (role === 'GUIDE') {
-        navItems = guideItems;
-        panelTitle = "Rehber Paneli";
-    } else if (role === 'ORGANIZATION') {
-        navItems = organizerItems;
-        panelTitle = "Organizatör Paneli";
+    } else if (role === 'GUIDE' || role === 'ORGANIZATION') {
+        navItems = providerItems;
+        panelTitle = role === 'GUIDE' ? "Rehber Paneli" : "Organizatör Paneli";
     }
 
     return (

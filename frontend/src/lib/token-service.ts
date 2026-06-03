@@ -1,22 +1,29 @@
 import { prisma } from "./prisma";
-import { withSerializableRetry } from "./with-retry";
-import { LedgerEntryType, Prisma } from "@prisma/client";
+import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
+import { spendToken } from "@/modules/tokens/application/spend-token.usecase";
+import { TokenAction } from "@/modules/tokens/domain/token-policy";
+import { Prisma } from "../../prisma/generated-client";
 
-// ─── Credit Economy Constants ───────────────────────────────────────────
-
+/**
+ * TOKEN SERVICE FACADE
+ * 
+ * This class provides backward compatibility for legacy code while
+ * delegating all business logic to the new @/modules/tokens system.
+ * 
+ * Standardized on:
+ * - Isolation Level: SERIALIZABLE (handled by use cases)
+ * - Single Source of Truth: User.tokenBalance
+ * - Immutable Ledger: TokenTransaction table
+ */
 export class TokenService {
-    // Interest costs
+    // Shared constants
     static readonly COST_GUIDE_INTEREST = 5;
     static readonly COST_ORG_INTEREST = 10;
-
-    // Feature cost
     static readonly COST_FEATURE = 10;
-
-    // Feature cap
     static readonly MAX_FEATURED_LISTINGS = 3;
 
     /**
-     * Get REAL balance from User.tokenBalance (Single Source of Truth).
+     * Get current balance from User.tokenBalance.
      */
     static async getBalance(userId: string): Promise<number> {
         const user = await prisma.user.findUnique({
@@ -27,14 +34,7 @@ export class TokenService {
     }
 
     /**
-     * Deduct credits atomically and idempotently.
-     *
-     * Safety guarantees:
-     * 1. Idempotency: if `idempotencyKey` was already used, return success with no-op.
-     * 2. Row-level lock: uses SELECT SUM ... FOR UPDATE to lock all rows for this userId,
-     *    preventing concurrent transactions from reading stale balances.
-     * 3. Strict non-negative balance: rejects if balance - cost < 0.
-     * 4. All writes (ledger + cache) happen inside a single $transaction.
+     * Facade for spendToken use case.
      */
     static async deductCredits(
         userId: string,
@@ -43,88 +43,23 @@ export class TokenService {
         relatedId?: string,
         idempotencyKey?: string
     ): Promise<{ success: boolean; newBalance: number; idempotent?: boolean }> {
-        try {
-            const result = await withSerializableRetry(() => prisma.$transaction(async (tx) => {
-                // ── (1) Idempotency check: if key exists, return cached result ──
-                if (idempotencyKey) {
-                    const existing = await tx.tokenTransaction.findUnique({
-                        where: { idempotencyKey_userId: { idempotencyKey, userId } }
-                    });
-                    if (existing) {
-                        const user = await tx.user.findUnique({
-                            where: { id: userId },
-                            select: { tokenBalance: true },
-                        });
-                        return { newBalance: user?.tokenBalance ?? 0, idempotent: true };
-                    }
-                }
+        const result = await spendToken({
+            userId,
+            action: (reason.split(':')[0] as TokenAction) || "OTHER",
+            relatedId: idempotencyKey || relatedId,
+            reason: reason,
+            overrideCost: cost
+        });
 
-                // ── (2) Row-level lock via raw SQL (MySQL SELECT FOR UPDATE) ──
-                // Single Source of Truth: ONLY User.tokenBalance
-                const [balanceRow] = await tx.$queryRaw<[{ balance: number }]>`
-                    SELECT availableBalance AS balance
-                    FROM users
-                    WHERE id = ${userId}
-                    FOR UPDATE
-                `;
-                const currentBalance = Number(balanceRow.balance);
-
-                // ── (3) Strict non-negative guard ──
-                if (currentBalance - cost < 0) {
-                    throw new Error('INSUFFICIENT_CREDITS');
-                }
-
-                // ── (4) Write to unified TokenTransaction ledger ──
-                await tx.tokenTransaction.create({
-                    data: {
-                        userId,
-                        amount: -cost,
-                        entryType: LedgerEntryType.CONSUME,
-                        reasonCode: reason,
-                        referenceId: relatedId || null,
-                        idempotencyKey: idempotencyKey || `spend:${Date.now()}-${Math.random()}`,
-                    }
-                });
-
-                // ── (5) Decrement ONLY User.tokenBalance (Single Source of Truth) ──
-                const updatedUser = await tx.user.update({
-                    where: { id: userId },
-                    data: { tokenBalance: { decrement: cost } },
-                });
-
-                return { newBalance: updatedUser.tokenBalance, idempotent: false };
-            }, {
-                isolationLevel: 'Serializable',
-                timeout: 10000,
-            }));
-
-            console.log(`[CreditService] Deducted ${cost} from ${userId}: ${reason}. New balance: ${result.newBalance}${result.idempotent ? ' (idempotent no-op)' : ''}`);
-            return { success: true, newBalance: result.newBalance, idempotent: result.idempotent };
-
-        } catch (error: any) {
-            if (error.message === 'INSUFFICIENT_CREDITS') {
-                const user = await prisma.user.findUnique({
-                    where: { id: userId },
-                    select: { tokenBalance: true },
-                });
-                return { success: false, newBalance: user?.tokenBalance ?? 0 };
-            }
-            // P2002 = unique constraint violation → idempotency key collision (parallel race both passed check)
-            if (error.code === 'P2002') {
-                const user = await prisma.user.findUnique({
-                    where: { id: userId },
-                    select: { tokenBalance: true },
-                });
-                return { success: true, newBalance: user?.tokenBalance ?? 0, idempotent: true };
-            }
-            throw error;
-        }
+        return {
+            success: result.ok,
+            newBalance: result.newBalance,
+            idempotent: (result as any).alreadyProcessed
+        };
     }
 
     /**
-     * Grant credits atomically:
-     * 1. Insert CreditTransaction (positive amount)
-     * 2. Increment GuideProfile.credits (cache)
+     * Facade for grantToken use case.
      */
     static async grantCredits(
         userId: string,
@@ -135,85 +70,29 @@ export class TokenService {
         idempotencyKey?: string,
         tx?: Prisma.TransactionClient
     ): Promise<number> {
-        // Core logic function to be called either in internal or external transaction
-        const executeGrant = async (transaction: Prisma.TransactionClient) => {
-            // Idempotency check: Pre-emptive check
-            if (idempotencyKey) {
-                const existing = await transaction.tokenTransaction.findUnique({
-                    where: { idempotencyKey_userId: { idempotencyKey, userId } }
-                });
-                if (existing) {
-                    const user = await transaction.user.findUnique({
-                        where: { id: userId },
-                        select: { tokenBalance: true },
-                    });
-                    return user?.tokenBalance ?? 0;
-                }
-            }
-
-            try {
-                // Write to unified TokenTransaction ledger
-                await transaction.tokenTransaction.create({
-                    data: {
-                        userId,
-                        amount,
-                        entryType: type === "refund" ? LedgerEntryType.REFUND : type === "purchase" ? LedgerEntryType.PURCHASE : LedgerEntryType.ADJUSTMENT,
-                        reasonCode: reason,
-                        referenceId: relatedId || null,
-                        idempotencyKey: idempotencyKey || `grant:${Date.now()}-${Math.random()}`,
-                    }
-                });
-
-                // ── Single Source of Truth: Update ONLY User.tokenBalance ──
-                const updatedUser = await transaction.user.update({
-                    where: { id: userId },
-                    data: { tokenBalance: { increment: amount } },
-                });
-
-                return updatedUser.tokenBalance;
-            } catch (error: any) {
-                // P2002 = unique constraint violation -> race condition collision
-                if (error.code === 'P2002' && idempotencyKey) {
-                    // VERIFY: Did this specific transaction succeed before?
-                    const existingTx = await transaction.tokenTransaction.findUnique({
-                        where: { idempotencyKey_userId: { idempotencyKey, userId } }
-                    });
-                    
-                    if (existingTx) {
-                        const user = await transaction.user.findUnique({
-                            where: { id: userId },
-                            select: { tokenBalance: true },
-                        });
-                        return user?.tokenBalance ?? 0;
-                    }
-                }
-                throw error;
-            }
+        const typeMap: Record<string, "PURCHASE" | "REFUND" | "ADMIN_GRANT"> = {
+            purchase: "PURCHASE",
+            refund: "REFUND",
+            admin: "ADMIN_GRANT"
         };
 
-        // If transaction client is provided, use it directly (Transaction-Aware)
-        if (tx) {
-            return executeGrant(tx);
-        }
+        const result = await grantToken({
+            userId,
+            amount,
+            type: typeMap[type] || "ADMIN_GRANT",
+            reason,
+            relatedId,
+            idempotencyKey: idempotencyKey || `grant_${userId}_${Date.now()}`,
+            tx
+        });
 
-        // If no transaction provided, use internal serializable transaction
-        const result = await withSerializableRetry(() => prisma.$transaction(async (internalTx) => {
-            return executeGrant(internalTx);
-        }));
-
-        console.log(`[CreditService] Granted ${amount} to ${userId} (${type}): ${reason}. New balance: ${result}`);
-        return result;
+        return result.newBalance;
     }
 
     /**
-     * Sync: returns authoritative User.tokenBalance.
-     * GuideProfile.credits is deprecated as the source of truth.
+     * Returns authoritative User.tokenBalance.
      */
     static async syncBalance(userId: string): Promise<number> {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { tokenBalance: true },
-        });
-        return user?.tokenBalance ?? 0;
+        return this.getBalance(userId);
     }
 }

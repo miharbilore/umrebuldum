@@ -24,7 +24,7 @@ async function runAdminTests() {
             tokenBalance: 0,
             phone: "000",
             city: "Mekke",
-            packageType: "PLUS"
+            packageType: "PREMIUM"
         }
     });
 

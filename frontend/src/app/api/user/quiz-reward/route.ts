@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { TokenService } from "@/lib/token-service";
 import { differenceInHours } from "date-fns";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "../../../../../prisma/generated-client";
 import { withSerializableRetry } from "@/lib/with-retry";
 
 export async function POST(req: Request) {

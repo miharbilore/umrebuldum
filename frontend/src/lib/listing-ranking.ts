@@ -1,4 +1,4 @@
-﻿// ─── Listing Ranking Algorithm (LEGACY) ─────────────────────────────────
+// ─── Listing Ranking Algorithm (LEGACY) ─────────────────────────────────
 // @deprecated Use `src/modules/ranking/ranking-engine.ts` instead.
 // This file is kept for backward compatibility only.
 // New code should import from the ranking-engine module.
@@ -106,10 +106,8 @@ export function scoreGuideListing(listing: ListingInput, guide: GuideInput): num
     // ── 1. Package tier ───────────────────────────────────────────
     let packageScore: number = GUIDE_WEIGHTS.PACKAGE_FREEMIUM;
     switch (guide.packageType) {
-        case "BUSINESS_PLUS": packageScore = GUIDE_WEIGHTS.PACKAGE_LEGEND; break;
         case "BUSINESS": packageScore = GUIDE_WEIGHTS.PACKAGE_LEGEND; break;
         case "PRO": packageScore = GUIDE_WEIGHTS.PACKAGE_PRO; break;
-        case "PLUS": packageScore = GUIDE_WEIGHTS.PACKAGE_STARTER; break;
         case "PREMIUM": packageScore = GUIDE_WEIGHTS.PACKAGE_STARTER; break;
     }
 

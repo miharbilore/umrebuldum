@@ -74,7 +74,7 @@ export const PACKAGE_LIMITS: Record<PackageType, PackageLimits> = {
         identityVerificationEligible: false,
         spotlightEligible: false,
         posterQuality: "LOW",
-        canCreatePoster: false,
+        canCreatePoster: true,
         watermark: true,
         aiGenerator: false,
     },

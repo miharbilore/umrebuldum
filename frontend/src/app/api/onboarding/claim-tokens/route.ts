@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateProfileCompleteness } from "@/lib/listing-ranking";
@@ -55,10 +55,10 @@ export async function POST(req: NextRequest) {
             }, { status: 403 });
         }
 
-        // Grant 20 Tokens via unified ledger (atomic + idempotent)
+        // Grant 5 Tokens via unified ledger (atomic + idempotent)
         const result = await grantToken({
             userId,
-            amount: 20,
+            amount: 5,
             type: "ADMIN_GRANT",
             reason: "Initial signup credits (Profile completed)",
             idempotencyKey,

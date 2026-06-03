@@ -29,6 +29,15 @@ export async function GET(req: Request) {
                 role: true,
                 trustScore: true,
                 completedTrips: true,
+                isApproved: true,
+                // Include applications for approvalStatus check
+                identityApplications: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 1,
+                    select: {
+                        status: true
+                    }
+                },
                 // Include guideProfile for trustScore calculation (rating)
                 guideProfile: {
                     select: {

@@ -23,7 +23,11 @@ declare module "next-auth" {
             name?: string | null;
             email?: string | null;
             image?: string | null;
+            fullName?: string | null;
             phone?: string | null;
+            city?: string | null;
+            slug?: string | null;
+            bio?: string | null;
             contactConsent?: boolean;
             packageType?: string;
             tokenBalance?: number;
@@ -40,180 +44,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
     useSecureCookies: process.env.NODE_ENV === "production",
     trustHost: true,
-    adapter: PrismaAdapter(prisma),
+    adapter: PrismaAdapter(prisma as any),
     session: { strategy: "jwt" },
-
-    callbacks: {
-        // ── JWT Callback ─────────────────────────────────────────────
-        // Merges auth.config.ts logic (role, onboarding, OAuth stub)
-        // with auth.ts logic (custom fields, manual refresh).
-        async jwt({ token, user, account, trigger, session }) {
-
-            // ─── FROM auth.config.ts: Client-side update handling ────
-            if (trigger === "update" && session) {
-                // SECURITY: Never accept role from client-side updates.
-                if (typeof session.requires_onboarding === "boolean") {
-                    token.requires_onboarding = session.requires_onboarding;
-                }
-                // Re-read role from DB (authoritative source)
-                if (token.email) {
-                    try {
-                        const dbUser = await prisma.user.findUnique({
-                            where: { email: token.email as string },
-                            select: { role: true }
-                        });
-                        if (dbUser?.role) {
-                            token.role = dbUser.role;
-                            token.requires_onboarding = false;
-                        }
-                    } catch (e) {
-                        console.error("DB role refresh failed:", e);
-                    }
-                }
-            }
-
-            // ─── FROM auth.ts: Custom field mapping on first login ───
-            if (user) {
-                token.id = (user as any).id;
-                token.role = (user as any).role || null;
-                token.phone = (user as any).phone;
-                token.contactConsent = (user as any).contactConsent;
-                token.packageType = (user as any).packageType;
-                token.tokenBalance = (user as any).tokenBalance;
-                token.isPhoneVerified = (user as any).isPhoneVerified;
-                token.requires_onboarding = !token.role;
-
-                // ─── FROM auth.config.ts: OAuth First-Login Stub ─────
-                if (!token.role && account && ["google", "facebook", "apple"].includes(account.provider)) {
-                    try {
-                        const email = token.email as string;
-                        const dbUser = await prisma.user.findUnique({
-                            where: { email },
-                            select: { id: true, role: true },
-                        });
-
-                        if (dbUser && !dbUser.role) {
-                            await prisma.user.update({
-                                where: { id: dbUser.id },
-                                data: { role: "USER", isVerified: true },
-                            });
-                            token.role = "USER";
-                            token.requires_onboarding = true;
-                            console.log(`[OAuth] Default USER role assigned to ${email} (${account.provider})`);
-                        } else if (dbUser?.role) {
-                            token.role = dbUser.role;
-                            token.requires_onboarding = false;
-                        }
-                    } catch (e) {
-                        console.error("[OAuth] Role assignment failed:", e);
-                    }
-                }
-            }
-
-            // ─── FROM auth.config.ts: DB fallback for role-less tokens ──
-            if (!token.role && token.email) {
-                try {
-                    const dbUser = await prisma.user.findUnique({
-                        where: { email: token.email as string },
-                        select: { role: true }
-                    });
-                    if (dbUser?.role) {
-                        token.role = dbUser.role;
-                        token.requires_onboarding = false;
-                    }
-                } catch (e) {
-                    console.error("DB role lookup failed:", e);
-                }
-            }
-
-            // ─── FROM auth.config.ts: Final role guards ─────────────
-            if (!token.role) token.requires_onboarding = true;
-            if (token.role === "BANNED") token.requires_onboarding = false;
-
-            // ─── FROM auth.ts: Manual refresh (trigger === "update") ─
-            if (trigger === "update" && token.id) {
-                try {
-                    const dbUser = await prisma.user.findUnique({
-                        where: { id: token.id as string },
-                        select: {
-                            packageType: true,
-                            tokenBalance: true,
-                            role: true,
-                            phone: true,
-                            contactConsent: true,
-                            isPhoneVerified: true
-                        }
-                    });
-
-                    if (dbUser) {
-                        token.packageType = dbUser.packageType;
-                        token.tokenBalance = dbUser.tokenBalance;
-                        token.role = dbUser.role;
-                        token.phone = dbUser.phone;
-                        token.contactConsent = dbUser.contactConsent;
-                        token.isPhoneVerified = dbUser.isPhoneVerified;
-                    }
-                } catch (e) {
-                    console.error("[Auth] JWT session refresh failed:", e);
-                }
-            }
-
-            return token;
-        },
-
-        // ── Session Callback ─────────────────────────────────────────
-        // Merges auth.config.ts (role, onboarding, billing sync)
-        // with auth.ts (custom field transfer to frontend).
-        async session({ session, token }) {
-            if (session.user) {
-                // FROM auth.ts: Custom fields
-                session.user.id = (token.id as string) || token.sub as string;
-                session.user.role = (token.role as string) || undefined;
-                session.user.phone = token.phone as string | null;
-                session.user.contactConsent = token.contactConsent as boolean;
-                session.user.isPhoneVerified = token.isPhoneVerified as boolean;
-
-                // FROM auth.config.ts: Onboarding flag
-                session.user.requires_onboarding = !session.user.role;
-
-                // FROM auth.config.ts: Fresh packageType/tokenBalance from DB
-                if (token.sub || token.id) {
-                    try {
-                        const userId = (token.sub || token.id) as string;
-                        const dbUser = await prisma.user.findUnique({
-                            where: { id: userId },
-                            select: { packageType: true, tokenBalance: true },
-                        });
-                        if (dbUser) {
-                            session.user.packageType = (dbUser.packageType as string) ?? "FREEMIUM";
-                            session.user.tokenBalance = dbUser.tokenBalance ?? 0;
-                        }
-                    } catch (e) {
-                        console.error("[Session] packageType/tokenBalance refresh failed:", e);
-                        // Fallback to JWT values
-                        session.user.packageType = (token.packageType as string) ?? "FREEMIUM";
-                        session.user.tokenBalance = (token.tokenBalance as number) ?? 0;
-                    }
-                } else {
-                    // No user ID available, use JWT values
-                    session.user.packageType = (token.packageType as string) ?? "FREEMIUM";
-                    session.user.tokenBalance = (token.tokenBalance as number) ?? 0;
-                }
-            }
-            return session;
-        },
-
-        // FROM auth.config.ts: Authorization (pass-through)
-        authorized() {
-            return true;
-        },
-
-        // FROM auth.config.ts: Open redirect protection
-        async redirect({ url, baseUrl }) {
-            return url.startsWith(baseUrl) ? url : baseUrl;
-        }
-    },
-
     providers: [
         Google,
         Apple,
@@ -349,7 +181,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     packageType: user.packageType,
                     tokenBalance: user.tokenBalance,
                     isPhoneVerified: user.isPhoneVerified,
-                    requires_onboarding: !user.role || !user.phone
+                    slug: user.slug,
+                    requires_onboarding: !user.role || !user.phone || !user.city
                 };
             }
         })

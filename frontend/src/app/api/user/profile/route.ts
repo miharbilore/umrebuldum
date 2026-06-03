@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         const guard = requireAuth(session);
         if (guard) return guard;
 
-        const userId = session!.user.id;
+        const userId = session!.user.id as string;
         const data = await req.json();
 
         // Update User

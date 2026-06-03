@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
@@ -62,6 +62,18 @@ export async function POST(req: Request) {
             return tokenGuardRes.error!;
         }
 
+        // 1. Business Rule: Must have at least 1 active listing to send offers
+        const activeListingsCount = await prisma.guideListing.count({
+            where: { guideId: guideUser.id, active: true, approvalStatus: "APPROVED" }
+        });
+
+        if (activeListingsCount === 0) {
+            return NextResponse.json({
+                error: "ACTIVE_LISTING_REQUIRED",
+                message: "Teklif verebilmek için önce yayında olan (onaylanmış) en az bir ilanınız olmalıdır."
+            }, { status: 400 });
+        }
+
         // Check for existing offer (idempotent)
         const existingOffer = await prisma.offer.findUnique({
             where: { guideId_requestId: { guideId: guideUser.id, requestId } },
@@ -75,7 +87,7 @@ export async function POST(req: Request) {
         const spendResult = await spendToken({
             userId: guideUser.id,
             action: "OFFER_SEND",
-            relatedId: requestId,
+            relatedId: `offer_send_${guideUser.id}_${requestId}`,
             reason: `Offer sent to request ${requestId}`,
         });
 

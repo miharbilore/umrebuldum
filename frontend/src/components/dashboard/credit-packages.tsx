@@ -39,10 +39,8 @@ const PERIOD_SAVINGS: Record<number, string> = { 1: "", 3: "%7 Avantaj", 12: "%1
 const TIER_STYLES: Record<string, { border: string; bg: string; badge: string; popular?: boolean; iconColor: string }> = {
     FREEMIUM:      { border: "border-slate-200", bg: "bg-white", badge: "bg-slate-100 text-slate-600", iconColor: "text-slate-400" },
     PREMIUM:       { border: "border-blue-200", bg: "bg-white", badge: "bg-blue-50 text-blue-700", iconColor: "text-blue-500" },
-    PLUS:          { border: "border-[#FFB800]/30", bg: "bg-white", badge: "bg-amber-50 text-amber-800", popular: true, iconColor: "text-[#FFB800]" },
-    PRO:           { border: "border-violet-300", bg: "bg-white", badge: "bg-violet-50 text-violet-800", iconColor: "text-violet-500" },
-    BUSINESS:      { border: "border-emerald-300", bg: "bg-white", badge: "bg-emerald-50 text-[#059669]", popular: true, iconColor: "text-[#059669]" },
-    BUSINESS_PLUS: { border: "border-purple-300", bg: "bg-white", badge: "bg-purple-50 text-purple-800", iconColor: "text-purple-600" },
+    PRO:           { border: "border-[#FFB800]/30", bg: "bg-white", badge: "bg-amber-50 text-amber-800", popular: true, iconColor: "text-[#FFB800]" },
+    BUSINESS:      { border: "border-emerald-300", bg: "bg-white", badge: "bg-emerald-50 text-[#059669]", iconColor: "text-[#059669]" },
 };
 
 function getTierStyle(slug: string) {

@@ -108,41 +108,46 @@ export default function LoginPage() {
                 })
             })
 
-            let data: any = {};
+            let data: any;
+            const responseText = await res.text();
+            
             try {
-                // If the response is not JSON (e.g. 500 HTML page), this throws
-                data = await res.json()
+                data = responseText ? JSON.parse(responseText) : {};
             } catch (jsonErr) {
-                console.error("Failed to parse register response:", jsonErr);
+                console.error("Failed to parse register response:", jsonErr, responseText);
+                data = { error: "Sunucudan geçersiz bir yanıt geldi." };
             }
 
             if (!res.ok) {
-                console.error("Registration failed:", data, "Status:", res.status);
+                console.error("Registration failed:", { 
+                    status: res.status, 
+                    statusText: res.statusText,
+                    data,
+                    raw: responseText,
+                    email: regEmail 
+                });
                 
-                // Construct a user-friendly error message
-                let errorMessage = "Kayıt başarısız. Lütfen bilgilerinizi kontrol edip tekrar deneyin.";
+                let errorMessage = data?.error || "Kayıt başarısız. Lütfen bilgilerinizi kontrol edip tekrar deneyin.";
                 
                 if (res.status === 409) {
-                    errorMessage = data?.error || "Bu hesap bilgileri zaten kullanımda.";
-                } else if (res.status === 429) {
-                    errorMessage = data?.error || "Çok fazla deneme yaptınız. Lütfen bir süre bekleyin.";
-                } else if (data?.error) {
-                    errorMessage = data.error;
+                    toast.error(errorMessage, {
+                        description: "Girdiğiniz e-posta veya telefon numarası zaten bir hesaba bağlı olabilir. Lütfen giriş yapmayı deneyin.",
+                        duration: 6000,
+                    });
+                } else {
+                    toast.error(errorMessage);
                 }
-
-                toast.error(errorMessage);
                 
-                if (data?.details) {
-                    console.error("Error details:", data.details);
+                if (data?.details || data?.debug) {
+                    console.error("Error details/debug:", data.details || data.debug);
                 }
             } else {
                 toast.success("Kayıt başarılı! Doğrulama kodu gönderildi.")
-                // Redirect to verify page with email
                 router.push(`/auth/verify?email=${encodeURIComponent(regEmail)}`)
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Registration error:", error);
-            toast.error("Bir hata oluştu.")
+            toast.error("İnternet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.");
         } finally {
             setLoading(false)
         }

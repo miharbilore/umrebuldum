@@ -2,8 +2,8 @@ import { HeroSection } from "@/components/profile/hero-section"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { AboutSection } from "@/components/profile/about-section"
 import { ContactCard } from "@/components/profile/contact-card"
-import { ToursSection } from "@/components/profile/tours-section"
-import { ReviewsSection } from "@/components/profile/reviews-section"
+// import { ToursSection } from "@/components/profile/tours-section"
+// import { ReviewsSection } from "@/components/profile/reviews-section"
 
 export default function ProfilePage() {
   return (
@@ -19,8 +19,8 @@ export default function ProfilePage() {
             <ContactCard />
           </div>
         </div>
-        <ToursSection />
-        <ReviewsSection />
+        {/* <ToursSection /> */}
+        {/* <ReviewsSection /> */}
       </div>
     </main>
   )

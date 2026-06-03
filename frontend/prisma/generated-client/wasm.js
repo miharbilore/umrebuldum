@@ -162,6 +162,7 @@ exports.Prisma.UserScalarFieldEnum = {
   isPhoneVerified: 'isPhoneVerified',
   agencyCity: 'agencyCity',
   hasCompletedQuiz: 'hasCompletedQuiz',
+  onboardingCompleted: 'onboardingCompleted',
   lastQuizAttempt: 'lastQuizAttempt',
   quizAttempts: 'quizAttempts',
   coverImage: 'coverImage',

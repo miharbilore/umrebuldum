@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Plus, Search, Loader2, Sparkles, FileX } from 'lucide-react';
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { ListingList } from '@/components/dashboard/ListingCard';
-import { CreditBalance } from '@/components/guide-dashboard/credit-balance';
+import { ProviderCreditBalance } from '@/components/dashboard/ProviderCreditBalance';
 import { SpotlightPurchaseModal } from '@/components/dashboard/spotlight-modal';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
@@ -155,7 +155,7 @@ export default function ListingsPage() {
         <DashboardLayout>
             <div className="p-4 lg:p-6 space-y-4">
                 {/* Credit Balance Hero */}
-                <CreditBalance />
+                <ProviderCreditBalance />
 
                 {/* Header */}
                 <div className="flex items-center justify-between">

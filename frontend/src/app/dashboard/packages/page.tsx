@@ -16,8 +16,8 @@ export default async function PackagesPage() {
 
     const getIcon = (slug: string) => {
         switch (slug) {
-            case 'PRO': return <Crown className="w-8 h-8 text-[#FFB800] fill-[#FFB800]" width={32} height={32} />;
-            case 'PLUS': return <Zap className="w-8 h-8 text-blue-500 fill-blue-500" width={32} height={32} />;
+            case 'BUSINESS': return <Crown className="w-8 h-8 text-[#FFB800] fill-[#FFB800]" width={32} height={32} />;
+            case 'PRO': return <Zap className="w-8 h-8 text-blue-500 fill-blue-500" width={32} height={32} />;
             case 'PREMIUM': return <Rocket className="w-8 h-8 text-slate-900" width={32} height={32} />;
             default: return <Shield className="w-8 h-8 text-slate-400" width={32} height={32} />;
         }
@@ -44,7 +44,7 @@ export default async function PackagesPage() {
                     {/* Pricing Cards */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto items-stretch">
                         {dbPackages.map((pkg, index) => {
-                            const isPopular = pkg.slug === "PRO" || pkg.slug === "PLUS";
+                            const isPopular = pkg.slug === "PRO";
                             const features = pkg.features as any || {};
 
                             return (
@@ -95,7 +95,7 @@ export default async function PackagesPage() {
                                             : "bg-slate-900 hover:bg-black text-white shadow-slate-200"
                                         )}
                                     >
-                                        <Link href={`/dashboard/checkout?pkgId=${pkg.id}`}>
+                                        <Link href={`/dashboard/billing`}>
                                             Hemen Başla
                                             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" width={20} height={20} />
                                         </Link>

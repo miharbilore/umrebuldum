@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Advanced Monetization Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Advanced Monetization Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Four-pillar monetization layer:
 //   1. Dynamic Token Pricing (demand-based surge + loyalty discounts)
 //   2. Performance-Based Tiers (revenue-linked token discounts)
@@ -307,7 +307,7 @@ export async function evaluatePerformanceTier(userId: string): Promise<{
  *
  * Rules:
  *   CORP_BASIC:      500 token credit line
- *   CORP_PRO:        1,500 token credit line // Handles edge-case logic specific to Corporate/Holding ("BUSINESS_PLUS") tiers.
+ *   CORP_PRO:        1,500 token credit line
  *   CORP_ENTERPRISE: 5,000 token credit line
  *
  * Billing: Auto-charge at end of 30-day cycle.
@@ -347,8 +347,8 @@ export async function openCreditLine(userId: string): Promise<{
     const nextBilling = new Date();
     nextBilling.setDate(nextBilling.getDate() + 30);
 
-    if (user.packageType !== "BUSINESS_PLUS") {
-        throw new Error(`Kredi Limit Artırımı sadece Business Plus paketi için geçerlidir`);
+    if (user.packageType !== "BUSINESS") {
+        throw new Error(`Kredi Limit Artırımı sadece Business paketi için geçerlidir`);
     }
 
     await prisma.enterpriseCreditLine.create({
@@ -569,8 +569,8 @@ export async function analyzePlanFit(userId: string): Promise<PlanFitAnalysis> {
     if (utilization > 85) {
         fitStatus = "OVER_USING";
         if (currentPlan === "FREEMIUM") suggestedPlan = "PREMIUM";
-        else if (currentPlan === "PREMIUM") suggestedPlan = "PLUS";
-        else if (currentPlan === "PLUS") suggestedPlan = "PRO";
+        else if (currentPlan === "PREMIUM") suggestedPlan = "PRO";
+        else if (currentPlan === "PRO") suggestedPlan = "BUSINESS";
         reasons.push(`Token usage at ${Math.round(tokenUsageRatio * 100)}% of monthly allotment`);
         if (boostUsageRatio > 0.8) reasons.push("Boost limit frequently reached");
         if (offerUsageRatio > 0.8) reasons.push("Offer limit frequently reached");
@@ -580,8 +580,8 @@ export async function analyzePlanFit(userId: string): Promise<PlanFitAnalysis> {
         const daysOnPlan = (Date.now() - user.createdAt.getTime()) / 86_400_000;
         if (daysOnPlan > 60) {
             fitStatus = "UNDER_USING";
-            if (currentPlan === "PRO") suggestedPlan = "PLUS";
-            else if (currentPlan === "PLUS") suggestedPlan = "PREMIUM";
+            if (currentPlan === "BUSINESS") suggestedPlan = "PRO";
+            else if (currentPlan === "PRO") suggestedPlan = "PREMIUM";
             reasons.push(`Only using ${utilization}% of plan capacity`);
             reasons.push("Consider saving by adjusting your plan");
         }
