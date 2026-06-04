@@ -15,6 +15,7 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { ProviderCreditBalance } from '@/components/dashboard/ProviderCreditBalance';
 import { ProviderOffers } from "@/components/dashboard/ProviderOffers";
 import { MyRequests } from "@/components/pilgrim-dashboard/my-requests";
+import { ProfileProgress } from "@/components/dashboard/ProfileProgress";
 
 // ── SWR Fetcher ─────────────────────────────────────────────────────────
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -48,6 +49,10 @@ function ProviderDashboard({ userName, roleLabel, emoji }: { userName: string; r
                 <h1 className="text-2xl font-bold text-gray-900">Merhaba, {userName || roleLabel} {emoji}</h1>
                 <p className="text-gray-500 mt-1">{roleLabel} paneliniz ve bugünkü özetiniz.</p>
             </div>
+            
+            {/* Gamification Progress Component */}
+            <ProfileProgress />
+
             <ProviderCreditBalance />
             <StatCards stats={stats} />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

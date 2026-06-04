@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model TokenPackageConfig
+ * 
+ */
+export type TokenPackageConfig = $Result.DefaultSelection<Prisma.$TokenPackageConfigPayload>
+/**
  * Model User
  * 
  */
@@ -279,16 +284,6 @@ export namespace $Enums {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
-export const PackageTier: {
-  FREEMIUM: 'FREEMIUM',
-  PREMIUM: 'PREMIUM',
-  PRO: 'PRO',
-  BUSINESS: 'BUSINESS'
-};
-
-export type PackageTier = (typeof PackageTier)[keyof typeof PackageTier]
-
-
 export const ApprovalStatus: {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
@@ -332,10 +327,6 @@ export type UserRole = $Enums.UserRole
 
 export const UserRole: typeof $Enums.UserRole
 
-export type PackageTier = $Enums.PackageTier
-
-export const PackageTier: typeof $Enums.PackageTier
-
 export type ApprovalStatus = $Enums.ApprovalStatus
 
 export const ApprovalStatus: typeof $Enums.ApprovalStatus
@@ -359,8 +350,8 @@ export const LedgerEntryType: typeof $Enums.LedgerEntryType
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Users
- * const users = await prisma.user.findMany()
+ * // Fetch zero or more TokenPackageConfigs
+ * const tokenPackageConfigs = await prisma.tokenPackageConfig.findMany()
  * ```
  *
  * 
@@ -380,8 +371,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Users
-   * const users = await prisma.user.findMany()
+   * // Fetch zero or more TokenPackageConfigs
+   * const tokenPackageConfigs = await prisma.tokenPackageConfig.findMany()
    * ```
    *
    * 
@@ -476,6 +467,16 @@ export class PrismaClient<
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb, ExtArgs>
 
       /**
+   * `prisma.tokenPackageConfig`: Exposes CRUD operations for the **TokenPackageConfig** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TokenPackageConfigs
+    * const tokenPackageConfigs = await prisma.tokenPackageConfig.findMany()
+    * ```
+    */
+  get tokenPackageConfig(): Prisma.TokenPackageConfigDelegate<ExtArgs>;
+
+  /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
     * Example usage:
     * ```ts
@@ -1415,6 +1416,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    TokenPackageConfig: 'TokenPackageConfig',
     User: 'User',
     Account: 'Account',
     Session: 'Session',
@@ -1480,10 +1482,76 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "account" | "session" | "guideProfile" | "departureCity" | "airline" | "guideListing" | "listingCategory" | "listingSeo" | "tourDay" | "umrahRequest" | "leadRoutingLog" | "requestInterest" | "offer" | "requestFavorite" | "conversation" | "message" | "moderationLog" | "creditPackage" | "coupon" | "transaction" | "savedCard" | "tokenTransaction" | "autoReplenishConfig" | "tokenReplenishLog" | "activeBoost" | "listingBoostCounter" | "webhookEvent" | "identityApplication" | "review" | "riskScore" | "riskEvent" | "deviceFingerprint" | "fraudReviewTicket" | "listingImpression" | "listingClick" | "velocityCounter" | "cancellationRecord" | "sLAMetric" | "dynamicPriceEvent" | "enterpriseCreditLine" | "creditLineTransaction" | "performanceTier" | "spotlightPlacement" | "seoLandingPage" | "newsletterSubscriber" | "chatbotTemplate" | "notification" | "testLog" | "guideArticle"
+      modelProps: "tokenPackageConfig" | "user" | "account" | "session" | "guideProfile" | "departureCity" | "airline" | "guideListing" | "listingCategory" | "listingSeo" | "tourDay" | "umrahRequest" | "leadRoutingLog" | "requestInterest" | "offer" | "requestFavorite" | "conversation" | "message" | "moderationLog" | "creditPackage" | "coupon" | "transaction" | "savedCard" | "tokenTransaction" | "autoReplenishConfig" | "tokenReplenishLog" | "activeBoost" | "listingBoostCounter" | "webhookEvent" | "identityApplication" | "review" | "riskScore" | "riskEvent" | "deviceFingerprint" | "fraudReviewTicket" | "listingImpression" | "listingClick" | "velocityCounter" | "cancellationRecord" | "sLAMetric" | "dynamicPriceEvent" | "enterpriseCreditLine" | "creditLineTransaction" | "performanceTier" | "spotlightPlacement" | "seoLandingPage" | "newsletterSubscriber" | "chatbotTemplate" | "notification" | "testLog" | "guideArticle"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      TokenPackageConfig: {
+        payload: Prisma.$TokenPackageConfigPayload<ExtArgs>
+        fields: Prisma.TokenPackageConfigFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TokenPackageConfigFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TokenPackageConfigFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>
+          }
+          findFirst: {
+            args: Prisma.TokenPackageConfigFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TokenPackageConfigFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>
+          }
+          findMany: {
+            args: Prisma.TokenPackageConfigFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>[]
+          }
+          create: {
+            args: Prisma.TokenPackageConfigCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>
+          }
+          createMany: {
+            args: Prisma.TokenPackageConfigCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.TokenPackageConfigDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>
+          }
+          update: {
+            args: Prisma.TokenPackageConfigUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>
+          }
+          deleteMany: {
+            args: Prisma.TokenPackageConfigDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TokenPackageConfigUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TokenPackageConfigUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TokenPackageConfigPayload>
+          }
+          aggregate: {
+            args: Prisma.TokenPackageConfigAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTokenPackageConfig>
+          }
+          groupBy: {
+            args: Prisma.TokenPackageConfigGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TokenPackageConfigGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TokenPackageConfigCountArgs<ExtArgs>
+            result: $Utils.Optional<TokenPackageConfigCountAggregateOutputType> | number
+          }
+        }
+      }
       User: {
         payload: Prisma.$UserPayload<ExtArgs>
         fields: Prisma.UserFieldRefs
@@ -5475,6 +5543,913 @@ export namespace Prisma {
    */
 
   /**
+   * Model TokenPackageConfig
+   */
+
+  export type AggregateTokenPackageConfig = {
+    _count: TokenPackageConfigCountAggregateOutputType | null
+    _avg: TokenPackageConfigAvgAggregateOutputType | null
+    _sum: TokenPackageConfigSumAggregateOutputType | null
+    _min: TokenPackageConfigMinAggregateOutputType | null
+    _max: TokenPackageConfigMaxAggregateOutputType | null
+  }
+
+  export type TokenPackageConfigAvgAggregateOutputType = {
+    tokens: number | null
+    priceTRY: Decimal | null
+    unitPrice: Decimal | null
+  }
+
+  export type TokenPackageConfigSumAggregateOutputType = {
+    tokens: number | null
+    priceTRY: Decimal | null
+    unitPrice: Decimal | null
+  }
+
+  export type TokenPackageConfigMinAggregateOutputType = {
+    id: string | null
+    packageId: string | null
+    tokens: number | null
+    priceTRY: Decimal | null
+    unitPrice: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TokenPackageConfigMaxAggregateOutputType = {
+    id: string | null
+    packageId: string | null
+    tokens: number | null
+    priceTRY: Decimal | null
+    unitPrice: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TokenPackageConfigCountAggregateOutputType = {
+    id: number
+    packageId: number
+    tokens: number
+    priceTRY: number
+    unitPrice: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TokenPackageConfigAvgAggregateInputType = {
+    tokens?: true
+    priceTRY?: true
+    unitPrice?: true
+  }
+
+  export type TokenPackageConfigSumAggregateInputType = {
+    tokens?: true
+    priceTRY?: true
+    unitPrice?: true
+  }
+
+  export type TokenPackageConfigMinAggregateInputType = {
+    id?: true
+    packageId?: true
+    tokens?: true
+    priceTRY?: true
+    unitPrice?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TokenPackageConfigMaxAggregateInputType = {
+    id?: true
+    packageId?: true
+    tokens?: true
+    priceTRY?: true
+    unitPrice?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TokenPackageConfigCountAggregateInputType = {
+    id?: true
+    packageId?: true
+    tokens?: true
+    priceTRY?: true
+    unitPrice?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TokenPackageConfigAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TokenPackageConfig to aggregate.
+     */
+    where?: TokenPackageConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenPackageConfigs to fetch.
+     */
+    orderBy?: TokenPackageConfigOrderByWithRelationInput | TokenPackageConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TokenPackageConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenPackageConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenPackageConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TokenPackageConfigs
+    **/
+    _count?: true | TokenPackageConfigCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TokenPackageConfigAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TokenPackageConfigSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TokenPackageConfigMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TokenPackageConfigMaxAggregateInputType
+  }
+
+  export type GetTokenPackageConfigAggregateType<T extends TokenPackageConfigAggregateArgs> = {
+        [P in keyof T & keyof AggregateTokenPackageConfig]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTokenPackageConfig[P]>
+      : GetScalarType<T[P], AggregateTokenPackageConfig[P]>
+  }
+
+
+
+
+  export type TokenPackageConfigGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TokenPackageConfigWhereInput
+    orderBy?: TokenPackageConfigOrderByWithAggregationInput | TokenPackageConfigOrderByWithAggregationInput[]
+    by: TokenPackageConfigScalarFieldEnum[] | TokenPackageConfigScalarFieldEnum
+    having?: TokenPackageConfigScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TokenPackageConfigCountAggregateInputType | true
+    _avg?: TokenPackageConfigAvgAggregateInputType
+    _sum?: TokenPackageConfigSumAggregateInputType
+    _min?: TokenPackageConfigMinAggregateInputType
+    _max?: TokenPackageConfigMaxAggregateInputType
+  }
+
+  export type TokenPackageConfigGroupByOutputType = {
+    id: string
+    packageId: string
+    tokens: number
+    priceTRY: Decimal
+    unitPrice: Decimal
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: TokenPackageConfigCountAggregateOutputType | null
+    _avg: TokenPackageConfigAvgAggregateOutputType | null
+    _sum: TokenPackageConfigSumAggregateOutputType | null
+    _min: TokenPackageConfigMinAggregateOutputType | null
+    _max: TokenPackageConfigMaxAggregateOutputType | null
+  }
+
+  type GetTokenPackageConfigGroupByPayload<T extends TokenPackageConfigGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TokenPackageConfigGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TokenPackageConfigGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TokenPackageConfigGroupByOutputType[P]>
+            : GetScalarType<T[P], TokenPackageConfigGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TokenPackageConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    packageId?: boolean
+    tokens?: boolean
+    priceTRY?: boolean
+    unitPrice?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["tokenPackageConfig"]>
+
+
+  export type TokenPackageConfigSelectScalar = {
+    id?: boolean
+    packageId?: boolean
+    tokens?: boolean
+    priceTRY?: boolean
+    unitPrice?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $TokenPackageConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TokenPackageConfig"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      packageId: string
+      tokens: number
+      priceTRY: Prisma.Decimal
+      unitPrice: Prisma.Decimal
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["tokenPackageConfig"]>
+    composites: {}
+  }
+
+  type TokenPackageConfigGetPayload<S extends boolean | null | undefined | TokenPackageConfigDefaultArgs> = $Result.GetResult<Prisma.$TokenPackageConfigPayload, S>
+
+  type TokenPackageConfigCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<TokenPackageConfigFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: TokenPackageConfigCountAggregateInputType | true
+    }
+
+  export interface TokenPackageConfigDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TokenPackageConfig'], meta: { name: 'TokenPackageConfig' } }
+    /**
+     * Find zero or one TokenPackageConfig that matches the filter.
+     * @param {TokenPackageConfigFindUniqueArgs} args - Arguments to find a TokenPackageConfig
+     * @example
+     * // Get one TokenPackageConfig
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TokenPackageConfigFindUniqueArgs>(args: SelectSubset<T, TokenPackageConfigFindUniqueArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one TokenPackageConfig that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {TokenPackageConfigFindUniqueOrThrowArgs} args - Arguments to find a TokenPackageConfig
+     * @example
+     * // Get one TokenPackageConfig
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TokenPackageConfigFindUniqueOrThrowArgs>(args: SelectSubset<T, TokenPackageConfigFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first TokenPackageConfig that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigFindFirstArgs} args - Arguments to find a TokenPackageConfig
+     * @example
+     * // Get one TokenPackageConfig
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TokenPackageConfigFindFirstArgs>(args?: SelectSubset<T, TokenPackageConfigFindFirstArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first TokenPackageConfig that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigFindFirstOrThrowArgs} args - Arguments to find a TokenPackageConfig
+     * @example
+     * // Get one TokenPackageConfig
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TokenPackageConfigFindFirstOrThrowArgs>(args?: SelectSubset<T, TokenPackageConfigFindFirstOrThrowArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more TokenPackageConfigs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TokenPackageConfigs
+     * const tokenPackageConfigs = await prisma.tokenPackageConfig.findMany()
+     * 
+     * // Get first 10 TokenPackageConfigs
+     * const tokenPackageConfigs = await prisma.tokenPackageConfig.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const tokenPackageConfigWithIdOnly = await prisma.tokenPackageConfig.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TokenPackageConfigFindManyArgs>(args?: SelectSubset<T, TokenPackageConfigFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a TokenPackageConfig.
+     * @param {TokenPackageConfigCreateArgs} args - Arguments to create a TokenPackageConfig.
+     * @example
+     * // Create one TokenPackageConfig
+     * const TokenPackageConfig = await prisma.tokenPackageConfig.create({
+     *   data: {
+     *     // ... data to create a TokenPackageConfig
+     *   }
+     * })
+     * 
+     */
+    create<T extends TokenPackageConfigCreateArgs>(args: SelectSubset<T, TokenPackageConfigCreateArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many TokenPackageConfigs.
+     * @param {TokenPackageConfigCreateManyArgs} args - Arguments to create many TokenPackageConfigs.
+     * @example
+     * // Create many TokenPackageConfigs
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TokenPackageConfigCreateManyArgs>(args?: SelectSubset<T, TokenPackageConfigCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a TokenPackageConfig.
+     * @param {TokenPackageConfigDeleteArgs} args - Arguments to delete one TokenPackageConfig.
+     * @example
+     * // Delete one TokenPackageConfig
+     * const TokenPackageConfig = await prisma.tokenPackageConfig.delete({
+     *   where: {
+     *     // ... filter to delete one TokenPackageConfig
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TokenPackageConfigDeleteArgs>(args: SelectSubset<T, TokenPackageConfigDeleteArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one TokenPackageConfig.
+     * @param {TokenPackageConfigUpdateArgs} args - Arguments to update one TokenPackageConfig.
+     * @example
+     * // Update one TokenPackageConfig
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TokenPackageConfigUpdateArgs>(args: SelectSubset<T, TokenPackageConfigUpdateArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more TokenPackageConfigs.
+     * @param {TokenPackageConfigDeleteManyArgs} args - Arguments to filter TokenPackageConfigs to delete.
+     * @example
+     * // Delete a few TokenPackageConfigs
+     * const { count } = await prisma.tokenPackageConfig.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TokenPackageConfigDeleteManyArgs>(args?: SelectSubset<T, TokenPackageConfigDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TokenPackageConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TokenPackageConfigs
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TokenPackageConfigUpdateManyArgs>(args: SelectSubset<T, TokenPackageConfigUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one TokenPackageConfig.
+     * @param {TokenPackageConfigUpsertArgs} args - Arguments to update or create a TokenPackageConfig.
+     * @example
+     * // Update or create a TokenPackageConfig
+     * const tokenPackageConfig = await prisma.tokenPackageConfig.upsert({
+     *   create: {
+     *     // ... data to create a TokenPackageConfig
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TokenPackageConfig we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TokenPackageConfigUpsertArgs>(args: SelectSubset<T, TokenPackageConfigUpsertArgs<ExtArgs>>): Prisma__TokenPackageConfigClient<$Result.GetResult<Prisma.$TokenPackageConfigPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of TokenPackageConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigCountArgs} args - Arguments to filter TokenPackageConfigs to count.
+     * @example
+     * // Count the number of TokenPackageConfigs
+     * const count = await prisma.tokenPackageConfig.count({
+     *   where: {
+     *     // ... the filter for the TokenPackageConfigs we want to count
+     *   }
+     * })
+    **/
+    count<T extends TokenPackageConfigCountArgs>(
+      args?: Subset<T, TokenPackageConfigCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TokenPackageConfigCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TokenPackageConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TokenPackageConfigAggregateArgs>(args: Subset<T, TokenPackageConfigAggregateArgs>): Prisma.PrismaPromise<GetTokenPackageConfigAggregateType<T>>
+
+    /**
+     * Group by TokenPackageConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TokenPackageConfigGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TokenPackageConfigGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TokenPackageConfigGroupByArgs['orderBy'] }
+        : { orderBy?: TokenPackageConfigGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TokenPackageConfigGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTokenPackageConfigGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TokenPackageConfig model
+   */
+  readonly fields: TokenPackageConfigFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TokenPackageConfig.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TokenPackageConfigClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TokenPackageConfig model
+   */ 
+  interface TokenPackageConfigFieldRefs {
+    readonly id: FieldRef<"TokenPackageConfig", 'String'>
+    readonly packageId: FieldRef<"TokenPackageConfig", 'String'>
+    readonly tokens: FieldRef<"TokenPackageConfig", 'Int'>
+    readonly priceTRY: FieldRef<"TokenPackageConfig", 'Decimal'>
+    readonly unitPrice: FieldRef<"TokenPackageConfig", 'Decimal'>
+    readonly isActive: FieldRef<"TokenPackageConfig", 'Boolean'>
+    readonly createdAt: FieldRef<"TokenPackageConfig", 'DateTime'>
+    readonly updatedAt: FieldRef<"TokenPackageConfig", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TokenPackageConfig findUnique
+   */
+  export type TokenPackageConfigFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TokenPackageConfig to fetch.
+     */
+    where: TokenPackageConfigWhereUniqueInput
+  }
+
+  /**
+   * TokenPackageConfig findUniqueOrThrow
+   */
+  export type TokenPackageConfigFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TokenPackageConfig to fetch.
+     */
+    where: TokenPackageConfigWhereUniqueInput
+  }
+
+  /**
+   * TokenPackageConfig findFirst
+   */
+  export type TokenPackageConfigFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TokenPackageConfig to fetch.
+     */
+    where?: TokenPackageConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenPackageConfigs to fetch.
+     */
+    orderBy?: TokenPackageConfigOrderByWithRelationInput | TokenPackageConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TokenPackageConfigs.
+     */
+    cursor?: TokenPackageConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenPackageConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenPackageConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TokenPackageConfigs.
+     */
+    distinct?: TokenPackageConfigScalarFieldEnum | TokenPackageConfigScalarFieldEnum[]
+  }
+
+  /**
+   * TokenPackageConfig findFirstOrThrow
+   */
+  export type TokenPackageConfigFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TokenPackageConfig to fetch.
+     */
+    where?: TokenPackageConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenPackageConfigs to fetch.
+     */
+    orderBy?: TokenPackageConfigOrderByWithRelationInput | TokenPackageConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TokenPackageConfigs.
+     */
+    cursor?: TokenPackageConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenPackageConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenPackageConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TokenPackageConfigs.
+     */
+    distinct?: TokenPackageConfigScalarFieldEnum | TokenPackageConfigScalarFieldEnum[]
+  }
+
+  /**
+   * TokenPackageConfig findMany
+   */
+  export type TokenPackageConfigFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TokenPackageConfigs to fetch.
+     */
+    where?: TokenPackageConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TokenPackageConfigs to fetch.
+     */
+    orderBy?: TokenPackageConfigOrderByWithRelationInput | TokenPackageConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TokenPackageConfigs.
+     */
+    cursor?: TokenPackageConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TokenPackageConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TokenPackageConfigs.
+     */
+    skip?: number
+    distinct?: TokenPackageConfigScalarFieldEnum | TokenPackageConfigScalarFieldEnum[]
+  }
+
+  /**
+   * TokenPackageConfig create
+   */
+  export type TokenPackageConfigCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * The data needed to create a TokenPackageConfig.
+     */
+    data: XOR<TokenPackageConfigCreateInput, TokenPackageConfigUncheckedCreateInput>
+  }
+
+  /**
+   * TokenPackageConfig createMany
+   */
+  export type TokenPackageConfigCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TokenPackageConfigs.
+     */
+    data: TokenPackageConfigCreateManyInput | TokenPackageConfigCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TokenPackageConfig update
+   */
+  export type TokenPackageConfigUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * The data needed to update a TokenPackageConfig.
+     */
+    data: XOR<TokenPackageConfigUpdateInput, TokenPackageConfigUncheckedUpdateInput>
+    /**
+     * Choose, which TokenPackageConfig to update.
+     */
+    where: TokenPackageConfigWhereUniqueInput
+  }
+
+  /**
+   * TokenPackageConfig updateMany
+   */
+  export type TokenPackageConfigUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TokenPackageConfigs.
+     */
+    data: XOR<TokenPackageConfigUpdateManyMutationInput, TokenPackageConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which TokenPackageConfigs to update
+     */
+    where?: TokenPackageConfigWhereInput
+  }
+
+  /**
+   * TokenPackageConfig upsert
+   */
+  export type TokenPackageConfigUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * The filter to search for the TokenPackageConfig to update in case it exists.
+     */
+    where: TokenPackageConfigWhereUniqueInput
+    /**
+     * In case the TokenPackageConfig found by the `where` argument doesn't exist, create a new TokenPackageConfig with this data.
+     */
+    create: XOR<TokenPackageConfigCreateInput, TokenPackageConfigUncheckedCreateInput>
+    /**
+     * In case the TokenPackageConfig was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TokenPackageConfigUpdateInput, TokenPackageConfigUncheckedUpdateInput>
+  }
+
+  /**
+   * TokenPackageConfig delete
+   */
+  export type TokenPackageConfigDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+    /**
+     * Filter which TokenPackageConfig to delete.
+     */
+    where: TokenPackageConfigWhereUniqueInput
+  }
+
+  /**
+   * TokenPackageConfig deleteMany
+   */
+  export type TokenPackageConfigDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TokenPackageConfigs to delete
+     */
+    where?: TokenPackageConfigWhereInput
+  }
+
+  /**
+   * TokenPackageConfig without action
+   */
+  export type TokenPackageConfigDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TokenPackageConfig
+     */
+    select?: TokenPackageConfigSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Model User
    */
 
@@ -5517,7 +6492,7 @@ export namespace Prisma {
     phone: string | null
     role: $Enums.UserRole | null
     previousRole: $Enums.UserRole | null
-    packageType: $Enums.PackageTier | null
+    packageType: string | null
     packageExpiry: Date | null
     isApproved: boolean | null
     isVerified: boolean | null
@@ -5568,7 +6543,7 @@ export namespace Prisma {
     phone: string | null
     role: $Enums.UserRole | null
     previousRole: $Enums.UserRole | null
-    packageType: $Enums.PackageTier | null
+    packageType: string | null
     packageExpiry: Date | null
     isApproved: boolean | null
     isVerified: boolean | null
@@ -5936,7 +6911,7 @@ export namespace Prisma {
     phone: string | null
     role: $Enums.UserRole
     previousRole: $Enums.UserRole | null
-    packageType: $Enums.PackageTier
+    packageType: string
     packageExpiry: Date | null
     isApproved: boolean
     isVerified: boolean
@@ -6184,7 +7159,7 @@ export namespace Prisma {
       phone: string | null
       role: $Enums.UserRole
       previousRole: $Enums.UserRole | null
-      packageType: $Enums.PackageTier
+      packageType: string
       packageExpiry: Date | null
       isApproved: boolean
       isVerified: boolean
@@ -6623,7 +7598,7 @@ export namespace Prisma {
     readonly phone: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'UserRole'>
     readonly previousRole: FieldRef<"User", 'UserRole'>
-    readonly packageType: FieldRef<"User", 'PackageTier'>
+    readonly packageType: FieldRef<"User", 'String'>
     readonly packageExpiry: FieldRef<"User", 'DateTime'>
     readonly isApproved: FieldRef<"User", 'Boolean'>
     readonly isVerified: FieldRef<"User", 'Boolean'>
@@ -53985,6 +54960,20 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const TokenPackageConfigScalarFieldEnum: {
+    id: 'id',
+    packageId: 'packageId',
+    tokens: 'tokens',
+    priceTRY: 'priceTRY',
+    unitPrice: 'unitPrice',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TokenPackageConfigScalarFieldEnum = (typeof TokenPackageConfigScalarFieldEnum)[keyof typeof TokenPackageConfigScalarFieldEnum]
+
+
   export const UserScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -54847,6 +55836,27 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal'
+   */
+  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -54861,27 +55871,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'PackageTier'
-   */
-  export type EnumPackageTierFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PackageTier'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -54892,13 +55881,6 @@ export namespace Prisma {
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'Decimal'
-   */
-  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
     
 
 
@@ -54933,6 +55915,75 @@ export namespace Prisma {
    */
 
 
+  export type TokenPackageConfigWhereInput = {
+    AND?: TokenPackageConfigWhereInput | TokenPackageConfigWhereInput[]
+    OR?: TokenPackageConfigWhereInput[]
+    NOT?: TokenPackageConfigWhereInput | TokenPackageConfigWhereInput[]
+    id?: StringFilter<"TokenPackageConfig"> | string
+    packageId?: StringFilter<"TokenPackageConfig"> | string
+    tokens?: IntFilter<"TokenPackageConfig"> | number
+    priceTRY?: DecimalFilter<"TokenPackageConfig"> | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFilter<"TokenPackageConfig"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFilter<"TokenPackageConfig"> | boolean
+    createdAt?: DateTimeFilter<"TokenPackageConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"TokenPackageConfig"> | Date | string
+  }
+
+  export type TokenPackageConfigOrderByWithRelationInput = {
+    id?: SortOrder
+    packageId?: SortOrder
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TokenPackageConfigWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    packageId?: string
+    AND?: TokenPackageConfigWhereInput | TokenPackageConfigWhereInput[]
+    OR?: TokenPackageConfigWhereInput[]
+    NOT?: TokenPackageConfigWhereInput | TokenPackageConfigWhereInput[]
+    tokens?: IntFilter<"TokenPackageConfig"> | number
+    priceTRY?: DecimalFilter<"TokenPackageConfig"> | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFilter<"TokenPackageConfig"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFilter<"TokenPackageConfig"> | boolean
+    createdAt?: DateTimeFilter<"TokenPackageConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"TokenPackageConfig"> | Date | string
+  }, "id" | "packageId">
+
+  export type TokenPackageConfigOrderByWithAggregationInput = {
+    id?: SortOrder
+    packageId?: SortOrder
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TokenPackageConfigCountOrderByAggregateInput
+    _avg?: TokenPackageConfigAvgOrderByAggregateInput
+    _max?: TokenPackageConfigMaxOrderByAggregateInput
+    _min?: TokenPackageConfigMinOrderByAggregateInput
+    _sum?: TokenPackageConfigSumOrderByAggregateInput
+  }
+
+  export type TokenPackageConfigScalarWhereWithAggregatesInput = {
+    AND?: TokenPackageConfigScalarWhereWithAggregatesInput | TokenPackageConfigScalarWhereWithAggregatesInput[]
+    OR?: TokenPackageConfigScalarWhereWithAggregatesInput[]
+    NOT?: TokenPackageConfigScalarWhereWithAggregatesInput | TokenPackageConfigScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TokenPackageConfig"> | string
+    packageId?: StringWithAggregatesFilter<"TokenPackageConfig"> | string
+    tokens?: IntWithAggregatesFilter<"TokenPackageConfig"> | number
+    priceTRY?: DecimalWithAggregatesFilter<"TokenPackageConfig"> | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalWithAggregatesFilter<"TokenPackageConfig"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolWithAggregatesFilter<"TokenPackageConfig"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"TokenPackageConfig"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TokenPackageConfig"> | Date | string
+  }
+
   export type UserWhereInput = {
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
@@ -54947,7 +55998,7 @@ export namespace Prisma {
     phone?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     previousRole?: EnumUserRoleNullableFilter<"User"> | $Enums.UserRole | null
-    packageType?: EnumPackageTierFilter<"User"> | $Enums.PackageTier
+    packageType?: StringFilter<"User"> | string
     packageExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     isApproved?: BoolFilter<"User"> | boolean
     isVerified?: BoolFilter<"User"> | boolean
@@ -55096,7 +56147,7 @@ export namespace Prisma {
     passwordHash?: StringNullableFilter<"User"> | string | null
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     previousRole?: EnumUserRoleNullableFilter<"User"> | $Enums.UserRole | null
-    packageType?: EnumPackageTierFilter<"User"> | $Enums.PackageTier
+    packageType?: StringFilter<"User"> | string
     packageExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     isApproved?: BoolFilter<"User"> | boolean
     isVerified?: BoolFilter<"User"> | boolean
@@ -55230,7 +56281,7 @@ export namespace Prisma {
     phone?: StringNullableWithAggregatesFilter<"User"> | string | null
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     previousRole?: EnumUserRoleNullableWithAggregatesFilter<"User"> | $Enums.UserRole | null
-    packageType?: EnumPackageTierWithAggregatesFilter<"User"> | $Enums.PackageTier
+    packageType?: StringWithAggregatesFilter<"User"> | string
     packageExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     isApproved?: BoolWithAggregatesFilter<"User"> | boolean
     isVerified?: BoolWithAggregatesFilter<"User"> | boolean
@@ -59152,6 +60203,83 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"GuideArticle"> | Date | string
   }
 
+  export type TokenPackageConfigCreateInput = {
+    id?: string
+    packageId: string
+    tokens: number
+    priceTRY: Decimal | DecimalJsLike | number | string
+    unitPrice: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TokenPackageConfigUncheckedCreateInput = {
+    id?: string
+    packageId: string
+    tokens: number
+    priceTRY: Decimal | DecimalJsLike | number | string
+    unitPrice: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TokenPackageConfigUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    packageId?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    priceTRY?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenPackageConfigUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    packageId?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    priceTRY?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenPackageConfigCreateManyInput = {
+    id?: string
+    packageId: string
+    tokens: number
+    priceTRY: Decimal | DecimalJsLike | number | string
+    unitPrice: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TokenPackageConfigUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    packageId?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    priceTRY?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenPackageConfigUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    packageId?: StringFieldUpdateOperationsInput | string
+    tokens?: IntFieldUpdateOperationsInput | number
+    priceTRY?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unitPrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -59163,7 +60291,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -59236,7 +60364,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -59309,7 +60437,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -59382,7 +60510,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -59455,7 +60583,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -59508,7 +60636,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -59561,7 +60689,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -63899,6 +65027,160 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type DecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type TokenPackageConfigCountOrderByAggregateInput = {
+    id?: SortOrder
+    packageId?: SortOrder
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TokenPackageConfigAvgOrderByAggregateInput = {
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+  }
+
+  export type TokenPackageConfigMaxOrderByAggregateInput = {
+    id?: SortOrder
+    packageId?: SortOrder
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TokenPackageConfigMinOrderByAggregateInput = {
+    id?: SortOrder
+    packageId?: SortOrder
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TokenPackageConfigSumOrderByAggregateInput = {
+    tokens?: SortOrder
+    priceTRY?: SortOrder
+    unitPrice?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -63936,40 +65218,6 @@ export namespace Prisma {
     in?: $Enums.UserRole[] | null
     notIn?: $Enums.UserRole[] | null
     not?: NestedEnumUserRoleNullableFilter<$PrismaModel> | $Enums.UserRole | null
-  }
-
-  export type EnumPackageTierFilter<$PrismaModel = never> = {
-    equals?: $Enums.PackageTier | EnumPackageTierFieldRefInput<$PrismaModel>
-    in?: $Enums.PackageTier[]
-    notIn?: $Enums.PackageTier[]
-    not?: NestedEnumPackageTierFilter<$PrismaModel> | $Enums.PackageTier
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -64351,23 +65599,6 @@ export namespace Prisma {
     establishmentYear?: SortOrder
   }
 
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -64417,54 +65648,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumUserRoleNullableFilter<$PrismaModel>
     _max?: NestedEnumUserRoleNullableFilter<$PrismaModel>
-  }
-
-  export type EnumPackageTierWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PackageTier | EnumPackageTierFieldRefInput<$PrismaModel>
-    in?: $Enums.PackageTier[]
-    notIn?: $Enums.PackageTier[]
-    not?: NestedEnumPackageTierWithAggregatesFilter<$PrismaModel> | $Enums.PackageTier
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPackageTierFilter<$PrismaModel>
-    _max?: NestedEnumPackageTierFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -64608,17 +65791,6 @@ export namespace Prisma {
     expires?: SortOrder
   }
 
-  export type DecimalFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
   export type GuideListingListRelationFilter = {
     every?: GuideListingWhereInput
     some?: GuideListingWhereInput
@@ -64684,22 +65856,6 @@ export namespace Prisma {
     averageRating?: SortOrder
     reviewCount?: SortOrder
     experienceYears?: SortOrder
-  }
-
-  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedDecimalFilter<$PrismaModel>
-    _sum?: NestedDecimalFilter<$PrismaModel>
-    _min?: NestedDecimalFilter<$PrismaModel>
-    _max?: NestedDecimalFilter<$PrismaModel>
   }
 
   export type DepartureCityCountOrderByAggregateInput = {
@@ -67101,6 +68257,34 @@ export namespace Prisma {
     viewCount?: SortOrder
   }
 
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type DecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -67371,10 +68555,6 @@ export namespace Prisma {
     connect?: GuideArticleWhereUniqueInput | GuideArticleWhereUniqueInput[]
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
   }
@@ -67389,26 +68569,6 @@ export namespace Prisma {
 
   export type NullableEnumUserRoleFieldUpdateOperationsInput = {
     set?: $Enums.UserRole | null
-  }
-
-  export type EnumPackageTierFieldUpdateOperationsInput = {
-    set?: $Enums.PackageTier
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -67993,14 +69153,6 @@ export namespace Prisma {
     connectOrCreate?: GuideListingCreateOrConnectWithoutGuideInput | GuideListingCreateOrConnectWithoutGuideInput[]
     createMany?: GuideListingCreateManyGuideInputEnvelope
     connect?: GuideListingWhereUniqueInput | GuideListingWhereUniqueInput[]
-  }
-
-  export type DecimalFieldUpdateOperationsInput = {
-    set?: Decimal | DecimalJsLike | number | string
-    increment?: Decimal | DecimalJsLike | number | string
-    decrement?: Decimal | DecimalJsLike | number | string
-    multiply?: Decimal | DecimalJsLike | number | string
-    divide?: Decimal | DecimalJsLike | number | string
   }
 
   export type GuideListingUpdateManyWithoutGuideNestedInput = {
@@ -69373,6 +70525,126 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedDecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -69412,51 +70684,6 @@ export namespace Prisma {
     not?: NestedEnumUserRoleNullableFilter<$PrismaModel> | $Enums.UserRole | null
   }
 
-  export type NestedEnumPackageTierFilter<$PrismaModel = never> = {
-    equals?: $Enums.PackageTier | EnumPackageTierFieldRefInput<$PrismaModel>
-    in?: $Enums.PackageTier[]
-    notIn?: $Enums.PackageTier[]
-    not?: NestedEnumPackageTierFilter<$PrismaModel> | $Enums.PackageTier
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type NestedIntNullableFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -69466,23 +70693,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -69534,54 +70744,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumUserRoleNullableFilter<$PrismaModel>
     _max?: NestedEnumUserRoleNullableFilter<$PrismaModel>
-  }
-
-  export type NestedEnumPackageTierWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PackageTier | EnumPackageTierFieldRefInput<$PrismaModel>
-    in?: $Enums.PackageTier[]
-    notIn?: $Enums.PackageTier[]
-    not?: NestedEnumPackageTierWithAggregatesFilter<$PrismaModel> | $Enums.PackageTier
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPackageTierFilter<$PrismaModel>
-    _max?: NestedEnumPackageTierFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -69647,33 +70809,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDecimalFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedDecimalFilter<$PrismaModel>
-    _sum?: NestedDecimalFilter<$PrismaModel>
-    _min?: NestedDecimalFilter<$PrismaModel>
-    _max?: NestedDecimalFilter<$PrismaModel>
   }
 
   export type NestedEnumApprovalStatusFilter<$PrismaModel = never> = {
@@ -71181,7 +72316,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -71253,7 +72388,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -71341,7 +72476,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -71413,7 +72548,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -71485,7 +72620,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -71557,7 +72692,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -71645,7 +72780,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -71717,7 +72852,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -71881,7 +73016,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -71953,7 +73088,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -72096,7 +73231,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -72168,7 +73303,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -73957,7 +75092,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -74029,7 +75164,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -74166,7 +75301,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -74238,7 +75373,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -74469,7 +75604,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -74541,7 +75676,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -74667,7 +75802,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -74739,7 +75874,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -74857,7 +75992,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -74929,7 +76064,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75067,7 +76202,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75139,7 +76274,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75250,7 +76385,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -75322,7 +76457,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -75461,7 +76596,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75533,7 +76668,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75687,7 +76822,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -75759,7 +76894,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -75847,7 +76982,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75919,7 +77054,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -75991,7 +77126,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -76063,7 +77198,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -76151,7 +77286,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -76223,7 +77358,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -76295,7 +77430,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -76367,7 +77502,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -76455,7 +77590,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -76527,7 +77662,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -76599,7 +77734,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -76671,7 +77806,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -76799,7 +77934,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -76871,7 +78006,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -77145,7 +78280,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -77217,7 +78352,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -77398,7 +78533,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -77470,7 +78605,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -77722,7 +78857,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -77794,7 +78929,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -77882,7 +79017,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -77954,7 +79089,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -78026,7 +79161,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -78098,7 +79233,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -78224,7 +79359,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -78296,7 +79431,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -78384,7 +79519,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -78456,7 +79591,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -78594,7 +79729,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -78666,7 +79801,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -78738,7 +79873,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -78810,7 +79945,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -78898,7 +80033,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -78970,7 +80105,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -79436,7 +80571,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -79508,7 +80643,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -79628,7 +80763,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -79700,7 +80835,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -79848,7 +80983,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -79920,7 +81055,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -80008,7 +81143,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -80080,7 +81215,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -80152,7 +81287,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -80224,7 +81359,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -80312,7 +81447,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -80384,7 +81519,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -80456,7 +81591,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -80528,7 +81663,7 @@ export namespace Prisma {
     phone?: string | null
     role?: $Enums.UserRole
     previousRole?: $Enums.UserRole | null
-    packageType?: $Enums.PackageTier
+    packageType?: string
     packageExpiry?: Date | string | null
     isApproved?: boolean
     isVerified?: boolean
@@ -80616,7 +81751,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -80688,7 +81823,7 @@ export namespace Prisma {
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     previousRole?: NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
-    packageType?: EnumPackageTierFieldUpdateOperationsInput | $Enums.PackageTier
+    packageType?: StringFieldUpdateOperationsInput | string
     packageExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isApproved?: BoolFieldUpdateOperationsInput | boolean
     isVerified?: BoolFieldUpdateOperationsInput | boolean
@@ -82700,6 +83835,10 @@ export namespace Prisma {
      * @deprecated Use EnterpriseCreditLineCountOutputTypeDefaultArgs instead
      */
     export type EnterpriseCreditLineCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = EnterpriseCreditLineCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use TokenPackageConfigDefaultArgs instead
+     */
+    export type TokenPackageConfigArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TokenPackageConfigDefaultArgs<ExtArgs>
     /**
      * @deprecated Use UserDefaultArgs instead
      */

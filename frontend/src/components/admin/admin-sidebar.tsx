@@ -28,6 +28,7 @@ import {
   X,
   LucideIcon,
   FlaskConical,
+  Send,
 } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -88,7 +89,7 @@ const navigation: NavSection[] = [
         icon: Wallet,
         children: [
           { name: "İşlem Geçmişi", href: "/admin/ledger", icon: FileSpreadsheet },
-          { name: "Ödemeler", href: "/admin/payouts", icon: Wallet },
+          { name: "Ödemeler (Yakında)", href: "#", icon: Wallet },
         ],
       },
     ],
@@ -99,8 +100,8 @@ const navigation: NavSection[] = [
       { name: "Afiş Motoru", href: "/admin/banner-engine", icon: ImageIcon },
       { name: "Sohbet Robotu", href: "/admin/chatbot", icon: Bot },
       { name: "Site Ayarları", href: "/admin/settings", icon: Cog },
-      { name: "Ban Paneli", href: "/admin/ban", icon: Shield },
-      { name: "Bülten Yönetimi", href: "/admin/newsletter", icon: Mail },
+      { name: "Güvenlik & Ban Paneli", href: "/admin/fraud", icon: Shield },
+      { name: "Bülten Yönetimi", href: "/admin/newsletter", icon: Send },
       { name: "Test Yönetimi", href: "/admin/tests", icon: FlaskConical },
     ],
   },
@@ -143,7 +144,7 @@ function SidebarContent({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 pb-20">
         <div className="space-y-6">
           {navigation.map((section) => (
             <div key={section.label}>
@@ -176,9 +177,13 @@ function SidebarContent({
                               <li key={child.name}>
                                 <Link
                                   href={child.href}
-                                  onClick={() => handleNavClick()}
+                                  onClick={(e) => {
+                                    if (child.href === "#") e.preventDefault()
+                                    else handleNavClick()
+                                  }}
                                   className={cn(
                                     "flex items-center gap-3 rounded-lg px-3 py-1.5 text-sm transition-colors",
+                                    child.href === "#" ? "opacity-50 cursor-not-allowed pointer-events-none" : "",
                                     pathname === child.href
                                       ? "bg-sidebar-primary text-sidebar-primary-foreground"
                                       : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
@@ -195,9 +200,13 @@ function SidebarContent({
                     ) : (
                       <Link
                         href={item.href!}
-                        onClick={() => handleNavClick()}
+                        onClick={(e) => {
+                          if (item.href === "#") e.preventDefault()
+                          else handleNavClick()
+                        }}
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          item.href === "#" ? "opacity-50 cursor-not-allowed pointer-events-none" : "",
                           pathname === item.href
                             ? "bg-sidebar-primary text-sidebar-primary-foreground"
                             : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
@@ -215,18 +224,6 @@ function SidebarContent({
         </div>
       </nav>
 
-      {/* Footer */}
-      <div className="border-t border-sidebar-border p-4">
-        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/50 px-3 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
-            SA
-          </div>
-          <div className="flex-1 truncate">
-            <p className="text-sm font-medium">System Admin</p>
-            <p className="text-xs text-sidebar-muted">Full Access</p>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
@@ -237,7 +234,7 @@ export function AdminSidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 lg:block">
+      <aside className="sticky top-20 z-40 hidden h-[calc(100vh-5rem)] w-64 shrink-0 border-r border-sidebar-border lg:block">
         <SidebarContent />
       </aside>
 

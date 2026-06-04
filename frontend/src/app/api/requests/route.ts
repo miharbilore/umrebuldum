@@ -1,8 +1,9 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireRole, requireSupply } from "@/lib/api-guards";
+import { matchAndNotifyGuides } from "@/lib/lead-matching";
 
 export async function POST(req: Request) {
     try {
@@ -48,6 +49,13 @@ export async function POST(req: Request) {
                 contactViaChat: contactViaChat !== false // Default true if undefined
             }
         });
+
+        // --- ASYNC LEAD MATCHING & NOTIFICATION (Fire and Forget) ---
+        // Bu işlem kullanıcının API yanıt süresini uzatmamak için 'await' edilmez.
+        matchAndNotifyGuides(newRequest).catch(err => {
+            console.error("Async matching error:", err);
+        });
+        // -------------------------------------------------------------
 
         return NextResponse.json({
             ...newRequest,

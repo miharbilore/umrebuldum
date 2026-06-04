@@ -8,6 +8,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+model TokenPackageConfig {
+  id        String   @id @default(cuid())
+  packageId String   @unique // "small", "medium", "large", "mega", "enterprise"
+  tokens    Int
+  priceTRY  Decimal  @db.Decimal(10, 2)
+  unitPrice Decimal  @db.Decimal(10, 2)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("token_package_configs")
+}
+
 model User {
   id                     String                @id @default(cuid())
   name                   String?
@@ -19,7 +33,7 @@ model User {
   phone                  String?               @unique
   role                   UserRole              @default(USER)
   previousRole           UserRole?
-  packageType            PackageTier           @default(FREEMIUM)
+  packageType            String                @default("FREEMIUM")
   packageExpiry          DateTime?
   isApproved             Boolean               @default(false)
   isVerified             Boolean               @default(false)
@@ -925,12 +939,6 @@ model TestLog {
   @@map("test_logs")
 }
 
-enum PackageTier {
-  FREEMIUM
-  PREMIUM
-  PRO
-  BUSINESS
-}
 
 enum UserRole {
   USER

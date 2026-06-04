@@ -1,11 +1,12 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Trash2 } from "lucide-react";
+import { Trash2, ShieldAlert, X } from "lucide-react";
+import { pusherClient } from "@/lib/pusher";
 
 interface ChatWindowProps {
     threadId: string;
@@ -27,6 +28,7 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
     const [loadingMore, setLoadingMore] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const initialLoadDone = useRef(false);
+    const [showBanner, setShowBanner] = useState(true);
 
     const loadLatest = async () => {
         try {
@@ -99,8 +101,22 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
     useEffect(() => {
         initialLoadDone.current = false;
         loadLatest();
-        const interval = setInterval(loadLatest, 3000);
-        return () => clearInterval(interval);
+
+        const channelName = `chat-${threadId}`;
+        const channel = pusherClient.subscribe(channelName);
+
+        channel.bind('new-message', (data: Message) => {
+            setMessages((prev) => {
+                // Prevent duplicate messages
+                if (prev.some(m => m.id === data.id)) return prev;
+                return [...prev, data];
+            });
+        });
+
+        return () => {
+            channel.unbind('new-message');
+            pusherClient.unsubscribe(channelName);
+        };
     }, [threadId]);
 
     useEffect(() => {
@@ -135,6 +151,29 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
 
     return (
         <div className="flex flex-col h-[600px] border rounded-xl bg-white shadow-sm overflow-hidden">
+            {/* ── Hukuki Güvenlik Uyarısı Banner ── */}
+            {showBanner && (
+                <div className="relative bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 px-4 py-3 text-xs leading-relaxed text-amber-900">
+                    <div className="flex items-start gap-2.5 pr-7">
+                        <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <p>
+                            <strong className="font-semibold text-amber-800">Güvenlik Uyarısı:</strong>{" "}
+                            Umrebuldum.com yalnızca bir ilan platformudur ve turların içeriğinden veya finansal süreçlerden sorumlu değildir.
+                            Güvenliğiniz için resmi acente hesapları dışında şahsi hesaplara kesinlikle para{" "}
+                            <strong className="font-semibold">GÖNDERMEYİNİZ</strong>.
+                            İletişim kurduğunuz kişilerin TÜRSAB belgelerini veya resmi kimliklerini teyit ediniz.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setShowBanner(false)}
+                        className="absolute top-2 right-2 p-1 rounded-full hover:bg-amber-200/60 transition-colors text-amber-600"
+                        aria-label="Uyarıyı kapat"
+                    >
+                        <X className="w-3.5 h-3.5" />
+                    </button>
+                </div>
+            )}
+
             <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4">
                 {nextCursor && (
                     <div className="flex justify-center pb-2">

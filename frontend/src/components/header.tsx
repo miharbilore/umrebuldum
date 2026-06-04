@@ -10,12 +10,14 @@ import { UserMenu } from "@/components/user-menu";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/brand/logo";
 import { CONTACT_PHONE_NUMBER, CONTACT_PHONE_DISPLAY } from "@/lib/constants";
+import { usePathname } from "next/navigation";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);

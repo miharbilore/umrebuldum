@@ -24,9 +24,9 @@ export default async function AdminLayout({
     ]);
 
     return (
-        <div className="flex min-h-screen bg-background text-foreground">
+        <div className="flex min-h-screen bg-background text-foreground relative">
             <AdminSidebar />
-            <div className="flex flex-1 flex-col lg:pl-64">
+            <div className="flex flex-1 flex-col w-full min-w-0">
                 <AdminHeader 
                     pendingListings={pendingListings}
                     pendingTickets={pendingGuideApprovals} // Tickets yerine şimdilik Rehber Onayları sayısını gösteriyoruz

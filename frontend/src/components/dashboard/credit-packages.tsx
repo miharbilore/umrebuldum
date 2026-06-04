@@ -82,7 +82,7 @@ export function CreditPackages() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await fetch("/api/admin/packages");
+                const res = await fetch("/api/packages");
                 if (res.ok) {
                     const data = await res.json();
                     if (data.length > 0) {

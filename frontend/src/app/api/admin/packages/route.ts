@@ -1,106 +1,94 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma"
+import { NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 
-/**
- * GET /api/admin/packages
- * Returns all CreditPackage records from the database.
- */
-export async function GET() {
-    try {
-        const session = await auth();
-        if (!session?.user?.role || session.user.role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
+export async function GET(req: Request) {
+  try {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
 
-        const packages = await prisma.creditPackage.findMany({
-            orderBy: { sortOrder: "asc" },
-        });
-
-        return NextResponse.json(packages);
-    } catch (error) {
-        console.error("[Admin Packages GET]", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-    }
+    const configs = await prisma.creditPackage.findMany({
+      orderBy: { sortOrder: "asc" }
+    })
+    return NextResponse.json(configs)
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+  }
 }
 
-/**
- * PUT /api/admin/packages
- * Updates a single CreditPackage record.
- * Body: { id, name?, credits?, priceTRY? }
- */
 export async function PUT(req: Request) {
-    try {
-        const session = await auth();
-        if (!session?.user?.role || session.user.role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
+  try {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
 
-        const body = await req.json();
-        const { id, name, credits, priceTRY, monthlyPrice, features } = body;
+    const data = await req.json()
+    const { id, name, slug, priceTRY, credits, monthlyPrice, features, billingPeriod, roleTarget, sortOrder } = data
 
-        if (!id) {
-            return NextResponse.json({ error: "Package ID is required" }, { status: 400 });
-        }
+    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 })
 
-        const existing = await prisma.creditPackage.findUnique({ where: { id } });
-        if (!existing) {
-            return NextResponse.json({ error: "Package not found" }, { status: 404 });
-        }
-
-        const updated = await prisma.creditPackage.update({
-            where: { id },
-            data: {
-                ...(name !== undefined && { name }),
-                ...(credits !== undefined && { credits: Number(credits) }),
-                ...(priceTRY !== undefined && { priceTRY: Number(priceTRY) }),
-                ...(monthlyPrice !== undefined && { monthlyPrice: Number(monthlyPrice) }),
-                ...(features !== undefined && typeof features === "object" && !Array.isArray(features) && { features }),
-            },
-        });
-
-        return NextResponse.json(updated);
-    } catch (error) {
-        console.error("[Admin Packages PUT]", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-    }
+    const updated = await prisma.creditPackage.update({
+      where: { id },
+      data: {
+        name,
+        slug,
+        priceTRY: Number(priceTRY),
+        credits: Number(credits),
+        monthlyPrice: Number(monthlyPrice),
+        features,
+        billingPeriod: Number(billingPeriod),
+        roleTarget,
+        sortOrder: Number(sortOrder)
+      }
+    })
+    return NextResponse.json(updated)
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+  }
 }
-/**
- * POST /api/admin/packages
- * Creates a new CreditPackage record.
- */
+
 export async function POST(req: Request) {
-    try {
-        const session = await auth();
-        if (!session?.user?.role || session.user.role !== "ADMIN") {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
-        }
+  try {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
 
-        const body = await req.json();
-        const { slug, name, credits, priceTRY, monthlyPrice, billingPeriod, roleTarget, features } = body;
+    const data = await req.json()
+    const { name, slug, priceTRY, credits, monthlyPrice, features, billingPeriod, roleTarget, sortOrder } = data
 
-        // Basic validation
-        if (!slug || !name || credits === undefined || priceTRY === undefined || !roleTarget) {
-            return NextResponse.json({ error: "Missing required fields (slug, name, credits, priceTRY, roleTarget)" }, { status: 400 });
-        }
+    const created = await prisma.creditPackage.create({
+      data: {
+        name: name || slug || "Yeni Paket",
+        slug: slug || "YENI_PAKET",
+        priceTRY: Number(priceTRY) || 0,
+        credits: Number(credits) || 0,
+        monthlyPrice: Number(monthlyPrice) || 0,
+        features: features || {},
+        billingPeriod: Number(billingPeriod) || 1,
+        roleTarget: roleTarget || "GUIDE",
+        sortOrder: Number(sortOrder) || 0
+      }
+    })
+    return NextResponse.json(created)
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error", details: error }, { status: 500 })
+  }
+}
 
-        const newPackage = await prisma.creditPackage.create({
-            data: {
-                slug,
-                name,
-                credits: Number(credits),
-                priceTRY: Number(priceTRY),
-                monthlyPrice: Number(monthlyPrice || 0),
-                billingPeriod: Number(billingPeriod || 1),
-                roleTarget,
-                features: features || {},
-                sortOrder: 0, // Frontend will sort by price anyway
-            },
-        });
+export async function DELETE(req: Request) {
+  try {
+    const session = await auth()
+    if (session?.user?.role !== "ADMIN") return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
 
-        return NextResponse.json(newPackage);
-    } catch (error: any) {
-        console.error("[Admin Packages POST]", error);
-        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
-    }
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+
+    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 })
+
+    await prisma.creditPackage.delete({
+      where: { id }
+    })
+    
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+  }
 }

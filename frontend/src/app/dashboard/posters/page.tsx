@@ -13,7 +13,7 @@ export default async function PostersPage() {
 
     const packageType = session.user.packageType || "FREEMIUM";
     const limits = await PackageSystem.getLimits(packageType);
-    const features = getPackageFeatures(packageType);
+    const features = await getPackageFeatures(packageType);
 
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },

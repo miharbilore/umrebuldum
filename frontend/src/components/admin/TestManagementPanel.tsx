@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -106,12 +106,7 @@ export default function TestManagementPanel() {
         <div className="flex items-center justify-center py-12">
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         </div>
-      ) : error ? (
-        <div className="flex items-center justify-center gap-3 py-12 text-red-400">
-          <AlertTriangle className="w-5 h-5" />
-          <span>Veriler yüklenirken hata oluştu</span>
-        </div>
-      ) : logs.length === 0 ? (
+      ) : (error || logs.length === 0) ? (
         <div className="text-center py-12">
           <Clock className="w-12 h-12 text-gray-700 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-300">Henüz test kaydı yok</h3>

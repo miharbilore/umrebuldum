@@ -62,25 +62,21 @@ export function UserMenu() {
                         <span>Panelim</span>
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link 
-                        href={
-                            session.user.role === 'ORGANIZATION' 
-                                ? `/organizers/${session.user.slug || session.user.id}` 
-                                : `/guide/${session.user.slug || session.user.id}`
-                        } 
-                        className="cursor-pointer"
-                    >
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>Açık Profilimi Gör</span>
-                    </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href={session.user.role === "ADMIN" ? "/admin/settings" : "/dashboard/profile"} className="cursor-pointer">
-                        <UserPen className="mr-2 h-4 w-4" />
-                        <span>Profilimi Düzenle</span>
-                    </Link>
-                </DropdownMenuItem>
+                {session.user.role !== "ADMIN" && (
+                    <DropdownMenuItem asChild>
+                        <Link 
+                            href={
+                                session.user.role === 'ORGANIZATION' 
+                                    ? `/organizers/${session.user.slug || session.user.id}` 
+                                    : `/guide/${session.user.slug || session.user.id}`
+                            } 
+                            className="cursor-pointer"
+                        >
+                            <Eye className="mr-2 h-4 w-4" />
+                            <span>Açık Profilimi Gör</span>
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link href={session.user.role === "ADMIN" ? "/admin/settings" : "/dashboard/settings"} className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />

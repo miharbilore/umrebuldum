@@ -43,7 +43,7 @@ export function AdminHeader({ pendingListings, pendingTickets, notifications }: 
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
+      <header className="sticky top-20 z-30 flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
         {/* Mobile spacer for hamburger menu */}
         <div className="w-10 lg:hidden" />
 
@@ -74,24 +74,6 @@ export function AdminHeader({ pendingListings, pendingTickets, notifications }: 
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Quick Stats Badges - Hidden on mobile */}
-          <div className="mr-2 hidden items-center gap-2 lg:mr-4 lg:flex lg:gap-3">
-            <div className="flex items-center gap-1.5 rounded-lg bg-warning/10 px-2 py-1.5 lg:gap-2 lg:px-3">
-              <FileText className="h-4 w-4 text-warning" />
-              <span className="text-xs font-medium text-warning lg:text-sm">
-                <span className="hidden lg:inline">{pendingListings} Bekleyen İlan</span>
-                <span className="lg:hidden">{pendingListings}</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-lg bg-destructive/10 px-2 py-1.5 lg:gap-2 lg:px-3">
-              <MessageSquare className="h-4 w-4 text-destructive" />
-              <span className="text-xs font-medium text-destructive lg:text-sm">
-                <span className="hidden lg:inline">{pendingTickets} Destek Talebi</span>
-                <span className="lg:hidden">{pendingTickets}</span>
-              </span>
-            </div>
-          </div>
-
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -107,14 +89,49 @@ export function AdminHeader({ pendingListings, pendingTickets, notifications }: 
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel>Bildirimler</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {notifications.length > 0 ? (
-                notifications.map((notif) => (
-                  <DropdownMenuItem key={notif.id} className="flex flex-col items-start gap-1 py-3">
-                    <span className="text-sm font-medium">{notif.message}</span>
-                    <span className="text-xs text-muted-foreground">{notif.time}</span>
-                  </DropdownMenuItem>
-                ))
-              ) : (
+              
+              {/* Sistemden gelen dinamik bekleyen işlemler */}
+              {pendingListings > 0 && (
+                <DropdownMenuItem asChild>
+                  <a href="/admin/approval/listings" className="flex items-start gap-3 py-3 cursor-pointer">
+                    <div className="mt-0.5 rounded-full bg-warning/10 p-1">
+                      <FileText className="h-4 w-4 text-warning" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Onay Bekleyen İlanlar</p>
+                      <p className="text-xs text-muted-foreground">{pendingListings} adet yeni ilan onayınızı bekliyor.</p>
+                    </div>
+                  </a>
+                </DropdownMenuItem>
+              )}
+
+              {pendingTickets > 0 && (
+                <DropdownMenuItem asChild>
+                  <a href="/admin/guides" className="flex items-start gap-3 py-3 cursor-pointer">
+                    <div className="mt-0.5 rounded-full bg-destructive/10 p-1">
+                      <MessageSquare className="h-4 w-4 text-destructive" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Rehber Onay Bekleyenleri</p>
+                      <p className="text-xs text-muted-foreground">{pendingTickets} adet rehber kaydı onayınızı bekliyor.</p>
+                    </div>
+                  </a>
+                </DropdownMenuItem>
+              )}
+
+              {notifications.length > 0 && (
+                <>
+                  <DropdownMenuSeparator />
+                  {notifications.map((notif) => (
+                    <DropdownMenuItem key={notif.id} className="flex flex-col items-start gap-1 py-3">
+                      <span className="text-sm font-medium">{notif.message}</span>
+                      <span className="text-xs text-muted-foreground">{notif.time}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </>
+              )}
+
+              {totalPending === 0 && notifications.length === 0 && (
                 <div className="py-4 text-center text-sm text-muted-foreground">
                   Yeni bildirim yok
                 </div>

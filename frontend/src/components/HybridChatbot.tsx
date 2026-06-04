@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import useSWR from 'swr';
 import { MessageSquare, X, Send, Bot, User, Phone } from 'lucide-react';
 import { CONTACT_WHATSAPP_NUMBER } from '@/lib/constants';
+import { usePathname } from 'next/navigation';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,6 +23,7 @@ export default function HybridChatbot() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const pathname = usePathname();
 
     // State Machine
     const [chatState, setChatState] = useState<'INIT' | 'CUSTOMER_MENU' | 'GUIDE_MENU' | 'ASK_ISSUE' | 'FREE_CHAT'>('INIT');
@@ -257,6 +259,8 @@ export default function HybridChatbot() {
         }
     };
 
+    if (pathname?.startsWith("/admin")) return null;
+
     return (
         <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
             {isOpen ? (
@@ -363,9 +367,13 @@ export default function HybridChatbot() {
             ) : (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="w-14 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105 active:scale-95 z-50 group duration-300"
+                    className="flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-700 text-white pl-4 pr-5 py-3 rounded-full shadow-[0_8px_30px_rgba(16,185,129,0.35)] hover:shadow-[0_8px_40px_rgba(16,185,129,0.5)] transition-all hover:scale-105 active:scale-95 z-50 group duration-300 animate-bounce [animation-duration:2s] [animation-iteration-count:3]"
                 >
-                    <MessageSquare className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                    <span className="relative flex items-center justify-center">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-white/30 animate-ping [animation-duration:2s]" />
+                        <MessageSquare className="w-5 h-5 relative group-hover:scale-110 transition-transform" />
+                    </span>
+                    <span className="text-sm font-semibold whitespace-nowrap">Canlı Destek</span>
                 </button>
             )}
         </div>

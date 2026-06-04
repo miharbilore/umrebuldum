@@ -1,13 +1,15 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { X, Send, Mail } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function NewsletterPopup() {
     const [isOpen, setIsOpen] = useState(false);
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState('');
+    const pathname = usePathname();
 
     useEffect(() => {
         // Show popup after 10 seconds if not already closed
@@ -54,6 +56,7 @@ export default function NewsletterPopup() {
         }
     };
 
+    if (pathname?.startsWith("/admin")) return null;
     if (!isOpen) return null;
 
     return (

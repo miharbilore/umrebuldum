@@ -12,7 +12,8 @@ export async function GET() {
     try {
         const packages = await prisma.creditPackage.findMany({
             orderBy: [
-                { roleTarget: 'desc' }, // GUIDE (G) precedes ORGANIZATION (O) alphabetically in desc? No, 'G' is before 'O'. 'asc' would be Guide first.
+                { roleTarget: 'desc' }, 
+                { sortOrder: 'asc' }, // Explicit sorting using admin sortOrder
                 { priceTRY: 'asc' }
             ]
         });
@@ -20,6 +21,9 @@ export async function GET() {
         // Manual secondary sorting to ensure GUIDE is strictly first if alphabetical fails to meet expectations
         const sortedPackages = packages.sort((a, b) => {
             if (a.roleTarget === b.roleTarget) {
+                if (a.sortOrder !== b.sortOrder) {
+                    return a.sortOrder - b.sortOrder;
+                }
                 return Number(a.priceTRY) - Number(b.priceTRY);
             }
             return a.roleTarget === 'GUIDE' ? -1 : 1;

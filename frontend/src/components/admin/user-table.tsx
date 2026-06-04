@@ -34,6 +34,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -68,10 +76,81 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     `/api/admin/users?role=${roleFilter}&search=${search}&page=${page}`,
     fetcher
   )
+
+  // Modal States
+  const [tokenModalOpen, setTokenModalOpen] = useState(false)
+  const [banModalOpen, setBanModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  
+  // Action States
+  const [tokenInput, setTokenInput] = useState("")
+  const [actionLoading, setActionLoading] = useState(false)
+
+  const openTokenModal = (user: User) => {
+    setSelectedUser(user)
+    setTokenInput(user.tokenBalance.toString())
+    setTokenModalOpen(true)
+  }
+
+  const openBanModal = (user: User) => {
+    setSelectedUser(user)
+    setBanModalOpen(true)
+  }
+
+  const handleUpdateToken = async () => {
+    if (!selectedUser) return
+    setActionLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tokenBalance: Number(tokenInput) })
+      })
+      if (res.ok) {
+        toast.success("Kullanıcı bakiyesi başarıyla güncellendi.")
+        setTokenModalOpen(false)
+        mutate() // SWR re-fetch
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "Bakiye güncellenemedi.")
+      }
+    } catch (err) {
+      toast.error("Sunucu ile bağlantı kurulamadı.")
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleToggleBan = async () => {
+    if (!selectedUser) return
+    setActionLoading(true)
+    const isBanned = selectedUser.role === "BANNED"
+    const newRole = isBanned ? "USER" : "BANNED" // Assuming default fallback is USER when unbanning
+    
+    try {
+      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole })
+      })
+      if (res.ok) {
+        toast.success(`Kullanıcı başarıyla ${isBanned ? "aktif edildi" : "engellendi"}.`)
+        setBanModalOpen(false)
+        mutate() // SWR re-fetch
+      } else {
+        const data = await res.json()
+        toast.error(data.error || "İşlem başarısız.")
+      }
+    } catch (err) {
+      toast.error("Sunucu ile bağlantı kurulamadı.")
+    } finally {
+      setActionLoading(false)
+    }
+  }
 
   const users: User[] = data?.users || []
   const pagination = data?.pagination || { total: 0, totalPages: 1 }
@@ -165,7 +244,7 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
             </Button>
             <Button variant="outline" size="sm" className="bg-white border-yellow-200 text-yellow-800 hover:bg-yellow-100">
               <Coins className="mr-2 h-4 w-4" />
-              Jeton Tanımla
+              Token Tanımla
             </Button>
           </div>
         )}
@@ -188,7 +267,7 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
                     <ArrowUpDown className="h-3 w-3" />
                   </Button>
                 </TableHead>
-                <TableHead className="font-semibold text-right">Jeton Bakiyesi</TableHead>
+                <TableHead className="font-semibold text-right">Token Bakiyesi</TableHead>
                 <TableHead className="font-semibold">Kayıt Tarihi</TableHead>
                 <TableHead className="w-16 text-center">İşlem</TableHead>
               </TableRow>
@@ -270,16 +349,16 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="cursor-pointer">
                             <UserCog className="mr-2 h-4 w-4" />
-                            Kullanıcıyı Taklit Et
+                            Hesaba Giriş Yap (Taklit)
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer">
+                          <DropdownMenuItem className="cursor-pointer" onClick={() => openTokenModal(user)}>
                             <Coins className="mr-2 h-4 w-4" />
-                            Jeton Ayarla
+                            Token Ayarla
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive cursor-pointer">
+                          <DropdownMenuItem className="text-destructive cursor-pointer" onClick={() => openBanModal(user)}>
                             <Ban className="mr-2 h-4 w-4" />
-                            Erişimi Engelle
+                            {user.role === "BANNED" ? "Engeli Kaldır" : "Erişimi Engelle"}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -319,6 +398,62 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
           </div>
         )}
       </CardContent>
+
+      {/* Token Update Modal */}
+      <Dialog open={tokenModalOpen} onOpenChange={setTokenModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Token Bakiyesini Ayarla</DialogTitle>
+            <DialogDescription>
+              {selectedUser?.fullName || selectedUser?.name} adlı kullanıcının cüzdan bakiyesini güncelliyorsunuz.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Mevcut Bakiye</label>
+              <div className="text-lg font-bold text-muted-foreground">{selectedUser?.tokenBalance || 0} Token</div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Yeni Bakiye</label>
+              <Input 
+                type="number" 
+                value={tokenInput} 
+                onChange={e => setTokenInput(e.target.value)} 
+                placeholder="Örn: 500"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTokenModalOpen(false)}>İptal</Button>
+            <Button onClick={handleUpdateToken} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Coins className="w-4 h-4 mr-2" />}
+              {actionLoading ? "Kaydediliyor..." : "Kaydet"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ban / Unban Modal */}
+      <Dialog open={banModalOpen} onOpenChange={setBanModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erişim Durumunu Değiştir</DialogTitle>
+            <DialogDescription>
+              {selectedUser?.role === "BANNED" 
+                ? `${selectedUser?.fullName || selectedUser?.name} adlı kullanıcının engelini kaldırmak istediğinize emin misiniz?`
+                : `${selectedUser?.fullName || selectedUser?.name} adlı kullanıcının platforma erişimini tamamen engellemek istediğinize emin misiniz?`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setBanModalOpen(false)}>İptal</Button>
+            <Button variant="destructive" onClick={handleToggleBan} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Ban className="w-4 h-4 mr-2" />}
+              {selectedUser?.role === "BANNED" ? "Engeli Kaldır" : "Erişimi Engelle"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

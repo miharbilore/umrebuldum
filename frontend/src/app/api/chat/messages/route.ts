@@ -1,10 +1,13 @@
-
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { containsProfanity } from "@/lib/bannedWords";
 import { checkChatRateLimits } from "@/lib/chat-rate-limit";
+import { pusherServer } from "@/lib/pusher";
+import { emailService } from "@/lib/email/email-service";
+import { newMessageTemplate } from "@/lib/email/email-templates";
 import { UserRole } from "../../../../../prisma/generated-client";
+import DOMPurify from "isomorphic-dompurify";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const MAX_MESSAGE_LENGTH = 500;
@@ -199,8 +202,18 @@ export async function POST(req: Request) {
             return res;
         }
 
+        // ── XSS Sanitization (DOMPurify) ──────────────────────────────────
+        const sanitizedMessage = DOMPurify.sanitize(message.trim(), {
+            ALLOWED_TAGS: [],      // Hiçbir HTML tag'ine izin verme
+            ALLOWED_ATTR: [],      // Hiçbir attribute'a izin verme
+        }).substring(0, MAX_MESSAGE_LENGTH);
+
+        if (sanitizedMessage.length === 0) {
+            return NextResponse.json({ error: "Message cannot be empty after sanitization" }, { status: 400 });
+        }
+
         // ── Profanity filter (upgraded normalizer) ────────────────────────
-        const isBlocked = containsProfanity(message);
+        const isBlocked = containsProfanity(sanitizedMessage);
 
         // ── Persist ───────────────────────────────────────────────────────
         const newMessage = await prisma.message.create({
@@ -208,7 +221,7 @@ export async function POST(req: Request) {
                 conversationId: threadId,
                 senderId: currentUser.id,
                 role: (session.user.role as UserRole) || UserRole.USER,
-                body: message.trim().substring(0, MAX_MESSAGE_LENGTH),
+                body: sanitizedMessage,
                 blocked: isBlocked,
             },
         });
@@ -229,7 +242,33 @@ export async function POST(req: Request) {
             });
         }
 
-        return NextResponse.json({
+        // ── Email notification to recipient (non-blocking, migrated from /api/chat/message) ──
+        if (!isBlocked) {
+            const recipientId = conversation.userId === currentUser.id
+                ? conversation.guideId
+                : conversation.userId;
+
+            // Fetch recipient info for email
+            const recipient = await prisma.user.findUnique({
+                where: { id: recipientId },
+                select: { email: true, name: true },
+            });
+
+            const senderName = session.user.name || "Kullanıcı";
+
+            if (recipient?.email) {
+                emailService.sendAsync(
+                    recipient.email,
+                    newMessageTemplate({
+                        recipientName: recipient.name || "Kullanıcı",
+                        senderName,
+                        messagePreview: sanitizedMessage.substring(0, 200),
+                    })
+                );
+            }
+        }
+
+        const responseData = {
             id: newMessage.id,
             threadId: newMessage.conversationId,
             senderRole: newMessage.role,
@@ -238,7 +277,12 @@ export async function POST(req: Request) {
                 : newMessage.body,
             blocked: newMessage.blocked,
             createdAt: newMessage.createdAt.toISOString(),
-        });
+        };
+
+        // WebSocket üzerinden anında fırlat
+        await pusherServer.trigger(`chat-${newMessage.conversationId}`, 'new-message', responseData);
+
+        return NextResponse.json(responseData);
 
     } catch (error) {
         console.error("Send message error:", error);

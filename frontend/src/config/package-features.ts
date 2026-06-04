@@ -1,66 +1,28 @@
-// ─── Merkezi Paket Feature Flags (Code-Level) ──────────────────────────
-// Veritabanına dokunmadan, PackageTier enum değerlerine göre
-// paket yetkilerini merkezi olarak yönetir.
-//
-// Kullanım:
-//   import { getPackageFeatures, canPurchaseAlacart } from "@/config/package-features";
-//   const features = getPackageFeatures("PREMIUM");
-//   if (features.allowAlacartPurchase) { ... }
-// ────────────────────────────────────────────────────────────────────────
-
+// ─── Merkezi Paket Feature Flags (Veritabanı Destekli) ──────────────────
+import { prisma } from "@/lib/prisma";
 import type { PackageType } from "@/lib/db-types";
-
-// ── Feature Flags Interface ─────────────────────────────────────────────
+import { unstable_cache } from "next/cache";
 
 export interface PackageFeatureFlags {
-  /** À la carte token satın alma yetkisi */
   allowAlacartPurchase: boolean;
-
-  /** Poster oluşturucu erişimi */
   hasPosterGenerator: boolean;
-
-  /** Blog / rehber makale yazma yetkisi */
   hasBlogFeature: boolean;
-
-  /** Teklif gönderme token maliyeti */
   offerCost: number;
-
-  /** Günlük teklif limiti */
   dailyOfferLimit: number;
-
-  /** İlan yenileme (republish) token maliyeti */
   republishCost: number;
-
-  /** Talep kilidini açma (demand unlock) token maliyeti */
   demandUnlockCost: number;
-
-  /** Boost özelliğine erişim */
   hasBoostAccess: boolean;
-
-  /** Spotlight özelliğine erişim */
   hasSpotlightAccess: boolean;
-
-  /** Kimlik doğrulama başvuru hakkı */
   canApplyIdentityVerification: boolean;
-
-  /** Telefon numarası ilan detayında görünür mü */
   phoneVisibleOnListing: boolean;
-
-  /** AI destekli özellikler (gelecek) */
   hasAIFeatures: boolean;
-
-  /** Filigranlı poster çıktısı */
   posterHasWatermark: boolean;
-
-  /** Poster kalite seviyesi */
   posterQuality: "LOW" | "NORMAL" | "HIGH";
+  dailyListingLimit: number;
 }
 
-// ── Feature Flag Tanımları (Tier Bazlı) ─────────────────────────────────
-
-export const PACKAGE_FEATURES: Record<PackageType, PackageFeatureFlags> = {
-  // ── FREEMIUM ────────────────────────────────────────────────────────
-  // Ücretsiz kullanıcılar: sınırlı erişim, à la carte yok
+// Varsayılan Statik Fallbackler
+export const DEFAULT_PACKAGE_FEATURES: Record<PackageType, PackageFeatureFlags> = {
   FREEMIUM: {
     allowAlacartPurchase: false,
     hasPosterGenerator: true,
@@ -76,10 +38,8 @@ export const PACKAGE_FEATURES: Record<PackageType, PackageFeatureFlags> = {
     hasAIFeatures: false,
     posterHasWatermark: true,
     posterQuality: "LOW",
+    dailyListingLimit: 5,
   },
-
-  // ── PREMIUM ─────────────────────────────────────────────────────────
-  // Temel ücretli paket: à la carte açılır, temel özellikler
   PREMIUM: {
     allowAlacartPurchase: true,
     hasPosterGenerator: true,
@@ -95,10 +55,8 @@ export const PACKAGE_FEATURES: Record<PackageType, PackageFeatureFlags> = {
     hasAIFeatures: false,
     posterHasWatermark: true,
     posterQuality: "NORMAL",
+    dailyListingLimit: 15,
   },
-
-  // ── PRO ─────────────────────────────────────────────────────────────
-  // Profesyonel rehberler: tüm özellikler açık
   PRO: {
     allowAlacartPurchase: true,
     hasPosterGenerator: true,
@@ -114,10 +72,8 @@ export const PACKAGE_FEATURES: Record<PackageType, PackageFeatureFlags> = {
     hasAIFeatures: true,
     posterHasWatermark: false,
     posterQuality: "HIGH",
+    dailyListingLimit: 50,
   },
-
-  // ── BUSINESS ────────────────────────────────────────────────────────
-  // Kurumsal / Acente: en yüksek limitler
   BUSINESS: {
     allowAlacartPurchase: true,
     hasPosterGenerator: true,
@@ -133,53 +89,87 @@ export const PACKAGE_FEATURES: Record<PackageType, PackageFeatureFlags> = {
     hasAIFeatures: false,
     posterHasWatermark: false,
     posterQuality: "HIGH",
+    dailyListingLimit: 100,
   },
 };
 
-// ── Helper Fonksiyonlar ─────────────────────────────────────────────────
+export const getPackageFeatures = unstable_cache(
+  async (tierSlug: string): Promise<PackageFeatureFlags> => {
+    // Determine a fallback based on slug or default to FREEMIUM fallback
+    let validTier: PackageType = "FREEMIUM";
+    if (["FREEMIUM", "PREMIUM", "PRO", "BUSINESS"].includes(tierSlug)) {
+      validTier = tierSlug as PackageType;
+    }
+    const fallback = DEFAULT_PACKAGE_FEATURES[validTier] ?? DEFAULT_PACKAGE_FEATURES.FREEMIUM;
 
-/**
- * Verilen PackageTier için feature flag'lerini döner.
- * Bilinmeyen tier verilirse FREEMIUM'a fallback yapar.
- */
-export function getPackageFeatures(tier: string): PackageFeatureFlags {
-  return PACKAGE_FEATURES[tier as PackageType] ?? PACKAGE_FEATURES.FREEMIUM;
+    try {
+      // Artık doğrudan CreditPackage (satış paketleri) tablosunu okuyoruz!
+      const dbConfig = await prisma.creditPackage.findFirst({
+        where: { slug: tierSlug }
+      });
+
+      if (dbConfig && dbConfig.features) {
+        // Parse the JSON features field safely
+        const f = typeof dbConfig.features === 'string' 
+            ? JSON.parse(dbConfig.features) 
+            : dbConfig.features as any;
+        
+        return {
+          ...fallback,
+          offerCost: f.offerCost !== undefined ? Number(f.offerCost) : fallback.offerCost,
+          hasBlogFeature: f.hasBlogFeature ?? fallback.hasBlogFeature,
+          hasPosterGenerator: f.hasPosterGenerator ?? fallback.hasPosterGenerator,
+          posterHasWatermark: f.posterHasWatermark ?? fallback.posterHasWatermark,
+          dailyListingLimit: f.dailyListingLimit !== undefined ? Number(f.dailyListingLimit) : fallback.dailyListingLimit,
+          allowAlacartPurchase: f.allowAlacartPurchase ?? fallback.allowAlacartPurchase,
+          dailyOfferLimit: f.dailyOfferLimit !== undefined ? Number(f.dailyOfferLimit) : fallback.dailyOfferLimit,
+          republishCost: f.republishCost !== undefined ? Number(f.republishCost) : fallback.republishCost,
+          demandUnlockCost: f.demandUnlockCost !== undefined ? Number(f.demandUnlockCost) : fallback.demandUnlockCost,
+          hasBoostAccess: f.hasBoostAccess ?? fallback.hasBoostAccess,
+          hasSpotlightAccess: f.hasSpotlightAccess ?? fallback.hasSpotlightAccess,
+          canApplyIdentityVerification: f.canApplyIdentityVerification ?? fallback.canApplyIdentityVerification,
+          phoneVisibleOnListing: f.phoneVisibleOnListing ?? fallback.phoneVisibleOnListing,
+          hasAIFeatures: f.hasAIFeatures ?? fallback.hasAIFeatures,
+          posterQuality: f.posterQuality ?? fallback.posterQuality,
+        };
+      }
+      return fallback;
+    } catch (error) {
+      console.error("Package features fetch error:", error);
+      return fallback;
+    }
+  },
+  ["package-features-db"],
+  {
+    revalidate: 3600, // 1 saat önbellek, webhook veya admin on-save ile bozulacak
+    tags: ["package-features"],
+  }
+);
+
+export async function canPurchaseAlacart(tier: string): Promise<boolean> {
+  const f = await getPackageFeatures(tier);
+  return f.allowAlacartPurchase;
 }
 
-/**
- * À la carte token satın alabilir mi?
- */
-export function canPurchaseAlacart(tier: string): boolean {
-  return getPackageFeatures(tier).allowAlacartPurchase;
+export async function canGeneratePoster(tier: string): Promise<boolean> {
+  const f = await getPackageFeatures(tier);
+  return f.hasPosterGenerator;
 }
 
-/**
- * Poster oluşturabilir mi?
- */
-export function canGeneratePoster(tier: string): boolean {
-  return getPackageFeatures(tier).hasPosterGenerator;
+export async function canWriteBlog(tier: string): Promise<boolean> {
+  const f = await getPackageFeatures(tier);
+  return f.hasBlogFeature;
 }
 
-/**
- * Blog yazabilir mi?
- */
-export function canWriteBlog(tier: string): boolean {
-  return getPackageFeatures(tier).hasBlogFeature;
+export async function getOfferCost(tier: string): Promise<number> {
+  const f = await getPackageFeatures(tier);
+  return f.offerCost;
 }
 
-/**
- * Teklif gönderme maliyetini döner.
- */
-export function getOfferCost(tier: string): number {
-  return getPackageFeatures(tier).offerCost;
-}
-
-/**
- * Belirli bir özelliğe erişim kontrolü (genel amaçlı).
- */
-export function hasFeature(
+export async function hasFeature(
   tier: string,
   feature: keyof PackageFeatureFlags
-): boolean | number | string {
-  return getPackageFeatures(tier)[feature];
+): Promise<boolean | number | string> {
+  const f = await getPackageFeatures(tier);
+  return f[feature];
 }

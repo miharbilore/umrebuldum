@@ -85,7 +85,7 @@ export async function POST(req: Request) {
         const offerExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours
 
         // 2. Config-driven offer cost (from package-features.ts, not hardcoded)
-        const packageFeatures = getPackageFeatures(guideUser.packageType);
+        const packageFeatures = await getPackageFeatures(guideUser.packageType);
         const offerCost = packageFeatures.offerCost;
 
         const spendResult = await spendToken({

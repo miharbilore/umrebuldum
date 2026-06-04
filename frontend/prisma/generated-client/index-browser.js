@@ -122,6 +122,17 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.TokenPackageConfigScalarFieldEnum = {
+  id: 'id',
+  packageId: 'packageId',
+  tokens: 'tokens',
+  priceTRY: 'priceTRY',
+  unitPrice: 'unitPrice',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -813,13 +824,6 @@ exports.UserRole = exports.$Enums.UserRole = {
   BANNED: 'BANNED'
 };
 
-exports.PackageTier = exports.$Enums.PackageTier = {
-  FREEMIUM: 'FREEMIUM',
-  PREMIUM: 'PREMIUM',
-  PRO: 'PRO',
-  BUSINESS: 'BUSINESS'
-};
-
 exports.ApprovalStatus = exports.$Enums.ApprovalStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
@@ -847,6 +851,7 @@ exports.LedgerEntryType = exports.$Enums.LedgerEntryType = {
 };
 
 exports.Prisma.ModelName = {
+  TokenPackageConfig: 'TokenPackageConfig',
   User: 'User',
   Account: 'Account',
   Session: 'Session',

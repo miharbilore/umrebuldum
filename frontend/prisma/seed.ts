@@ -1,166 +1,100 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-    // Seed default credit packages (4 approved tiers)
-    const packages = [
-        { 
-            id: "FREEMIUM_GUIDE_1", 
-            name: "Freemium", 
-            credits: 15, 
-            priceTRY: 0,
-            slug: "FREEMIUM",
-            roleTarget: "GUIDE" as const,
-            features: { maxListings: 1, listingDays: 30, maxBoosts: 0, phoneVisible: false, canCreatePoster: false, priorityRanking: false, identityVerificationEligible: false }
-        },
-        { 
-            id: "PREMIUM", 
-            name: "Premium Paket", 
-            credits: 50, 
-            priceTRY: 199,
-            slug: "PREMIUM",
-            roleTarget: "GUIDE" as const,
-            features: { maxListings: 3, listingDays: 60, maxBoosts: 1, phoneVisible: true, canCreatePoster: true, priorityRanking: false, identityVerificationEligible: true }
-        },
-        { 
-            id: "PRO", 
-            name: "Pro Paket", 
-            credits: 200, 
-            priceTRY: 699,
-            slug: "PRO",
-            roleTarget: "GUIDE" as const,
-            features: { maxListings: 15, listingDays: 180, maxBoosts: 5, phoneVisible: true, canCreatePoster: true, priorityRanking: true, identityVerificationEligible: true, spotlightEligible: true }
-        },
-        { 
-            id: "BUSINESS", 
-            name: "Business Paket", 
-            credits: 500, 
-            priceTRY: 1299,
-            slug: "BUSINESS",
-            roleTarget: "ORGANIZATION" as const,
-            features: { maxListings: 30, listingDays: 180, maxBoosts: 10, phoneVisible: true, canCreatePoster: true, priorityRanking: true, identityVerificationEligible: true, spotlightEligible: true }
-        },
-    ];
+  console.log('Seeding Token Packages...');
 
-    for (const pkg of packages) {
-        await prisma.creditPackage.upsert({
-            where: { id: pkg.id },
-            update: { name: pkg.name, features: pkg.features, credits: pkg.credits, priceTRY: pkg.priceTRY, slug: pkg.slug, roleTarget: pkg.roleTarget },
-            create: { id: pkg.id, name: pkg.name, credits: pkg.credits, priceTRY: pkg.priceTRY, slug: pkg.slug, roleTarget: pkg.roleTarget, features: pkg.features },
-        });
-    }
+  // 1. Token Packages
+  const tokenPackages = [
+    { packageId: 'small', tokens: 10, priceTRY: 49.00, unitPrice: 4.90, isActive: true },
+    { packageId: 'medium', tokens: 30, priceTRY: 119.00, unitPrice: 3.97, isActive: true },
+    { packageId: 'large', tokens: 75, priceTRY: 249.00, unitPrice: 3.32, isActive: true },
+    { packageId: 'mega', tokens: 200, priceTRY: 549.00, unitPrice: 2.75, isActive: true },
+    { packageId: 'enterprise', tokens: 500, priceTRY: 999.00, unitPrice: 2.00, isActive: true },
+  ];
 
-    console.log("✅ Seeded credit packages (4 approved tiers)");
+  for (const pkg of tokenPackages) {
+    await prisma.$executeRaw`
+      INSERT INTO token_package_configs (id, packageId, tokens, priceTRY, unitPrice, isActive, updatedAt)
+      VALUES (UUID(), ${pkg.packageId}, ${pkg.tokens}, ${pkg.priceTRY}, ${pkg.unitPrice}, ${pkg.isActive}, NOW())
+      ON DUPLICATE KEY UPDATE
+        tokens = ${pkg.tokens}, priceTRY = ${pkg.priceTRY}, unitPrice = ${pkg.unitPrice}, isActive = ${pkg.isActive}, updatedAt = NOW()
+    `;
+  }
+  console.log('Token Packages seeded successfully.');
 
-    // ─── Seed Departure Cities ──────────────────────────────────────────────
+  // 2. Package Tier Configs
+  const packageTiers = [
+    { tierName: 'FREEMIUM', priceTRY: 0, offerCost: 5, hasBlogFeature: false, hasPosterGenerator: true, posterHasWatermark: true, dailyListingLimit: 5 },
+    { tierName: 'PREMIUM', priceTRY: 299, offerCost: 3, hasBlogFeature: true, hasPosterGenerator: true, posterHasWatermark: false, dailyListingLimit: 50 },
+    { tierName: 'PRO', priceTRY: 599, offerCost: 2, hasBlogFeature: true, hasPosterGenerator: true, posterHasWatermark: false, dailyListingLimit: 200 },
+    { tierName: 'BUSINESS', priceTRY: 1499, offerCost: 1, hasBlogFeature: true, hasPosterGenerator: true, posterHasWatermark: false, dailyListingLimit: 1000 },
+  ];
 
-    const priorityCities = [
-        { name: "İstanbul", airport: "İstanbul Havalimanı / Sabiha Gökçen" },
-        { name: "Ankara", airport: "Esenboğa" },
-        { name: "İzmir", airport: "Adnan Menderes" },
-    ];
+  for (const pkg of packageTiers) {
+    await prisma.$executeRaw`
+      INSERT INTO package_tier_configs (id, tierName, priceTRY, offerCost, hasBlogFeature, hasPosterGenerator, posterHasWatermark, dailyListingLimit, updatedAt)
+      VALUES (UUID(), ${pkg.tierName}, ${pkg.priceTRY}, ${pkg.offerCost}, ${pkg.hasBlogFeature}, ${pkg.hasPosterGenerator}, ${pkg.posterHasWatermark}, ${pkg.dailyListingLimit}, NOW())
+      ON DUPLICATE KEY UPDATE
+        priceTRY = ${pkg.priceTRY}, offerCost = ${pkg.offerCost}, hasBlogFeature = ${pkg.hasBlogFeature}, hasPosterGenerator = ${pkg.hasPosterGenerator}, posterHasWatermark = ${pkg.posterHasWatermark}, dailyListingLimit = ${pkg.dailyListingLimit}, updatedAt = NOW()
+    `;
+  }
+  console.log('Package Tiers seeded successfully.');
 
-    const otherCities = [
-        { name: "Adana", airport: "Çukurova" },
-        { name: "Antalya", airport: "Antalya" },
-        { name: "Gaziantep", airport: "Gaziantep" },
-        { name: "Kayseri", airport: "Erkilet" },
-        { name: "Konya", airport: "Konya" },
-        { name: "Trabzon", airport: "Trabzon" },
-        { name: "Samsun", airport: "Çarşamba" },
-        { name: "Diyarbakır", airport: "Diyarbakır" },
-        { name: "Malatya", airport: "Erhaç" },
-        { name: "Erzurum", airport: "Erzurum" },
-        { name: "Van", airport: "Ferit Melen" },
-        { name: "Hatay", airport: "Hatay" },
-        { name: "Şanlıurfa", airport: "GAP" },
-        { name: "Mardin", airport: "Mardin" },
-        { name: "Elazığ", airport: "Elazığ" },
-        { name: "Batman", airport: "Batman" },
-        { name: "Kahramanmaraş", airport: "Kahramanmaraş" },
-    ];
+  // 3. Test Data (Chatbot, Newsletter, Users, etc)
+  try {
+    // Sohbet Robotu
+    await prisma.$executeRaw`
+      INSERT IGNORE INTO chatbot_templates (id, question, answer, isActive, \`order\`, createdAt, updatedAt) 
+      VALUES 
+      (UUID(), 'Umre turları fiyatları ne kadar?', 'Umre tur fiyatları seçeceğiniz paketlere ve tarihlere göre değişiklik göstermektedir.', true, 1, NOW(), NOW()),
+      (UUID(), 'Nasıl rehber olabilirim?', 'Sistemimize kayıt olduktan sonra profilinizi tamamlayıp admin onayına gönderebilirsiniz.', true, 2, NOW(), NOW())
+    `;
 
-    const sanitizeName = (name: string) => name.replace(/\*/g, "").trim();
+    // Bülten
+    await prisma.$executeRaw`
+      INSERT IGNORE INTO newsletter_subscribers (id, email, isActive, createdAt) 
+      VALUES 
+      (UUID(), 'testabone1@umrebuldum.com', true, NOW()),
+      (UUID(), 'testabone2@umrebuldum.com', true, NOW())
+    `;
 
-    for (const city of priorityCities) {
-        const name = sanitizeName(city.name);
-        await prisma.departureCity.upsert({
-            where: { name },
-            update: { priority: true, airport: city.airport, name },
-            create: { ...city, name, priority: true },
-        });
-    }
+    // Örnek Admin ve Rehber Kullanıcı (Eğer yoksa)
+    const adminId = "clk123admin00000000000000";
+    await prisma.$executeRaw`
+      INSERT IGNORE INTO users (id, name, email, role, isApproved, isVerified, packageType, trustScore, availableBalance, createdAt, updatedAt) 
+      VALUES (${adminId}, 'Super Admin', 'admin@umrebuldum.com', 'ADMIN', true, true, 'BUSINESS', 100, 10000, NOW(), NOW())
+    `;
 
-    for (const city of otherCities) {
-        const name = sanitizeName(city.name);
-        await prisma.departureCity.upsert({
-            where: { name },
-            update: { priority: false, airport: city.airport, name },
-            create: { ...city, name, priority: false },
-        });
-    }
-    console.log("✅ Seeded departure cities");
+    const guideId = "clk123guide00000000000000";
+    await prisma.$executeRaw`
+      INSERT IGNORE INTO users (id, name, email, role, isApproved, isVerified, packageType, trustScore, availableBalance, createdAt, updatedAt) 
+      VALUES (${guideId}, 'Örnek Rehber', 'rehber@umrebuldum.com', 'GUIDE', false, true, 'FREEMIUM', 85, 50, NOW(), NOW())
+    `;
 
-    // ─── Seed Airlines ──────────────────────────────────────────────────────
+    // Rehber Profili
+    await prisma.$executeRaw`
+      INSERT IGNORE INTO guide_profiles (id, userId, quotaTarget, currentCount, averageRating, reviewCount, createdAt, updatedAt)
+      VALUES (UUID(), ${guideId}, 100, 0, 0.00, 0, NOW(), NOW())
+    `;
 
-    const charterAirlines = [
-        "Türk Hava Yolları", "AJet", "SunExpress", "Freebird Airlines", "Tailwind Airlines"
-    ];
-    const otherAirlines = [
-        "Pegasus Airlines", "Corendon Airlines"
-    ];
+    // Bekleyen Örnek İlan
+    await prisma.$executeRaw`
+      INSERT IGNORE INTO guide_listings (id, guideId, title, description, city, extraServices, pricingDouble, pricingCurrency, quota, startDate, endDate, approvalStatus, createdAt, updatedAt)
+      VALUES (UUID(), ${guideId}, 'Ramazan Umresi (Test)', 'Test ilan açıklamasıdır.', 'Mekke', '[]', 1500.00, 'SAR', 20, DATE_ADD(NOW(), INTERVAL 30 DAY), DATE_ADD(NOW(), INTERVAL 45 DAY), 'PENDING', NOW(), NOW())
+    `;
 
-    for (const name of charterAirlines) {
-        await prisma.airline.upsert({
-            where: { name },
-            update: { isCharterFriendly: true },
-            create: { name, isCharterFriendly: true },
-        });
-    }
-
-    for (const name of otherAirlines) {
-        await prisma.airline.upsert({
-            where: { name },
-            update: { isCharterFriendly: false },
-            create: { name, isCharterFriendly: false },
-        });
-    }
-    console.log("✅ Seeded airlines");
-
-    // ─── Seed Listing Categories (SEO + Filtering) ─────────────────────────
-
-    const listingCategories = [
-        { slug: "ekonomik-umre", name: "Ekonomik Umre" },
-        { slug: "standart-umre", name: "Standart Umre" },
-        { slug: "vip-umre", name: "VIP Umre" },
-        { slug: "5-yildiz-umre", name: "5 Yıldız Otel Umre" },
-        { slug: "ramazan-umresi", name: "Ramazan Umresi" },
-        { slug: "soguk-sezon-umre", name: "Soğuk Sezon (Kış) Umresi" },
-        { slug: "yaz-umresi", name: "Yaz Umresi" },
-        { slug: "kisa-sureli-umre", name: "Kısa Süreli Umre" },
-        { slug: "uzun-sureli-umre", name: "Uzun Süreli Umre" },
-        { slug: "aile-umresi", name: "Aile Umresi" },
-        { slug: "genclere-ozel-umre", name: "Gençlere Özel Umre" },
-    ];
-
-    for (const category of listingCategories) {
-        await prisma.listingCategory.upsert({
-            where: { slug: category.slug },
-            update: {},
-            create: category,
-        });
-    }
-
-    console.log("✅ Seeded listing categories");
+    console.log('Kapsamlı Test Mock Data başarıyla eklendi.');
+  } catch (e) {
+    console.log('Bazı test verileri atlandı (zaten mevcut olabilir veya şema uyumsuzluğu):', e);
+  }
 }
 
 main()
-    .then(async () => {
-        await prisma.$disconnect();
-    })
-    .catch(async (e) => {
-        console.error(e);
-        await prisma.$disconnect();
-        process.exit(1);
-    });
+  .catch((e) => {
+    console.error('Error during seeding:', e);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

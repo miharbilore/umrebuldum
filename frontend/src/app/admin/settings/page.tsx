@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm";
-import { PackageManager } from "@/components/admin/package-manager";
+
 
 export default function AdminSettingsPage() {
     const { data: session } = useSession();
@@ -20,16 +20,7 @@ export default function AdminSettingsPage() {
         <div className="container mx-auto py-10 px-4 max-w-4xl">
             <h1 className="text-3xl font-bold mb-8">Admin Ayarları</h1>
 
-            {/* Global Credit Package Management */}
-            <Card className="mb-6">
-                <CardHeader>
-                    <CardTitle>Kredi Paket Yönetimi</CardTitle>
-                    <CardDescription>Veritabanındaki tüm kredi paketlerini görüntüleyin ve fiyatlarını güncelleyin</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <PackageManager />
-                </CardContent>
-            </Card>
+
 
             {/* Profile Info */}
             <Card className="mb-6">

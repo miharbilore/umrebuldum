@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PosterTemplate } from './poster-template';
 import { Download, Loader2, Image as ImageIcon } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 interface PosterGeneratorProps {
     listing: any;
@@ -51,15 +51,15 @@ export function PosterGenerator({ listing }: PosterGeneratorProps) {
         setGenerating(true);
 
         try {
-            const canvas = await html2canvas(previewRef.current, {
-                scale: 2, // High quality
-                useCORS: true, // For cross-origin images
-                allowTaint: true
+            const dataUrl = await toPng(previewRef.current, {
+                pixelRatio: 2, // High quality
+                cacheBust: true,
+                backgroundColor: 'white'
             });
 
             const link = document.createElement('a');
             link.download = `afis-${(listing.title || 'tur').slice(0, 20)}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.href = dataUrl;
             link.click();
         } catch (err) {
             console.error(err);

@@ -64,7 +64,7 @@ export async function POST(req: Request) {
         }
 
         // ── Package Feature Guard: Blog yazma yetkisi ────────────────
-        const features = getPackageFeatures(user.packageType);
+        const features = await getPackageFeatures(user.packageType);
         if (!features.hasBlogFeature) {
             return NextResponse.json({
                 error: "Blog yazma özelliği mevcut paketinizde bulunmamaktadır. Lütfen paketinizi yükseltin."

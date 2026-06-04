@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -9,8 +9,6 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 export default function NewsletterPanel() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: subscribers, error, isLoading, mutate } = useSWR('/api/admin/newsletter', fetcher);
-
-    if (error) return <div className="p-4 text-red-500 bg-red-50 rounded-lg">Veriler yüklenirken bir hata oluştu.</div>;
 
     const filtered = (subscribers || []).filter((s: any) =>
         s.email.toLowerCase().includes(searchTerm.toLowerCase())

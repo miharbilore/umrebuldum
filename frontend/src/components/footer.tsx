@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Phone, Mail, Rocket, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/brand/logo";

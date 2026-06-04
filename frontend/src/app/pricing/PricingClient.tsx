@@ -17,9 +17,6 @@ import {
     Lock,
     Package
 } from 'lucide-react';
-import { 
-    TOKEN_PACKAGES
-} from '@/lib/package-system';
 import { Button } from '@/components/ui/button';
 import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
@@ -70,15 +67,25 @@ export default function PricingClient() {
     const [billingPeriod, setBillingPeriod] = useState<number>(12); // Default to Annual (12 months)
     const [openFaq, setOpenFaq] = useState<number | null>(null);
     const [packages, setPackages] = useState<RemotePackage[]>([]);
+    const [tokenPackages, setTokenPackages] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function load() {
             try {
-                const res = await fetch('/api/packages');
-                if (res.ok) {
-                    const data = await res.json();
+                const [pkgRes, tokenRes] = await Promise.all([
+                    fetch('/api/packages'),
+                    fetch('/api/token-packages')
+                ]);
+                
+                if (pkgRes.ok) {
+                    const data = await pkgRes.json();
                     setPackages(data);
+                }
+                
+                if (tokenRes.ok) {
+                    const tData = await tokenRes.json();
+                    setTokenPackages(tData);
                 }
             } catch (err) {
                 console.error(err);
@@ -283,7 +290,11 @@ export default function PricingClient() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-                            {TOKEN_PACKAGES.map((tokenPkg) => {
+                            {isLoading && packages.length === 0 ? (
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <div key={i} className="animate-pulse bg-slate-200 h-[300px] rounded-[2.5rem]" />
+                                ))
+                            ) : tokenPackages.map((tokenPkg) => {
                                 const isFreemium = session?.user?.packageType === 'FREEMIUM';
                                 return (
                                     <div key={tokenPkg.id} className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:border-[#FFB800] hover:shadow-xl hover:-translate-y-1 group relative overflow-hidden">
@@ -292,10 +303,10 @@ export default function PricingClient() {
                                             <Zap className="w-8 h-8 text-[#FFB800] group-hover:fill-[#FFB800] transition-all" width={32} height={32} />
                                         </div>
                                         <h3 className="font-black text-2xl text-slate-900 mb-1 leading-none">{tokenPkg.tokens} Token</h3>
-                                        <div className="text-[10px] font-black text-slate-400 mb-6 uppercase tracking-wider">₺{tokenPkg.unitPrice.toFixed(2)} / ADET</div>
+                                        <div className="text-[10px] font-black text-slate-400 mb-6 uppercase tracking-wider">₺{Number(tokenPkg.unitPrice).toFixed(2)} / ADET</div>
                                         
                                         <div className="mt-auto w-full">
-                                            <div className="text-3xl font-black text-slate-900 mb-6">₺{tokenPkg.priceTRY.toLocaleString('tr-TR')}</div>
+                                            <div className="text-3xl font-black text-slate-900 mb-6">₺{Number(tokenPkg.priceTRY).toLocaleString('tr-TR')}</div>
                                             <Button 
                                                 asChild 
                                                 disabled={isFreemium}
