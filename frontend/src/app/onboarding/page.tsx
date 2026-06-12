@@ -242,6 +242,8 @@ export default function OnboardingPage() {
     }
 
     if (isCompleted) {
+        const isGuideOrOrg = selectedRole === 'GUIDE' || selectedRole === 'ORGANIZATION';
+
         return (
             <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-950 dark:to-gray-900 p-6">
                 <motion.div 
@@ -263,18 +265,38 @@ export default function OnboardingPage() {
                         </p>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-blue-200 dark:border-blue-900/50 rounded-3xl p-6 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-2">
-                            <Sparkles className="w-5 h-5 text-yellow-500 animate-bounce" />
+                    <div className="space-y-4">
+                        {isGuideOrOrg && (
+                            <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-blue-200 dark:border-blue-900/50 rounded-3xl p-6 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-2">
+                                    <Sparkles className="w-5 h-5 text-yellow-500 animate-bounce" />
+                                </div>
+                                <p className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Tebrikler!</p>
+                                <div className="flex items-center justify-center gap-2">
+                                    <span className="text-5xl font-black text-gray-900 dark:text-white">5</span>
+                                    <span className="text-2xl font-bold text-gray-500">TOKEN</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-4">
+                                    Profil tamamlama ödülünüz hesabınıza tanımlandı. Bu tokenları ilan öne çıkarmada kullanabilirsiniz.
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-dashed border-emerald-200 dark:border-emerald-900/50 rounded-3xl p-6 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-2">
+                                <Sparkles className="w-5 h-5 text-emerald-500 animate-pulse" />
+                            </div>
+                            <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-2">Sürpriz Hediye!</p>
+                            <div className="flex flex-col items-center justify-center gap-2">
+                                <span className="text-3xl font-black text-emerald-900 dark:text-white">%10 İNDİRİM</span>
+                                <div className="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg font-mono text-xl font-bold tracking-widest border border-emerald-200 dark:border-emerald-800">
+                                    beyobası10
+                                </div>
+                            </div>
+                            <p className="text-xs text-emerald-700/80 dark:text-emerald-400/80 mt-4 px-2">
+                                beyobası.com'da 1000 TL ve üzeri alışverişlerinizde geçerli indirim kuponunuz!
+                            </p>
                         </div>
-                        <p className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Tebrikler!</p>
-                        <div className="flex items-center justify-center gap-2">
-                            <span className="text-5xl font-black text-gray-900 dark:text-white">5</span>
-                            <span className="text-2xl font-bold text-gray-500">TOKEN</span>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-4">
-                            İlk kayıt ödülünüz hesabınıza tanımlandı. Bu tokenları ilan öne çıkarmada kullanabilirsiniz.
-                        </p>
                     </div>
 
                     <Button 

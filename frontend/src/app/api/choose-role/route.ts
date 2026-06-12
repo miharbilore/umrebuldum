@@ -81,6 +81,8 @@ export async function POST(req: Request) {
                     phone,
                     city,
                     bio,
+                    profileCompletedAt: new Date(),
+                    hasClaimedProfileBonus: role === 'GUIDE' || role === 'ORGANIZATION' ? true : false,
                 }
             })
 
@@ -96,6 +98,7 @@ export async function POST(req: Request) {
 
         // 3. Grant 15 Tokens Reward only for GUIDE or ORGANIZATION
         let reward = null;
+        let profileReward = null;
         if (role === 'GUIDE' || role === 'ORGANIZATION') {
             reward = await grantToken({
                 userId,
@@ -104,12 +107,21 @@ export async function POST(req: Request) {
                 reason: "Başlangıç Paketi (Hoşgeldin Bonusu)",
                 idempotencyKey: rewardIdempotencyKey
             });
+
+            profileReward = await grantToken({
+                userId,
+                amount: 5,
+                type: "ADMIN_GRANT",
+                reason: "Profil Tamamlama Bonusu",
+                idempotencyKey: `profile-reward-${userId}`
+            });
         }
 
         return NextResponse.json({ 
             success: true, 
             role,
-            rewarded: reward ? (reward.ok && !reward.alreadyProcessed) : false
+            rewarded: reward ? (reward.ok && !reward.alreadyProcessed) : false,
+            profileRewarded: profileReward ? (profileReward.ok && !profileReward.alreadyProcessed) : false
         })
 
     } catch (error: any) {
