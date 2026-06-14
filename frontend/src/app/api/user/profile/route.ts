@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/api-guards";
+import { calculateProfileCompleteness } from "@/lib/listing-ranking";
+import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 
 export async function GET(req: Request) {
     try {
@@ -86,6 +88,49 @@ export async function POST(req: Request) {
                     videoIntroduction: data.videoIntroduction !== undefined ? data.videoIntroduction : undefined,
                 }
             });
+        }
+
+        // Check for Profile Completeness Bonus
+        const updatedUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                role: true,
+                fullName: true,
+                phone: true,
+                bio: true,
+                city: true,
+                image: true,
+                hasClaimedProfileBonus: true,
+            }
+        });
+
+        if (updatedUser && (updatedUser.role === 'GUIDE' || updatedUser.role === 'ORGANIZATION') && !updatedUser.hasClaimedProfileBonus) {
+            const score = calculateProfileCompleteness({
+                fullName: updatedUser.fullName,
+                phone: updatedUser.phone,
+                bio: updatedUser.bio,
+                city: updatedUser.city,
+                photo: updatedUser.image,
+                isIdentityVerified: false, // Could be true if we add identity checks here
+            });
+
+            if (score >= 95) {
+                // Grant Token
+                const reward = await grantToken({
+                    userId,
+                    amount: 5,
+                    type: "ADMIN_GRANT",
+                    reason: "Profil Tamamlama Bonusu",
+                    idempotencyKey: `profile-reward-${userId}`
+                });
+
+                if (reward.ok && !reward.alreadyProcessed) {
+                    await prisma.user.update({
+                        where: { id: userId },
+                        data: { hasClaimedProfileBonus: true }
+                    });
+                }
+            }
         }
 
         return NextResponse.json({ success: true });

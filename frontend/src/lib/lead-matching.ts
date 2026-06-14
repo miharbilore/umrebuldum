@@ -50,10 +50,23 @@ export async function matchAndNotifyGuides(request: any) {
             data: notifications
         });
 
-        // 3. Dış Bildirim Servisi (SMS & E-Mail Stub)
-        // İleride buraya Resend veya Twilio/Netgsm entegre edilecek.
+        // 3. Dış Bildirim Servisi (E-Mail)
+        // Resend üzerinden gerçek e-posta gönderimi
+        const { emailService } = await import("./email/email-service");
+        const { newLeadTemplate } = await import("./email/email-templates");
+
         eligibleGuides.forEach(guide => {
-            console.log(`[STUB - NOTIFICATION SENT] SMS/Email -> To: ${guide.email || guide.phone} | Request: ${request.departureCity} / ${request.id}`);
+            if (guide.email) {
+                emailService.sendAsync(
+                    guide.email,
+                    newLeadTemplate({
+                        guideName: guide.name || "Rehber",
+                        departureCity: request.departureCity || "Belirtilmemiş",
+                        peopleCount: request.peopleCount || 1,
+                        requestUrl: `${process.env.NEXTAUTH_URL || 'https://umrebuldum.com'}/dashboard/requests/${request.id}`
+                    })
+                );
+            }
         });
 
     } catch (error) {

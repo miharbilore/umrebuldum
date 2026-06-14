@@ -70,7 +70,7 @@ export async function POST(req: Request) {
             if (spendResult.error === "INSUFFICIENT_TOKENS") {
                 return NextResponse.json({
                     error: "INSUFFICIENT_CREDITS",
-                    message: "Yetersiz Kredi",
+                    message: "Yetersiz Token",
                     balance: spendResult.newBalance,
                 }, { status: 402 });
             }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -7,23 +7,26 @@ import { Loader2, Trash2, Edit, Plus, X, Check } from 'lucide-react';
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
 export default function ChatbotAdminPanel() {
-    const { data: templates, error, isLoading, mutate } = useSWR('/api/admin/chatbot', fetcher);
+    const [currentParentId, setCurrentParentId] = useState<string | null>(null);
+    const [parentHistory, setParentHistory] = useState<{id: string, question: string}[]>([]);
+    
+    const { data: templates, error, isLoading, mutate } = useSWR(`/api/admin/chatbot${currentParentId ? `?parentId=${currentParentId}` : ''}`, fetcher);
     const [editingModal, setEditingModal] = useState<boolean>(false);
-    const [formData, setFormData] = useState({ id: '', question: '', answer: '', order: 0, isActive: true });
+    const [formData, setFormData] = useState({ id: '', question: '', answer: '', order: 0, isActive: true, parentId: null as string | null });
 
     if (error) return <div className="p-4 text-red-500 bg-red-50 rounded-lg">Veriler yüklenirken bir hata oluştu.</div>;
 
     const handleOpenModal = (t: any = null) => {
         if (t) {
-            setFormData({ id: t.id, question: t.question, answer: t.answer, order: t.order, isActive: t.isActive });
+            setFormData({ id: t.id, question: t.question, answer: t.answer || '', order: t.order, isActive: t.isActive, parentId: currentParentId });
         } else {
-            setFormData({ id: '', question: '', answer: '', order: 0, isActive: true });
+            setFormData({ id: '', question: '', answer: '', order: 0, isActive: true, parentId: currentParentId });
         }
         setEditingModal(true);
     };
 
     const handleSave = async () => {
-        if (!formData.question || !formData.answer) return alert("Soru ve cevap alanları zorunludur.");
+        if (!formData.question) return alert("Soru alanı zorunludur.");
 
         try {
             const method = formData.id ? 'PATCH' : 'POST';
@@ -65,12 +68,34 @@ export default function ChatbotAdminPanel() {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2 text-sm">
+                    <button 
+                        onClick={() => { setCurrentParentId(null); setParentHistory([]); }}
+                        className={`font-medium ${currentParentId === null ? 'text-emerald-500' : 'text-gray-400 hover:text-white transition-colors'}`}
+                    >
+                        Ana Menü (Root)
+                    </button>
+                    {parentHistory.map((hist, idx) => (
+                        <div key={hist.id} className="flex items-center gap-2">
+                            <span className="text-gray-600">/</span>
+                            <button
+                                onClick={() => {
+                                    setCurrentParentId(hist.id);
+                                    setParentHistory(prev => prev.slice(0, idx + 1));
+                                }}
+                                className={`font-medium ${currentParentId === hist.id ? 'text-emerald-500' : 'text-gray-400 hover:text-white transition-colors'}`}
+                            >
+                                {hist.question}
+                            </button>
+                        </div>
+                    ))}
+                </div>
                 <button
                     onClick={() => handleOpenModal()}
                     className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                     <Plus className="w-4 h-4" />
-                    Yeni Soru Ekle
+                    Yeni Seçenek Ekle
                 </button>
             </div>
 
@@ -86,15 +111,23 @@ export default function ChatbotAdminPanel() {
                 <div className="grid gap-4">
                     {templates.map((t: any) => (
                         <div key={t.id} className="bg-gray-900 border border-gray-800 rounded-lg p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between transition-colors hover:border-gray-700">
-                            <div className="flex-1 space-y-2">
+                            <div className="flex-1 space-y-2 cursor-pointer" onClick={() => {
+                                setCurrentParentId(t.id);
+                                setParentHistory(prev => [...prev, {id: t.id, question: t.question}]);
+                            }}>
                                 <div className="flex items-center gap-2">
                                     <span className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-md font-mono">Sıra: {t.order}</span>
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${t.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
                                         {t.isActive ? "AKTİF" : "PASİF"}
                                     </span>
+                                    {t._count?.children > 0 && (
+                                        <span className="bg-blue-500/10 text-blue-500 text-xs px-2 py-0.5 rounded-md">
+                                            {t._count.children} Alt Seçenek
+                                        </span>
+                                    )}
                                 </div>
-                                <h4 className="text-sm font-semibold text-gray-200">{t.question}</h4>
-                                <p className="text-sm text-gray-500 line-clamp-2">{t.answer}</p>
+                                <h4 className="text-sm font-semibold text-gray-200 hover:text-emerald-400 transition-colors">{t.question}</h4>
+                                {t.answer && <p className="text-sm text-gray-500 line-clamp-2">{t.answer}</p>}
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                                 <button
@@ -148,7 +181,7 @@ export default function ChatbotAdminPanel() {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="font-medium text-gray-400">Cevap (Otomatik Verilecek Yanıt)</label>
+                                <label className="font-medium text-gray-400">Cevap (Eğer bu bir son duraksa cevap yazın. Alt menü ekleyecekseniz boş bırakın)</label>
                                 <textarea
                                     value={formData.answer}
                                     onChange={(e) => setFormData({ ...formData, answer: e.target.value })}

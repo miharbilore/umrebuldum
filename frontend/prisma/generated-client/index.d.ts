@@ -268,6 +268,11 @@ export type TestLog = $Result.DefaultSelection<Prisma.$TestLogPayload>
  * 
  */
 export type GuideArticle = $Result.DefaultSelection<Prisma.$GuideArticlePayload>
+/**
+ * Model ContactMessage
+ * 
+ */
+export type ContactMessage = $Result.DefaultSelection<Prisma.$ContactMessagePayload>
 
 /**
  * Enums
@@ -975,6 +980,16 @@ export class PrismaClient<
     * ```
     */
   get guideArticle(): Prisma.GuideArticleDelegate<ExtArgs>;
+
+  /**
+   * `prisma.contactMessage`: Exposes CRUD operations for the **ContactMessage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContactMessages
+    * const contactMessages = await prisma.contactMessage.findMany()
+    * ```
+    */
+  get contactMessage(): Prisma.ContactMessageDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1466,7 +1481,8 @@ export namespace Prisma {
     ChatbotTemplate: 'ChatbotTemplate',
     Notification: 'Notification',
     TestLog: 'TestLog',
-    GuideArticle: 'GuideArticle'
+    GuideArticle: 'GuideArticle',
+    ContactMessage: 'ContactMessage'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1482,7 +1498,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "tokenPackageConfig" | "user" | "account" | "session" | "guideProfile" | "departureCity" | "airline" | "guideListing" | "listingCategory" | "listingSeo" | "tourDay" | "umrahRequest" | "leadRoutingLog" | "requestInterest" | "offer" | "requestFavorite" | "conversation" | "message" | "moderationLog" | "creditPackage" | "coupon" | "transaction" | "savedCard" | "tokenTransaction" | "autoReplenishConfig" | "tokenReplenishLog" | "activeBoost" | "listingBoostCounter" | "webhookEvent" | "identityApplication" | "review" | "riskScore" | "riskEvent" | "deviceFingerprint" | "fraudReviewTicket" | "listingImpression" | "listingClick" | "velocityCounter" | "cancellationRecord" | "sLAMetric" | "dynamicPriceEvent" | "enterpriseCreditLine" | "creditLineTransaction" | "performanceTier" | "spotlightPlacement" | "seoLandingPage" | "newsletterSubscriber" | "chatbotTemplate" | "notification" | "testLog" | "guideArticle"
+      modelProps: "tokenPackageConfig" | "user" | "account" | "session" | "guideProfile" | "departureCity" | "airline" | "guideListing" | "listingCategory" | "listingSeo" | "tourDay" | "umrahRequest" | "leadRoutingLog" | "requestInterest" | "offer" | "requestFavorite" | "conversation" | "message" | "moderationLog" | "creditPackage" | "coupon" | "transaction" | "savedCard" | "tokenTransaction" | "autoReplenishConfig" | "tokenReplenishLog" | "activeBoost" | "listingBoostCounter" | "webhookEvent" | "identityApplication" | "review" | "riskScore" | "riskEvent" | "deviceFingerprint" | "fraudReviewTicket" | "listingImpression" | "listingClick" | "velocityCounter" | "cancellationRecord" | "sLAMetric" | "dynamicPriceEvent" | "enterpriseCreditLine" | "creditLineTransaction" | "performanceTier" | "spotlightPlacement" | "seoLandingPage" | "newsletterSubscriber" | "chatbotTemplate" | "notification" | "testLog" | "guideArticle" | "contactMessage"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4852,6 +4868,72 @@ export namespace Prisma {
           }
         }
       }
+      ContactMessage: {
+        payload: Prisma.$ContactMessagePayload<ExtArgs>
+        fields: Prisma.ContactMessageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContactMessageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContactMessageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          findFirst: {
+            args: Prisma.ContactMessageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContactMessageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          findMany: {
+            args: Prisma.ContactMessageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>[]
+          }
+          create: {
+            args: Prisma.ContactMessageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          createMany: {
+            args: Prisma.ContactMessageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ContactMessageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          update: {
+            args: Prisma.ContactMessageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          deleteMany: {
+            args: Prisma.ContactMessageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContactMessageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ContactMessageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          aggregate: {
+            args: Prisma.ContactMessageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContactMessage>
+          }
+          groupBy: {
+            args: Prisma.ContactMessageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContactMessageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContactMessageCountArgs<ExtArgs>
+            result: $Utils.Optional<ContactMessageCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -5535,6 +5617,37 @@ export namespace Prisma {
    */
   export type EnterpriseCreditLineCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CreditLineTransactionWhereInput
+  }
+
+
+  /**
+   * Count Type ChatbotTemplateCountOutputType
+   */
+
+  export type ChatbotTemplateCountOutputType = {
+    children: number
+  }
+
+  export type ChatbotTemplateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    children?: boolean | ChatbotTemplateCountOutputTypeCountChildrenArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ChatbotTemplateCountOutputType without action
+   */
+  export type ChatbotTemplateCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatbotTemplateCountOutputType
+     */
+    select?: ChatbotTemplateCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ChatbotTemplateCountOutputType without action
+   */
+  export type ChatbotTemplateCountOutputTypeCountChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChatbotTemplateWhereInput
   }
 
 
@@ -22926,6 +23039,7 @@ export namespace Prisma {
     role: $Enums.UserRole | null
     body: string | null
     blocked: boolean | null
+    readAt: Date | null
     createdAt: Date | null
   }
 
@@ -22936,6 +23050,7 @@ export namespace Prisma {
     role: $Enums.UserRole | null
     body: string | null
     blocked: boolean | null
+    readAt: Date | null
     createdAt: Date | null
   }
 
@@ -22946,6 +23061,7 @@ export namespace Prisma {
     role: number
     body: number
     blocked: number
+    readAt: number
     createdAt: number
     _all: number
   }
@@ -22958,6 +23074,7 @@ export namespace Prisma {
     role?: true
     body?: true
     blocked?: true
+    readAt?: true
     createdAt?: true
   }
 
@@ -22968,6 +23085,7 @@ export namespace Prisma {
     role?: true
     body?: true
     blocked?: true
+    readAt?: true
     createdAt?: true
   }
 
@@ -22978,6 +23096,7 @@ export namespace Prisma {
     role?: true
     body?: true
     blocked?: true
+    readAt?: true
     createdAt?: true
     _all?: true
   }
@@ -23061,6 +23180,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked: boolean
+    readAt: Date | null
     createdAt: Date
     _count: MessageCountAggregateOutputType | null
     _min: MessageMinAggregateOutputType | null
@@ -23088,6 +23208,7 @@ export namespace Prisma {
     role?: boolean
     body?: boolean
     blocked?: boolean
+    readAt?: boolean
     createdAt?: boolean
     conversation?: boolean | ConversationDefaultArgs<ExtArgs>
     sender?: boolean | UserDefaultArgs<ExtArgs>
@@ -23103,6 +23224,7 @@ export namespace Prisma {
     role?: boolean
     body?: boolean
     blocked?: boolean
+    readAt?: boolean
     createdAt?: boolean
   }
 
@@ -23127,6 +23249,7 @@ export namespace Prisma {
       role: $Enums.UserRole
       body: string
       blocked: boolean
+      readAt: Date | null
       createdAt: Date
     }, ExtArgs["result"]["message"]>
     composites: {}
@@ -23506,6 +23629,7 @@ export namespace Prisma {
     readonly role: FieldRef<"Message", 'UserRole'>
     readonly body: FieldRef<"Message", 'String'>
     readonly blocked: FieldRef<"Message", 'Boolean'>
+    readonly readAt: FieldRef<"Message", 'DateTime'>
     readonly createdAt: FieldRef<"Message", 'DateTime'>
   }
     
@@ -51259,6 +51383,7 @@ export namespace Prisma {
     id: string | null
     question: string | null
     answer: string | null
+    parentId: string | null
     isActive: boolean | null
     order: number | null
     createdAt: Date | null
@@ -51269,6 +51394,7 @@ export namespace Prisma {
     id: string | null
     question: string | null
     answer: string | null
+    parentId: string | null
     isActive: boolean | null
     order: number | null
     createdAt: Date | null
@@ -51279,6 +51405,7 @@ export namespace Prisma {
     id: number
     question: number
     answer: number
+    parentId: number
     isActive: number
     order: number
     createdAt: number
@@ -51299,6 +51426,7 @@ export namespace Prisma {
     id?: true
     question?: true
     answer?: true
+    parentId?: true
     isActive?: true
     order?: true
     createdAt?: true
@@ -51309,6 +51437,7 @@ export namespace Prisma {
     id?: true
     question?: true
     answer?: true
+    parentId?: true
     isActive?: true
     order?: true
     createdAt?: true
@@ -51319,6 +51448,7 @@ export namespace Prisma {
     id?: true
     question?: true
     answer?: true
+    parentId?: true
     isActive?: true
     order?: true
     createdAt?: true
@@ -51415,7 +51545,8 @@ export namespace Prisma {
   export type ChatbotTemplateGroupByOutputType = {
     id: string
     question: string
-    answer: string
+    answer: string | null
+    parentId: string | null
     isActive: boolean
     order: number
     createdAt: Date
@@ -51445,10 +51576,14 @@ export namespace Prisma {
     id?: boolean
     question?: boolean
     answer?: boolean
+    parentId?: boolean
     isActive?: boolean
     order?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    parent?: boolean | ChatbotTemplate$parentArgs<ExtArgs>
+    children?: boolean | ChatbotTemplate$childrenArgs<ExtArgs>
+    _count?: boolean | ChatbotTemplateCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["chatbotTemplate"]>
 
 
@@ -51456,20 +51591,30 @@ export namespace Prisma {
     id?: boolean
     question?: boolean
     answer?: boolean
+    parentId?: boolean
     isActive?: boolean
     order?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
+  export type ChatbotTemplateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    parent?: boolean | ChatbotTemplate$parentArgs<ExtArgs>
+    children?: boolean | ChatbotTemplate$childrenArgs<ExtArgs>
+    _count?: boolean | ChatbotTemplateCountOutputTypeDefaultArgs<ExtArgs>
+  }
 
   export type $ChatbotTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ChatbotTemplate"
-    objects: {}
+    objects: {
+      parent: Prisma.$ChatbotTemplatePayload<ExtArgs> | null
+      children: Prisma.$ChatbotTemplatePayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       question: string
-      answer: string
+      answer: string | null
+      parentId: string | null
       isActive: boolean
       order: number
       createdAt: Date
@@ -51814,6 +51959,8 @@ export namespace Prisma {
    */
   export interface Prisma__ChatbotTemplateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    parent<T extends ChatbotTemplate$parentArgs<ExtArgs> = {}>(args?: Subset<T, ChatbotTemplate$parentArgs<ExtArgs>>): Prisma__ChatbotTemplateClient<$Result.GetResult<Prisma.$ChatbotTemplatePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    children<T extends ChatbotTemplate$childrenArgs<ExtArgs> = {}>(args?: Subset<T, ChatbotTemplate$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatbotTemplatePayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -51846,6 +51993,7 @@ export namespace Prisma {
     readonly id: FieldRef<"ChatbotTemplate", 'String'>
     readonly question: FieldRef<"ChatbotTemplate", 'String'>
     readonly answer: FieldRef<"ChatbotTemplate", 'String'>
+    readonly parentId: FieldRef<"ChatbotTemplate", 'String'>
     readonly isActive: FieldRef<"ChatbotTemplate", 'Boolean'>
     readonly order: FieldRef<"ChatbotTemplate", 'Int'>
     readonly createdAt: FieldRef<"ChatbotTemplate", 'DateTime'>
@@ -51863,6 +52011,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * Filter, which ChatbotTemplate to fetch.
      */
     where: ChatbotTemplateWhereUniqueInput
@@ -51877,6 +52029,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * Filter, which ChatbotTemplate to fetch.
      */
     where: ChatbotTemplateWhereUniqueInput
@@ -51890,6 +52046,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the ChatbotTemplate
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
     /**
      * Filter, which ChatbotTemplate to fetch.
      */
@@ -51935,6 +52095,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * Filter, which ChatbotTemplate to fetch.
      */
     where?: ChatbotTemplateWhereInput
@@ -51979,6 +52143,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * Filter, which ChatbotTemplates to fetch.
      */
     where?: ChatbotTemplateWhereInput
@@ -52018,6 +52186,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * The data needed to create a ChatbotTemplate.
      */
     data: XOR<ChatbotTemplateCreateInput, ChatbotTemplateUncheckedCreateInput>
@@ -52042,6 +52214,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the ChatbotTemplate
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
     /**
      * The data needed to update a ChatbotTemplate.
      */
@@ -52075,6 +52251,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * The filter to search for the ChatbotTemplate to update in case it exists.
      */
     where: ChatbotTemplateWhereUniqueInput
@@ -52097,6 +52277,10 @@ export namespace Prisma {
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    /**
      * Filter which ChatbotTemplate to delete.
      */
     where: ChatbotTemplateWhereUniqueInput
@@ -52113,6 +52297,41 @@ export namespace Prisma {
   }
 
   /**
+   * ChatbotTemplate.parent
+   */
+  export type ChatbotTemplate$parentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatbotTemplate
+     */
+    select?: ChatbotTemplateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    where?: ChatbotTemplateWhereInput
+  }
+
+  /**
+   * ChatbotTemplate.children
+   */
+  export type ChatbotTemplate$childrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatbotTemplate
+     */
+    select?: ChatbotTemplateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
+    where?: ChatbotTemplateWhereInput
+    orderBy?: ChatbotTemplateOrderByWithRelationInput | ChatbotTemplateOrderByWithRelationInput[]
+    cursor?: ChatbotTemplateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ChatbotTemplateScalarFieldEnum | ChatbotTemplateScalarFieldEnum[]
+  }
+
+  /**
    * ChatbotTemplate without action
    */
   export type ChatbotTemplateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -52120,6 +52339,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the ChatbotTemplate
      */
     select?: ChatbotTemplateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChatbotTemplateInclude<ExtArgs> | null
   }
 
 
@@ -54947,6 +55170,860 @@ export namespace Prisma {
 
 
   /**
+   * Model ContactMessage
+   */
+
+  export type AggregateContactMessage = {
+    _count: ContactMessageCountAggregateOutputType | null
+    _min: ContactMessageMinAggregateOutputType | null
+    _max: ContactMessageMaxAggregateOutputType | null
+  }
+
+  export type ContactMessageMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    message: string | null
+    isRead: boolean | null
+    createdAt: Date | null
+  }
+
+  export type ContactMessageMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    message: string | null
+    isRead: boolean | null
+    createdAt: Date | null
+  }
+
+  export type ContactMessageCountAggregateOutputType = {
+    id: number
+    name: number
+    email: number
+    phone: number
+    message: number
+    isRead: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ContactMessageMinAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    phone?: true
+    message?: true
+    isRead?: true
+    createdAt?: true
+  }
+
+  export type ContactMessageMaxAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    phone?: true
+    message?: true
+    isRead?: true
+    createdAt?: true
+  }
+
+  export type ContactMessageCountAggregateInputType = {
+    id?: true
+    name?: true
+    email?: true
+    phone?: true
+    message?: true
+    isRead?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ContactMessageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactMessage to aggregate.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ContactMessages
+    **/
+    _count?: true | ContactMessageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContactMessageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContactMessageMaxAggregateInputType
+  }
+
+  export type GetContactMessageAggregateType<T extends ContactMessageAggregateArgs> = {
+        [P in keyof T & keyof AggregateContactMessage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContactMessage[P]>
+      : GetScalarType<T[P], AggregateContactMessage[P]>
+  }
+
+
+
+
+  export type ContactMessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactMessageWhereInput
+    orderBy?: ContactMessageOrderByWithAggregationInput | ContactMessageOrderByWithAggregationInput[]
+    by: ContactMessageScalarFieldEnum[] | ContactMessageScalarFieldEnum
+    having?: ContactMessageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContactMessageCountAggregateInputType | true
+    _min?: ContactMessageMinAggregateInputType
+    _max?: ContactMessageMaxAggregateInputType
+  }
+
+  export type ContactMessageGroupByOutputType = {
+    id: string
+    name: string
+    email: string
+    phone: string | null
+    message: string
+    isRead: boolean
+    createdAt: Date
+    _count: ContactMessageCountAggregateOutputType | null
+    _min: ContactMessageMinAggregateOutputType | null
+    _max: ContactMessageMaxAggregateOutputType | null
+  }
+
+  type GetContactMessageGroupByPayload<T extends ContactMessageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContactMessageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContactMessageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContactMessageGroupByOutputType[P]>
+            : GetScalarType<T[P], ContactMessageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContactMessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    message?: boolean
+    isRead?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["contactMessage"]>
+
+
+  export type ContactMessageSelectScalar = {
+    id?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    message?: boolean
+    isRead?: boolean
+    createdAt?: boolean
+  }
+
+
+  export type $ContactMessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ContactMessage"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      email: string
+      phone: string | null
+      message: string
+      isRead: boolean
+      createdAt: Date
+    }, ExtArgs["result"]["contactMessage"]>
+    composites: {}
+  }
+
+  type ContactMessageGetPayload<S extends boolean | null | undefined | ContactMessageDefaultArgs> = $Result.GetResult<Prisma.$ContactMessagePayload, S>
+
+  type ContactMessageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ContactMessageFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ContactMessageCountAggregateInputType | true
+    }
+
+  export interface ContactMessageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ContactMessage'], meta: { name: 'ContactMessage' } }
+    /**
+     * Find zero or one ContactMessage that matches the filter.
+     * @param {ContactMessageFindUniqueArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContactMessageFindUniqueArgs>(args: SelectSubset<T, ContactMessageFindUniqueArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ContactMessage that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ContactMessageFindUniqueOrThrowArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContactMessageFindUniqueOrThrowArgs>(args: SelectSubset<T, ContactMessageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ContactMessage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageFindFirstArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContactMessageFindFirstArgs>(args?: SelectSubset<T, ContactMessageFindFirstArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ContactMessage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageFindFirstOrThrowArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContactMessageFindFirstOrThrowArgs>(args?: SelectSubset<T, ContactMessageFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ContactMessages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ContactMessages
+     * const contactMessages = await prisma.contactMessage.findMany()
+     * 
+     * // Get first 10 ContactMessages
+     * const contactMessages = await prisma.contactMessage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contactMessageWithIdOnly = await prisma.contactMessage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContactMessageFindManyArgs>(args?: SelectSubset<T, ContactMessageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ContactMessage.
+     * @param {ContactMessageCreateArgs} args - Arguments to create a ContactMessage.
+     * @example
+     * // Create one ContactMessage
+     * const ContactMessage = await prisma.contactMessage.create({
+     *   data: {
+     *     // ... data to create a ContactMessage
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContactMessageCreateArgs>(args: SelectSubset<T, ContactMessageCreateArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ContactMessages.
+     * @param {ContactMessageCreateManyArgs} args - Arguments to create many ContactMessages.
+     * @example
+     * // Create many ContactMessages
+     * const contactMessage = await prisma.contactMessage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContactMessageCreateManyArgs>(args?: SelectSubset<T, ContactMessageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ContactMessage.
+     * @param {ContactMessageDeleteArgs} args - Arguments to delete one ContactMessage.
+     * @example
+     * // Delete one ContactMessage
+     * const ContactMessage = await prisma.contactMessage.delete({
+     *   where: {
+     *     // ... filter to delete one ContactMessage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContactMessageDeleteArgs>(args: SelectSubset<T, ContactMessageDeleteArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ContactMessage.
+     * @param {ContactMessageUpdateArgs} args - Arguments to update one ContactMessage.
+     * @example
+     * // Update one ContactMessage
+     * const contactMessage = await prisma.contactMessage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContactMessageUpdateArgs>(args: SelectSubset<T, ContactMessageUpdateArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ContactMessages.
+     * @param {ContactMessageDeleteManyArgs} args - Arguments to filter ContactMessages to delete.
+     * @example
+     * // Delete a few ContactMessages
+     * const { count } = await prisma.contactMessage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContactMessageDeleteManyArgs>(args?: SelectSubset<T, ContactMessageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactMessages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ContactMessages
+     * const contactMessage = await prisma.contactMessage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContactMessageUpdateManyArgs>(args: SelectSubset<T, ContactMessageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ContactMessage.
+     * @param {ContactMessageUpsertArgs} args - Arguments to update or create a ContactMessage.
+     * @example
+     * // Update or create a ContactMessage
+     * const contactMessage = await prisma.contactMessage.upsert({
+     *   create: {
+     *     // ... data to create a ContactMessage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ContactMessage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContactMessageUpsertArgs>(args: SelectSubset<T, ContactMessageUpsertArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ContactMessages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageCountArgs} args - Arguments to filter ContactMessages to count.
+     * @example
+     * // Count the number of ContactMessages
+     * const count = await prisma.contactMessage.count({
+     *   where: {
+     *     // ... the filter for the ContactMessages we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContactMessageCountArgs>(
+      args?: Subset<T, ContactMessageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContactMessageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ContactMessage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContactMessageAggregateArgs>(args: Subset<T, ContactMessageAggregateArgs>): Prisma.PrismaPromise<GetContactMessageAggregateType<T>>
+
+    /**
+     * Group by ContactMessage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContactMessageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContactMessageGroupByArgs['orderBy'] }
+        : { orderBy?: ContactMessageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContactMessageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContactMessageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ContactMessage model
+   */
+  readonly fields: ContactMessageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ContactMessage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContactMessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ContactMessage model
+   */ 
+  interface ContactMessageFieldRefs {
+    readonly id: FieldRef<"ContactMessage", 'String'>
+    readonly name: FieldRef<"ContactMessage", 'String'>
+    readonly email: FieldRef<"ContactMessage", 'String'>
+    readonly phone: FieldRef<"ContactMessage", 'String'>
+    readonly message: FieldRef<"ContactMessage", 'String'>
+    readonly isRead: FieldRef<"ContactMessage", 'Boolean'>
+    readonly createdAt: FieldRef<"ContactMessage", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ContactMessage findUnique
+   */
+  export type ContactMessageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage findUniqueOrThrow
+   */
+  export type ContactMessageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage findFirst
+   */
+  export type ContactMessageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactMessages.
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactMessages.
+     */
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
+  }
+
+  /**
+   * ContactMessage findFirstOrThrow
+   */
+  export type ContactMessageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactMessages.
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactMessages.
+     */
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
+  }
+
+  /**
+   * ContactMessage findMany
+   */
+  export type ContactMessageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Filter, which ContactMessages to fetch.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ContactMessages.
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
+  }
+
+  /**
+   * ContactMessage create
+   */
+  export type ContactMessageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * The data needed to create a ContactMessage.
+     */
+    data: XOR<ContactMessageCreateInput, ContactMessageUncheckedCreateInput>
+  }
+
+  /**
+   * ContactMessage createMany
+   */
+  export type ContactMessageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ContactMessages.
+     */
+    data: ContactMessageCreateManyInput | ContactMessageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ContactMessage update
+   */
+  export type ContactMessageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * The data needed to update a ContactMessage.
+     */
+    data: XOR<ContactMessageUpdateInput, ContactMessageUncheckedUpdateInput>
+    /**
+     * Choose, which ContactMessage to update.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage updateMany
+   */
+  export type ContactMessageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ContactMessages.
+     */
+    data: XOR<ContactMessageUpdateManyMutationInput, ContactMessageUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactMessages to update
+     */
+    where?: ContactMessageWhereInput
+  }
+
+  /**
+   * ContactMessage upsert
+   */
+  export type ContactMessageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * The filter to search for the ContactMessage to update in case it exists.
+     */
+    where: ContactMessageWhereUniqueInput
+    /**
+     * In case the ContactMessage found by the `where` argument doesn't exist, create a new ContactMessage with this data.
+     */
+    create: XOR<ContactMessageCreateInput, ContactMessageUncheckedCreateInput>
+    /**
+     * In case the ContactMessage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContactMessageUpdateInput, ContactMessageUncheckedUpdateInput>
+  }
+
+  /**
+   * ContactMessage delete
+   */
+  export type ContactMessageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Filter which ContactMessage to delete.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage deleteMany
+   */
+  export type ContactMessageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactMessages to delete
+     */
+    where?: ContactMessageWhereInput
+  }
+
+  /**
+   * ContactMessage without action
+   */
+  export type ContactMessageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -55260,6 +56337,7 @@ export namespace Prisma {
     role: 'role',
     body: 'body',
     blocked: 'blocked',
+    readAt: 'readAt',
     createdAt: 'createdAt'
   };
 
@@ -55727,6 +56805,7 @@ export namespace Prisma {
     id: 'id',
     question: 'question',
     answer: 'answer',
+    parentId: 'parentId',
     isActive: 'isActive',
     order: 'order',
     createdAt: 'createdAt',
@@ -55781,6 +56860,19 @@ export namespace Prisma {
   };
 
   export type GuideArticleScalarFieldEnum = (typeof GuideArticleScalarFieldEnum)[keyof typeof GuideArticleScalarFieldEnum]
+
+
+  export const ContactMessageScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    email: 'email',
+    phone: 'phone',
+    message: 'message',
+    isRead: 'isRead',
+    createdAt: 'createdAt'
+  };
+
+  export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -57526,6 +58618,7 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"Message"> | $Enums.UserRole
     body?: StringFilter<"Message"> | string
     blocked?: BoolFilter<"Message"> | boolean
+    readAt?: DateTimeNullableFilter<"Message"> | Date | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     conversation?: XOR<ConversationRelationFilter, ConversationWhereInput>
     sender?: XOR<UserRelationFilter, UserWhereInput>
@@ -57539,6 +58632,7 @@ export namespace Prisma {
     role?: SortOrder
     body?: SortOrder
     blocked?: SortOrder
+    readAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     conversation?: ConversationOrderByWithRelationInput
     sender?: UserOrderByWithRelationInput
@@ -57555,6 +58649,7 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"Message"> | $Enums.UserRole
     body?: StringFilter<"Message"> | string
     blocked?: BoolFilter<"Message"> | boolean
+    readAt?: DateTimeNullableFilter<"Message"> | Date | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
     conversation?: XOR<ConversationRelationFilter, ConversationWhereInput>
     sender?: XOR<UserRelationFilter, UserWhereInput>
@@ -57568,6 +58663,7 @@ export namespace Prisma {
     role?: SortOrder
     body?: SortOrder
     blocked?: SortOrder
+    readAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: MessageCountOrderByAggregateInput
     _max?: MessageMaxOrderByAggregateInput
@@ -57584,6 +58680,7 @@ export namespace Prisma {
     role?: EnumUserRoleWithAggregatesFilter<"Message"> | $Enums.UserRole
     body?: StringWithAggregatesFilter<"Message"> | string
     blocked?: BoolWithAggregatesFilter<"Message"> | boolean
+    readAt?: DateTimeNullableWithAggregatesFilter<"Message"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
   }
 
@@ -59909,21 +61006,27 @@ export namespace Prisma {
     NOT?: ChatbotTemplateWhereInput | ChatbotTemplateWhereInput[]
     id?: StringFilter<"ChatbotTemplate"> | string
     question?: StringFilter<"ChatbotTemplate"> | string
-    answer?: StringFilter<"ChatbotTemplate"> | string
+    answer?: StringNullableFilter<"ChatbotTemplate"> | string | null
+    parentId?: StringNullableFilter<"ChatbotTemplate"> | string | null
     isActive?: BoolFilter<"ChatbotTemplate"> | boolean
     order?: IntFilter<"ChatbotTemplate"> | number
     createdAt?: DateTimeFilter<"ChatbotTemplate"> | Date | string
     updatedAt?: DateTimeFilter<"ChatbotTemplate"> | Date | string
+    parent?: XOR<ChatbotTemplateNullableRelationFilter, ChatbotTemplateWhereInput> | null
+    children?: ChatbotTemplateListRelationFilter
   }
 
   export type ChatbotTemplateOrderByWithRelationInput = {
     id?: SortOrder
     question?: SortOrder
-    answer?: SortOrder
+    answer?: SortOrderInput | SortOrder
+    parentId?: SortOrderInput | SortOrder
     isActive?: SortOrder
     order?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    parent?: ChatbotTemplateOrderByWithRelationInput
+    children?: ChatbotTemplateOrderByRelationAggregateInput
   }
 
   export type ChatbotTemplateWhereUniqueInput = Prisma.AtLeast<{
@@ -59932,17 +61035,21 @@ export namespace Prisma {
     OR?: ChatbotTemplateWhereInput[]
     NOT?: ChatbotTemplateWhereInput | ChatbotTemplateWhereInput[]
     question?: StringFilter<"ChatbotTemplate"> | string
-    answer?: StringFilter<"ChatbotTemplate"> | string
+    answer?: StringNullableFilter<"ChatbotTemplate"> | string | null
+    parentId?: StringNullableFilter<"ChatbotTemplate"> | string | null
     isActive?: BoolFilter<"ChatbotTemplate"> | boolean
     order?: IntFilter<"ChatbotTemplate"> | number
     createdAt?: DateTimeFilter<"ChatbotTemplate"> | Date | string
     updatedAt?: DateTimeFilter<"ChatbotTemplate"> | Date | string
+    parent?: XOR<ChatbotTemplateNullableRelationFilter, ChatbotTemplateWhereInput> | null
+    children?: ChatbotTemplateListRelationFilter
   }, "id">
 
   export type ChatbotTemplateOrderByWithAggregationInput = {
     id?: SortOrder
     question?: SortOrder
-    answer?: SortOrder
+    answer?: SortOrderInput | SortOrder
+    parentId?: SortOrderInput | SortOrder
     isActive?: SortOrder
     order?: SortOrder
     createdAt?: SortOrder
@@ -59960,7 +61067,8 @@ export namespace Prisma {
     NOT?: ChatbotTemplateScalarWhereWithAggregatesInput | ChatbotTemplateScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"ChatbotTemplate"> | string
     question?: StringWithAggregatesFilter<"ChatbotTemplate"> | string
-    answer?: StringWithAggregatesFilter<"ChatbotTemplate"> | string
+    answer?: StringNullableWithAggregatesFilter<"ChatbotTemplate"> | string | null
+    parentId?: StringNullableWithAggregatesFilter<"ChatbotTemplate"> | string | null
     isActive?: BoolWithAggregatesFilter<"ChatbotTemplate"> | boolean
     order?: IntWithAggregatesFilter<"ChatbotTemplate"> | number
     createdAt?: DateTimeWithAggregatesFilter<"ChatbotTemplate"> | Date | string
@@ -60201,6 +61309,68 @@ export namespace Prisma {
     viewCount?: IntWithAggregatesFilter<"GuideArticle"> | number
     createdAt?: DateTimeWithAggregatesFilter<"GuideArticle"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"GuideArticle"> | Date | string
+  }
+
+  export type ContactMessageWhereInput = {
+    AND?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    OR?: ContactMessageWhereInput[]
+    NOT?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    id?: StringFilter<"ContactMessage"> | string
+    name?: StringFilter<"ContactMessage"> | string
+    email?: StringFilter<"ContactMessage"> | string
+    phone?: StringNullableFilter<"ContactMessage"> | string | null
+    message?: StringFilter<"ContactMessage"> | string
+    isRead?: BoolFilter<"ContactMessage"> | boolean
+    createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+  }
+
+  export type ContactMessageOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    message?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ContactMessageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    OR?: ContactMessageWhereInput[]
+    NOT?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    name?: StringFilter<"ContactMessage"> | string
+    email?: StringFilter<"ContactMessage"> | string
+    phone?: StringNullableFilter<"ContactMessage"> | string | null
+    message?: StringFilter<"ContactMessage"> | string
+    isRead?: BoolFilter<"ContactMessage"> | boolean
+    createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+  }, "id">
+
+  export type ContactMessageOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    message?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+    _count?: ContactMessageCountOrderByAggregateInput
+    _max?: ContactMessageMaxOrderByAggregateInput
+    _min?: ContactMessageMinOrderByAggregateInput
+  }
+
+  export type ContactMessageScalarWhereWithAggregatesInput = {
+    AND?: ContactMessageScalarWhereWithAggregatesInput | ContactMessageScalarWhereWithAggregatesInput[]
+    OR?: ContactMessageScalarWhereWithAggregatesInput[]
+    NOT?: ContactMessageScalarWhereWithAggregatesInput | ContactMessageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ContactMessage"> | string
+    name?: StringWithAggregatesFilter<"ContactMessage"> | string
+    email?: StringWithAggregatesFilter<"ContactMessage"> | string
+    phone?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    message?: StringWithAggregatesFilter<"ContactMessage"> | string
+    isRead?: BoolWithAggregatesFilter<"ContactMessage"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"ContactMessage"> | Date | string
   }
 
   export type TokenPackageConfigCreateInput = {
@@ -62033,6 +63203,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     conversation: ConversationCreateNestedOneWithoutMessagesInput
     sender: UserCreateNestedOneWithoutMessagesInput
@@ -62046,6 +63217,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutMessageInput
   }
@@ -62055,6 +63227,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
     sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
@@ -62068,6 +63241,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutMessageNestedInput
   }
@@ -62079,6 +63253,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -62087,6 +63262,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -62097,6 +63273,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -64682,47 +65859,56 @@ export namespace Prisma {
   export type ChatbotTemplateCreateInput = {
     id?: string
     question: string
-    answer: string
+    answer?: string | null
     isActive?: boolean
     order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    parent?: ChatbotTemplateCreateNestedOneWithoutChildrenInput
+    children?: ChatbotTemplateCreateNestedManyWithoutParentInput
   }
 
   export type ChatbotTemplateUncheckedCreateInput = {
     id?: string
     question: string
-    answer: string
+    answer?: string | null
+    parentId?: string | null
     isActive?: boolean
     order?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    children?: ChatbotTemplateUncheckedCreateNestedManyWithoutParentInput
   }
 
   export type ChatbotTemplateUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     question?: StringFieldUpdateOperationsInput | string
-    answer?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    parent?: ChatbotTemplateUpdateOneWithoutChildrenNestedInput
+    children?: ChatbotTemplateUpdateManyWithoutParentNestedInput
   }
 
   export type ChatbotTemplateUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     question?: StringFieldUpdateOperationsInput | string
-    answer?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: ChatbotTemplateUncheckedUpdateManyWithoutParentNestedInput
   }
 
   export type ChatbotTemplateCreateManyInput = {
     id?: string
     question: string
-    answer: string
+    answer?: string | null
+    parentId?: string | null
     isActive?: boolean
     order?: number
     createdAt?: Date | string
@@ -64732,7 +65918,7 @@ export namespace Prisma {
   export type ChatbotTemplateUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     question?: StringFieldUpdateOperationsInput | string
-    answer?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -64742,7 +65928,8 @@ export namespace Prisma {
   export type ChatbotTemplateUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     question?: StringFieldUpdateOperationsInput | string
-    answer?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     order?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -65011,6 +66198,76 @@ export namespace Prisma {
     viewCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageCreateInput = {
+    id?: string
+    name: string
+    email: string
+    phone?: string | null
+    message: string
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactMessageUncheckedCreateInput = {
+    id?: string
+    name: string
+    email: string
+    phone?: string | null
+    message: string
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactMessageUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageCreateManyInput = {
+    id?: string
+    name: string
+    email: string
+    phone?: string | null
+    message: string
+    isRead?: boolean
+    createdAt?: Date | string
+  }
+
+  export type ContactMessageUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    isRead?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -66567,6 +67824,7 @@ export namespace Prisma {
     role?: SortOrder
     body?: SortOrder
     blocked?: SortOrder
+    readAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -66577,6 +67835,7 @@ export namespace Prisma {
     role?: SortOrder
     body?: SortOrder
     blocked?: SortOrder
+    readAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -66587,6 +67846,7 @@ export namespace Prisma {
     role?: SortOrder
     body?: SortOrder
     blocked?: SortOrder
+    readAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -68091,10 +69351,26 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type ChatbotTemplateNullableRelationFilter = {
+    is?: ChatbotTemplateWhereInput | null
+    isNot?: ChatbotTemplateWhereInput | null
+  }
+
+  export type ChatbotTemplateListRelationFilter = {
+    every?: ChatbotTemplateWhereInput
+    some?: ChatbotTemplateWhereInput
+    none?: ChatbotTemplateWhereInput
+  }
+
+  export type ChatbotTemplateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ChatbotTemplateCountOrderByAggregateInput = {
     id?: SortOrder
     question?: SortOrder
     answer?: SortOrder
+    parentId?: SortOrder
     isActive?: SortOrder
     order?: SortOrder
     createdAt?: SortOrder
@@ -68109,6 +69385,7 @@ export namespace Prisma {
     id?: SortOrder
     question?: SortOrder
     answer?: SortOrder
+    parentId?: SortOrder
     isActive?: SortOrder
     order?: SortOrder
     createdAt?: SortOrder
@@ -68119,6 +69396,7 @@ export namespace Prisma {
     id?: SortOrder
     question?: SortOrder
     answer?: SortOrder
+    parentId?: SortOrder
     isActive?: SortOrder
     order?: SortOrder
     createdAt?: SortOrder
@@ -68255,6 +69533,36 @@ export namespace Prisma {
 
   export type GuideArticleSumOrderByAggregateInput = {
     viewCount?: SortOrder
+  }
+
+  export type ContactMessageCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    message?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ContactMessageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    message?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ContactMessageMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    message?: SortOrder
+    isRead?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -70481,6 +71789,64 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutPerformanceTierInput, UserUpdateWithoutPerformanceTierInput>, UserUncheckedUpdateWithoutPerformanceTierInput>
   }
 
+  export type ChatbotTemplateCreateNestedOneWithoutChildrenInput = {
+    create?: XOR<ChatbotTemplateCreateWithoutChildrenInput, ChatbotTemplateUncheckedCreateWithoutChildrenInput>
+    connectOrCreate?: ChatbotTemplateCreateOrConnectWithoutChildrenInput
+    connect?: ChatbotTemplateWhereUniqueInput
+  }
+
+  export type ChatbotTemplateCreateNestedManyWithoutParentInput = {
+    create?: XOR<ChatbotTemplateCreateWithoutParentInput, ChatbotTemplateUncheckedCreateWithoutParentInput> | ChatbotTemplateCreateWithoutParentInput[] | ChatbotTemplateUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: ChatbotTemplateCreateOrConnectWithoutParentInput | ChatbotTemplateCreateOrConnectWithoutParentInput[]
+    createMany?: ChatbotTemplateCreateManyParentInputEnvelope
+    connect?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+  }
+
+  export type ChatbotTemplateUncheckedCreateNestedManyWithoutParentInput = {
+    create?: XOR<ChatbotTemplateCreateWithoutParentInput, ChatbotTemplateUncheckedCreateWithoutParentInput> | ChatbotTemplateCreateWithoutParentInput[] | ChatbotTemplateUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: ChatbotTemplateCreateOrConnectWithoutParentInput | ChatbotTemplateCreateOrConnectWithoutParentInput[]
+    createMany?: ChatbotTemplateCreateManyParentInputEnvelope
+    connect?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+  }
+
+  export type ChatbotTemplateUpdateOneWithoutChildrenNestedInput = {
+    create?: XOR<ChatbotTemplateCreateWithoutChildrenInput, ChatbotTemplateUncheckedCreateWithoutChildrenInput>
+    connectOrCreate?: ChatbotTemplateCreateOrConnectWithoutChildrenInput
+    upsert?: ChatbotTemplateUpsertWithoutChildrenInput
+    disconnect?: ChatbotTemplateWhereInput | boolean
+    delete?: ChatbotTemplateWhereInput | boolean
+    connect?: ChatbotTemplateWhereUniqueInput
+    update?: XOR<XOR<ChatbotTemplateUpdateToOneWithWhereWithoutChildrenInput, ChatbotTemplateUpdateWithoutChildrenInput>, ChatbotTemplateUncheckedUpdateWithoutChildrenInput>
+  }
+
+  export type ChatbotTemplateUpdateManyWithoutParentNestedInput = {
+    create?: XOR<ChatbotTemplateCreateWithoutParentInput, ChatbotTemplateUncheckedCreateWithoutParentInput> | ChatbotTemplateCreateWithoutParentInput[] | ChatbotTemplateUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: ChatbotTemplateCreateOrConnectWithoutParentInput | ChatbotTemplateCreateOrConnectWithoutParentInput[]
+    upsert?: ChatbotTemplateUpsertWithWhereUniqueWithoutParentInput | ChatbotTemplateUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: ChatbotTemplateCreateManyParentInputEnvelope
+    set?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    disconnect?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    delete?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    connect?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    update?: ChatbotTemplateUpdateWithWhereUniqueWithoutParentInput | ChatbotTemplateUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: ChatbotTemplateUpdateManyWithWhereWithoutParentInput | ChatbotTemplateUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: ChatbotTemplateScalarWhereInput | ChatbotTemplateScalarWhereInput[]
+  }
+
+  export type ChatbotTemplateUncheckedUpdateManyWithoutParentNestedInput = {
+    create?: XOR<ChatbotTemplateCreateWithoutParentInput, ChatbotTemplateUncheckedCreateWithoutParentInput> | ChatbotTemplateCreateWithoutParentInput[] | ChatbotTemplateUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: ChatbotTemplateCreateOrConnectWithoutParentInput | ChatbotTemplateCreateOrConnectWithoutParentInput[]
+    upsert?: ChatbotTemplateUpsertWithWhereUniqueWithoutParentInput | ChatbotTemplateUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: ChatbotTemplateCreateManyParentInputEnvelope
+    set?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    disconnect?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    delete?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    connect?: ChatbotTemplateWhereUniqueInput | ChatbotTemplateWhereUniqueInput[]
+    update?: ChatbotTemplateUpdateWithWhereUniqueWithoutParentInput | ChatbotTemplateUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: ChatbotTemplateUpdateManyWithWhereWithoutParentInput | ChatbotTemplateUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: ChatbotTemplateScalarWhereInput | ChatbotTemplateScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutNotificationsInput = {
     create?: XOR<UserCreateWithoutNotificationsInput, UserUncheckedCreateWithoutNotificationsInput>
     connectOrCreate?: UserCreateOrConnectWithoutNotificationsInput
@@ -71204,6 +72570,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     conversation: ConversationCreateNestedOneWithoutMessagesInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutMessageInput
@@ -71215,6 +72582,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutMessageInput
   }
@@ -71937,6 +73305,7 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"Message"> | $Enums.UserRole
     body?: StringFilter<"Message"> | string
     blocked?: BoolFilter<"Message"> | boolean
+    readAt?: DateTimeNullableFilter<"Message"> | Date | string | null
     createdAt?: DateTimeFilter<"Message"> | Date | string
   }
 
@@ -75945,6 +77314,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     sender: UserCreateNestedOneWithoutMessagesInput
     moderationLogs?: ModerationLogCreateNestedManyWithoutMessageInput
@@ -75956,6 +77326,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     moderationLogs?: ModerationLogUncheckedCreateNestedManyWithoutMessageInput
   }
@@ -76760,6 +78131,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
     conversation: ConversationCreateNestedOneWithoutMessagesInput
     sender: UserCreateNestedOneWithoutMessagesInput
@@ -76772,6 +78144,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -76796,6 +78169,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
     sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
@@ -76808,6 +78182,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -81276,6 +82651,128 @@ export namespace Prisma {
     authoredArticles?: GuideArticleUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
+  export type ChatbotTemplateCreateWithoutChildrenInput = {
+    id?: string
+    question: string
+    answer?: string | null
+    isActive?: boolean
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    parent?: ChatbotTemplateCreateNestedOneWithoutChildrenInput
+  }
+
+  export type ChatbotTemplateUncheckedCreateWithoutChildrenInput = {
+    id?: string
+    question: string
+    answer?: string | null
+    parentId?: string | null
+    isActive?: boolean
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatbotTemplateCreateOrConnectWithoutChildrenInput = {
+    where: ChatbotTemplateWhereUniqueInput
+    create: XOR<ChatbotTemplateCreateWithoutChildrenInput, ChatbotTemplateUncheckedCreateWithoutChildrenInput>
+  }
+
+  export type ChatbotTemplateCreateWithoutParentInput = {
+    id?: string
+    question: string
+    answer?: string | null
+    isActive?: boolean
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: ChatbotTemplateCreateNestedManyWithoutParentInput
+  }
+
+  export type ChatbotTemplateUncheckedCreateWithoutParentInput = {
+    id?: string
+    question: string
+    answer?: string | null
+    isActive?: boolean
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: ChatbotTemplateUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type ChatbotTemplateCreateOrConnectWithoutParentInput = {
+    where: ChatbotTemplateWhereUniqueInput
+    create: XOR<ChatbotTemplateCreateWithoutParentInput, ChatbotTemplateUncheckedCreateWithoutParentInput>
+  }
+
+  export type ChatbotTemplateCreateManyParentInputEnvelope = {
+    data: ChatbotTemplateCreateManyParentInput | ChatbotTemplateCreateManyParentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ChatbotTemplateUpsertWithoutChildrenInput = {
+    update: XOR<ChatbotTemplateUpdateWithoutChildrenInput, ChatbotTemplateUncheckedUpdateWithoutChildrenInput>
+    create: XOR<ChatbotTemplateCreateWithoutChildrenInput, ChatbotTemplateUncheckedCreateWithoutChildrenInput>
+    where?: ChatbotTemplateWhereInput
+  }
+
+  export type ChatbotTemplateUpdateToOneWithWhereWithoutChildrenInput = {
+    where?: ChatbotTemplateWhereInput
+    data: XOR<ChatbotTemplateUpdateWithoutChildrenInput, ChatbotTemplateUncheckedUpdateWithoutChildrenInput>
+  }
+
+  export type ChatbotTemplateUpdateWithoutChildrenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    parent?: ChatbotTemplateUpdateOneWithoutChildrenNestedInput
+  }
+
+  export type ChatbotTemplateUncheckedUpdateWithoutChildrenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatbotTemplateUpsertWithWhereUniqueWithoutParentInput = {
+    where: ChatbotTemplateWhereUniqueInput
+    update: XOR<ChatbotTemplateUpdateWithoutParentInput, ChatbotTemplateUncheckedUpdateWithoutParentInput>
+    create: XOR<ChatbotTemplateCreateWithoutParentInput, ChatbotTemplateUncheckedCreateWithoutParentInput>
+  }
+
+  export type ChatbotTemplateUpdateWithWhereUniqueWithoutParentInput = {
+    where: ChatbotTemplateWhereUniqueInput
+    data: XOR<ChatbotTemplateUpdateWithoutParentInput, ChatbotTemplateUncheckedUpdateWithoutParentInput>
+  }
+
+  export type ChatbotTemplateUpdateManyWithWhereWithoutParentInput = {
+    where: ChatbotTemplateScalarWhereInput
+    data: XOR<ChatbotTemplateUpdateManyMutationInput, ChatbotTemplateUncheckedUpdateManyWithoutParentInput>
+  }
+
+  export type ChatbotTemplateScalarWhereInput = {
+    AND?: ChatbotTemplateScalarWhereInput | ChatbotTemplateScalarWhereInput[]
+    OR?: ChatbotTemplateScalarWhereInput[]
+    NOT?: ChatbotTemplateScalarWhereInput | ChatbotTemplateScalarWhereInput[]
+    id?: StringFilter<"ChatbotTemplate"> | string
+    question?: StringFilter<"ChatbotTemplate"> | string
+    answer?: StringNullableFilter<"ChatbotTemplate"> | string | null
+    parentId?: StringNullableFilter<"ChatbotTemplate"> | string | null
+    isActive?: BoolFilter<"ChatbotTemplate"> | boolean
+    order?: IntFilter<"ChatbotTemplate"> | number
+    createdAt?: DateTimeFilter<"ChatbotTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"ChatbotTemplate"> | Date | string
+  }
+
   export type UserCreateWithoutNotificationsInput = {
     id?: string
     name?: string | null
@@ -81945,6 +83442,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -82248,6 +83746,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     conversation?: ConversationUpdateOneRequiredWithoutMessagesNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutMessageNestedInput
@@ -82259,6 +83758,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutMessageNestedInput
   }
@@ -82269,6 +83769,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -83622,6 +85123,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     body: string
     blocked?: boolean
+    readAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -83630,6 +85132,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sender?: UserUpdateOneRequiredWithoutMessagesNestedInput
     moderationLogs?: ModerationLogUpdateManyWithoutMessageNestedInput
@@ -83641,6 +85144,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     moderationLogs?: ModerationLogUncheckedUpdateManyWithoutMessageNestedInput
   }
@@ -83651,6 +85155,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     body?: StringFieldUpdateOperationsInput | string
     blocked?: BoolFieldUpdateOperationsInput | boolean
+    readAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -83786,6 +85291,48 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ChatbotTemplateCreateManyParentInput = {
+    id?: string
+    question: string
+    answer?: string | null
+    isActive?: boolean
+    order?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatbotTemplateUpdateWithoutParentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: ChatbotTemplateUpdateManyWithoutParentNestedInput
+  }
+
+  export type ChatbotTemplateUncheckedUpdateWithoutParentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: ChatbotTemplateUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type ChatbotTemplateUncheckedUpdateManyWithoutParentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    question?: StringFieldUpdateOperationsInput | string
+    answer?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    order?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
@@ -83835,6 +85382,10 @@ export namespace Prisma {
      * @deprecated Use EnterpriseCreditLineCountOutputTypeDefaultArgs instead
      */
     export type EnterpriseCreditLineCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = EnterpriseCreditLineCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ChatbotTemplateCountOutputTypeDefaultArgs instead
+     */
+    export type ChatbotTemplateCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ChatbotTemplateCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use TokenPackageConfigDefaultArgs instead
      */
@@ -84039,6 +85590,10 @@ export namespace Prisma {
      * @deprecated Use GuideArticleDefaultArgs instead
      */
     export type GuideArticleArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = GuideArticleDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ContactMessageDefaultArgs instead
+     */
+    export type ContactMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ContactMessageDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

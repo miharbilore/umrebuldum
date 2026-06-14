@@ -32,7 +32,7 @@ export const handlePaymentCompletion = inngest.createFunction(
                 userId,
                 type: "IN_APP",
                 title: "Ödeme Başarılı",
-                message: `Teşekkürler! Hesabınıza ${amount} kredi başarıyla yüklendi.`,
+                message: `Teşekkürler! Hesabınıza ${amount} token başarıyla yüklendi.`,
                 referenceId: transactionId
             });
         });

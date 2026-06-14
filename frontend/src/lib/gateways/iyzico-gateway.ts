@@ -74,7 +74,7 @@ export class IyzicoGateway implements PaymentGateway {
             basketItems: [
                 {
                     id: params.packageId,
-                    name: `${params.credits} Kredi Paketi`,
+                    name: `${params.credits} Token Paketi`,
                     category1: "Credits",
                     itemType: "VIRTUAL",
                     price: params.amountTRY.toString()

@@ -18,6 +18,7 @@ interface Message {
     senderRole: string;
     message: string;
     createdAt: string;
+    readAt: string | null;
 }
 
 export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
@@ -113,8 +114,13 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
             });
         });
 
+        channel.bind('messages-read', (data: { messageIds: string[], readAt: string }) => {
+            setMessages(prev => prev.map(m => data.messageIds.includes(m.id) ? { ...m, readAt: data.readAt } : m));
+        });
+
         return () => {
             channel.unbind('new-message');
+            channel.unbind('messages-read');
             pusherClient.unsubscribe(channelName);
         };
     }, [threadId]);
@@ -123,7 +129,23 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
         if (scrollRef.current && messages.length <= 30) {
             scrollRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, [messages]);
+        
+        // Read receipt logic
+        const unreadMsgs = messages.filter(m => m.senderRole !== currentUserRole && !m.readAt);
+        if (unreadMsgs.length > 0) {
+            const messageIds = unreadMsgs.map(m => m.id);
+            fetch('/api/chat/read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messageIds, threadId })
+            }).then(res => {
+                if (res.ok) {
+                    const now = new Date().toISOString();
+                    setMessages(prev => prev.map(m => messageIds.includes(m.id) ? { ...m, readAt: now } : m));
+                }
+            }).catch(console.error);
+        }
+    }, [messages, currentUserRole, threadId]);
 
     const handleSend = async () => {
         if (!newMessage.trim()) return;
@@ -158,10 +180,9 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
                         <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                         <p>
                             <strong className="font-semibold text-amber-800">Güvenlik Uyarısı:</strong>{" "}
-                            Umrebuldum.com yalnızca bir ilan platformudur ve turların içeriğinden veya finansal süreçlerden sorumlu değildir.
-                            Güvenliğiniz için resmi acente hesapları dışında şahsi hesaplara kesinlikle para{" "}
-                            <strong className="font-semibold">GÖNDERMEYİNİZ</strong>.
-                            İletişim kurduğunuz kişilerin TÜRSAB belgelerini veya resmi kimliklerini teyit ediniz.
+                            Umrebuldum.com yalnızca bir iletişim platformudur ve turların içeriğinden veya finansal süreçlerden sorumlu değildir.
+                            Burası <strong className="font-semibold">sadece iletişim amaçlıdır</strong>.
+                            Güvenliğiniz için bu sohbet üzerinden kesinlikle <strong className="font-semibold text-red-600">IBAN numarası, Kredi Kartı bilgisi veya şifre</strong> PAYLAŞMAYINIZ ve PARA GÖNDERMEYİNİZ.
                         </p>
                     </div>
                     <button
@@ -204,6 +225,11 @@ export function ChatWindow({ threadId, currentUserRole }: ChatWindowProps) {
                                     <div className="flex items-center justify-between gap-3 mt-1">
                                         <span className={cn("text-[10px] opacity-70", isMe ? "text-blue-100" : "text-gray-400")}>
                                             {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {isMe && (
+                                                <span className="ml-1 tracking-tighter">
+                                                    {msg.readAt ? "✓✓" : "✓"}
+                                                </span>
+                                            )}
                                         </span>
                                         {canDelete && (
                                             <button

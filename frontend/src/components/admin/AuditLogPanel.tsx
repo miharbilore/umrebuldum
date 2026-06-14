@@ -19,7 +19,7 @@ interface AuditLog {
 const actionLabels: Record<string, { label: string; color: string }> = {
     approve_listing: { label: 'İlan Onay', color: 'bg-emerald-500/10 text-emerald-400' },
     reject_listing: { label: 'İlan Red', color: 'bg-red-500/10 text-red-400' },
-    adjust_credits: { label: 'Kredi', color: 'bg-blue-500/10 text-blue-400' },
+    adjust_credits: { label: 'Token', color: 'bg-blue-500/10 text-blue-400' },
     ban_user: { label: 'Ban', color: 'bg-red-500/10 text-red-400' },
     delete_request: { label: 'Talep Sil', color: 'bg-yellow-500/10 text-yellow-400' },
 };

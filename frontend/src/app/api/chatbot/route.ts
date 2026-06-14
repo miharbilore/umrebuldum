@@ -1,15 +1,19 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
     try {
+        const url = new URL(request.url);
+        const parentId = url.searchParams.get("parentId") || null;
+
         const templates = await prisma.chatbotTemplate.findMany({
-            where: { isActive: true },
+            where: { isActive: true, parentId },
             orderBy: { order: "asc" },
             select: {
                 id: true,
                 question: true,
                 answer: true,
+                _count: { select: { children: true } }
             }
         });
 
@@ -33,7 +37,7 @@ export async function POST(request: Request) {
         // For a true "hybrid", we might match against predefined templates first.
         const templates = await prisma.chatbotTemplate.findMany({
             where: { isActive: true },
-            select: { question: true, answer: true },
+            select: { id: true, question: true, answer: true, _count: { select: { children: true } } },
         });
 
         const userQuery = query.toLowerCase().trim();
@@ -47,12 +51,13 @@ export async function POST(request: Request) {
         }
 
         if (bestMatch) {
-            return NextResponse.json({ answer: bestMatch.answer });
+            return NextResponse.json({ answer: bestMatch.answer || "Lütfen bir alt seçenek seçin.", node: bestMatch });
         }
 
         // Fallback static answer if no match found
         return NextResponse.json({
-            answer: "Bu konuda size yardımcı olabilmem için lütfen destek talebi oluşturun veya iletişim sayfamızı ziyaret edin."
+            answer: "Üzgünüm, sorunuzu anlayamadım. Size müşteri temsilcimiz yardımcı olabilir.",
+            needsWhatsApp: true
         });
 
     } catch (error) {

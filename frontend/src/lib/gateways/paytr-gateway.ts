@@ -58,7 +58,7 @@ export class PayTRGateway implements PaymentGateway {
 
         // PayTR user_basket format: [[product_name, price_str, quantity]]
         const userBasket = Buffer.from(
-            JSON.stringify([[`${params.credits} Kredi Paketi`, String(params.amountTRY), 1]])
+            JSON.stringify([[`${params.credits} Token Paketi`, String(params.amountTRY), 1]])
         ).toString("base64");
 
         // User IP — PayTR requires this; will be injected by the route handler

@@ -267,19 +267,19 @@ export function paymentSuccessTemplate(params: {
             Merhaba <strong>${userName}</strong>,
         </p>
         <p style="margin:0 0 20px 0; color:#475569;">
-            Ödemeniz başarıyla tamamlandı ve kredileriniz hesabınıza tanımlandı.
+            Ödemeniz başarıyla tamamlandı ve tokenleriniz hesabınıza tanımlandı.
         </p>
         ${infoBox(`
             <strong>Paket:</strong> ${packageName}<br/>
             <strong>Tutar:</strong> ${amount}<br/>
-            <strong>Kredi:</strong> ${credits} adet
+            <strong>Token:</strong> ${credits} adet
         `)}
         ${ctaButton("Panele Git", `${BASE_URL}/dashboard/billing`)}
     `;
 
     return {
         subject: `💳 Ödeme onayı: ${packageName} — UmreBuldum`,
-        html: baseLayout(content, `Ödemeniz onaylandı. ${credits} kredi hesabınıza tanımlandı.`),
+        html: baseLayout(content, `Ödemeniz onaylandı. ${credits} token hesabınıza tanımlandı.`),
     };
 }
 
@@ -310,5 +310,39 @@ export function listingExpiredTemplate(params: {
     return {
         subject: `⏳ İlanınız sona erdi: ${listingTitle}`,
         html: baseLayout(content, `"${listingTitle}" ilanınızın süresi doldu.`),
+    };
+}
+
+// --- New Lead (Request) -----------------------------------------------------
+
+export function newLeadTemplate(params: {
+    guideName: string;
+    departureCity: string;
+    peopleCount: number;
+    requestUrl?: string;
+}): EmailTemplate {
+    const { guideName, departureCity, peopleCount, requestUrl } = params;
+    const url = requestUrl || `${BASE_URL}/dashboard/requests`;
+
+    const content = `
+        <h1 style="margin:0 0 16px 0; font-size:22px; font-weight:700; color:#1e293b;">
+            🎯 Yeni Bir Umre Talebi!
+        </h1>
+        <p style="margin:0 0 12px 0;">
+            Merhaba <strong>${guideName}</strong>,
+        </p>
+        <p style="margin:0 0 20px 0; color:#475569;">
+            Kriterlerinize uygun yeni bir Umre talebi oluşturuldu. Müşteriye ilk teklifi veren siz olun!
+        </p>
+        ${infoBox(`
+            <strong>Kalkış Yeri:</strong> ${departureCity}<br/>
+            <strong>Kişi Sayısı:</strong> ${peopleCount} Kişi
+        `)}
+        ${ctaButton("Talebi İncele", url)}
+    `;
+
+    return {
+        subject: `🎯 Yeni Umre Talebi: ${departureCity} çıkışlı, ${peopleCount} kişilik`,
+        html: baseLayout(content, `Yeni bir umre talebi oluşturuldu: ${departureCity} çıkışlı, ${peopleCount} kişilik.`),
     };
 }

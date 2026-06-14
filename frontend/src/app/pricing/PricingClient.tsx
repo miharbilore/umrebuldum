@@ -35,7 +35,7 @@ const DEFAULT_METADATA = { icon: Package, color: 'slate', desc: 'Özel üyelik a
 const FAQS = [
     {
         q: 'Paketimi dilediğim zaman değiştirebilir miyim?',
-        a: 'Evet, dilediğiniz zaman bir üst pakete geçiş yapabilirsiniz. Üst pakete geçişlerde mevcut krediniz korunur. Alt pakete geçişlerde ise mevcut döneminizin bitmesi gerekir.'
+        a: 'Evet, dilediğiniz zaman bir üst pakete geçiş yapabilirsiniz. Üst pakete geçişlerde mevcut tokeniniz korunur. Alt pakete geçişlerde ise mevcut döneminizin bitmesi gerekir.'
     },
     {
         q: 'Tokenlar ne işe yarar?',

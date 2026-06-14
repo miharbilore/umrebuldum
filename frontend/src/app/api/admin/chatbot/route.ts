@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
@@ -9,8 +9,17 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+        const url = new URL(request.url);
+        const parentId = url.searchParams.get("parentId") || null;
+
         const templates = await prisma.chatbotTemplate.findMany({
+            where: { parentId },
             orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+            include: {
+                _count: {
+                    select: { children: true }
+                }
+            }
         });
 
         return NextResponse.json(templates);
@@ -28,16 +37,17 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { question, answer, order } = body;
+        const { question, answer, order, parentId } = body;
 
-        if (!question || !answer) {
-            return NextResponse.json({ error: "Soru ve cevap alanları zorunludur." }, { status: 400 });
+        if (!question) {
+            return NextResponse.json({ error: "Soru başlığı zorunludur." }, { status: 400 });
         }
 
         const newTemplate = await prisma.chatbotTemplate.create({
             data: {
                 question,
-                answer,
+                answer: answer || null,
+                parentId: parentId || null,
                 order: order ? parseInt(order) : 0,
             },
         });
@@ -57,7 +67,7 @@ export async function PATCH(request: Request) {
         }
 
         const body = await request.json();
-        const { id, question, answer, isActive, order } = body;
+        const { id, question, answer, isActive, order, parentId } = body;
 
         if (!id) {
             return NextResponse.json({ error: "ID parametresi eksik." }, { status: 400 });
@@ -67,8 +77,9 @@ export async function PATCH(request: Request) {
             where: { id },
             data: {
                 ...(question && { question }),
-                ...(answer && { answer }),
+                ...(answer !== undefined && { answer: answer || null }),
                 ...(isActive !== undefined && { isActive }),
+                ...(parentId !== undefined && { parentId: parentId || null }),
                 ...(order !== undefined && { order: parseInt(order) }),
             },
         });

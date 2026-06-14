@@ -90,7 +90,7 @@ export function RefundPolicyContent() {
     return (
         <div className="space-y-12">
             <div className="grid grid-cols-1 gap-8 items-stretch">
-                {/* Umrebuldum Üyelik ve Kredi Paketleri */}
+                {/* Umrebuldum Üyelik ve Token Paketleri */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col relative overflow-hidden">
                     <div className="flex items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-800 pb-6">
                         <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center shrink-0">
@@ -100,7 +100,7 @@ export function RefundPolicyContent() {
                     </div>
 
                     <div className="prose prose-slate dark:prose-invert prose-sm max-w-none mb-4">
-                        <p className="font-medium text-slate-900 dark:text-slate-100">Bu bölüm, platformumuzda kredi/token ve abonelik paketi satın alan acentelerimizi kapsar.</p>
+                        <p className="font-medium text-slate-900 dark:text-slate-100">Bu bölüm, platformumuzda token/token ve abonelik paketi satın alan acentelerimizi kapsar.</p>
                         
                         <h3>1. 14 Günlük Cayma Hakkı</h3>
                         <p>Satın alınan hizmet henüz hiç kullanılmamışsa (ilan yayınlanmamış ve öne çıkarma başlamamışsa), 14 gün içerisinde kesintisiz iade talep edilebilir.</p>

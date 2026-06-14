@@ -66,7 +66,7 @@ export default function CreditManagementPanel() {
             });
             const result = await res.json();
             if (!res.ok) throw new Error(result.error || 'İşlem başarısız');
-            setFeedback({ type: 'success', message: `${amount > 0 ? '+' : ''}${amount} kredi ${amount > 0 ? 'eklendi' : 'düşüldü'}. Yeni bakiye: ${result.newBalance}` });
+            setFeedback({ type: 'success', message: `${amount > 0 ? '+' : ''}${amount} token ${amount > 0 ? 'eklendi' : 'düşüldü'}. Yeni bakiye: ${result.newBalance}` });
             setAdjustAmount('');
             setAdjustReason('');
             mutate();
@@ -171,7 +171,7 @@ export default function CreditManagementPanel() {
                             <div className="text-right">
                                 <p className="text-xs text-gray-500 uppercase tracking-wider">Bakiye</p>
                                 <p className="text-2xl font-bold text-emerald-400">{balance}</p>
-                                <p className="text-xs text-gray-500">kredi</p>
+                                <p className="text-xs text-gray-500">token</p>
                             </div>
                         </div>
                     </div>
@@ -180,7 +180,7 @@ export default function CreditManagementPanel() {
                     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
                         <h4 className="font-semibold text-gray-200 mb-3 flex items-center gap-2">
                             <CreditCard className="w-4 h-4 text-emerald-500" />
-                            Kredi Düzenle
+                            Token Düzenle
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
@@ -200,7 +200,7 @@ export default function CreditManagementPanel() {
                                         type="text"
                                         value={adjustReason}
                                         onChange={(e) => setAdjustReason(e.target.value)}
-                                        placeholder="Kredi düzenleme sebebi..."
+                                        placeholder="Token düzenleme sebebi..."
                                         className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                                     />
                                     <button

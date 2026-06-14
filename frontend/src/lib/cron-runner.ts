@@ -1,4 +1,4 @@
-﻿import cron from "node-cron";
+import cron from "node-cron";
 import { runExpiration } from "./expiration-service";
 
 // ─── Cron Runner ────────────────────────────────────────────────────────
@@ -41,6 +41,20 @@ export function startCronJobs(): void {
             console.log(`[Cron] Cleanup complete:`, result);
         } catch (error) {
             console.error("[Cron] Cleanup failed:", error);
+        }
+    }, {
+        timezone: "Europe/Istanbul",
+    });
+
+    // ── Package Expiration Reminders: daily at 09:00 ────────────────
+    cron.schedule("0 9 * * *", async () => {
+        console.log(`[Cron] Running package reminders at ${new Date().toISOString()}`);
+        try {
+            const { runPackageReminders } = await import("@/jobs/package-reminders.job");
+            const result = await runPackageReminders();
+            console.log(`[Cron] Package reminders complete:`, result);
+        } catch (error) {
+            console.error("[Cron] Package reminders failed:", error);
         }
     }, {
         timezone: "Europe/Istanbul",

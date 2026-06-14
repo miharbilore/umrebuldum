@@ -128,7 +128,7 @@ const mockBanners: Banner[] = [
   },
   {
     id: "5",
-    title: "Jeton Al - %20 Bonus",
+    title: "Token Al - %20 Bonus",
     location: "checkout",
     image: "/banners/token-bonus.jpg",
     link: "/token-satin-al",

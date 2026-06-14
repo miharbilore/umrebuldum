@@ -110,6 +110,7 @@ export async function GET(req: Request) {
                 message: m.blocked ? "[Bu mesaj moderasyon tarafından engellendi]" : m.body,
                 blocked: m.blocked,
                 createdAt: m.createdAt.toISOString(),
+                readAt: m.readAt ? m.readAt.toISOString() : null,
             })),
             nextCursor,
         });
@@ -242,29 +243,42 @@ export async function POST(req: Request) {
             });
         }
 
-        // ── Email notification to recipient (non-blocking, migrated from /api/chat/message) ──
+        // ── Email notification to recipient (non-blocking, throttled) ──
         if (!isBlocked) {
             const recipientId = conversation.userId === currentUser.id
                 ? conversation.guideId
                 : conversation.userId;
 
-            // Fetch recipient info for email
-            const recipient = await prisma.user.findUnique({
-                where: { id: recipientId },
-                select: { email: true, name: true },
+            // Email throttling: Only send if no previous message from this sender in the last 5 mins
+            const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+            const recentMessage = await prisma.message.findFirst({
+                where: {
+                    conversationId: threadId,
+                    senderId: currentUser.id,
+                    createdAt: { gt: fiveMinsAgo },
+                    id: { not: newMessage.id }
+                }
             });
 
-            const senderName = session.user.name || "Kullanıcı";
+            if (!recentMessage) {
+                // Fetch recipient info for email
+                const recipient = await prisma.user.findUnique({
+                    where: { id: recipientId },
+                    select: { email: true, name: true },
+                });
 
-            if (recipient?.email) {
-                emailService.sendAsync(
-                    recipient.email,
-                    newMessageTemplate({
-                        recipientName: recipient.name || "Kullanıcı",
-                        senderName,
-                        messagePreview: sanitizedMessage.substring(0, 200),
-                    })
-                );
+                const senderName = session.user.name || "Kullanıcı";
+
+                if (recipient?.email) {
+                    emailService.sendAsync(
+                        recipient.email,
+                        newMessageTemplate({
+                            recipientName: recipient.name || "Kullanıcı",
+                            senderName,
+                            messagePreview: sanitizedMessage.substring(0, 200),
+                        })
+                    );
+                }
             }
         }
 

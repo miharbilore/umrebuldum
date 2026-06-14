@@ -109,7 +109,7 @@ export default function ListingsPage() {
         } else if (action === 'spotlight') {
             setSpotlightModalListing(listingId);
         } else if (action === 'feature') {
-            if (!confirm('Bu ilanı öne çıkarmak için kredi bakiyenizden düşülecektir. Onaylıyor musunuz?')) return;
+            if (!confirm('Bu ilanı öne çıkarmak için token bakiyenizden düşülecektir. Onaylıyor musunuz?')) return;
             try {
                 const res = await fetch('/api/guide/feature', {
                     method: 'POST',

@@ -89,9 +89,18 @@ export function ProfileProgress() {
 
     if (hidden) {
         return (
-            <div className="flex items-center gap-2 text-sm font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30 w-max">
-                <CheckCircle2 className="w-4 h-4" />
-                Profil %100 Tamamlandı
+            <div className="flex flex-col md:flex-row items-center gap-4 text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 px-6 py-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+                <div className="flex items-center gap-2 text-emerald-600">
+                    <CheckCircle2 className="w-5 h-5" />
+                    Profiliniz Başarıyla Tamamlandı!
+                </div>
+                <div className="hidden md:block w-px h-6 bg-emerald-200"></div>
+                <div className="flex items-center gap-3">
+                    <span className="text-slate-600">Size Özel Beyobası.com İndirim Kodunuz:</span>
+                    <span className="bg-white text-emerald-700 font-black px-3 py-1.5 rounded-lg tracking-widest border border-emerald-200 shadow-sm select-all">
+                        BEYOBASI2026
+                    </span>
+                </div>
             </div>
         );
     }

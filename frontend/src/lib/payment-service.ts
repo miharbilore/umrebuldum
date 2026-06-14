@@ -105,8 +105,8 @@ export class PaymentService {
                         price_data: {
                             currency: "try",
                             product_data: {
-                                name: `${pkg.credits} Kredi — ${pkg.name}`,
-                                description: "UmreBuldum kredi paketi",
+                                name: `${pkg.credits} Token — ${pkg.name}`,
+                                description: "UmreBuldum token paketi",
                             },
                             unit_amount: Math.round(pkg.priceTRY.toNumber() * 100),
                         },

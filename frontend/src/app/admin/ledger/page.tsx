@@ -6,7 +6,7 @@ export default function AdminLedgerPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Mali Defter</h1>
         <p className="text-sm text-muted-foreground">
-          Platform üzerindeki tüm jeton alımları, harcamaları ve ödeme işlemlerini takip edin
+          Platform üzerindeki tüm token alımları, harcamaları ve ödeme işlemlerini takip edin
         </p>
       </div>
       <LedgerPanel />

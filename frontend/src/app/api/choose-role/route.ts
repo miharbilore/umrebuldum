@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/api-guards"
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase"
+import { calculateProfileCompleteness } from "@/lib/listing-ranking"
 import { z } from "zod"
 
 // Anti-bypass regex: Block 5+ consecutive digits (phone) or email patterns
@@ -20,6 +21,7 @@ const onboardingSchema = z.object({
     bio: z.string().trim().max(500, "Biyografi 500 karakteri geçemez").refine(bioAntiBypass, {
         message: "Biyografi alanına iletişim bilgisi (telefon veya e-posta) yazılamaz."
     }),
+    photo: z.string().url().optional().or(z.literal("")),
 });
 
 /**
@@ -43,7 +45,7 @@ export async function POST(req: Request) {
             }, { status: 400 })
         }
 
-        const { role, name, phone, city, bio } = validation.data
+        const { role, name, phone, city, bio, photo } = validation.data
         const userId = session!.user.id!
 
         // Find the user to check if this is the first time (already has role?)
@@ -69,6 +71,18 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor." }, { status: 409 });
         }
 
+        // Calculate completeness
+        const score = calculateProfileCompleteness({
+            fullName: name,
+            phone: phone,
+            bio: bio,
+            city: city,
+            photo: photo,
+            isIdentityVerified: false
+        });
+        
+        const isEligibleForBonus = (role === 'GUIDE' || role === 'ORGANIZATION') && score >= 95;
+
         await prisma.$transaction(async (tx) => {
             // 1. Update User Profile
             await tx.user.update({
@@ -81,8 +95,9 @@ export async function POST(req: Request) {
                     phone,
                     city,
                     bio,
+                    image: photo && photo.length > 0 ? photo : undefined,
                     profileCompletedAt: new Date(),
-                    hasClaimedProfileBonus: role === 'GUIDE' || role === 'ORGANIZATION' ? true : false,
+                    hasClaimedProfileBonus: isEligibleForBonus,
                 }
             })
 
@@ -108,13 +123,15 @@ export async function POST(req: Request) {
                 idempotencyKey: rewardIdempotencyKey
             });
 
-            profileReward = await grantToken({
-                userId,
-                amount: 5,
-                type: "ADMIN_GRANT",
-                reason: "Profil Tamamlama Bonusu",
-                idempotencyKey: `profile-reward-${userId}`
-            });
+            if (isEligibleForBonus) {
+                profileReward = await grantToken({
+                    userId,
+                    amount: 5,
+                    type: "ADMIN_GRANT",
+                    reason: "Profil Tamamlama Bonusu",
+                    idempotencyKey: `profile-reward-${userId}`
+                });
+            }
         }
 
         return NextResponse.json({ 

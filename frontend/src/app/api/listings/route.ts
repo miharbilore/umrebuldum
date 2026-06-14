@@ -427,7 +427,7 @@ export const POST = withErrorHandler(async (req: Request) => {
             if (error.message.includes('Insufficient tickets') || error.message.includes('Insufficient balance')) {
                 return NextResponse.json({
                     error: "Yetersiz Bakiye",
-                    message: "İlan yayınlamak için yeterli tokeniniz bulunmuyor. Lütfen kredi yükleyin.",
+                    message: "İlan yayınlamak için yeterli tokeniniz bulunmuyor. Lütfen token yükleyin.",
                     code: "INSUFFICIENT_FUNDS"
                 }, { status: 402 });
             }

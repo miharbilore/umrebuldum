@@ -54,8 +54,8 @@ export class StripeGateway implements PaymentGateway {
                         price_data: {
                             currency: "try",
                             product_data: {
-                                name: `${params.credits} Kredi Paketi`,
-                                description: "UmreBuldum kredi paketi",
+                                name: `${params.credits} Token Paketi`,
+                                description: "UmreBuldum token paketi",
                             },
                             unit_amount: Math.round(params.amountTRY * 100), // kuruş
                         },

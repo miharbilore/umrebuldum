@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -28,7 +28,14 @@ export async function POST(req: Request) {
 
         const fullName = `${firstName} ${lastName}`.trim();
 
-        console.log("Contact message bypassed:", { name: fullName, email, phone, message });
+        await prisma.contactMessage.create({
+            data: {
+                name: fullName,
+                email,
+                phone: phone || null,
+                message,
+            }
+        });
 
         return NextResponse.json({ success: true, data: { name: fullName, email, phone, message } }, { status: 201 });
     } catch (error) {

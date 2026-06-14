@@ -2,7 +2,7 @@
 
 import { ProviderCreditBalance as CreditBalance } from "@/components/dashboard/ProviderCreditBalance";
 import { CreditPackages } from "@/components/dashboard/credit-packages";
-import { AutoReplenishSettings } from "@/components/dashboard/auto-replenish-settings";
+
 import { SavedCards } from "@/components/dashboard/SavedCards";
 import { useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
@@ -72,17 +72,7 @@ function BillingContent() {
                                 <SavedCards />
                             </div>
 
-                            {/* Auto Replenish Settings */}
-                            <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-full -z-10 group-hover:bg-[#FFB800]/5 transition-colors" />
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-2 bg-amber-50 rounded-xl">
-                                        <Settings2 className="h-5 w-5 text-[#FFB800]" width={20} height={20} />
-                                    </div>
-                                    <h2 className="text-xl font-black text-slate-900 leading-none">Otomatik Yükleme</h2>
-                                </div>
-                                <AutoReplenishSettings />
-                            </div>
+
                         </div>
                     </div>
                 </div>

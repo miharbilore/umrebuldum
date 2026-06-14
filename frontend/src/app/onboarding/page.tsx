@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { 
     User, Map, Building2, CheckCircle2, Loader2, Phone, Mail, 
     ChevronRight, ChevronLeft, MapPin, Sparkles, Trophy, 
-    Check, ChevronsUpDown, ShieldCheck, Info
+    Check, ChevronsUpDown, ShieldCheck, Info, Camera, Upload
 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -97,7 +97,7 @@ export default function OnboardingPage() {
     
     // Step State
     const [step, setStep] = useState(1)
-    const TOTAL_STEPS = 5
+    const TOTAL_STEPS = 6
 
     // Form Fields
     const [selectedRole, setSelectedRole] = useState<string | null>(null)
@@ -105,7 +105,9 @@ export default function OnboardingPage() {
     const [city, setCity] = useState("")
     const [phone, setPhone] = useState("")
     const [bio, setBio] = useState("")
+    const [photo, setPhoto] = useState("")
     const [kvkkAccepted, setKvkkAccepted] = useState(false)
+    const [uploadingPhoto, setUploadingPhoto] = useState(false)
     
     // UI Helpers
     const [openCity, setOpenCity] = useState(false)
@@ -148,6 +150,34 @@ export default function OnboardingPage() {
         return true;
     };
 
+    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingPhoto(true);
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) throw new Error("Yükleme başarısız");
+            
+            const data = await res.json();
+            if (data.url) {
+                setPhoto(data.url);
+                toast.success("Fotoğraf eklendi! +%25 Profil Doluluğu");
+            }
+        } catch (error) {
+            toast.error("Fotoğraf yüklenemedi. Lütfen tekrar deneyin.");
+        } finally {
+            setUploadingPhoto(false);
+        }
+    };
+
     const nextStep = () => {
         // Validation per step
         if (step === 1 && !selectedRole) {
@@ -164,13 +194,17 @@ export default function OnboardingPage() {
                 return
             }
         }
-        if (step === 3 && !phone.trim().startsWith("+")) {
-            toast.error("Lütfen telefon numaranızı + formatında girin (Örn: +90...).")
-            return
+        if (step === 3) {
+            const phoneRegex = /^\+[1-9]\d{10,14}$/;
+            if (!phoneRegex.test(phone.trim())) {
+                toast.error("Lütfen geçerli bir uluslararası telefon numarası girin. Örn: +905051234567")
+                return
+            }
         }
         if (step === 4 && !validateBio(bio)) {
             return
         }
+        // Step 5 is optional (photo), so just go to next
 
         setStep(prev => Math.min(prev + 1, TOTAL_STEPS))
         window.scrollTo(0, 0)
@@ -194,7 +228,8 @@ export default function OnboardingPage() {
                     name: fullName.trim(),
                     phone: phone.trim(),
                     city,
-                    bio: bio.trim()
+                    bio: bio.trim(),
+                    photo: photo
                 })
             })
 
@@ -215,12 +250,6 @@ export default function OnboardingPage() {
             setIsCompleted(true)
             toast.success("Mükemmel! Onboarding tamamlandı.")
 
-            // Give a small delay for toast/success screen then push
-            setTimeout(() => {
-                router.push("/dashboard")
-                router.refresh()
-            }, 1500)
-
         } catch (error: any) {
             toast.error(error.message || "Bir hata oluştu.")
         } finally {
@@ -228,7 +257,17 @@ export default function OnboardingPage() {
         }
     }
 
-    const progressValue = (step / TOTAL_STEPS) * 100
+    const score = useMemo(() => {
+        let s = 0;
+        if (fullName.trim()) s += 25;
+        if (phone.trim()) s += 15;
+        if (city.trim()) s += 10;
+        if (bio.trim().length >= 50) s += 20;
+        if (photo) s += 25;
+        return s;
+    }, [fullName, phone, city, bio, photo]);
+
+    const isEligibleForToken = (selectedRole === 'GUIDE' || selectedRole === 'ORGANIZATION') && score >= 95;
 
     if (status === "loading") {
         return (
@@ -266,7 +305,7 @@ export default function OnboardingPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {isGuideOrOrg && (
+                        {isEligibleForToken ? (
                             <div className="bg-white dark:bg-gray-800 border-2 border-dashed border-blue-200 dark:border-blue-900/50 rounded-3xl p-6 relative overflow-hidden group">
                                 <div className="absolute top-0 right-0 p-2">
                                     <Sparkles className="w-5 h-5 text-yellow-500 animate-bounce" />
@@ -277,10 +316,18 @@ export default function OnboardingPage() {
                                     <span className="text-2xl font-bold text-gray-500">TOKEN</span>
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-4">
-                                    Profil tamamlama ödülünüz hesabınıza tanımlandı. Bu tokenları ilan öne çıkarmada kullanabilirsiniz.
+                                    Profilinizi %95 tamamladığınız için ödülünüz hesabınıza tanımlandı. Bu tokenları ilan öne çıkarmada kullanabilirsiniz.
                                 </p>
                             </div>
-                        )}
+                        ) : isGuideOrOrg ? (
+                            <div className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 text-center">
+                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    Profil doluluğunuz şu an <strong>%{score}</strong>. 
+                                    <br/>
+                                    Kontrol paneline gidip eksik bilgilerinizi (veya fotoğrafınızı) tamamlayarak <strong>%95</strong> seviyesine ulaştığınız an <strong>5 Token</strong> kazanacaksınız!
+                                </p>
+                            </div>
+                        ) : null}
 
                         <div className="bg-emerald-50 dark:bg-emerald-900/20 border-2 border-dashed border-emerald-200 dark:border-emerald-900/50 rounded-3xl p-6 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-2">
@@ -322,9 +369,10 @@ export default function OnboardingPage() {
                 <div className="max-w-screen-xl mx-auto px-4 h-16 flex items-center justify-between">
                     <Logo size="sm" />
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-muted-foreground hidden sm:inline-block">ADIM {step} / {TOTAL_STEPS}</span>
-                        <div className="w-32 sm:w-48">
-                            <Progress value={progressValue} className="h-2 bg-blue-100 dark:bg-gray-800" />
+                        <span className="text-xs font-bold text-muted-foreground hidden sm:inline-block">PROFİL DOLULUĞU</span>
+                        <div className="w-32 sm:w-48 flex items-center gap-2">
+                            <Progress value={score} className="h-2 flex-1 bg-blue-100 dark:bg-gray-800" />
+                            <span className="text-xs font-black text-blue-600">%{score}</span>
                         </div>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => signOut({ callbackUrl: "/" })} className="text-muted-foreground hover:text-red-500 font-medium">
@@ -531,19 +579,69 @@ export default function OnboardingPage() {
                                     />
                                     <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
                                         <span className={cn(bio.length > 500 ? "text-red-500 font-bold" : "")}>
-                                            {bio.length} / 500 Karakter
+                                            {bio.length} / 500 Karakter {bio.length >= 50 && <span className="text-green-500 font-bold ml-2">(+%20 Eklendi)</span>}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <ShieldCheck className="w-3 h-3" />
                                             İletişim bilgisi girmeyiniz.
                                         </span>
                                     </div>
+                                    {bio.length < 50 && (
+                                        <p className="text-[10px] text-amber-600 text-center font-medium mt-2">
+                                            Profil puanınıza +%20 eklenmesi için en az 50 karakter biyografi yazın.
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         )}
 
-                        {/* STEP 5: FINAL APPROVAL */}
+                        {/* STEP 5: PROFILE PHOTO (OPTIONAL) */}
                         {step === 5 && (
+                            <div className="space-y-8 text-center">
+                                <div className="space-y-2">
+                                    <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                        <Camera className="w-6 h-6 text-purple-600" />
+                                    </div>
+                                    <h1 className="text-3xl font-black text-gray-900 dark:text-white">Profil Fotoğrafı</h1>
+                                    <p className="text-muted-foreground">Güven veren bir profil, daha fazla talep demektir.</p>
+                                </div>
+                                <div className="max-w-md mx-auto space-y-6 bg-white dark:bg-gray-900 p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                    <div className="relative w-32 h-32 mx-auto rounded-full bg-slate-100 dark:bg-gray-800 border-4 border-white dark:border-gray-900 shadow-xl overflow-hidden flex items-center justify-center">
+                                        {photo ? (
+                                            <img src={photo} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <User className="w-12 h-12 text-slate-300" />
+                                        )}
+                                        {uploadingPhoto && (
+                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm">
+                                                <Loader2 className="w-8 h-8 animate-spin text-white" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="space-y-3">
+                                        <div className="flex justify-center">
+                                            <Label className="cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors">
+                                                <Upload className="w-4 h-4" />
+                                                Fotoğraf Seç
+                                                <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} disabled={uploadingPhoto} />
+                                            </Label>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">İsteyenler şirket logosu veya kişisel fotoğraf yükleyebilir.</p>
+                                    </div>
+                                    
+                                    {!photo && (
+                                        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-xl p-3 text-amber-700 dark:text-amber-500 text-[11px] font-medium flex items-start gap-2">
+                                            <Trophy className="w-4 h-4 shrink-0" />
+                                            <p className="text-left">Şimdi eklersen profil doluluğuna <strong>+%25</strong> puan eklenir ve 5 Token hedefine ulaşman çok daha kolaylaşır!</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* STEP 6: FINAL APPROVAL */}
+                        {step === 6 && (
                             <div className="space-y-8">
                                 <div className="text-center space-y-2">
                                     <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -569,13 +667,19 @@ export default function OnboardingPage() {
                                                     <p className="text-sm font-semibold">{city}</p>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">ROLY</p>
+                                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">ROL</p>
                                                     <p className="text-sm font-semibold">{roles.find(r => r.id === selectedRole)?.title}</p>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">TELEFON</p>
                                                     <p className="text-sm font-semibold">{phone}</p>
                                                 </div>
+                                            </div>
+                                            <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                                                <p className="text-xs font-bold text-gray-500">Profil Doluluk Skorun:</p>
+                                                <span className={cn("text-lg font-black", score >= 95 ? "text-green-600" : "text-amber-500")}>
+                                                    %{score}
+                                                </span>
                                             </div>
                                         </div>
                                         <div className="p-6 space-y-4">
@@ -615,7 +719,7 @@ export default function OnboardingPage() {
                                     onClick={nextStep} 
                                     className="w-full sm:w-auto min-h-12 px-10 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20"
                                 >
-                                    Devam Et
+                                    {step === 5 && !photo ? 'Fotoğraf Eklemeden Devam Et' : 'Devam Et'}
                                     <ChevronRight className="ml-2 w-5 h-5" />
                                 </Button>
                             ) : (

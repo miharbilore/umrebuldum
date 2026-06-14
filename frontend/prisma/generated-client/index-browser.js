@@ -371,6 +371,7 @@ exports.Prisma.MessageScalarFieldEnum = {
   role: 'role',
   body: 'body',
   blocked: 'blocked',
+  readAt: 'readAt',
   createdAt: 'createdAt'
 };
 
@@ -748,6 +749,7 @@ exports.Prisma.ChatbotTemplateScalarFieldEnum = {
   id: 'id',
   question: 'question',
   answer: 'answer',
+  parentId: 'parentId',
   isActive: 'isActive',
   order: 'order',
   createdAt: 'createdAt',
@@ -790,6 +792,16 @@ exports.Prisma.GuideArticleScalarFieldEnum = {
   viewCount: 'viewCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ContactMessageScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  message: 'message',
+  isRead: 'isRead',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -901,7 +913,8 @@ exports.Prisma.ModelName = {
   ChatbotTemplate: 'ChatbotTemplate',
   Notification: 'Notification',
   TestLog: 'TestLog',
-  GuideArticle: 'GuideArticle'
+  GuideArticle: 'GuideArticle',
+  ContactMessage: 'ContactMessage'
 };
 
 /**

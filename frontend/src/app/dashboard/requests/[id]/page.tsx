@@ -47,7 +47,7 @@ export default function RequestDetailPage() {
                 window.location.reload();
             } else {
                 if (data.error === "INSUFFICIENT_CREDITS") {
-                    toast.error("Yetersiz bakiye. Kredi yükleyin.");
+                    toast.error("Yetersiz bakiye. Token yükleyin.");
                     router.push("/dashboard/credits");
                 } else if (data.message === "Already expressed interest") {
                     window.location.reload();

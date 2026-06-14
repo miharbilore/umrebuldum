@@ -24,7 +24,7 @@ export function SpotlightPurchaseModal({ isOpen, onClose, listingId, balance, co
 
     const handlePurchase = async () => {
         if (balance < cost) {
-            toast.error("Yetersiz kredi bakiyesi. Lütfen hesabınıza yükleme yapın.");
+            toast.error("Yetersiz token bakiyesi. Lütfen hesabınıza yükleme yapın.");
             return;
         }
 
@@ -84,19 +84,19 @@ export function SpotlightPurchaseModal({ isOpen, onClose, listingId, balance, co
 
                     <div className="flex items-center justify-between text-sm pt-3 border-t">
                         <span className="text-gray-500 font-medium">İşlem Bedeli:</span>
-                        <span className="font-bold text-red-600">{cost} Kredi</span>
+                        <span className="font-bold text-red-600">{cost} Token</span>
                     </div>
                     <div className="flex items-center justify-between text-sm pt-3 border-t">
                         <span className="text-gray-500 font-medium">Mevcut Bakiyeniz:</span>
                         <span className={`font-bold ${balance >= cost ? "text-emerald-600" : "text-red-600"}`}>
-                            {balance} Kredi
+                            {balance} Token
                         </span>
                     </div>
                 </div>
 
                 <div className="bg-blue-50 text-blue-700 p-3 rounded-lg flex gap-2 text-xs">
                     <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                    <p>Güven skoru yeterli olan acenteler bu alana başvurabilir. Saatlik kota (3) dolmuşsa işlem reddedilir ve krediniz kesilmez.</p>
+                    <p>Güven skoru yeterli olan acenteler bu alana başvurabilir. Saatlik kota (3) dolmuşsa işlem reddedilir ve tokeniniz kesilmez.</p>
                 </div>
 
                 <DialogFooter className="mt-4 gap-2 sm:gap-0">

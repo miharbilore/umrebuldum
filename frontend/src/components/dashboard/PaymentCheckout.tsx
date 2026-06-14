@@ -75,7 +75,7 @@ export function PaymentCheckout({
         const handleMessage = (event: MessageEvent) => {
             if (event.origin === "https://www.paytr.com") {
                 if (event.data === "payment_success") {
-                    toast.success("Ödeme başarılı! Kredileriniz hesabınıza tanımlandı.");
+                    toast.success("Ödeme başarılı! Tokenleriniz hesabınıza tanımlandı.");
                     onSuccess?.();
                     onClose();
                 } else if (event.data === "payment_fail") {
@@ -239,7 +239,7 @@ export function PaymentCheckout({
                     <div className="bg-slate-50 rounded-xl p-4 space-y-2">
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">{packageName}</span>
-                            <span className="text-sm font-medium text-gray-900">{credits} Kredi</span>
+                            <span className="text-sm font-medium text-gray-900">{credits} Token</span>
                         </div>
                         {discountedAmount && discountedAmount < amountTRY && (
                             <div className="flex justify-between items-center text-sm">

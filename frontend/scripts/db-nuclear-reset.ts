@@ -32,7 +32,7 @@ async function nuclearReset() {
         await prisma.spotlightPlacement.deleteMany({});
         await prisma.guideListing.deleteMany({});
 
-        // 4. Ekonomi ve Jeton İşlemleri
+        // 4. Ekonomi ve Token İşlemleri
         console.log("--- Finansal veriler temizleniyor ---");
         await prisma.tokenReplenishLog.deleteMany({});
         await prisma.autoReplenishConfig.deleteMany({});

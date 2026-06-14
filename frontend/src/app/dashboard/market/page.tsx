@@ -120,7 +120,7 @@ export default function GuideMarketPage() {
                 setInterestedIds(prev => new Set(prev).add(confirmModal.requestId));
             } else {
                 if (data.error === "INSUFFICIENT_CREDITS") {
-                    toast.error("Bakiyeniz yetersiz. Lütfen kredi yükleyin.");
+                    toast.error("Bakiyeniz yetersiz. Lütfen token yükleyin.");
                 } else {
                     toast.error(data.message || "Bir hata oluştu.");
                 }
@@ -160,7 +160,7 @@ export default function GuideMarketPage() {
                 <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center gap-3">
                     <Coins className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     <p className="text-sm text-blue-800">
-                        Her ilgi beyanı <strong>{creditCost} kredi</strong> düşer. Mevcut bakiyeniz: <strong>{currentBalance} kredi</strong>
+                        Her ilgi beyanı <strong>{creditCost} token</strong> düşer. Mevcut bakiyeniz: <strong>{currentBalance} token</strong>
                     </p>
                 </div>
 
@@ -234,7 +234,7 @@ export default function GuideMarketPage() {
                                         ? "İletişime Geçildi (Detaya Git) ✅"
                                         : currentBalance < creditCost
                                             ? "Yetersiz Bakiye 💰"
-                                            : `Teklif Ver (${creditCost} Kredi) ✨`
+                                            : `Teklif Ver (${creditCost} Token) ✨`
                                     }
                                 </Button>
                             </div>
@@ -260,17 +260,17 @@ export default function GuideMarketPage() {
                             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-600">İşlem Maliyeti</span>
-                                    <span className="font-bold text-amber-700">{creditCost} Kredi</span>
+                                    <span className="font-bold text-amber-700">{creditCost} Token</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm mt-2">
                                     <span className="text-gray-600">Mevcut Bakiye</span>
-                                    <span className="font-bold text-gray-900">{currentBalance} Kredi</span>
+                                    <span className="font-bold text-gray-900">{currentBalance} Token</span>
                                 </div>
                                 <hr className="my-2 border-amber-200" />
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-600">İşlem Sonrası</span>
                                     <span className={`font-bold ${(currentBalance - creditCost) < 5 ? 'text-red-600' : 'text-emerald-600'}`}>
-                                        {currentBalance - creditCost} Kredi
+                                        {currentBalance - creditCost} Token
                                     </span>
                                 </div>
                             </div>

@@ -67,6 +67,7 @@ export function CreditPackages() {
     const role = session?.user?.role;
 
     const [packages, setPackages] = useState<CreditPackage[]>([]);
+    const [tokenPackages, setTokenPackages] = useState<any[]>([]);
     const [loading, setLoading] = useState<string | null>(null);
     const [billingTab, setBillingTab] = useState<BillingTab>(12); // Default to Annual for better conversion
     const [checkoutPkg, setCheckoutPkg] = useState<CreditPackage | null>(null);
@@ -91,6 +92,11 @@ export function CreditPackages() {
                             features: pkg.features || {},
                         })));
                     }
+                }
+                const tokenRes = await fetch("/api/token-packages");
+                if (tokenRes.ok) {
+                    const tData = await tokenRes.json();
+                    setTokenPackages(tData);
                 }
             } catch {
                 console.error("Paketler yüklenirken hata oluştu.");
@@ -317,6 +323,55 @@ export function CreditPackages() {
                         </div>
                     );
                 })}
+            </div>
+
+            {/* Alakart Token Section */}
+            <div className="mt-12 pt-12 border-t border-slate-100 mb-12">
+                <div className="mb-8">
+                    <h2 className="text-2xl font-black text-slate-900 leading-none mb-2">Alakart Tokenler</h2>
+                    <p className="text-slate-500 font-bold">
+                        Sadece ücretli paket (Pro, Premium, Business) sahipleri ek token satın alabilir.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {tokenPackages.map((tokenPkg) => {
+                        const isFreemium = session?.user?.packageType === 'FREEMIUM';
+                        return (
+                            <div key={tokenPkg.id} className="bg-white rounded-[2rem] p-6 border-2 border-slate-100 shadow-sm flex flex-col items-center text-center transition-all hover:border-[#FFB800] hover:shadow-xl group relative overflow-hidden">
+                                <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 group-hover:bg-[#FFB800]/10 transition-colors">
+                                    <Zap className="w-8 h-8 text-[#FFB800] group-hover:fill-[#FFB800]" width={32} height={32} />
+                                </div>
+                                <h3 className="font-black text-xl text-slate-900 mb-1">{tokenPkg.tokens} Token</h3>
+                                <div className="text-[10px] font-black text-slate-400 mb-6 uppercase tracking-wider">₺{Number(tokenPkg.unitPrice).toFixed(2)} / ADET</div>
+                                
+                                <div className="mt-auto w-full">
+                                    <div className="text-3xl font-black text-slate-900 mb-6">₺{Number(tokenPkg.priceTRY).toLocaleString('tr-TR')}</div>
+                                    <Button 
+                                        onClick={() => {
+                                            if (!isFreemium) {
+                                                setCheckoutPkg({
+                                                    id: tokenPkg.id,
+                                                    name: `${tokenPkg.tokens} Token Paketi`,
+                                                    credits: tokenPkg.tokens,
+                                                    priceTRY: tokenPkg.priceTRY
+                                                } as any);
+                                            }
+                                        }}
+                                        disabled={isFreemium}
+                                        className={cn(
+                                            "w-full min-h-[48px] rounded-2xl font-black text-sm uppercase transition-all shadow-md active:scale-95",
+                                            isFreemium 
+                                                ? "bg-slate-200 text-slate-400 cursor-not-allowed border-none shadow-none"
+                                                : "bg-slate-900 hover:bg-black text-white"
+                                        )}
+                                    >
+                                        {isFreemium ? "Paket Gerekli" : "Satın Al"}
+                                    </Button>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Coupon Input Section */}
