@@ -60,9 +60,25 @@ export function startCronJobs(): void {
         timezone: "Europe/Istanbul",
     });
 
+    // ── Package Downgrades (Expirations): daily at 01:00 ────────────
+    cron.schedule("0 1 * * *", async () => {
+        console.log(`[Cron] Running package downgrades at ${new Date().toISOString()}`);
+        try {
+            const { runPackageDowngrades } = await import("@/jobs/package-downgrade.job");
+            const result = await runPackageDowngrades();
+            console.log(`[Cron] Package downgrades complete:`, result);
+        } catch (error) {
+            console.error("[Cron] Package downgrades failed:", error);
+        }
+    }, {
+        timezone: "Europe/Istanbul",
+    });
+
     isRunning = true;
     console.log("[Cron] Scheduled: expire-listings (*/15 * * * *)");
     console.log("[Cron] Scheduled: data-cleanup (0 3 * * *)");
+    console.log("[Cron] Scheduled: package-reminders (0 9 * * *)");
+    console.log("[Cron] Scheduled: package-downgrades (0 1 * * *)");
 }
 
 /**
