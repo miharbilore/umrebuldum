@@ -117,110 +117,202 @@ export default function RequestDetailPage() {
                         )}
                     </div>
 
-                    {/* Contact Logic */}
+                    {/* Contact Logic or Offers List */}
                     <div className="bg-white border rounded-xl p-6 space-y-6 shadow-sm flex flex-col justify-between">
-                        <div>
-                            <h2 className="font-semibold text-lg border-b pb-2 flex items-center gap-2 mb-4">
-                                <span className="bg-green-100 text-green-800 p-1 rounded-lg"><Phone className="w-4 h-4" /></span>
-                                İletişim & Aksiyon
-                            </h2>
-
-                            {hasPaidInterest ? (
-                                <div className="space-y-4 animate-in fade-in duration-500">
-                                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                        <p className="text-green-800 text-sm font-medium mb-3 flex items-center gap-2">
-                                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                            İletişim Bilgileri Açık
-                                        </p>
-
-                                        <div className="space-y-3">
-                                            {/* Phone (WhatsApp Action) */}
-                                            {contactInfo?.phone && (
-                                                <Button
-                                                    variant="outline"
-                                                    disabled={!contactInfo.phone}
-                                                    onClick={() => {
-                                                        if (!contactInfo.phone) return;
-                                                        let cleaned = contactInfo.phone.replace(/\D/g, "");
-                                                        if (cleaned.startsWith("0")) cleaned = cleaned.substring(1);
-                                                        if (!cleaned.startsWith("90")) cleaned = "90" + cleaned;
-                                                        window.open(`https://wa.me/${cleaned}`, '_blank');
-                                                    }}
-                                                    className="w-full gap-3 h-12 justify-start border-green-200 bg-green-50/50 hover:bg-green-100 text-green-700 transition-colors"
-                                                >
-                                                    <div className="bg-green-100 p-1.5 rounded-full shrink-0">
-                                                        <Phone className="w-4 h-4 text-green-700" />
-                                                    </div>
-                                                    <div className="flex flex-col items-start leading-tight">
-                                                        <span className="font-semibold">WhatsApp ile Ulaş</span>
-                                                        <span className="text-[10px] text-green-600/80 font-medium tracking-wide font-mono">{contactInfo.phone}</span>
-                                                    </div>
-                                                </Button>
-                                            )}
-
-                                            {/* Email Action */}
-                                            {contactInfo?.email && (
-                                                <Button
-                                                    variant="outline"
-                                                    disabled={!contactInfo.email}
-                                                    onClick={() => window.open(`mailto:${contactInfo.email}`, '_blank')}
-                                                    className="w-full gap-3 h-12 justify-start border-gray-200 bg-gray-50/50 hover:bg-gray-100 text-gray-700 transition-colors"
-                                                >
-                                                    <div className="bg-gray-200 p-1.5 rounded-full shrink-0">
-                                                        <Mail className="w-4 h-4 text-gray-700" />
-                                                    </div>
-                                                    <div className="flex flex-col items-start leading-tight">
-                                                        <span className="font-semibold">E-posta Gönder</span>
-                                                        <span className="text-[10px] text-gray-500 font-medium tracking-wide">{contactInfo.email}</span>
-                                                    </div>
-                                                </Button>
-                                            )}
-                                        </div>
+                        {request.isOwner ? (
+                            <div>
+                                <h2 className="font-semibold text-lg border-b pb-2 flex items-center gap-2 mb-4">
+                                    <span className="bg-purple-100 text-purple-800 p-1 rounded-lg"><MessageSquare className="w-4 h-4" /></span>
+                                    Gelen Teklifler ({request.offers?.length || 0}/5)
+                                </h2>
+                                {(!request.offers || request.offers.length === 0) ? (
+                                    <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg">
+                                        Henüz bu talebe teklif veren olmadı.
                                     </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {request.offers.map((offer: any) => (
+                                            <div key={offer.id} className="border p-4 rounded-lg bg-gray-50 relative">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <h4 className="font-bold">{offer.guide?.guideProfile?.companyName || offer.guide?.name}</h4>
+                                                        <p className="text-sm text-gray-500">{new Date(offer.createdAt).toLocaleDateString('tr-TR')} {new Date(offer.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="font-bold text-lg text-blue-700">{offer.price} {offer.currency}</div>
+                                                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                                            offer.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                                                            offer.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                            'bg-amber-100 text-amber-800'
+                                                        }`}>
+                                                            {offer.status === 'accepted' ? 'Kabul Edildi' : offer.status === 'rejected' ? 'Reddedildi' : 'Bekliyor'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                {offer.message && (
+                                                    <p className="text-sm text-gray-700 mt-2 p-2 bg-white rounded border">{offer.message}</p>
+                                                )}
+                                                {request.status !== 'completed' && request.status !== 'closed' && offer.status === 'pending' && (
+                                                    <Button 
+                                                        onClick={async () => {
+                                                            if (!confirm('Bu teklifi kabul etmek istediğinize emin misiniz? Diğer teklifler reddedilecektir.')) return;
+                                                            try {
+                                                                const res = await fetch(`/api/requests/${request.id}/accept-offer`, {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({ offerId: offer.id })
+                                                                });
+                                                                if (res.ok) {
+                                                                    toast.success('Teklif kabul edildi!');
+                                                                    window.location.reload();
+                                                                } else {
+                                                                    const data = await res.json();
+                                                                    toast.error(data.error || 'Hata oluştu');
+                                                                }
+                                                            } catch (e) {
+                                                                toast.error('Bağlantı hatası');
+                                                            }
+                                                        }}
+                                                        className="w-full mt-4 bg-green-600 hover:bg-green-700" size="sm"
+                                                    >
+                                                        Bu Teklifi Kabul Et
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div>
+                                <h2 className="font-semibold text-lg border-b pb-2 flex items-center gap-2 mb-4">
+                                    <span className="bg-green-100 text-green-800 p-1 rounded-lg"><Phone className="w-4 h-4" /></span>
+                                    İletişim & Aksiyon
+                                </h2>
 
-                                    {canChat && (
+                                {hasPaidInterest ? (
+                                    <div className="space-y-4 animate-in fade-in duration-500">
+                                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                            <p className="text-green-800 text-sm font-medium mb-3 flex items-center gap-2">
+                                                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                                İletişim Bilgileri Açık
+                                            </p>
+
+                                            <div className="space-y-3">
+                                                {/* Phone (WhatsApp Action) */}
+                                                {contactInfo?.phone && (
+                                                    <Button
+                                                        variant="outline"
+                                                        disabled={!contactInfo.phone}
+                                                        onClick={() => {
+                                                            if (!contactInfo.phone) return;
+                                                            let cleaned = contactInfo.phone.replace(/\D/g, "");
+                                                            if (cleaned.startsWith("0")) cleaned = cleaned.substring(1);
+                                                            if (!cleaned.startsWith("90")) cleaned = "90" + cleaned;
+                                                            window.open(`https://wa.me/${cleaned}`, '_blank');
+                                                        }}
+                                                        className="w-full gap-3 h-12 justify-start border-green-200 bg-green-50/50 hover:bg-green-100 text-green-700 transition-colors"
+                                                    >
+                                                        <div className="bg-green-100 p-1.5 rounded-full shrink-0">
+                                                            <Phone className="w-4 h-4 text-green-700" />
+                                                        </div>
+                                                        <div className="flex flex-col items-start leading-tight">
+                                                            <span className="font-semibold">WhatsApp ile Ulaş</span>
+                                                            <span className="text-[10px] text-green-600/80 font-medium tracking-wide font-mono">{contactInfo.phone}</span>
+                                                        </div>
+                                                    </Button>
+                                                )}
+
+                                                {/* Email Action */}
+                                                {contactInfo?.email && (
+                                                    <Button
+                                                        variant="outline"
+                                                        disabled={!contactInfo.email}
+                                                        onClick={() => window.open(`mailto:${contactInfo.email}`, '_blank')}
+                                                        className="w-full gap-3 h-12 justify-start border-gray-200 bg-gray-50/50 hover:bg-gray-100 text-gray-700 transition-colors"
+                                                    >
+                                                        <div className="bg-gray-200 p-1.5 rounded-full shrink-0">
+                                                            <Mail className="w-4 h-4 text-gray-700" />
+                                                        </div>
+                                                        <div className="flex flex-col items-start leading-tight">
+                                                            <span className="font-semibold">E-posta Gönder</span>
+                                                            <span className="text-[10px] text-gray-500 font-medium tracking-wide">{contactInfo.email}</span>
+                                                        </div>
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {canChat && (
+                                            <Button
+                                                onClick={() => {
+                                                    const url = request.conversationId 
+                                                        ? `/dashboard/messages?conversationId=${request.conversationId}` 
+                                                        : "/dashboard/messages";
+                                                    router.push(url);
+                                                }}
+                                                className="w-full gap-2 bg-blue-600 hover:bg-blue-700 h-12 text-lg shadow-sm"
+                                            >
+                                                <MessageSquare className="w-5 h-5" />
+                                                Platform İçi Mesajlaş
+                                            </Button>
+                                        )}
+
                                         <Button
-                                            onClick={() => {
-                                                const url = request.conversationId 
-                                                    ? `/dashboard/messages?conversationId=${request.conversationId}` 
-                                                    : "/dashboard/messages";
-                                                router.push(url);
+                                            onClick={async () => {
+                                                const reason = prompt('Lütfen şikayet nedeninizi kısaca yazın (Sahte, Yanlış numara vb.):');
+                                                if (!reason) return;
+                                                try {
+                                                    const res = await fetch('/api/guide/report-lead', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ requestId: id, reason })
+                                                    });
+                                                    const data = await res.json();
+                                                    if (res.ok) {
+                                                        toast.success(data.message);
+                                                    } else {
+                                                        toast.error(data.error);
+                                                    }
+                                                } catch (e) {
+                                                    toast.error('Bağlantı hatası');
+                                                }
                                             }}
-                                            className="w-full gap-2 bg-blue-600 hover:bg-blue-700 h-12 text-lg shadow-sm"
+                                            variant="ghost"
+                                            className="w-full text-red-500 hover:bg-red-50 hover:text-red-600 mt-2 text-xs"
                                         >
-                                            <MessageSquare className="w-5 h-5" />
-                                            Platform İçi Mesajlaş
+                                            Sahte / Hatalı Talebi Şikayet Et
                                         </Button>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="space-y-6 text-center py-6">
-                                    <div className="mx-auto w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-2">
-                                        <Lock className="w-8 h-8" />
                                     </div>
-                                    <div className="space-y-2">
-                                        <h3 className="text-lg font-bold text-gray-900">İletişim Bilgileri Kapalı</h3>
-                                        <p className="text-gray-500 text-sm">
-                                            Bu kullanıcının iletişim bilgilerini görmek ve mesajlaşmak için kilidi açmalısınız.
-                                        </p>
-                                    </div>
-
-                                    <div className="text-sm bg-gray-50 p-3 rounded-lg text-left space-y-2">
-                                        <p className="font-semibold text-gray-700">Kullanıcı Tercihleri:</p>
-                                        <div className="flex gap-2 flex-wrap">
-                                            {contactPreferences?.chat && <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">Sohbet</span>}
-                                            {contactPreferences?.phone && <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">Telefon</span>}
-                                            {contactPreferences?.email && <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-medium">E-posta</span>}
+                                ) : (
+                                    <div className="space-y-6 text-center py-6">
+                                        <div className="mx-auto w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                                            <Lock className="w-8 h-8" />
                                         </div>
-                                    </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-lg font-bold text-gray-900">İletişim Bilgileri Kapalı</h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Bu kullanıcının iletişim bilgilerini görmek ve mesajlaşmak için kilidi açmalısınız.
+                                            </p>
+                                        </div>
 
-                                    <Button onClick={() => setShowUnlockModal(true)} className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg shadow-lg shadow-blue-200">
-                                        Kilidi Aç & İletişime Geç
-                                    </Button>
-                                    <p className="text-xs text-gray-400">İşlem bakiyenizden düşülecektir.</p>
-                                </div>
-                            )}
-                        </div>
+                                        <div className="text-sm bg-gray-50 p-3 rounded-lg text-left space-y-2">
+                                            <p className="font-semibold text-gray-700">Kullanıcı Tercihleri:</p>
+                                            <div className="flex gap-2 flex-wrap">
+                                                {contactPreferences?.chat && <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">Sohbet</span>}
+                                                {contactPreferences?.phone && <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">Telefon</span>}
+                                                {contactPreferences?.email && <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-medium">E-posta</span>}
+                                            </div>
+                                        </div>
+
+                                        <Button onClick={() => setShowUnlockModal(true)} className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg shadow-lg shadow-blue-200">
+                                            Kilidi Aç & İletişime Geç
+                                        </Button>
+                                        <p className="text-xs text-gray-400">İşlem bakiyenizden düşülecektir.</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

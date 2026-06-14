@@ -55,7 +55,21 @@ export async function POST(req: Request) {
             where: { id: requestId },
         });
         if (!request) return NextResponse.json({ error: "Request not found" }, { status: 404 });
-        if (request.status !== "open") return NextResponse.json({ error: "Request is closed" }, { status: 400 });
+        if (request.status !== "open") return NextResponse.json({ error: "Request is closed or fulfilled" }, { status: 400 });
+
+        // Max 5 offers check (Pre-flight)
+        const currentOffersCount = await prisma.offer.count({
+            where: { requestId }
+        });
+
+        if (currentOffersCount >= 5) {
+            // Auto-close if it somehow stayed open
+            await prisma.umrahRequest.update({
+                where: { id: requestId },
+                data: { status: "fulfilled" }
+            });
+            return NextResponse.json({ error: "Bu talebe maksimum teklif sayısına (5) ulaşıldı." }, { status: 403 });
+        }
 
         // Pre-flight Token Guard (Role, Daily Cap, Cache Balance)
         const tokenGuardRes = await requireTokens(guideUser.id, session!.user.role || "FREEMIUM", guideUser.packageType || "FREEMIUM", "OFFER_SEND");
@@ -121,6 +135,18 @@ export async function POST(req: Request) {
                         expiresAt: offerExpiresAt,
                     },
                 });
+
+                // Auto-fulfill request if this was the 5th offer
+                const updatedOffersCount = await tx.offer.count({
+                    where: { requestId }
+                });
+
+                if (updatedOffersCount >= 5) {
+                    await tx.umrahRequest.update({
+                        where: { id: requestId },
+                        data: { status: "fulfilled" }
+                    });
+                }
 
                 // Create conversation if not exists
                 const requestOwner = await tx.user.findUnique({

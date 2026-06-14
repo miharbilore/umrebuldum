@@ -39,6 +39,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
             contactViaEmail: true,
             contactViaPhone: true,
             contactViaChat: true,
+            offers: {
+                select: {
+                    id: true,
+                    price: true,
+                    currency: true,
+                    message: true,
+                    status: true,
+                    createdAt: true,
+                    guide: { select: { id: true, name: true, image: true, guideProfile: { select: { companyName: true } } } }
+                },
+                orderBy: { createdAt: 'desc' }
+            }
         }
     });
 
@@ -95,6 +107,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         hasPaidInterest, // Let frontend know if they have access
         conversationId,   // Include conversation ID for routing to chats
         isOwner, // Let frontend know if they own this request
+        ...(isOwner && { offers: request.offers }) // Include offers for owner
     };
 
     // Contact info ONLY for: owner, admin, or guide who paid interest
