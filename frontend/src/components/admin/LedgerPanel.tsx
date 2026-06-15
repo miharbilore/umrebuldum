@@ -55,6 +55,29 @@ export default function LedgerPanel() {
                 </button>
             </div>
 
+            {data?.metrics && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-900 border border-emerald-900/50 rounded-xl p-4 flex items-center gap-4">
+                        <div className="bg-emerald-500/20 p-3 rounded-lg text-emerald-400">
+                            <CreditCard className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-gray-400 text-sm">Piyasadaki Toplam Token</p>
+                            <p className="text-2xl font-bold text-gray-100">{data.metrics.totalTokensInCirculation} <span className="text-sm font-normal text-gray-500">adet</span></p>
+                        </div>
+                    </div>
+                    <div className="bg-gray-900 border border-amber-900/50 rounded-xl p-4 flex items-center gap-4">
+                        <div className="bg-amber-500/20 p-3 rounded-lg text-amber-400">
+                            <ShieldAlert className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-gray-400 text-sm">Sistemde Harcanan (Yakılan)</p>
+                            <p className="text-2xl font-bold text-gray-100">{data.metrics.totalTokensBurned} <span className="text-sm font-normal text-gray-500">adet</span></p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left whitespace-nowrap">

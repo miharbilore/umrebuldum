@@ -62,7 +62,9 @@ export const viewport: Viewport = {
 
 import { Toaster } from 'sonner';
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll";
+import { ShieldAlert } from "lucide-react";
 
 export default async function RootLayout({
   children,
@@ -74,6 +76,34 @@ export default async function RootLayout({
     session = await auth();
   } catch (e) {
     console.error("Auth failed in RootLayout:", e);
+  }
+
+  // Check Maintenance Mode
+  let maintenanceMode = false;
+  try {
+      const setting = await prisma.systemSetting.findUnique({ where: { key: "maintenance_mode" } });
+      if (setting?.value === "true") maintenanceMode = true;
+  } catch(e) {}
+
+  const isAdmin = session?.user?.role === "ADMIN";
+
+  if (maintenanceMode && !isAdmin) {
+      return (
+          <html lang="tr" suppressHydrationWarning>
+            <body className="font-sans antialiased flex flex-col min-h-screen bg-gray-50 items-center justify-center p-4">
+               <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center space-y-6">
+                   <div className="mx-auto w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center">
+                       <ShieldAlert className="w-8 h-8" />
+                   </div>
+                   <h1 className="text-2xl font-bold text-gray-900">Sistem Bakımda</h1>
+                   <p className="text-gray-600">
+                       Platformumuzda planlı bir altyapı güncellemesi yapılmaktadır. Daha iyi bir deneyim sunabilmek için kısa süreliğine kapalıyız. Lütfen daha sonra tekrar deneyin.
+                   </p>
+                   <p className="text-sm text-gray-400">Sabrınız için teşekkür ederiz.</p>
+               </div>
+            </body>
+          </html>
+      );
   }
 
   return (

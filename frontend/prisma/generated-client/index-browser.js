@@ -804,6 +804,13 @@ exports.Prisma.ContactMessageScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SystemSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  description: 'description',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -914,7 +921,8 @@ exports.Prisma.ModelName = {
   Notification: 'Notification',
   TestLog: 'TestLog',
   GuideArticle: 'GuideArticle',
-  ContactMessage: 'ContactMessage'
+  ContactMessage: 'ContactMessage',
+  SystemSetting: 'SystemSetting'
 };
 
 /**

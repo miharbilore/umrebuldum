@@ -371,6 +371,7 @@ model Message {
   role           UserRole
   body           String          @db.Text
   blocked        Boolean         @default(false)
+  readAt         DateTime?
   createdAt      DateTime        @default(now())
   conversation   Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User            @relation(fields: [senderId], references: [id], onDelete: Cascade)
@@ -897,12 +898,17 @@ model NewsletterSubscriber {
 model ChatbotTemplate {
   id        String   @id @default(cuid())
   question  String   @db.Text
-  answer    String   @db.Text
+  answer    String?  @db.Text
+  parentId  String?
   isActive  Boolean  @default(true)
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  parent   ChatbotTemplate?  @relation("ChatbotTree", fields: [parentId], references: [id])
+  children ChatbotTemplate[] @relation("ChatbotTree")
+
+  @@index([parentId])
   @@map("chatbot_templates")
 }
 
@@ -1003,4 +1009,13 @@ model ContactMessage {
   createdAt DateTime @default(now())
 
   @@map("contact_messages")
+}
+
+model SystemSetting {
+  key         String   @id
+  value       String   @db.Text
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
 }

@@ -9,18 +9,56 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ChangePasswordForm } from "@/components/dashboard/ChangePasswordForm";
-
+import { ShieldAlert, Loader2 } from "lucide-react";
 
 export default function AdminSettingsPage() {
     const { data: session } = useSession();
-    const [notifications, setNotifications] = useState(true);
-    const [marketingEmails, setMarketingEmails] = useState(false);
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        fetch("/api/admin/settings")
+            .then(res => res.json())
+            .then(data => {
+                if (data.maintenance_mode === "true") {
+                    setMaintenanceMode(true);
+                }
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const toggleMaintenanceMode = async (checked: boolean) => {
+        setMaintenanceMode(checked);
+        setSaving(true);
+        try {
+            const res = await fetch("/api/admin/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    key: "maintenance_mode", 
+                    value: checked ? "true" : "false",
+                    description: "Site bakım moduna alınırsa, adminler hariç herkes engellenir."
+                })
+            });
+            if (res.ok) {
+                toast.success(checked ? "Bakım Modu AKTİF!" : "Bakım Modu KAPALI.");
+            } else {
+                toast.error("Ayarlar kaydedilemedi.");
+                setMaintenanceMode(!checked); // revert
+            }
+        } catch (e) {
+            toast.error("Bağlantı hatası");
+            setMaintenanceMode(!checked); // revert
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <div className="container mx-auto py-10 px-4 max-w-4xl">
             <h1 className="text-3xl font-bold mb-8">Admin Ayarları</h1>
-
-
 
             {/* Profile Info */}
             <Card className="mb-6">
@@ -42,35 +80,31 @@ export default function AdminSettingsPage() {
                 </CardContent>
             </Card>
 
-            {/* Notifications */}
-            <Card className="mb-6">
-                <CardHeader>
-                    <CardTitle>Bildirimler</CardTitle>
-                    <CardDescription>Bildirim tercihlerinizi yönetin</CardDescription>
+            {/* System Settings */}
+            <Card className="mb-6 border-red-100">
+                <CardHeader className="bg-red-50/50 rounded-t-lg pb-4 border-b border-red-100">
+                    <CardTitle className="text-red-800 flex items-center gap-2">
+                        <ShieldAlert className="w-5 h-5" />
+                        Kritik Sistem Ayarları
+                    </CardTitle>
+                    <CardDescription>Sitenin yayında kalmasını etkileyen ana şalterler</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="pt-6 space-y-4">
                     <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                            <Label>Anlık Bildirimler</Label>
+                        <div className="space-y-1">
+                            <Label className="text-lg font-semibold flex items-center gap-2">
+                                Bakım Modu (Maintenance Mode)
+                                {loading && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
+                            </Label>
                             <p className="text-sm text-muted-foreground">
-                                Önemli güncellemeler hakkında bildirim alın
+                                Açıldığında siteye sadece "Admin" rolündeki yöneticiler girebilir. Tüm müşteriler ve rehberler "Sistem Bakımda" uyarı sayfasıyla karşılaşır.
                             </p>
                         </div>
                         <Switch
-                            checked={notifications}
-                            onCheckedChange={setNotifications}
-                        />
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                            <Label>E-posta Bültenleri</Label>
-                            <p className="text-sm text-muted-foreground">
-                                Haftalık özet ve kampanya bildirimleri
-                            </p>
-                        </div>
-                        <Switch
-                            checked={marketingEmails}
-                            onCheckedChange={setMarketingEmails}
+                            checked={maintenanceMode}
+                            onCheckedChange={toggleMaintenanceMode}
+                            disabled={loading || saving}
+                            className="data-[state=checked]:bg-red-600 scale-125"
                         />
                     </div>
                 </CardContent>
