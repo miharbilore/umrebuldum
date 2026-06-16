@@ -313,6 +313,68 @@ export function listingExpiredTemplate(params: {
     };
 }
 
+// --- Listing Expiring Soon (Warning) ----------------------------------------
+
+export function listingExpiringWarningTemplate(params: {
+    guideName: string;
+    listingTitle: string;
+    daysLeft: number;
+    renewUrl?: string;
+}): EmailTemplate {
+    const { guideName, listingTitle, daysLeft, renewUrl } = params;
+    const url = renewUrl || `${BASE_URL}/dashboard/listings`;
+
+    const content = `
+        <h1 style="margin:0 0 16px 0; font-size:22px; font-weight:700; color:#1e293b;">
+            ⚠️ İlan Süreniz Dolmak Üzere
+        </h1>
+        <p style="margin:0 0 12px 0;">
+            Merhaba <strong>${guideName}</strong>,
+        </p>
+        <p style="margin:0 0 20px 0; color:#475569;">
+            <em>"${listingTitle}"</em> başlıklı ilanınızın yayın süresi <strong>${daysLeft} gün</strong> sonra dolacaktır.
+            Yayında kalmaya devam etmesi için süreyi uzatmayı unutmayın.
+        </p>
+        ${ctaButton("İlanı Yenile", url)}
+    `;
+
+    return {
+        subject: `⚠️ İlan süreniz dolmak üzere: ${listingTitle}`,
+        html: baseLayout(content, `"${listingTitle}" ilanınızın süresi ${daysLeft} gün sonra dolacak.`),
+    };
+}
+
+// --- Package Expiring Soon --------------------------------------------------
+
+export function packageExpiringTemplate(params: {
+    userName: string;
+    packageName: string;
+    daysLeft: number;
+    renewUrl?: string;
+}): EmailTemplate {
+    const { userName, packageName, daysLeft, renewUrl } = params;
+    const url = renewUrl || `${BASE_URL}/dashboard/billing`;
+
+    const content = `
+        <h1 style="margin:0 0 16px 0; font-size:22px; font-weight:700; color:#1e293b;">
+            ⚠️ Paket Süreniz Doluyor
+        </h1>
+        <p style="margin:0 0 12px 0;">
+            Merhaba <strong>${userName}</strong>,
+        </p>
+        <p style="margin:0 0 20px 0; color:#475569;">
+            Kullanmakta olduğunuz <strong>${packageName}</strong> paketinizin süresi <strong>${daysLeft} gün</strong> sonra dolacaktır.
+            İlanlarınızın ve teklif haklarınızın kesintiye uğramaması için paketinizi yenilemeyi unutmayın.
+        </p>
+        ${ctaButton("Paketi Yenile", url)}
+    `;
+
+    return {
+        subject: `⚠️ Paket süreniz doluyor (${packageName}) — UmreBuldum`,
+        html: baseLayout(content, `${packageName} paketinizin süresi ${daysLeft} gün sonra dolacak.`),
+    };
+}
+
 // --- New Lead (Request) -----------------------------------------------------
 
 export function newLeadTemplate(params: {

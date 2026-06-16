@@ -1,4 +1,4 @@
-﻿import { prisma } from "./prisma";
+import { prisma } from "./prisma";
 
 // ─── Expiration Service ─────────────────────────────────────────────────
 // Handles expiration of Listings, Demands, Offers, and featured badges.
@@ -138,8 +138,10 @@ export async function runExpiration(): Promise<ExpirationResult> {
     return result;
 }
 
-// ── Email Queue ─────────────────────────────────────────────────────────
-// TODO: Replace with actual email service (SendGrid, Resend, etc.)
+// ── Email Integration ─────────────────────────────────────────────────────
+
+import { emailService } from "./email/email-service";
+import { listingExpiredTemplate } from "./email/email-templates";
 
 interface ExpirationEmailData {
     to: string;
@@ -171,6 +173,20 @@ async function queueExpirationEmail(
     emailQueue.push(emailData);
 
     console.log(`[Email Queue] Expiration notification for ${to}: ${entityType} "${entityTitle}"`);
+
+    // ACTUALLY SEND THE EMAIL via Resend
+    if (entityType === "listing") {
+        emailService.sendAsync(
+            to,
+            listingExpiredTemplate({
+                guideName: userName,
+                listingTitle: entityTitle,
+            })
+        );
+    } else {
+        // For demand expiration, if we had a demandExpiredTemplate we would use it here.
+        // For now, we just log it as there is no specific template for demand expiration yet.
+    }
 }
 
 /**

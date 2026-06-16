@@ -121,7 +121,6 @@ export default async function OrganizerPublicProfile({ params }: { params: Promi
                                 <ListingCard 
                                     key={listing.id} 
                                     listing={listing as any} 
-                                    agencyName={user.fullName || "Acente"}
                                 />
                             ))}
                         </div>

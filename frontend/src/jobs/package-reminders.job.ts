@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { emailService } from "@/lib/email/email-service";
+import { packageExpiringTemplate, listingExpiringWarningTemplate } from "@/lib/email/email-templates";
 
 export async function runPackageReminders() {
     try {
@@ -20,7 +22,7 @@ export async function runPackageReminders() {
                     lt: targetEnd
                 }
             },
-            select: { id: true, name: true, packageType: true, packageExpiry: true }
+            select: { id: true, name: true, email: true, packageType: true, packageExpiry: true }
         });
 
         if (expiringUsers.length === 0) {
@@ -51,6 +53,19 @@ export async function runPackageReminders() {
                         referenceId: "billing"
                     }
                 });
+                
+                // Send Email via Resend
+                if (user.email) {
+                    emailService.sendAsync(
+                        user.email,
+                        packageExpiringTemplate({
+                            userName: user.name || "Kullanıcı",
+                            packageName: user.packageType,
+                            daysLeft: 3
+                        })
+                    );
+                }
+
                 notificationsCreated++;
             }
         }
@@ -65,15 +80,17 @@ export async function runPackageReminders() {
                     lt: targetEnd
                 }
             },
-            select: { id: true, title: true, guide: { select: { userId: true } } }
+            select: { id: true, title: true, guide: { select: { userId: true, user: { select: { email: true, name: true } } } } }
         });
 
         for (const listing of expiringListings) {
-            if (!listing.guide?.userId) continue;
+            const guideUser = listing.guide?.user;
+            const userId = listing.guide?.userId;
+            if (!userId) continue;
 
             const existingListingNotif = await prisma.notification.findFirst({
                 where: {
-                    userId: listing.guide.userId,
+                    userId: userId,
                     type: "SYSTEM",
                     title: "İlan Süresi Doluyor",
                     referenceId: `listing_${listing.id}`,
@@ -86,13 +103,26 @@ export async function runPackageReminders() {
             if (!existingListingNotif) {
                 await prisma.notification.create({
                     data: {
-                        userId: listing.guide.userId,
+                        userId: userId,
                         type: "SYSTEM",
                         title: "İlan Süresi Doluyor",
                         message: `"${listing.title}" başlıklı ilanınızın yayın süresi 3 gün sonra dolacaktır. Yayında kalmaya devam etmesi için süreyi uzatmayı unutmayın.`,
                         referenceId: `listing_${listing.id}`
                     }
                 });
+
+                // Send Email via Resend
+                if (guideUser?.email) {
+                    emailService.sendAsync(
+                        guideUser.email,
+                        listingExpiringWarningTemplate({
+                            guideName: guideUser.name || "Kullanıcı",
+                            listingTitle: listing.title,
+                            daysLeft: 3
+                        })
+                    );
+                }
+
                 notificationsCreated++;
             }
         }
