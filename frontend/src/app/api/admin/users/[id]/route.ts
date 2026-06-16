@@ -27,7 +27,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         }
         
         if (role !== undefined) {
-            data.role = String(role);
+            const roleStr = String(role);
+            if (!["USER", "GUIDE", "ORGANIZATION", "ADMIN", "BANNED"].includes(roleStr)) {
+                return NextResponse.json({ error: "Geçersiz kullanıcı rolü." }, { status: 400 });
+            }
+            data.role = roleStr;
         }
         
         const currentUser = await prisma.user.findUnique({ where: { id } });

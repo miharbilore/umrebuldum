@@ -97,7 +97,7 @@ export function HeroSection() {
         {mounted ? (
           <form
             onSubmit={handleSearch}
-            className="mx-auto max-w-4xl rounded-3xl bg-white p-6 shadow-2xl backdrop-blur-sm/90"
+            className="mx-auto max-w-4xl rounded-3xl p-6 shadow-2xl bg-white/90 backdrop-blur-sm"
           >
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
               {/* Departure City (5 cols) */}

@@ -118,7 +118,7 @@ export function GamificationAIPanel() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Sohbet Kategorileri</span>
               </div>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div className="rounded-lg bg-muted p-2 text-center">
                   <p className="text-lg font-semibold">42%</p>
                   <p className="text-xs text-muted-foreground">Rezerv.</p>

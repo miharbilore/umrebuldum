@@ -9,6 +9,7 @@ import { ProviderCreditBalance } from '@/components/dashboard/ProviderCreditBala
 import { SpotlightPurchaseModal } from '@/components/dashboard/spotlight-modal';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -102,10 +103,10 @@ export default function ListingsPage() {
             const url = `${window.location.origin}/tours/${listingId}`;
             try {
                 await navigator.clipboard.writeText(url);
-                alert('Bağlantı kopyalandı!');
+                toast.success('Bağlantı kopyalandı!');
             } catch (err) {
                 console.error('Copy failed', err);
-                alert('Bağlantı kopyalanamadı. Lütfen panoya erişim izni verin veya manuel kopyalayın.');
+                toast.error('Bağlantı kopyalanamadı. Lütfen panoya erişim izni verin veya manuel kopyalayın.');
             }
         } else if (action === 'spotlight') {
             setSpotlightModalListing(listingId);
