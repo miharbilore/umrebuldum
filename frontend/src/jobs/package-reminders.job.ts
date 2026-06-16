@@ -51,8 +51,48 @@ export async function runPackageReminders() {
                         referenceId: "billing"
                     }
                 });
-                
-                // Email can be hooked up here
+                notificationsCreated++;
+            }
+        }
+
+        // --- LISTING EXPIRATION REMINDERS ---
+        const expiringListings = await prisma.guideListing.findMany({
+            where: {
+                active: true,
+                deletedAt: null,
+                endDate: {
+                    gte: targetStart,
+                    lt: targetEnd
+                }
+            },
+            select: { id: true, title: true, guide: { select: { userId: true } } }
+        });
+
+        for (const listing of expiringListings) {
+            if (!listing.guide?.userId) continue;
+
+            const existingListingNotif = await prisma.notification.findFirst({
+                where: {
+                    userId: listing.guide.userId,
+                    type: "SYSTEM",
+                    title: "İlan Süresi Doluyor",
+                    referenceId: `listing_${listing.id}`,
+                    createdAt: {
+                        gte: new Date(new Date().setHours(0, 0, 0, 0))
+                    }
+                }
+            });
+
+            if (!existingListingNotif) {
+                await prisma.notification.create({
+                    data: {
+                        userId: listing.guide.userId,
+                        type: "SYSTEM",
+                        title: "İlan Süresi Doluyor",
+                        message: `"${listing.title}" başlıklı ilanınızın yayın süresi 3 gün sonra dolacaktır. Yayında kalmaya devam etmesi için süreyi uzatmayı unutmayın.`,
+                        referenceId: `listing_${listing.id}`
+                    }
+                });
                 notificationsCreated++;
             }
         }
@@ -60,6 +100,7 @@ export async function runPackageReminders() {
         return { 
             message: "Success", 
             foundUsers: expiringUsers.length,
+            foundListings: expiringListings.length,
             notificationsSent: notificationsCreated 
         };
 

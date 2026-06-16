@@ -6,6 +6,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { EXTRA_SERVICES_LIST } from "@/lib/constants/services";
 
 interface LocationAndPriceSectionProps {
     departureCity: string;
@@ -37,8 +38,6 @@ export function LocationAndPriceSection({
     quota, setQuota,
     extraServices, toggleService
 }: LocationAndPriceSectionProps) {
-    const servicesList = ["Otel Dahil", "Transfer", "Rehberlik", "7/24 Destek", "Bayan Rehber"];
-
     return (
         <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,6 +87,7 @@ export function LocationAndPriceSection({
                     <Input
                         className="min-h-11"
                         type="number"
+                        min="1"
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         placeholder="0"
@@ -120,7 +120,7 @@ export function LocationAndPriceSection({
             <div>
                 <label className="block text-sm font-medium mb-2">Ekstra Hizmetler</label>
                 <div className="flex flex-wrap gap-2">
-                    {servicesList.map((service) => (
+                    {EXTRA_SERVICES_LIST.map((service) => (
                         <button
                             key={service}
                             type="button"
@@ -141,6 +141,7 @@ export function LocationAndPriceSection({
                 <Input
                     className="min-h-11"
                     type="number"
+                    min="1"
                     value={quota}
                     onChange={(e) => setQuota(e.target.value)}
                     placeholder="30"

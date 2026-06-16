@@ -38,6 +38,12 @@ export function useCreateListing() {
         e.preventDefault();
         setLoading(true);
 
+        if (!title || !city || !price) {
+            toast.error("Lütfen zorunlu alanları doldurun (Başlık, Şehir, Fiyat).");
+            setLoading(false);
+            return;
+        }
+
         try {
             let finalImageUrl = selectedPredefinedImage;
 
@@ -90,8 +96,9 @@ export function useCreateListing() {
 
             toast.success("İlan başarıyla oluşturuldu!");
             router.push("/dashboard/listings");
-        } catch (e: any) {
-            toast.error(e.message || "İlan oluşturulamadı.");
+        } catch (e: unknown) {
+            const msg = e instanceof Error ? e.message : "İlan oluşturulamadı.";
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

@@ -60,6 +60,10 @@ export async function GET(req: Request) {
         const rawLimit = parseInt(searchParams.get("limit") ?? String(DEFAULT_PAGE_SIZE));
         const limit = Math.min(Math.max(1, rawLimit), MAX_PAGE_SIZE);
 
+        if (cursor && isNaN(Date.parse(cursor))) {
+            return NextResponse.json({ error: "Invalid cursor date" }, { status: 400 });
+        }
+
         if (!threadId) return NextResponse.json({ error: "Missing threadId" }, { status: 400 });
 
         // Find current user
