@@ -105,6 +105,7 @@ export default function ListingsPage() {
                 alert('Bağlantı kopyalandı!');
             } catch (err) {
                 console.error('Copy failed', err);
+                alert('Bağlantı kopyalanamadı. Lütfen panoya erişim izni verin veya manuel kopyalayın.');
             }
         } else if (action === 'spotlight') {
             setSpotlightModalListing(listingId);

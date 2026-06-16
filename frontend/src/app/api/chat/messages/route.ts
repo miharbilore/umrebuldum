@@ -7,7 +7,6 @@ import { pusherServer } from "@/lib/pusher";
 import { emailService } from "@/lib/email/email-service";
 import { newMessageTemplate } from "@/lib/email/email-templates";
 import { UserRole } from "../../../../../prisma/generated-client";
-import DOMPurify from "isomorphic-dompurify";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const MAX_MESSAGE_LENGTH = 500;
@@ -203,11 +202,8 @@ export async function POST(req: Request) {
             return res;
         }
 
-        // ── XSS Sanitization (DOMPurify) ──────────────────────────────────
-        const sanitizedMessage = DOMPurify.sanitize(message.trim(), {
-            ALLOWED_TAGS: [],      // Hiçbir HTML tag'ine izin verme
-            ALLOWED_ATTR: [],      // Hiçbir attribute'a izin verme
-        }).substring(0, MAX_MESSAGE_LENGTH);
+        // ── HTML Tag Sanitization ──────────────────────────────────────────
+        const sanitizedMessage = message.trim().replace(/<[^>]*>?/gm, '').substring(0, MAX_MESSAGE_LENGTH);
 
         if (sanitizedMessage.length === 0) {
             return NextResponse.json({ error: "Message cannot be empty after sanitization" }, { status: 400 });

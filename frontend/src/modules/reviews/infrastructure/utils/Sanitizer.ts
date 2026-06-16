@@ -1,11 +1,9 @@
-﻿import DOMPurify from "isomorphic-dompurify";
-
 export class Sanitizer {
     public static sanitizeReviewText(input: string | null | undefined): string | null {
         if (!input) return null;
 
         // 1. Strip HTML
-        let cleanText = DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
+        let cleanText = input.replace(/<[^>]*>?/gm, '');
 
         // 2. Remove phone numbers
         // Note: Replaced \s with \s to avoid TS escape sequence issues 

@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Building2, MapPin, BadgeCheck, Star } from "lucide-react";
 
-export default function OrganizerPublicProfile({ params }: { params: { slug: string } }) {
+export default async function OrganizerPublicProfile({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     return (
         <div className="min-h-screen bg-slate-50 py-12 px-4">
             <div className="max-w-4xl mx-auto">
@@ -26,7 +27,7 @@ export default function OrganizerPublicProfile({ params }: { params: { slug: str
                                     <h1 className="text-3xl font-bold text-slate-900">Organizasyon Profili</h1>
                                     <BadgeCheck className="w-6 h-6 text-blue-500" />
                                 </div>
-                                <p className="text-slate-500">@{params.slug}</p>
+                                <p className="text-slate-500">@{slug}</p>
                             </div>
 
                             <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-600">

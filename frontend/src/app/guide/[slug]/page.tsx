@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
-export default async function GuidePublicProfile({ params }: { params: { slug: string } }) {
+export default async function GuidePublicProfile({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const user = await prisma.user.findUnique({
-        where: { slug: params.slug },
+        where: { slug },
         include: { guideProfile: true }
     });
 

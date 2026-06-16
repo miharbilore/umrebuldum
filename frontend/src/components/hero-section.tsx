@@ -147,7 +147,7 @@ export function HeroSection() {
         )}
 
         {/* Stats */}
-        <div className="mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8 text-center text-white">
+        <div className="mx-auto mt-16 grid max-w-3xl grid-cols-1 sm:grid-cols-3 gap-8 text-center text-white">
           <div className="p-4 rounded-xl bg-black/30 backdrop-blur-sm">
             <p className="text-3xl font-bold sm:text-4xl text-amber-400">500+</p>
             <p className="mt-1 text-sm sm:text-base opacity-90">Aktif Tur</p>

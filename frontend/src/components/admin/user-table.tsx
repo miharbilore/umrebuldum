@@ -251,7 +251,7 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
 
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
+            <TableHeader className="whitespace-nowrap">
               <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead className="w-12 text-center">
                   <Checkbox

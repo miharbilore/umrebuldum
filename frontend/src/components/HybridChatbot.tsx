@@ -5,6 +5,13 @@ import { MessageSquare, X, Send, Bot, User, Phone } from 'lucide-react';
 import { CONTACT_WHATSAPP_NUMBER } from '@/lib/constants';
 import { usePathname } from 'next/navigation';
 
+function generateId(): string {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
 interface ChatbotNode {
     id: string;
     question: string;
@@ -48,7 +55,7 @@ export default function HybridChatbot() {
         setIsTyping(true);
         setTimeout(() => {
             setMessages(prev => [...prev, {
-                id: crypto.randomUUID(),
+                id: generateId(),
                 type: 'bot',
                 text,
                 options
@@ -74,7 +81,7 @@ export default function HybridChatbot() {
         setChatState('TREE');
 
         const rootNodes = await fetchNodes(null);
-        const options = rootNodes.map(node => ({
+        const options: { label: string; action: string; data?: any }[] = rootNodes.map(node => ({
             label: node.question,
             action: 'NODE_CLICK',
             data: node
@@ -84,7 +91,7 @@ export default function HybridChatbot() {
 
         setIsTyping(false);
         setMessages([{
-            id: crypto.randomUUID(),
+            id: generateId(),
             type: 'bot',
             text: 'Selamün Aleyküm, UmreBuldum Asistanı\'na hoş geldiniz. Size nasıl yardımcı olabilirim?',
             options
@@ -97,7 +104,7 @@ export default function HybridChatbot() {
     };
 
     const handleAction = async (action: string, label: string, data?: any) => {
-        setMessages(prev => [...prev, { id: crypto.randomUUID(), type: 'user', text: label }]);
+        setMessages(prev => [...prev, { id: generateId(), type: 'user', text: label }]);
 
         if (action === 'NODE_CLICK' && data) {
             const node = data as ChatbotNode;
@@ -109,7 +116,7 @@ export default function HybridChatbot() {
                 children = await fetchNodes(node.id);
             }
 
-            const options = children.map(child => ({
+            const options: { label: string; action: string; data?: any }[] = children.map(child => ({
                 label: child.question,
                 action: 'NODE_CLICK',
                 data: child
@@ -125,7 +132,7 @@ export default function HybridChatbot() {
             setIsTyping(false);
             
             setMessages(prev => [...prev, {
-                id: crypto.randomUUID(),
+                id: generateId(),
                 type: 'bot',
                 text: responseText,
                 options
@@ -151,13 +158,13 @@ export default function HybridChatbot() {
                 : '';
 
             setMessages(prev => [...prev, {
-                id: crypto.randomUUID(),
+                id: generateId(),
                 type: 'bot',
                 text: `Anladım. Aşağıdaki butona tıkladığınızda mesajınızla birlikte WhatsApp hattımıza bağlanacaksınız.${outOfHoursNote}`
             }]);
 
             setMessages(prev => [...prev, {
-                id: crypto.randomUUID(),
+                id: generateId(),
                 type: 'bot',
                 text: 'WhatsApp\'a Geçiş',
                 options: [
@@ -174,7 +181,7 @@ export default function HybridChatbot() {
     const handleTextInput = async (text: string) => {
         if (!text.trim()) return;
 
-        setMessages(prev => [...prev, { id: crypto.randomUUID(), type: 'user', text }]);
+        setMessages(prev => [...prev, { id: generateId(), type: 'user', text }]);
         setInputValue('');
 
         if (chatState === 'CONNECTING') {
@@ -196,7 +203,7 @@ export default function HybridChatbot() {
                 // Not found, go straight to WP
                 setChatState('CONNECTING');
                 setMessages(prev => [...prev, {
-                    id: crypto.randomUUID(),
+                    id: generateId(),
                     type: 'bot',
                     text: data.answer || "Sizi müşteri temsilcimize aktarıyorum."
                 }]);
@@ -206,7 +213,7 @@ export default function HybridChatbot() {
                 handleAction('NODE_CLICK', `Arama Sonucu: ${data.node.question}`, data.node);
             } else {
                 setMessages(prev => [...prev, {
-                    id: crypto.randomUUID(),
+                    id: generateId(),
                     type: 'bot',
                     text: data.answer,
                     options: [
@@ -217,7 +224,7 @@ export default function HybridChatbot() {
             }
         } catch (error) {
             setMessages(prev => [...prev, {
-                id: crypto.randomUUID(),
+                id: generateId(),
                 type: 'bot',
                 text: "Bir hata oluştu. Sizi temsilcimize bağlayalım.",
                 options: [{ label: 'Temsilciye Bağlan', action: 'CONNECT_AGENT' }]

@@ -19,7 +19,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         const data: any = {};
         
         if (tokenBalance !== undefined) {
-            data.tokenBalance = Number(tokenBalance);
+            const parsedBalance = Number(tokenBalance);
+            if (isNaN(parsedBalance) || !Number.isInteger(parsedBalance) || parsedBalance < 0) {
+                return NextResponse.json({ error: "Geçersiz token bakiyesi. Sadece pozitif tam sayılar girilebilir." }, { status: 400 });
+            }
+            data.tokenBalance = parsedBalance;
         }
         
         if (role !== undefined) {

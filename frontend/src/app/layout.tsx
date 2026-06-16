@@ -58,6 +58,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: "cover",
 };
 
 import { Toaster } from 'sonner';
@@ -65,6 +66,24 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll";
 import { ShieldAlert } from "lucide-react";
+
+import { unstable_cache } from 'next/cache';
+
+const getMaintenanceMode = unstable_cache(
+  async () => {
+    try {
+      const setting = await prisma.systemSetting.findUnique({ where: { key: "maintenance_mode" } });
+      return setting?.value === "true";
+    } catch (e) {
+      console.error("Database error while checking maintenance mode:", e);
+      // Fail-closed: If the database is unreachable, assume we are under maintenance
+      // to avoid ugly 500 errors across the application.
+      return true;
+    }
+  },
+  ['maintenance-mode'],
+  { revalidate: 60, tags: ['system-settings'] }
+);
 
 export default async function RootLayout({
   children,
@@ -79,11 +98,7 @@ export default async function RootLayout({
   }
 
   // Check Maintenance Mode
-  let maintenanceMode = false;
-  try {
-      const setting = await prisma.systemSetting.findUnique({ where: { key: "maintenance_mode" } });
-      if (setting?.value === "true") maintenanceMode = true;
-  } catch(e) {}
+  const maintenanceMode = await getMaintenanceMode();
 
   const isAdmin = session?.user?.role === "ADMIN";
 

@@ -42,7 +42,7 @@ export function GamificationAIPanel() {
         <CardContent>
           <div className="grid gap-4">
             {/* Quiz Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {quizStats.map((stat) => (
                 <div key={stat.label} className="space-y-1">
                   <p className="text-2xl font-bold">{stat.value}</p>
@@ -98,7 +98,7 @@ export function GamificationAIPanel() {
         <CardContent>
           <div className="grid gap-4">
             {/* AI Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {aiStats.map((stat) => (
                 <div key={stat.label} className="space-y-1">
                   <p className="text-2xl font-bold">{stat.value}</p>

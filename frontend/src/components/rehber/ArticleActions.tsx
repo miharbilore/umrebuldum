@@ -5,12 +5,18 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export function ArticleActions() {
-  const handleShare = () => {
+  const handleShare = async () => {
     if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Bağlantı kopyalandı!', {
-        description: 'Makale linki panonuza eklendi.',
-      });
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success('Bağlantı kopyalandı!', {
+          description: 'Makale linki panonuza eklendi.',
+        });
+      } catch (err) {
+        toast.error('Bağlantı kopyalanamadı', {
+          description: 'Lütfen bağlantıyı tarayıcı adres çubuğundan kopyalayın.',
+        });
+      }
     }
   };
 

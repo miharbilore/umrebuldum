@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ export function ImageUploadSection({
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (customImagePreview) URL.revokeObjectURL(customImagePreview);
             setCustomImageFile(file);
             setCustomImagePreview(URL.createObjectURL(file));
             setSelectedPredefinedImage(undefined);
@@ -34,12 +35,19 @@ export function ImageUploadSection({
     };
 
     const clearCustomImage = () => {
+        if (customImagePreview) URL.revokeObjectURL(customImagePreview);
         setCustomImageFile(null);
         setCustomImagePreview(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
+
+    useEffect(() => {
+        return () => {
+            if (customImagePreview) URL.revokeObjectURL(customImagePreview);
+        };
+    }, [customImagePreview]);
 
     return (
         <div className="space-y-3 p-4 bg-gray-50 border rounded-lg">
