@@ -71,7 +71,11 @@ export default async function OrganizerPublicProfile({ params }: { params: Promi
                             <div>
                                 <div className="flex items-center gap-2">
                                     <h1 className="text-3xl font-bold text-slate-900">{user.fullName || user.name}</h1>
-                                    {user.isIdentityVerified && <BadgeCheck className="w-6 h-6 text-blue-500" title="Doğrulanmış Acente" />}
+                                    {user.isIdentityVerified && (
+                                        <span title="Doğrulanmış Acente">
+                                            <BadgeCheck className="w-6 h-6 text-blue-500" />
+                                        </span>
+                                    )}
                                 </div>
                                 <p className="text-slate-500">@{user.slug}</p>
                             </div>
