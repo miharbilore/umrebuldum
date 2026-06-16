@@ -47,7 +47,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                     message: true,
                     status: true,
                     createdAt: true,
-                    guide: { select: { id: true, name: true, image: true, guideProfile: { select: { companyName: true } } } }
+                    guide: { select: { id: true, name: true, image: true } }
                 },
                 orderBy: { createdAt: 'desc' }
             }

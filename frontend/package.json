@@ -57,6 +57,7 @@
     "firebase-admin": "^13.10.0",
     "framer-motion": "^12.35.2",
     "html-to-image": "^1.11.13",
+    "html2canvas": "^1.4.1",
     "inngest": "^4.1.0",
     "input-otp": "1.4.1",
     "isomorphic-dompurify": "^3.0.0",

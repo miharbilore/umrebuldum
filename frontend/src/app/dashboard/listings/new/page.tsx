@@ -1,7 +1,7 @@
 "use client";
 
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { CreateListingForm } from "@/components/guide-dashboard/create-listing-form";
+import { CreateListingForm } from "@/components/guide-dashboard/create-listing/CreateListingForm";
 
 /**
  * Yeni İlan Oluşturma Sayfası — Thin Wrapper

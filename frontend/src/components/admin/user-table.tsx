@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import useSWR from "swr"
+import { toast } from "sonner"
 import {
   MoreHorizontal,
   Ban,
@@ -129,13 +130,12 @@ export function UserTable({ initialRole = "all" }: UserTableProps) {
     if (!selectedUser) return
     setActionLoading(true)
     const isBanned = selectedUser.role === "BANNED"
-    const newRole = isBanned ? "USER" : "BANNED" // Assuming default fallback is USER when unbanning
     
     try {
       const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole })
+        body: JSON.stringify({ isBanned: !isBanned })
       })
       if (res.ok) {
         toast.success(`Kullanıcı başarıyla ${isBanned ? "aktif edildi" : "engellendi"}.`)

@@ -40,7 +40,7 @@ export default async function GuidePublicProfile({ params }: { params: { slug: s
                                 <div className="flex items-center gap-2">
                                     <h1 className="text-3xl font-bold text-slate-900">{user.fullName || "İsimsiz Rehber"}</h1>
                                     {user.isIdentityVerified && (
-                                        <ShieldCheck className="w-6 h-6 text-blue-500" title="Kimlik Onaylı" />
+                                        <ShieldCheck className="w-6 h-6 text-blue-500" />
                                     )}
                                 </div>
                                 <p className="text-slate-500">@{user.slug}</p>
@@ -70,11 +70,11 @@ export default async function GuidePublicProfile({ params }: { params: { slug: s
                                 </p>
                             </div>
 
-                            {user.guideProfile?.languagesSpoken && user.guideProfile.languagesSpoken.length > 0 && (
+                            {user.guideProfile?.languagesSpoken && Array.isArray(user.guideProfile.languagesSpoken) && user.guideProfile.languagesSpoken.length > 0 && (
                                 <div className="border-t border-slate-100 pt-6">
                                     <h2 className="text-xl font-bold text-slate-900 mb-3">Bildiği Diller</h2>
                                     <div className="flex flex-wrap gap-2">
-                                        {user.guideProfile.languagesSpoken.map((lang: string, i: number) => (
+                                        {(user.guideProfile.languagesSpoken as string[]).map((lang: string, i: number) => (
                                             <span key={i} className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                                                 {lang}
                                             </span>
@@ -83,11 +83,11 @@ export default async function GuidePublicProfile({ params }: { params: { slug: s
                                 </div>
                             )}
 
-                            {user.guideProfile?.specialties && user.guideProfile.specialties.length > 0 && (
+                            {user.guideProfile?.specialties && Array.isArray(user.guideProfile.specialties) && user.guideProfile.specialties.length > 0 && (
                                 <div className="border-t border-slate-100 pt-6">
                                     <h2 className="text-xl font-bold text-slate-900 mb-3">Uzmanlık Alanları</h2>
                                     <div className="flex flex-wrap gap-2">
-                                        {user.guideProfile.specialties.map((spec: string, i: number) => (
+                                        {(user.guideProfile.specialties as string[]).map((spec: string, i: number) => (
                                             <span key={i} className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
                                                 {spec}
                                             </span>

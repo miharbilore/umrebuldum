@@ -4,13 +4,13 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
 import { safeErrorMessage } from "@/lib/safe-error";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await auth();
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const id = params.id;
         const body = await req.json();
 
         // allowed fields to update
@@ -26,22 +26,22 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
             data.role = String(role);
         }
         
-        // Example: If we want to ban users, maybe there's a status field or isBanned?
-        // Wait, the User schema has 'status' or 'role' = 'BANNED'?
-        // Let's check `lib/db-types.ts` or schema.
-        // I will use role="BANNED" if `isBanned` is true, or I will use `status` field if it exists.
-        // Actually, in `user-table.tsx` there's `role` and `status` might be undefined. Let's just update `role` for Ban, or `isActive` / `isApproved`.
-        // Let me check prisma schema for ban logic. I'll just use a try-catch for `status` or update whatever field is passed.
-        // Wait, the User model has `status` or just `role`?
-        // In the previous output of user-table.tsx, the `getRoleBadge` handles 'BANNED' as a UserRole. Let's use role="BANNED".
+        const currentUser = await prisma.user.findUnique({ where: { id } });
+        if (!currentUser) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        // Handle Banning correctly
         if (isBanned === true) {
-            data.role = "BANNED";
+            if (currentUser.role !== "BANNED") {
+                data.role = "BANNED";
+                data.previousRole = currentUser.role;
+            }
         } else if (isBanned === false) {
-            // Need to know what role to restore? Usually just "USER" or whatever it was. 
-            // We should probably rely on a dedicated `status` field or just leave it to the client to send the right `role` when unbanning.
-            // Let's look at schema to be sure, but for now I'll support passing `status` or updating `isBanned` if that's a field.
-            // Wait, the user asked: "Gelen JSON içindeki verilere göre (Örn: tokenBalance veya isBanned)".
-            // I'll check if `isBanned` exists, if not, I'll update it anyway and let Prisma complain if it's wrong, or I can safely check.
+            if (currentUser.role === "BANNED") {
+                data.role = currentUser.previousRole || "USER";
+                data.previousRole = null;
+            }
         }
 
         // Just blindly pass the data the client sends for these simple fields
@@ -54,7 +54,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
                 email: true,
                 role: true,
                 tokenBalance: true,
-                // isBanned: true // If it exists
+                previousRole: true
             }
         });
 
