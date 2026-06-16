@@ -187,11 +187,12 @@ export default function LoginPage() {
                                             <svg className="h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path></svg>
                                             <span className="sr-only">Google</span>
                                         </Button>
-                                        <Button variant="outline" onClick={() => handleSocialLogin('apple')} className="w-full">
+                                        <Button variant="outline" disabled className="w-full relative opacity-50 cursor-not-allowed">
                                             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.127 3.675-.552 9.127 1.519 12.153 1.015 1.481 2.228 3.143 3.82 3.083 1.53-.059 2.106-.989 3.96-.989 1.849 0 2.373.989 3.993.957 1.666-.027 2.723-1.509 3.738-2.992 1.171-1.71 1.652-3.376 1.666-3.456-.035-.018-3.226-1.24-3.268-4.918-.041-3.076 2.508-4.544 2.637-4.634-1.44-2.112-3.69-2.355-4.48-2.39-1.025-.045-1.875.25-2.665.213zM15.545 4.387c.792-1.096 1.957-1.745 1.957-1.745a5.524 5.524 0 0 0-1.442-3.35 5.254 5.254 0 0 0-3.39 1.83 5.378 5.378 0 0 0 1.465 3.393 4.964 4.964 0 0 0 3.385-1.761 1.144 1.144 0 0 0-.014-.029.043.043 0 0 0 .04-.04v.003-.003.002-.002.003.111z" />
                                             </svg>
                                             <span className="sr-only">Apple</span>
+                                            <span className="absolute -top-2 -right-1 text-[8px] font-bold bg-slate-100 text-slate-500 px-1 rounded border">Yakında</span>
                                         </Button>
                                         <Button variant="outline" onClick={() => handleSocialLogin('facebook')} className="w-full">
                                             <Facebook className="h-4 w-4 text-[#1877F2]" />

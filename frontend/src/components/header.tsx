@@ -187,6 +187,13 @@ export function Header() {
               ℹ️ Hakkımızda
             </Link>
             <Link
+              href="/pricing"
+              className="rounded-xl px-5 py-3 text-lg font-medium text-foreground transition-colors hover:bg-secondary flex items-center gap-3"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              💳 Fiyatlandırma
+            </Link>
+            <Link
               href="/contact"
               className="rounded-xl px-5 py-3 text-lg font-medium text-foreground transition-colors hover:bg-secondary flex items-center gap-3"
               onClick={() => setIsMenuOpen(false)}

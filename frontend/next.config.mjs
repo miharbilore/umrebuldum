@@ -31,7 +31,9 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  allowedDevOrigins: ['192.168.1.220', 'localhost'],
   images: {
+    qualities: [25, 50, 75, 80, 90, 100],
     remotePatterns: [
       {
         protocol: 'https',
