@@ -32,12 +32,15 @@ export function PosterTemplateGrid({ selectedTemplateId, setSelectedTemplateId, 
                                     <span className="text-[10px] font-bold text-white/80 uppercase tracking-tighter bg-slate-950/40 px-2 py-0.5 rounded-full">Kilitli</span>
                                 </div>
                             )}
-                            <div className={`flex-1 bg-slate-100 flex items-center justify-center p-2 relative transition-all duration-500 ${locked ? 'grayscale contrast-75' : ''}`}>
-                                <div className="text-xs text-slate-400 font-mono absolute top-2 left-2">{tpl.id.split('-')[1]}</div>
-                                <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 rounded shadow-sm"></div>
+                            <div className={`flex-1 flex flex-col items-center justify-center p-4 relative transition-all duration-500 ${locked ? 'bg-slate-50' : 'bg-[#f8fafc] group-hover:bg-[#f1f5f9]'}`}>
+                                <div className={`text-3xl font-black mb-1 ${active ? 'text-primary' : 'text-slate-300'}`}>
+                                    {tpl.id.split('-')[1]}
+                                </div>
+                                <div className="w-12 h-1.5 rounded-full bg-gradient-to-r from-slate-200 to-slate-300 mb-2"></div>
+                                <div className="w-8 h-1.5 rounded-full bg-gradient-to-r from-slate-200 to-slate-300"></div>
                             </div>
-                            <div className="p-2 bg-white">
-                                <div className="text-xs font-semibold truncate pr-4">{tpl.name}</div>
+                            <div className="p-2.5 bg-white border-t border-slate-100">
+                                <div className={`text-xs font-bold truncate pr-4 ${active ? 'text-primary' : 'text-slate-700'}`}>{tpl.name}</div>
                                 {locked && (
                                     <div className="absolute bottom-2 right-2 text-red-500" title={`Requires ${tpl.requiredTier}`}>
                                         <Lock className="w-3 h-3" />

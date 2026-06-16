@@ -115,7 +115,7 @@ export function ProviderCreditBalance() {
                                     className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-black text-white font-black uppercase text-xs tracking-widest shadow-lg flex-1"
                                 >
                                     <GraduationCap className="w-5 h-5 mr-2" width={20} height={20} />
-                                    Sınavla Token Kazan
+                                    Uzmanlık Testine Katıl
                                 </Button>
                                 <Button asChild className="h-14 px-8 rounded-2xl bg-[#FFB800] hover:bg-[#E6A600] text-black font-black uppercase text-xs tracking-widest shadow-lg shadow-[#FFB800]/20 flex-1">
                                     <Link href="/pricing" className="flex items-center">

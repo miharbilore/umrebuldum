@@ -3,14 +3,34 @@ import * as htmlToImage from 'html-to-image';
 import { PackageLimits } from '@/lib/package-system';
 import { PosterData } from './types';
 
+function dataURItoBlob(dataURI: string) {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+}
+
 export function usePosterExport(previewRef: RefObject<HTMLDivElement | null>, limits: PackageLimits, data: PosterData, selectedTemplateId: string) {
     const [generating, setGenerating] = useState(false);
 
     const handleShare = async () => {
         if (!previewRef.current) return;
         try {
-            const blob = await htmlToImage.toBlob(previewRef.current, { pixelRatio: 2 });
-            if (!blob) throw new Error("Could not generate image blob");
+            const options = {
+                pixelRatio: 1.25,
+                backgroundColor: '#ffffff',
+                width: 1080,
+                height: 1350,
+            };
+
+            await htmlToImage.toPng(previewRef.current, options).catch(() => {});
+            const dataUrl = await htmlToImage.toPng(previewRef.current, options);
+            if (!dataUrl || dataUrl === 'data:,') throw new Error("Could not generate image data");
+            const blob = dataURItoBlob(dataUrl);
             const file = new File([blob], 'umre-afis.png', { type: 'image/png' });
 
             const shareLink = `https://umrebuldum.com/guide/${data.guideName.toLowerCase().replace(/\s+/g, '-')}`;
@@ -35,9 +55,9 @@ export function usePosterExport(previewRef: RefObject<HTMLDivElement | null>, li
         if (!previewRef.current) return;
         setGenerating(true);
 
-        let scale = 1;
-        if (limits.posterQuality === "NORMAL") scale = 2;
-        if (limits.posterQuality === "HIGH") scale = 3;
+        let scale = 1; // 1080x1350 (Standard HD)
+        if (limits.posterQuality === "NORMAL") scale = 1.25; 
+        if (limits.posterQuality === "HIGH") scale = 1.5; 
 
         try {
             await new Promise(r => setTimeout(r, 800));
@@ -45,20 +65,24 @@ export function usePosterExport(previewRef: RefObject<HTMLDivElement | null>, li
             const options = {
                 pixelRatio: scale,
                 backgroundColor: '#ffffff',
-                cacheBust: true,
-                style: {
-                    transform: 'scale(1)',
-                    transformOrigin: 'top left',
-                },
+                width: 1080,
+                height: 1350,
             };
 
-            const blob = await htmlToImage.toBlob(previewRef.current, options);
+            // Warm-up call (solves the famous html-to-image Safari/Chrome empty data bug)
+            await htmlToImage.toPng(previewRef.current, options).catch(() => {});
             
-            if (!blob) {
-                throw new Error("Blob generation returned null.");
+            // Actual capture
+            const dataUrl = await htmlToImage.toPng(previewRef.current, options);
+            
+            if (!dataUrl || dataUrl === 'data:,') {
+                throw new Error("Image generation returned empty data.");
             }
 
+            // Convert to Blob manually to prevent browser href string length limits (0kb error)
+            const blob = dataURItoBlob(dataUrl);
             const url = URL.createObjectURL(blob);
+
             const link = document.createElement('a');
             link.download = `umre-afis-${selectedTemplateId}-${Date.now()}.png`;
             link.href = url;

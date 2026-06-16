@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Eye, Settings, Palette } from 'lucide-react';
-import { QRCodeCanvas } from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Templates & Config
 import { POSTER_TEMPLATES } from '@/components/dashboard/poster-templates/registry';
@@ -145,7 +145,7 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
                             <div className="text-[11px] font-black text-[#d4af37] mb-3.5 tracking-[0.3em] uppercase opacity-90">UmreBuldum</div>
                             
                             <div className="relative p-3.5 bg-[#f9f7f2] rounded-2xl shadow-inner border border-white/20">
-                                <QRCodeCanvas
+                                <QRCodeSVG
                                     value={`https://umrebuldum.com/guide/${data.guideName.toLowerCase().replace(/\s+/g, '-')}`}
                                     size={115}
                                     level="H"

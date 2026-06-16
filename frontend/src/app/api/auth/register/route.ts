@@ -154,7 +154,7 @@ export async function POST(req: Request) {
 
         // This guarantees: SUM(ledger) == tokenBalance for all users.
         // Empty ledger state is IMPOSSIBLE after this point.
-        const initialTokens = (role === 'GUIDE' || role === 'ORGANIZATION') ? 15 : 0;
+        const initialTokens = 0; // Tokenlar kayıtta değil, onboarding sayfasında verilecek.
 
         try {
             console.log("Granting initial tokens...");
@@ -162,7 +162,7 @@ export async function POST(req: Request) {
                 userId: newUser.id,
                 amount: initialTokens,
                 type: "INITIAL_BALANCE",
-                reason: "INITIAL_BALANCE",
+                reason: "Hesap Açılışı",
                 idempotencyKey: `register:${newUser.id}`,
             });
             console.log(`Seeded ledger for ${email}: ${initialTokens} tokens (role: ${role}).`);

@@ -1,4 +1,4 @@
-﻿// import * as Sentry from "@sentry/nextjs";
+// import * as Sentry from "@sentry/nextjs";
 const Sentry = {
   captureException: (...args: any[]) => console.error("[Sentry Mock]", ...args),
 };
@@ -12,8 +12,13 @@ export const safeInngestSend = async (inngestClient: any, eventPayload: any) => 
   try {
     await inngestClient.send(eventPayload);
   } catch (err: any) {
+    // Development ortamında anahtar yoksa uyarıyı sessize al (konsolu kirletmemesi için)
+    const isMissingKey = err?.message?.includes("INNGEST_EVENT_KEY") || err?.message?.includes("event key");
+    
     if (process.env.NODE_ENV === "development") {
-      console.error("[Inngest Send Failed]", err);
+      if (!isMissingKey) {
+        console.error("[Inngest Send Failed]", err);
+      }
     } else {
       Sentry.captureException(err);
     }

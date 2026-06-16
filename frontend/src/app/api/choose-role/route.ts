@@ -21,7 +21,7 @@ const onboardingSchema = z.object({
     bio: z.string().trim().max(500, "Biyografi 500 karakteri geçemez").refine(bioAntiBypass, {
         message: "Biyografi alanına iletişim bilgisi (telefon veya e-posta) yazılamaz."
     }),
-    photo: z.string().url().optional().or(z.literal("")),
+    photo: z.string().optional(),
 });
 
 /**

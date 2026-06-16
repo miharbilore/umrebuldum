@@ -1,4 +1,4 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { Review } from "../domain/Review";
 import { ReviewPolicy } from "../domain/ReviewPolicy";
 import { Sanitizer } from "../infrastructure/utils/Sanitizer";
@@ -66,15 +66,28 @@ export class CreateReviewUseCase {
         const hasConversation = demand.conversations.length > 0 && demand.conversations[0].messages.length > 0;
 
         // P1 Requirement: Booking/Assignment verification
-        // Status must be closed/completed (meaning user picked a guide)
-        const isRequestClosed = demand.status === "closed" || demand.status === "completed";
+        // Status must be completed (meaning user picked a guide via an Offer)
+        const isRequestCompleted = demand.status === "completed";
 
         if (!hasConversation) {
             throw new Error("Yalnızca mesajlaştığınız rehberleri değerlendirebilirsiniz.");
         }
 
-        if (!isRequestClosed) {
-            throw new Error("Değerlendirme yapabilmek için anlaşmanın tamamlanması gereklidir.");
+        if (!isRequestCompleted) {
+            throw new Error("Değerlendirme yapabilmek için uygulamanın teklif (offer) sistemi üzerinden rehberle anlaşmanız (talebin tamamlanması) gereklidir.");
+        }
+
+        // SECURITY FIX: Ensure the user actually hired this SPECIFIC guide
+        const acceptedOffer = await prisma.offer.findFirst({
+            where: {
+                requestId: req.requestId,
+                guideId: req.guideId,
+                status: "accepted"
+            }
+        });
+
+        if (!acceptedOffer) {
+            throw new Error("Sadece teklifini kabul ettiğiniz (sistem üzerinden anlaştığınız) rehber veya acenteyi değerlendirebilirsiniz.");
         }
 
         // Check if review already exists

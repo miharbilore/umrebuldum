@@ -98,7 +98,7 @@ export function ProfileProgress() {
                 <div className="flex items-center gap-3">
                     <span className="text-slate-600">Size Özel Beyobası.com İndirim Kodunuz:</span>
                     <span className="bg-white text-emerald-700 font-black px-3 py-1.5 rounded-lg tracking-widest border border-emerald-200 shadow-sm select-all">
-                        BEYOBASI2026
+                        BEYOBASI10
                     </span>
                 </div>
             </div>

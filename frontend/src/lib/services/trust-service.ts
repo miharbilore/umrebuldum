@@ -27,8 +27,8 @@ export interface ProfileCompletionResult {
  * Logic:
  * 1. Role & Name present: 40%
  * 2. Phone & City present: 60%
- * 3. Bio & Identity Application present: 80%
- * 4. approvalStatus === 'APPROVED': 100%
+ * 3. Bio & Photo present: 95%
+ * 4. approvalStatus === 'APPROVED' or isIdentityVerified: 100%
  */
 export function calculateProfileCompletion(user: any): ProfileCompletionResult {
     let percentage = 0;
@@ -36,11 +36,11 @@ export function calculateProfileCompletion(user: any): ProfileCompletionResult {
 
     const hasRoleAndName = !!(user.role && user.fullName);
     const hasPhoneAndCity = !!(user.phone && user.city);
-    const hasBioAndDocs = !!(user.bio && user.identityApplications?.length > 0);
+    const hasBioAndPhoto = !!(user.bio && (user.photo || user.image));
     
-    // Check for approved status from the latest application
+    // Check for approved status from the latest application or direct flag
     const latestApp = user.identityApplications?.[0];
-    const isApproved = user.isApproved || latestApp?.status === "APPROVED";
+    const isApproved = user.isApproved || user.isIdentityVerified || latestApp?.status === "APPROVED";
     const isPending = latestApp?.status === "PENDING";
 
     if (hasRoleAndName) {
@@ -55,12 +55,12 @@ export function calculateProfileCompletion(user: any): ProfileCompletionResult {
 
     if (hasPhoneAndCity) {
         percentage = 60;
-        missingStep = { label: "Özgeçmiş ve Belgeleri Yükle", link: "/dashboard/profile" };
+        missingStep = { label: "Özgeçmiş ve Fotoğraf Yükle", link: "/dashboard/profile" };
     }
 
-    if (hasBioAndDocs) {
-        percentage = 80;
-        missingStep = { label: "Onay Bekleniyor", link: "/dashboard/settings" };
+    if (hasBioAndPhoto) {
+        percentage = 95;
+        missingStep = { label: "Kimlik ve Belge Doğrulaması", link: "#verify-identity" };
     }
 
     if (isApproved) {
