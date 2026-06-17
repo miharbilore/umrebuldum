@@ -10,6 +10,8 @@ const config = [
       "node_modules/**",
       "coverage/**",
       "public/**",
+      "prisma/**",
+      "prisma/generated-client/**",
     ],
   },
 ];

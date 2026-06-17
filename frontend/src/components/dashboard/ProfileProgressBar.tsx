@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2, ShieldCheck, X, Mail } from "lucide-react";
@@ -18,6 +18,15 @@ export function ProfileProgressBar() {
 
     const [isVisible, setIsVisible] = useState(true);
     const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+
+    const handleActionClick = (e: React.MouseEvent<HTMLAnchorElement>, link: string) => {
+        if (link.startsWith("#")) {
+            e.preventDefault();
+            if (link === "#verify-identity") {
+                setIsVerifyModalOpen(true);
+            }
+        }
+    };
 
     if (isLoading || error || !data || !data.completion) return null;
 
@@ -151,7 +160,7 @@ export function ProfileProgressBar() {
                     </div>
                     
                     <p className="text-sm text-gray-500">
-                        Ekibimiz belgelerinizi inceledikten sonra profilinizi onaylayacak ve güven skorunuz %100'e ulaşacaktır. İşlem süresi genellikle 1-2 iş günüdür.
+                        Ekibimiz belgelerinizi inceledikten sonra profilinizi onaylayacak ve güven skorunuz %100&apos;e ulaşacaktır. İşlem süresi genellikle 1-2 iş günüdür.
                     </p>
 
                     <DialogFooter className="mt-4 sm:justify-start">
