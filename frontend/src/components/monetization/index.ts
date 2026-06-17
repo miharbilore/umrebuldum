@@ -1,4 +1,4 @@
-﻿export {
+export {
     FeaturedBadge,
     ListingCardPro,
     RequestPriorityUpsell,
@@ -15,9 +15,4 @@ export {
     FeatureList,
 } from './UpgradePrompts';
 
-// Backend-synced components (Primary Source)
-export {
-    PricingTable, // The new correct one
-    QuotaStatus,
-    FeatureGate
-} from './BackendSyncedComponents';
+// Note: BackendSyncedComponents were legacy WordPress components and have been safely removed.

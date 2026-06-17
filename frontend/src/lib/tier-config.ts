@@ -116,16 +116,4 @@ export const TIER_DISPLAY_CONFIG: Record<TierType, TierDisplayConfig> = {
     }
 };
 
-/**
- * Fetch Access Info from Backend
- */
-export async function fetchAccessInfo(): Promise<AccessInfo | null> {
-    try {
-        const res = await fetch('/wp-json/umrebuldum/v1/access');
-        if (!res.ok) return null;
-        return await res.json();
-    } catch (e) {
-        console.error('Failed to fetch access info', e);
-        return null;
-    }
-}
+// fetchAccessInfo function has been removed as it was a legacy WordPress connector.
