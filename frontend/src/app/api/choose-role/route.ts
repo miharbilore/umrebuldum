@@ -51,11 +51,15 @@ export async function POST(req: Request) {
         // Find the user to check if this is the first time (already has role?)
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, role: true, email: true }
+            select: { id: true, role: true, email: true, onboardingCompleted: true }
         })
 
         if (!user) {
             return NextResponse.json({ error: "Kullanıcı bulunamadı" }, { status: 404 })
+        }
+
+        if (user.onboardingCompleted) {
+            return NextResponse.json({ error: "Onboarding işlemini zaten tamamladınız. Rolünüzü değiştiremezsiniz." }, { status: 400 })
         }
 
         // 5-Token Reward Logic
@@ -98,6 +102,7 @@ export async function POST(req: Request) {
                     image: photo && photo.length > 0 ? photo : undefined,
                     profileCompletedAt: new Date(),
                     hasClaimedProfileBonus: isEligibleForBonus,
+                    onboardingCompleted: true,
                 }
             })
 
