@@ -1,4 +1,4 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 import type {
     PaymentGateway,
     CreateSessionParams,
@@ -26,6 +26,17 @@ interface PayTRTokenResponse {
     status: "success" | "failed";
     token?: string;
     reason?: string;
+}
+
+export interface PayTRCallbackPayload {
+    merchant_oid: string;
+    status: string;
+    total_amount: string;
+    hash: string;
+    ctoken?: string;
+    utoken?: string;
+    last4?: string;
+    card_brand?: string;
 }
 
 export class PayTRGateway implements PaymentGateway {
@@ -139,8 +150,9 @@ export class PayTRGateway implements PaymentGateway {
      *
      * We must respond with "OK" on success.
      */
-    async verifyCallback(payload: Record<string, string>): Promise<CallbackResult> {
-        const { merchant_oid, status, total_amount, hash } = payload;
+    async verifyCallback(payload: unknown): Promise<CallbackResult> {
+        const typedPayload = payload as PayTRCallbackPayload;
+        const { merchant_oid, status, total_amount, hash } = typedPayload;
 
         if (!merchant_oid || !status || !total_amount || !hash) {
             return { success: false, error: "Missing callback parameters" };
@@ -170,17 +182,17 @@ export class PayTRGateway implements PaymentGateway {
             sessionId: merchant_oid,
         };
 
-        if (payload.ctoken) {
-            result.cardToken = payload.ctoken;
+        if (typedPayload.ctoken) {
+            result.cardToken = typedPayload.ctoken;
         }
-        if (payload.utoken) {
-            result.userToken = payload.utoken;
+        if (typedPayload.utoken) {
+            result.userToken = typedPayload.utoken;
         }
-        if (payload.last4) {
-            result.last4 = payload.last4;
+        if (typedPayload.last4) {
+            result.last4 = typedPayload.last4;
         }
-        if (payload.card_brand) {
-            result.brand = payload.card_brand.toLowerCase();
+        if (typedPayload.card_brand) {
+            result.brand = typedPayload.card_brand.toLowerCase();
         }
 
         return result;
@@ -216,8 +228,11 @@ export class PayTRGateway implements PaymentGateway {
             }
 
             return { success: false, error: result.err_msg || "PayTR refund failed" };
-        } catch (err: any) {
-            return { success: false, error: err.message };
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                return { success: false, error: err.message };
+            }
+            return { success: false, error: "An unknown error occurred" };
         }
     }
 

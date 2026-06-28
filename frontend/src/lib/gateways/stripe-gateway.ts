@@ -1,4 +1,4 @@
-﻿import Stripe from "stripe";
+import Stripe from "stripe";
 import type {
     PaymentGateway,
     CreateSessionParams,
@@ -6,6 +6,11 @@ import type {
     CallbackResult,
     RefundResult,
 } from "../payment-gateway";
+
+export interface StripeWebhookEvent {
+    body: string;
+    signature: string;
+}
 
 /**
  * Stripe Payment Gateway
@@ -27,11 +32,11 @@ export class StripeGateway implements PaymentGateway {
             if (!secretKey) {
                 console.warn("[StripeGateway] STRIPE_SECRET_KEY is not set.");
                 this.stripeClient = new Stripe("dummy_key", {
-                    apiVersion: "2023-10-16" as any,
+                    apiVersion: "2023-10-16",
                 });
             } else {
                 this.stripeClient = new Stripe(secretKey, {
-                    apiVersion: "2023-10-16" as any,
+                    apiVersion: "2023-10-16",
                 });
             }
         }
@@ -86,19 +91,23 @@ export class StripeGateway implements PaymentGateway {
     }
 
     async verifyCallback(
-        payload: { body: string; signature: string },
+        payload: unknown,
     ): Promise<CallbackResult> {
+        const typedPayload = payload as StripeWebhookEvent;
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
         let event: Stripe.Event;
         try {
             event = this.getStripeClient().webhooks.constructEvent(
-                payload.body,
-                payload.signature,
+                typedPayload.body,
+                typedPayload.signature,
                 webhookSecret
             );
-        } catch (err: any) {
-            return { success: false, error: `Signature verification failed: ${err.message}` };
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                return { success: false, error: `Signature verification failed: ${err.message}` };
+            }
+            return { success: false, error: "Signature verification failed: Unknown error" };
         }
 
         if (event.type !== "checkout.session.completed") {
@@ -129,8 +138,11 @@ export class StripeGateway implements PaymentGateway {
             });
 
             return { success: true, refundId: refund.id };
-        } catch (err: any) {
-            return { success: false, error: err.message };
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                return { success: false, error: err.message };
+            }
+            return { success: false, error: "An unknown error occurred" };
         }
     }
 

@@ -1,11 +1,11 @@
-﻿import { inngest } from "../client";
+import { inngest } from "../client";
 import { prisma } from "@/lib/prisma";
 import { emailService } from "@/lib/email/email-service";
 import { smsService } from "@/lib/sms/sms-service";
 
 export const notificationRouter = inngest.createFunction(
     { id: "notification-router", triggers: [{ event: "event/DEMAND_UNLOCKED" }] },
-    async ({ event, step }: { event: any, step: any }) => {
+    async ({ event, step }) => {
         const { demandId, guideId } = event.data;
 
         // 1. Fetch related data to know WHO to notify

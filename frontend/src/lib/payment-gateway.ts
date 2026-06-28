@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Payment Gateway Abstraction Layer
  *
  * Strategy pattern: each payment provider implements this interface.
@@ -87,7 +87,7 @@ export interface PaymentGateway {
      * - Stripe: Verify webhook signature, extract session data
      * - PayTR: Verify HMAC hash, extract merchant_oid
      */
-    verifyCallback(payload: any, signature?: string): Promise<CallbackResult>;
+    verifyCallback(payload: unknown, signature?: string): Promise<CallbackResult>;
 
     /**
      * Process a refund for a completed transaction.

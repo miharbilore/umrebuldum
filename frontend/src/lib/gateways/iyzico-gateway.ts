@@ -1,4 +1,4 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 import type {
     PaymentGateway,
     CreateSessionParams,
@@ -6,6 +6,10 @@ import type {
     CallbackResult,
     RefundResult,
 } from "../payment-gateway";
+
+export interface IyzicoCallbackPayload {
+    token: string;
+}
 
 /**
  * Iyzico Checkout Form Gateway (Redirect Method)
@@ -106,8 +110,8 @@ export class IyzicoGateway implements PaymentGateway {
         };
     }
 
-    async verifyCallback(payload: { token: string }): Promise<CallbackResult> {
-        const { token } = payload;
+    async verifyCallback(payload: unknown): Promise<CallbackResult> {
+        const { token } = payload as IyzicoCallbackPayload;
         if (!token) return { success: false, error: "Missing token in callback" };
 
         const body = {
@@ -156,7 +160,7 @@ export class IyzicoGateway implements PaymentGateway {
 
     // ── PKI Hash Generator ──────────────────────────────────────────────
 
-    private generateHeaders(body: any, urlPath: string) {
+    private generateHeaders(body: Record<string, unknown>, urlPath: string) {
         const rnd = Date.now().toString();
         const pkiString = this.generatePkiString(body);
         const hashStr = this.apiKey + rnd + this.secretKey + pkiString;
@@ -169,13 +173,16 @@ export class IyzicoGateway implements PaymentGateway {
         };
     }
 
-    private generatePkiString(obj: any): string {
+    private generatePkiString(obj: unknown): string {
+        if (typeof obj !== "object" || obj === null) {
+            return String(obj);
+        }
         // Recursive PKI string generator following Iyzico's exact rules
         let pki = "[";
         const keys = Object.keys(obj).sort();
 
         for (const key of keys) {
-            const val = obj[key];
+            const val = (obj as Record<string, unknown>)[key];
             if (val === null || val === undefined) continue;
 
             pki += key + "=";

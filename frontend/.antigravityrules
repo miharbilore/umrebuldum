@@ -1,0 +1,9 @@
+# DEĞİŞMEZ OPERASYON VE TİP GÜVENLİĞİ KURALLARI
+
+Bu projenin tip güvenliğini (Type Safety) inşa ederken aşağıdaki kurallara KESİN OLARAK uyulacaktır:
+
+1. SCRIPT VE OTOMASYON YASAKTIR: Hataları topluca çözmek için ASLA bash, node.js (.js/.ts) veya python scriptleri yazma. Regex ile "Find & Replace" yapmaya kalkışma.
+2. MANUEL VE ODAKLI ÇALIŞMA: İstenen değişiklikleri SADECE belirtilen dosyalara girerek, kodun mantığını okuyup anlayarak, dosya-dosya (file-by-file) yapacaksın. Toplu (bulk) değişiklik yasaktır.
+3. KATI TİP GÜVENLİĞİ: `any`, `unknown` olarak bırakmak veya `@ts-ignore`, `as any` gibi bypass yöntemleri kullanmak KESİNLİKLE YASAKTIR.
+4. PRISMA REFERANSI: Veritabanından gelen veya veritabanına giden her veri için mutlaka Prisma'nın kendi ürettiği tipler (`Prisma.TransactionClient`, `Prisma.InputJsonValue`, Payload'lar vb.) kullanılacaktır.
+5. UYDURMA TİP YASAKTIR: API rotalarından veya dış servislerden (Iyzico, Stripe vb.) gelen veriler için özellikler uydurma. O servisin veya payload'un gerçek Interface'ini dosyanın en üstüne tanımla ve onu kullan.

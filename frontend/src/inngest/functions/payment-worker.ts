@@ -1,4 +1,4 @@
-﻿import { inngest } from "@/inngest/client";
+import { inngest } from "@/inngest/client";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 import { EventBus } from "@/core/events/event-bus";
 
@@ -10,7 +10,7 @@ import { EventBus } from "@/core/events/event-bus";
  */
 export const handlePaymentCompletion = inngest.createFunction(
     { id: "payment-completion-worker", name: "Payment Completion Worker", retries: 5, triggers: [{ event: "event/PAYMENT_COMPLETED" }] },
-    async ({ event, step }: { event: any, step: any }) => {
+    async ({ event, step }) => {
         const { transactionId, userId, amount, packageId, provider } = event.data;
 
         // 1. Grant Tokens (Safe Double-Entry Ledger)

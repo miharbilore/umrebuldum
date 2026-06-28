@@ -1,4 +1,4 @@
-﻿// ─── Safe Error Response ────────────────────────────────────────────────
+// ─── Safe Error Response ────────────────────────────────────────────────
 // Strips Prisma/Stripe internals from API error responses.
 // Use in catch blocks to prevent information leakage.
 
@@ -35,8 +35,8 @@ const SAFE_MESSAGES = new Set([
  * Returns a safe error message for API responses.
  * Known application errors pass through; unknown/internal errors are masked.
  */
-export function safeErrorMessage(error: any, fallback = "Internal Server Error"): string {
-    const msg = error?.message || String(error);
+export function safeErrorMessage(error: unknown, fallback = "Internal Server Error"): string {
+    const msg = error instanceof Error ? error.message : String(error);
     if (SAFE_MESSAGES.has(msg)) return msg;
 
     // Log the full error server-side for debugging
@@ -48,7 +48,7 @@ export function safeErrorMessage(error: any, fallback = "Internal Server Error")
  * Build a safe NextResponse JSON error.
  * Usage: return safeErrorJson(err, 500);
  */
-export function safeErrorJson(error: any, status = 500, fallback?: string) {
+export function safeErrorJson(error: unknown, status = 500, fallback?: string) {
     const { NextResponse } = require("next/server");
     return NextResponse.json(
         { error: safeErrorMessage(error, fallback) },

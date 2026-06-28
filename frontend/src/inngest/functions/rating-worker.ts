@@ -1,4 +1,4 @@
-﻿import { inngest } from "@/inngest/client";
+import { inngest } from "@/inngest/client";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -10,7 +10,7 @@ import { prisma } from "@/lib/prisma";
  */
 export const handleRatingWorker = inngest.createFunction(
     { id: "rating-worker", name: "Rating Average Computing Worker", retries: 3, triggers: [{ event: "event/REVIEW_APPROVED" }] },
-    async ({ event, step }: { event: any, step: any }) => {
+    async ({ event, step }) => {
         const { guideId } = event.data;
 
         if (!guideId) {

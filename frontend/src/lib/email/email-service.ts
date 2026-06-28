@@ -1,4 +1,4 @@
-﻿import { Resend } from "resend";
+import { Resend } from "resend";
 import type { EmailTemplate } from "./email-templates";
 
 /**
@@ -85,9 +85,13 @@ async function sendEmail(options: SendEmailOptions): Promise<SendResult> {
 
         console.log(`[EmailService] [${type}] Sent → ${to}: ${data?.id}`);
         return { success: true, id: data?.id };
-    } catch (err: any) {
-        console.error(`[EmailService] [${type}] Exception → ${to}:`, err.message);
-        return { success: false, error: err.message };
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            console.error(`[EmailService] [${type}] Exception   ${to}:`, err.message);
+            return { success: false, error: err.message };
+        }
+        console.error(`[EmailService] [${type}] Exception   ${to}:`, String(err));
+        return { success: false, error: "An unknown error occurred" };
     }
 }
 
@@ -140,9 +144,13 @@ async function sendBatch(
             success: true,
             id: item.id,
         }));
-    } catch (err: any) {
-        console.error("[EmailService] Batch exception:", err.message);
-        return recipients.map(() => ({ success: false, error: err.message }));
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            console.error("[EmailService] Batch exception:", err.message);
+            return recipients.map(() => ({ success: false, error: err.message }));
+        }
+        console.error("[EmailService] Batch exception:", String(err));
+        return recipients.map(() => ({ success: false, error: "An unknown error occurred" }));
     }
 }
 
