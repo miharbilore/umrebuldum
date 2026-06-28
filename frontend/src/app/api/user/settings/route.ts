@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { requireAuth } from '@/lib/api-guards';
@@ -19,10 +19,19 @@ export async function GET(req: Request) {
         }
 
         return NextResponse.json(user);
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Settings GET error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Settings GET error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+interface SettingsRequest {
+    contactConsent?: boolean;
+    phone?: string;
 }
 
 export async function POST(req: Request) {
@@ -31,9 +40,9 @@ export async function POST(req: Request) {
     if (authErr) return authErr;
 
     try {
-        const body = await req.json();
+        const body = (await req.json()) as SettingsRequest;
         
-        const updateData: any = {};
+        const updateData: { contactConsent?: boolean; phone?: string } = {};
         
         if (typeof body.contactConsent === 'boolean') {
             updateData.contactConsent = Boolean(body.contactConsent);
@@ -57,7 +66,11 @@ export async function POST(req: Request) {
             contactConsent: updatedUser.contactConsent,
             phone: updatedUser.phone
         });
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Settings update error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Settings update error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

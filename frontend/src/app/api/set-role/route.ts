@@ -1,10 +1,15 @@
-﻿import { auth } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/api-guards"
 import { logAdminAction } from "@/lib/admin-audit"
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase"
 import { UserRole } from "@prisma/client"
+
+interface SetRoleRequest {
+    targetUserId: string;
+    role: UserRole;
+}
 
 /**
  * ADMIN-ONLY: Set a user's role.
@@ -16,7 +21,8 @@ export async function POST(req: Request) {
     if (guard) return guard
 
     try {
-        const { targetUserId, role } = await req.json()
+        const body = (await req.json()) as SetRoleRequest;
+        const { targetUserId, role } = body;
 
         if (!targetUserId) {
             return NextResponse.json({ error: "Missing targetUserId" }, { status: 400 })
@@ -89,7 +95,11 @@ export async function POST(req: Request) {
             message: `User ${targetUserId} role set to ${role}`
         })
 
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Set Role Error:", error.message)
+            return NextResponse.json({ error: error.message }, { status: 500 })
+        }
         console.error("Set Role Error:", error)
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }

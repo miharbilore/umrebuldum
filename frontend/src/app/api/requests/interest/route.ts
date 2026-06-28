@@ -1,11 +1,16 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { requireSupply } from "@/lib/api-guards";
 import { spendToken } from "@/modules/tokens/application/spend-token.usecase";
 import { rateLimit } from "@/lib/rate-limit";
 import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
+
+interface RequestInterestBody {
+    requestId: string;
+}
 
 export async function POST(req: Request) {
     try {
@@ -13,7 +18,8 @@ export async function POST(req: Request) {
         const guard = requireSupply(session);
         if (guard) return guard;
 
-        const { requestId } = await req.json();
+        const body = (await req.json()) as RequestInterestBody;
+        const { requestId } = body;
         if (!requestId) return NextResponse.json({ error: "Missing requestId" }, { status: 400 });
 
         // Rate limit: 10 interests per minute per guide
@@ -135,19 +141,23 @@ export async function POST(req: Request) {
                     });
                 }
             });
-        } catch (err: any) {
+        } catch (error: unknown) {
             // P2002 on requestInterest unique constraint — parallel race
-            if (err.code === "P2002") {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
                 return NextResponse.json({ message: "Interest already recorded", creditsRemaining: spendResult.newBalance }, { status: 200 });
             }
-            throw err;
+            throw error;
         }
 
         console.log(`[Interest] Deducted ${spendResult.cost} tokens from ${guideUser.id}. New balance: ${spendResult.newBalance}`);
         return NextResponse.json({ message: "Interest recorded", creditsRemaining: spendResult.newBalance }, { status: 201 });
 
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Interest error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Interest error:", error);
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

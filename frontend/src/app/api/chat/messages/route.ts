@@ -1,10 +1,19 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { containsProfanity } from "@/lib/bannedWords";
 import { checkChatRateLimits } from "@/lib/chat-rate-limit";
 import { UserRole } from "@prisma/client";
+
+interface ChatMessagesPostBody {
+    threadId: string;
+    message: string;
+}
+
+interface ChatMessagesDeleteBody {
+    messageId: string;
+}
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const MAX_MESSAGE_LENGTH = 500;
@@ -111,8 +120,12 @@ export async function GET(req: Request) {
             nextCursor,
         });
 
-    } catch (error) {
-        console.error("GET messages error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("GET messages error:", error.message);
+        } else {
+            console.error("GET messages error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
@@ -138,8 +151,8 @@ export async function POST(req: Request) {
         if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         if (session.user.role === "BANNED") return NextResponse.json({ error: "Account banned" }, { status: 403 });
 
-        const body = await req.json();
-        const { threadId, message } = body;
+        const reqBody = (await req.json()) as ChatMessagesPostBody;
+        const { threadId, message } = reqBody;
 
         if (!threadId || !message) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
@@ -240,8 +253,12 @@ export async function POST(req: Request) {
             createdAt: newMessage.createdAt.toISOString(),
         });
 
-    } catch (error) {
-        console.error("Send message error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Send message error:", error.message);
+        } else {
+            console.error("Send message error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
@@ -257,7 +274,7 @@ export async function DELETE(req: Request) {
         if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         if (session.user.role === "BANNED") return NextResponse.json({ error: "Account banned" }, { status: 403 });
 
-        const { messageId } = await req.json();
+        const { messageId } = (await req.json()) as ChatMessagesDeleteBody;
         if (!messageId) return NextResponse.json({ error: "Missing messageId" }, { status: 400 });
 
         const currentUser = await prisma.user.findUnique({
@@ -286,8 +303,12 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json({ success: true });
 
-    } catch (error) {
-        console.error("Delete message error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Delete message error:", error.message);
+        } else {
+            console.error("Delete message error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

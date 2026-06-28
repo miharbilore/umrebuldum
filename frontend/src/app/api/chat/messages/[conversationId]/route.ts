@@ -44,8 +44,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ conversa
 
         return NextResponse.json(safeMessages);
 
-    } catch (error) {
-        console.error(error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error(error);
+        }
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

@@ -1,12 +1,18 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { AuthRateLimit } from "@/lib/auth-rate-limit";
 
+interface ResetPasswordBody {
+    token: string;
+    email: string;
+    newPassword: string;
+}
+
 export async function POST(req: Request) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
-        const body = await req.json();
+        const body = (await req.json()) as ResetPasswordBody;
         const { token, email, newPassword } = body;
 
         const lockout = await AuthRateLimit.checkLockout(ip, email);
@@ -62,8 +68,12 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, message: "Şifre güncellendi." });
 
-    } catch (error) {
-        console.error("Reset password error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Reset password error:", error.message);
+        } else {
+            console.error("Reset password error:", error);
+        }
         return NextResponse.json({ error: "Bir hata oluştu." }, { status: 500 });
     }
 }

@@ -15,9 +15,34 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         }
 
         return NextResponse.json(listing);
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+interface UpdateListingRequest {
+    title?: string;
+    description?: string;
+    city?: string;
+    meetingCity?: string;
+    hotelName?: string;
+    extraServices?: string[];
+    departureCityId?: string;
+    airlineId?: string;
+    pricingDouble?: number;
+    pricingTriple?: number;
+    pricingQuad?: number;
+    pricingCurrency?: string;
+    quota?: string | number;
+    totalDays?: string | number;
+    startDate?: string | Date;
+    endDate?: string | Date;
+    urgencyTag?: string;
+    category?: string | null;
+    active?: boolean;
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +52,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
         const { id } = await params;
-        const body = await req.json();
+        const body = (await req.json()) as UpdateListingRequest;
 
         // Check ownership
         const listing = await prisma.guideListing.findUnique({
@@ -60,8 +85,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (body.pricingTriple !== undefined) safeData.pricingTriple = Number(body.pricingTriple);
         if (body.pricingQuad !== undefined) safeData.pricingQuad = Number(body.pricingQuad);
         if (body.pricingCurrency !== undefined) safeData.pricingCurrency = String(body.pricingCurrency);
-        if (body.quota !== undefined) safeData.quota = Math.min(500, Math.max(1, parseInt(body.quota)));
-        if (body.totalDays !== undefined) safeData.totalDays = Math.min(60, Math.max(1, parseInt(body.totalDays)));
+        if (body.quota !== undefined) safeData.quota = Math.min(500, Math.max(1, typeof body.quota === "string" ? parseInt(body.quota) : body.quota));
+        if (body.totalDays !== undefined) safeData.totalDays = Math.min(60, Math.max(1, typeof body.totalDays === "string" ? parseInt(body.totalDays) : body.totalDays));
         if (body.startDate !== undefined) safeData.startDate = new Date(body.startDate);
         if (body.endDate !== undefined) safeData.endDate = new Date(body.endDate);
         if (body.urgencyTag !== undefined) safeData.urgencyTag = body.urgencyTag;
@@ -81,7 +106,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         });
 
         return NextResponse.json(updated);
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         return NextResponse.json({ error: "Update failed" }, { status: 500 });
     }
 }
@@ -111,7 +139,11 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Delete error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Delete error:", error);
         return NextResponse.json({ error: "Delete failed" }, { status: 500 });
     }

@@ -122,6 +122,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json(safeResponse);
 }
 
+interface UpdateUmrahRequest {
+    departureCity?: string;
+    peopleCount?: string | number;
+    dateRange?: string;
+    roomType?: string;
+    budget?: string | number;
+    note?: string;
+    contactViaEmail?: boolean;
+    contactViaPhone?: boolean;
+    contactViaChat?: boolean;
+}
+
 /**
  * PUT /api/requests/[id] — Edit own request (full update)
  * Only owner or ADMIN, only open requests
@@ -137,7 +149,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         }
 
         const { id } = await params;
-        const body = await req.json();
+        const body = (await req.json()) as UpdateUmrahRequest;
 
         // 1. Check ownership
         const request = await prisma.umrahRequest.findUnique({
@@ -172,10 +184,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         });
 
         return NextResponse.json({ message: "Updated", request: updated });
-    } catch (e) {
-        console.error(e);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        console.error(error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
+}
+
+interface PatchUmrahRequest extends UpdateUmrahRequest {
+    status?: 'open' | 'closed' | 'deleted';
 }
 
 /**
@@ -189,7 +209,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (guard) return guard;
 
         const { id } = await params;
-        const body = await req.json();
+        const body = (await req.json()) as PatchUmrahRequest;
 
         const request = await prisma.umrahRequest.findUnique({
             where: { id },
@@ -235,8 +255,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         });
 
         return NextResponse.json({ message: "Updated", request: updated });
-    } catch (e) {
-        console.error(e);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        console.error(error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }
@@ -273,8 +297,12 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         });
 
         return NextResponse.json({ success: true, message: `Request ${id} soft-deleted` });
-    } catch (e) {
-        console.error("Delete request error:", e);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Delete request error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        console.error("Delete request error:", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

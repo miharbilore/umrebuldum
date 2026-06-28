@@ -1,8 +1,20 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireRole, requireSupply } from "@/lib/api-guards";
+
+interface CreateRequest {
+    departureCity: string;
+    peopleCount: string;
+    dateRange: string;
+    budget?: string;
+    note?: string;
+    roomType?: string;
+    contactViaEmail?: boolean;
+    contactViaPhone?: boolean;
+    contactViaChat?: boolean;
+}
 
 export async function POST(req: Request) {
     try {
@@ -11,7 +23,7 @@ export async function POST(req: Request) {
         if (guard) return guard;
 
 
-        const body = await req.json();
+        const body = (await req.json()) as CreateRequest;
         const { departureCity, peopleCount, dateRange, budget, note, roomType, contactViaEmail, contactViaPhone, contactViaChat } = body;
 
         if (!departureCity || !peopleCount || !dateRange) {
@@ -53,7 +65,11 @@ export async function POST(req: Request) {
             ...newRequest,
             createdAt: newRequest.createdAt.toISOString()
         }, { status: 201 });
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Create request error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Create request error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
@@ -90,7 +106,11 @@ export async function DELETE(req: Request) {
         });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Delete request error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Delete request error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
@@ -151,7 +171,11 @@ export async function GET(req: Request) {
 
         return NextResponse.json(cleanRequests);
 
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Get requests error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Get requests error:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }

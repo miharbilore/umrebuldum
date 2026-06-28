@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 import { rateLimit } from "@/lib/rate-limit";
@@ -7,7 +7,13 @@ import { selectGateway, getAvailableProviders } from "@/lib/payment-router";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 import type { PaymentProvider } from "@/lib/payment-gateway";
 // DOĞRU IMPORT: İsim çakışmasını önlemek için Prisma Enum'una 'PrismaPaymentProvider' takma adı verdik
-import { TransactionStatus, PaymentProvider as PrismaPaymentProvider } from "@prisma/client"; 
+import { TransactionStatus, PaymentProvider as PrismaPaymentProvider } from "@prisma/client";
+
+interface CheckoutBody {
+    packageId: string;
+    couponCode?: string;
+    provider?: PaymentProvider;
+} 
 
 /**
  * POST /api/billing/checkout
@@ -48,7 +54,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const body = await req.json();
+        const body = (await req.json()) as CheckoutBody;
         const { packageId, couponCode, provider: requestedProvider } = body;
 
         if (!packageId || typeof packageId !== "string") {
@@ -236,15 +242,18 @@ export async function POST(req: Request) {
             provider: gateway.provider,
         });
 
-    } catch (err: any) {
-        if (err.message === "PACKAGE_NOT_FOUND") {
-            return NextResponse.json({ error: "Invalid package" }, { status: 400 });
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            if (err.message === "PACKAGE_NOT_FOUND") {
+                return NextResponse.json({ error: "Invalid package" }, { status: 400 });
+            }
+            if (err.message === "USER_NOT_FOUND") {
+                return NextResponse.json({ error: "User not found" }, { status: 404 });
+            }
+            console.error("[Checkout] Unexpected error:", err.message);
+        } else {
+            console.error("[Checkout] Unexpected error:", err);
         }
-        if (err.message === "USER_NOT_FOUND") {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
-        }
-
-        console.error("[Checkout] Unexpected error:", err.message);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

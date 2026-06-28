@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
@@ -8,6 +8,21 @@ import { rateLimit } from "@/lib/rate-limit";
 import { requireTokens } from "@/core/guards/token.guard";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { safeErrorMessage } from "@/lib/safe-error";
+
+interface OfferRequest {
+    requestId: string;
+    price: number;
+    currency?: string;
+    message?: string;
+}
+
+interface OfferResponse {
+    message?: string;
+    offer?: unknown;
+    error?: string;
+    balance?: number;
+    creditsRemaining?: number;
+}
 
 /**
  * POST /api/guide/offer
@@ -23,23 +38,23 @@ export async function POST(req: Request) {
 
         const roleConfig = getRoleConfig(session!.user.role);
         if (!roleConfig.canSendOffer) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+            return NextResponse.json<OfferResponse>({ error: "Forbidden" }, { status: 403 });
         }
 
-        const body = await req.json();
+        const body = (await req.json()) as OfferRequest;
         const { requestId, price, currency, message } = body;
 
         if (!requestId || typeof requestId !== "string") {
-            return NextResponse.json({ error: "Missing requestId" }, { status: 400 });
+            return NextResponse.json<OfferResponse>({ error: "Missing requestId" }, { status: 400 });
         }
         if (!price || typeof price !== "number" || price <= 0) {
-            return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+            return NextResponse.json<OfferResponse>({ error: "Invalid price" }, { status: 400 });
         }
 
         // Rate limit: 10 offers per minute
         const rl = await rateLimit(`offer:${session!.user.email}`, 60_000, 10);
         if (!rl.success) {
-            return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+            return NextResponse.json<OfferResponse>({ error: "Rate limit exceeded" }, { status: 429 });
         }
 
         // Resolve guide user
@@ -47,14 +62,14 @@ export async function POST(req: Request) {
             where: { email: session!.user.email! },
             select: { id: true, packageType: true },
         });
-        if (!guideUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
+        if (!guideUser) return NextResponse.json<OfferResponse>({ error: "User not found" }, { status: 404 });
 
         // Verify request exists and is open
         const request = await prisma.umrahRequest.findUnique({
             where: { id: requestId },
         });
-        if (!request) return NextResponse.json({ error: "Request not found" }, { status: 404 });
-        if (request.status !== "open") return NextResponse.json({ error: "Request is closed" }, { status: 400 });
+        if (!request) return NextResponse.json<OfferResponse>({ error: "Request not found" }, { status: 404 });
+        if (request.status !== "open") return NextResponse.json<OfferResponse>({ error: "Request is closed" }, { status: 400 });
 
         // Pre-flight Token Guard (Role, Daily Cap, Cache Balance)
         const tokenGuardRes = await requireTokens(guideUser.id, session!.user.role || "FREEMIUM", guideUser.packageType || "FREEMIUM", "OFFER_SEND");
@@ -67,7 +82,7 @@ export async function POST(req: Request) {
             where: { guideId_requestId: { guideId: guideUser.id, requestId } },
         });
         if (existingOffer) {
-            return NextResponse.json({ message: "Offer already sent", offer: existingOffer }, { status: 200 });
+            return NextResponse.json<OfferResponse>({ message: "Offer already sent", offer: existingOffer }, { status: 200 });
         }
 
         const offerExpiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000); // 48 hours
@@ -81,13 +96,13 @@ export async function POST(req: Request) {
 
         if (!spendResult.ok) {
             if (spendResult.error === "INSUFFICIENT_TOKENS") {
-                return NextResponse.json({
+                return NextResponse.json<OfferResponse>({
                     error: "INSUFFICIENT_CREDITS",
                     message: "Yetersiz Token",
                     balance: spendResult.newBalance,
                 }, { status: 402 });
             }
-            return NextResponse.json({ error: spendResult.error }, { status: 400 });
+            return NextResponse.json<OfferResponse>({ error: spendResult.error }, { status: 400 });
         }
 
         // ─── Create offer + conversation (post-spend) ───
@@ -123,21 +138,21 @@ export async function POST(req: Request) {
                     }
                 }
             });
-        } catch (err: any) {
-            if (err.code === "P2002") {
-                return NextResponse.json({ message: "Offer already sent (race)", creditsRemaining: spendResult.newBalance }, { status: 200 });
+        } catch (err: unknown) {
+            if (err && typeof err === 'object' && 'code' in err && (err as { code: string }).code === "P2002") {
+                return NextResponse.json<OfferResponse>({ message: "Offer already sent (race)", creditsRemaining: spendResult.newBalance }, { status: 200 });
             }
             throw err;
         }
 
         console.log(`[Offer] Guide ${guideUser.id} sent offer to request ${requestId}. Cost: ${spendResult.cost}, Balance: ${spendResult.newBalance}`);
-        return NextResponse.json({
+        return NextResponse.json<OfferResponse>({
             message: "Offer sent",
             creditsRemaining: spendResult.newBalance,
         }, { status: 201 });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Offer error:", error);
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+        return NextResponse.json<OfferResponse>({ error: safeErrorMessage(error) }, { status: 500 });
     }
 }

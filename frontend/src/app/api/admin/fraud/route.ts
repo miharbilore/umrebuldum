@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/api-guards";
@@ -61,10 +61,15 @@ export async function GET(req: Request) {
             totalPages: Math.ceil(total / limit),
         });
 
-    } catch (error) {
-        console.error("Fraud queue error:", error);
+    } catch (error: unknown) {
+        console.error("Fraud queue error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
     }
+}
+
+interface ResolveFraudRequest {
+    ticketId: string;
+    resolution: "FALSE_POSITIVE" | "CONFIRMED" | "MONITORING";
 }
 
 /**
@@ -84,7 +89,7 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { ticketId, resolution } = await req.json();
+        const { ticketId, resolution } = (await req.json()) as ResolveFraudRequest;
 
         if (!ticketId || !resolution) {
             return NextResponse.json({ error: "Missing ticketId or resolution" }, { status: 400 });
@@ -107,8 +112,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, resolution });
 
-    } catch (error) {
-        console.error("Fraud resolve error:", error);
+    } catch (error: unknown) {
+        console.error("Fraud resolve error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
     }
 }

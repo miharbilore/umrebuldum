@@ -1,14 +1,18 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { AuthRateLimit } from "@/lib/auth-rate-limit";
 import { emailService } from "@/lib/email/email-service";
 import { passwordResetTemplate } from "@/lib/email/email-templates";
 
+interface ForgotPasswordBody {
+    email: string;
+}
+
 export async function POST(req: Request) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
-        const body = await req.json();
+        const body = (await req.json()) as ForgotPasswordBody;
         const { email } = body;
 
         const lockout = await AuthRateLimit.checkLockout(ip, email);
@@ -69,8 +73,12 @@ export async function POST(req: Request) {
             success: true,
             message: "E-posta adresinize şifre sıfırlama bağlantısı gönderildi.",
         });
-    } catch (error) {
-        console.error("Forgot password error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Forgot password error:", error.message);
+        } else {
+            console.error("Forgot password error:", error);
+        }
         return NextResponse.json({ error: "Bir hata oluştu." }, { status: 500 });
     }
 }

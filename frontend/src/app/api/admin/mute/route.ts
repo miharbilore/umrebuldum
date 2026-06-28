@@ -1,7 +1,13 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/api-guards";
+
+interface MuteUserRequest {
+    userId: string;
+    mutedUntil?: string | null;
+    reason: string;
+}
 
 export async function POST(req: Request) {
     try {
@@ -10,8 +16,7 @@ export async function POST(req: Request) {
         if (guard) return guard;
 
         const adminId = session!.user.id!;
-        const body = await req.json();
-        const { userId, mutedUntil, reason } = body;
+        const { userId, mutedUntil, reason } = (await req.json()) as MuteUserRequest;
 
         if (!userId || typeof userId !== "string") {
             return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -62,10 +67,15 @@ export async function POST(req: Request) {
             success: true,
             message: `User ${target.email} muted${mutedUntilDate ? ` until ${mutedUntilDate.toISOString()}` : " permanently"}.`,
         });
-    } catch (error) {
-        console.error("Admin mute error:", error);
+    } catch (error: unknown) {
+        console.error("Admin mute error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+interface UnmuteUserRequest {
+    userId: string;
+    reason: string;
 }
 
 export async function DELETE(req: Request) {
@@ -75,8 +85,7 @@ export async function DELETE(req: Request) {
         if (guard) return guard;
 
         const adminId = session!.user.id!;
-        const body = await req.json();
-        const { userId, reason } = body;
+        const { userId, reason } = (await req.json()) as UnmuteUserRequest;
 
         if (!userId || typeof userId !== "string") {
             return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -116,8 +125,8 @@ export async function DELETE(req: Request) {
             success: true,
             message: `User ${target.email} unmuted.`,
         });
-    } catch (error) {
-        console.error("Admin unmute error:", error);
+    } catch (error: unknown) {
+        console.error("Admin unmute error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

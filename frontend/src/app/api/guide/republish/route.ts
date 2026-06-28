@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
@@ -6,6 +6,20 @@ import { getRoleConfig } from "@/lib/role-config";
 import { PackageSystem, TOKEN_COSTS } from "@/lib/package-system";
 import { spendToken } from "@/modules/tokens/application/spend-token.usecase";
 import { safeErrorMessage } from "@/lib/safe-error";
+
+interface RepublishRequest {
+    listingId: string;
+}
+
+interface RepublishResponse {
+    success?: boolean;
+    message?: string;
+    error?: string;
+    expiresAt?: string;
+    tokenBalance?: number;
+    cost?: number;
+    limit?: number;
+}
 
 /**
  * POST /api/guide/republish
@@ -21,12 +35,12 @@ export async function POST(req: Request) {
 
         const roleConfig = getRoleConfig(session!.user.role);
         if (!roleConfig.canRepublish) {
-            return NextResponse.json({ error: "Upgrade required to republish" }, { status: 403 });
+            return NextResponse.json<RepublishResponse>({ error: "Upgrade required to republish" }, { status: 403 });
         }
 
-        const { listingId } = await req.json();
+        const { listingId } = (await req.json()) as RepublishRequest;
         if (!listingId) {
-            return NextResponse.json({ error: "Missing listingId" }, { status: 400 });
+            return NextResponse.json<RepublishResponse>({ error: "Missing listingId" }, { status: 400 });
         }
 
         // Resolve user
@@ -34,18 +48,18 @@ export async function POST(req: Request) {
             where: { email: session!.user.email! },
             select: { id: true, packageType: true },
         });
-        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+        if (!user) return NextResponse.json<RepublishResponse>({ error: "User not found" }, { status: 404 });
 
         // Verify listing exists, belongs to user, and is EXPIRED
         const listing = await prisma.guideListing.findUnique({
             where: { id: listingId },
         });
-        if (!listing) return NextResponse.json({ error: "Listing not found" }, { status: 404 });
+        if (!listing) return NextResponse.json<RepublishResponse>({ error: "Listing not found" }, { status: 404 });
         if (listing.guideId !== user.id) {
-            return NextResponse.json({ error: "Not your listing" }, { status: 403 });
+            return NextResponse.json<RepublishResponse>({ error: "Not your listing" }, { status: 403 });
         }
         if (listing.approvalStatus === "REJECTED") {
-            return NextResponse.json({ error: "Listing is rejected" }, { status: 400 });
+            return NextResponse.json<RepublishResponse>({ error: "Listing is rejected" }, { status: 400 });
         }
 
         // Check active listing count (republishing = reactivating)
@@ -54,7 +68,7 @@ export async function POST(req: Request) {
         });
         if (!(await PackageSystem.canCreateListing(user.packageType, activeCount))) {
             const limits = await PackageSystem.getLimits(user.packageType);
-            return NextResponse.json({
+            return NextResponse.json<RepublishResponse>({
                 error: "MAX_LISTINGS_REACHED",
                 limit: limits.maxListings,
             }, { status: 403 });
@@ -69,13 +83,13 @@ export async function POST(req: Request) {
 
         if (!spendResult.ok) {
             if (spendResult.error === "INSUFFICIENT_TOKENS") {
-                return NextResponse.json({
+                return NextResponse.json<RepublishResponse>({
                     error: "INSUFFICIENT_CREDITS",
                     message: "Yetersiz Token",
                     cost: spendResult.cost,
                 }, { status: 402 });
             }
-            return NextResponse.json({ error: spendResult.error }, { status: 400 });
+            return NextResponse.json<RepublishResponse>({ error: spendResult.error }, { status: 400 });
         }
 
         // Reactivate logically
@@ -92,15 +106,15 @@ export async function POST(req: Request) {
 
         console.log(`[Republish] Listing ${listingId} republished. Cost: ${spendResult.cost}, Balance: ${spendResult.newBalance}`);
 
-        return NextResponse.json({
+        return NextResponse.json<RepublishResponse>({
             success: true,
             message: "İlan yeniden yayınlandı",
             expiresAt: expiresAt.toISOString(),
             tokenBalance: spendResult.newBalance,
         }, { status: 200 });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Republish error:", error);
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+        return NextResponse.json<RepublishResponse>({ error: safeErrorMessage(error) }, { status: 500 });
     }
 }

@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
@@ -69,10 +69,16 @@ export async function GET(req: Request) {
             balance: user.tokenBalance,
             transactions: formattedTransactions,
         });
-    } catch (error) {
-        console.error("Admin credits GET error:", error);
+    } catch (error: unknown) {
+        console.error("Admin credits GET error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
+}
+
+interface AdjustCreditsRequest {
+    targetUserId: string;
+    amount: number;
+    reason: string;
 }
 
 export async function POST(req: Request) {
@@ -81,7 +87,7 @@ export async function POST(req: Request) {
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { targetUserId, amount, reason } = await req.json();
+        const { targetUserId, amount, reason } = (await req.json()) as AdjustCreditsRequest;
 
         if (!targetUserId || amount === undefined || !reason) {
             return NextResponse.json({ error: "Missing targetUserId, amount, or reason" }, { status: 400 });
@@ -149,8 +155,8 @@ export async function POST(req: Request) {
             message: `Adjusted ${amount} credits for user ${targetUserId}`
         });
 
-    } catch (error) {
-        console.error("Admin credit adjustment error:", error);
+    } catch (error: unknown) {
+        console.error("Admin credit adjustment error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

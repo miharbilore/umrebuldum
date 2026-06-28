@@ -1,4 +1,4 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
@@ -7,6 +7,11 @@ import { containsProfanity } from "@/lib/bannedWords";
 import { rateLimit } from "@/lib/rate-limit";
 import { emailService } from "@/lib/email/email-service";
 import { newMessageTemplate } from "@/lib/email/email-templates";
+
+interface ChatMessageBody {
+    conversationId: string;
+    body: string;
+}
 
 export async function POST(req: Request) {
     try {
@@ -26,7 +31,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Account banned" }, { status: 403 });
         }
 
-        const { conversationId, body } = await req.json();
+        const reqBody = (await req.json()) as ChatMessageBody;
+        const { conversationId, body } = reqBody;
 
         if (!conversationId || !body || !body.trim()) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -123,8 +129,12 @@ export async function POST(req: Request) {
 
         return NextResponse.json(message);
 
-    } catch (error) {
-        console.error("Send Message Error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Send Message Error:", error.message);
+        } else {
+            console.error("Send Message Error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

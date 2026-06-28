@@ -1,8 +1,13 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
 import { logAdminAction } from "@/lib/admin-audit";
+
+interface BanRequest {
+    targetUserId: string;
+    reason: string;
+}
 
 /**
  * POST /api/admin/ban — Ban a user (cannot ban ADMIN)
@@ -14,7 +19,7 @@ export async function POST(req: Request) {
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { targetUserId, reason } = await req.json();
+        const { targetUserId, reason } = (await req.json()) as BanRequest;
 
         if (!targetUserId || !reason) {
             return NextResponse.json({ error: "Missing targetUserId or reason" }, { status: 400 });
@@ -67,8 +72,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, message: `User ${targetUserId} banned` });
 
-    } catch (error) {
-        console.error("Admin ban error:", error);
+    } catch (error: unknown) {
+        console.error("Admin ban error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }
@@ -82,7 +87,7 @@ export async function PUT(req: Request) {
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { targetUserId, reason } = await req.json();
+        const { targetUserId, reason } = (await req.json()) as BanRequest;
 
         if (!targetUserId || !reason) {
             return NextResponse.json({ error: "Missing targetUserId or reason" }, { status: 400 });
@@ -127,8 +132,8 @@ export async function PUT(req: Request) {
             message: `User ${targetUserId} unbanned, role restored to ${restoredRole}`
         });
 
-    } catch (error) {
-        console.error("Admin unban error:", error);
+    } catch (error: unknown) {
+        console.error("Admin unban error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

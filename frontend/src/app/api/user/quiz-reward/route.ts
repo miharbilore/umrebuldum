@@ -6,6 +6,10 @@ import { differenceInHours } from "date-fns";
 import { Prisma } from "@prisma/client";
 import { withSerializableRetry } from "@/lib/with-retry";
 
+interface QuizRewardRequest {
+    score: number;
+}
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
@@ -13,7 +17,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "UNAUTHORIZED", message: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
-        const { score } = await req.json();
+        const body = (await req.json()) as QuizRewardRequest;
+        const { score } = body;
 
         // 1. Strict Validation
         if (typeof score !== 'number' || !Number.isInteger(score) || score < 0 || score > 10) {
@@ -91,19 +96,23 @@ export async function POST(req: Request) {
             newBalance: result.finalBalance 
         });
 
-    } catch (error: any) {
-        // Map specific errors to correct HTTP status and localized messages
-        if (error.message === "USER_NOT_FOUND") {
-            return NextResponse.json({ error: "USER_NOT_FOUND", message: "Kullanıcı bulunamadı." }, { status: 404 });
-        }
-        if (error.message === "QUIZ_ALREADY_COMPLETED") {
-            return NextResponse.json({ error: "QUIZ_ALREADY_COMPLETED", message: "Ödülü zaten aldınız." }, { status: 400 });
-        }
-        if (error.message === "MAX_ATTEMPTS_REACHED") {
-            return NextResponse.json({ error: "MAX_ATTEMPTS_REACHED", message: "3 deneme hakkınızı da kullandınız." }, { status: 400 });
-        }
-        if (error.message === "COOLDOWN_ACTIVE") {
-            return NextResponse.json({ error: "COOLDOWN_ACTIVE", message: "Tekrar denemek için 24 saat beklemelisiniz." }, { status: 400 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            // Map specific errors to correct HTTP status and localized messages
+            if (error.message === "USER_NOT_FOUND") {
+                return NextResponse.json({ error: "USER_NOT_FOUND", message: "Kullanıcı bulunamadı." }, { status: 404 });
+            }
+            if (error.message === "QUIZ_ALREADY_COMPLETED") {
+                return NextResponse.json({ error: "QUIZ_ALREADY_COMPLETED", message: "Ödülü zaten aldınız." }, { status: 400 });
+            }
+            if (error.message === "MAX_ATTEMPTS_REACHED") {
+                return NextResponse.json({ error: "MAX_ATTEMPTS_REACHED", message: "3 deneme hakkınızı da kullandınız." }, { status: 400 });
+            }
+            if (error.message === "COOLDOWN_ACTIVE") {
+                return NextResponse.json({ error: "COOLDOWN_ACTIVE", message: "Tekrar denemek için 24 saat beklemelisiniz." }, { status: 400 });
+            }
+            console.error("Quiz reward API error:", error.message);
+            return NextResponse.json({ error: "INTERNAL_SERVER_ERROR", message: error.message }, { status: 500 });
         }
 
         console.error("Quiz reward API error:", error);

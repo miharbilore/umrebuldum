@@ -1,5 +1,18 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+
+interface CheckoutRequest {
+    pkgId: string;
+    cardName: string;
+    cardNumber: string;
+}
+
+interface CheckoutResponse {
+    success?: boolean;
+    message?: string;
+    transactionId?: string;
+    error?: string;
+}
 
 /**
  * Mock Checkout API
@@ -11,14 +24,14 @@ export async function POST(req: Request) {
         const session = await auth();
         
         if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            return NextResponse.json<CheckoutResponse>({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const data = await req.json();
+        const data = (await req.json()) as CheckoutRequest;
         
         // Mock validation
         if (!data.pkgId || !data.cardName || !data.cardNumber) {
-            return NextResponse.json({ error: "Eksik bilgi gönderildi." }, { status: 400 });
+            return NextResponse.json<CheckoutResponse>({ error: "Eksik bilgi gönderildi." }, { status: 400 });
         }
 
         // Simüle edilen bekleme süresi (banka onayı vb.)
@@ -26,14 +39,18 @@ export async function POST(req: Request) {
 
         console.log(`[Mock Checkout] User ${session.user.id} purchased package ${data.pkgId}`);
 
-        return NextResponse.json({
+        return NextResponse.json<CheckoutResponse>({
             success: true,
             message: "Ödeme başarıyla tamamlandı. Tokenlarınız yükleniyor.",
             transactionId: `MOCK-${Date.now()}`
         });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Checkout error:", error);
-        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+        let errorMessage = "Internal Error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return NextResponse.json<CheckoutResponse>({ error: errorMessage }, { status: 500 });
     }
 }

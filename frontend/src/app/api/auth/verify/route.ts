@@ -1,10 +1,16 @@
-﻿
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+interface VerifyAuthBody {
+    email: string;
+    code: string;
+}
+
 export async function POST(req: Request) {
     try {
-        const { email, code } = await req.json();
+        const body = (await req.json()) as VerifyAuthBody;
+        const { email, code } = body;
 
         if (!email || !code) {
             return NextResponse.json(
@@ -57,8 +63,12 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true });
 
-    } catch (error) {
-        console.error("Verification Error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Verification Error:", error.message);
+        } else {
+            console.error("Verification Error:", error);
+        }
         return NextResponse.json(
             { error: "Doğrulama sırasında bir hata oluştu" },
             { status: 500 }

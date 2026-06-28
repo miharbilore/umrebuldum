@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
@@ -37,10 +37,15 @@ export async function GET() {
         }));
 
         return NextResponse.json({ requests: result });
-    } catch (error) {
-        console.error("Admin requests GET error:", error);
+    } catch (error: unknown) {
+        console.error("Admin requests GET error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
+}
+
+interface DeleteRequestPayload {
+    requestId: string;
+    reason?: string;
 }
 
 export async function DELETE(req: Request) {
@@ -49,7 +54,7 @@ export async function DELETE(req: Request) {
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { requestId, reason } = await req.json();
+        const { requestId, reason } = (await req.json()) as DeleteRequestPayload;
 
         if (!requestId) return NextResponse.json({ error: "Missing requestId" }, { status: 400 });
 
@@ -115,8 +120,8 @@ export async function DELETE(req: Request) {
             message: `Request ${requestId} soft-deleted, ${request.interests.length} interest(s) refunded`
         });
 
-    } catch (error) {
-        console.error("Admin requests DELETE error:", error);
+    } catch (error: unknown) {
+        console.error("Admin requests DELETE error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

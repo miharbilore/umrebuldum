@@ -12,13 +12,20 @@ const s3Client = new S3Client({
     },
 });
 
+interface S3UploadRequest {
+    filename: string;
+    contentType: string;
+    folder?: string;
+}
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
         const guard = requireAuth(session);
         if (guard) return guard;
 
-        const { filename, contentType, folder = "profiles" } = await req.json();
+        const body = (await req.json()) as S3UploadRequest;
+        const { filename, contentType, folder = "profiles" } = body;
 
         if (!filename || !contentType) {
             return NextResponse.json({ error: "Dosya bilgileri eksik" }, { status: 400 });
@@ -40,7 +47,11 @@ export async function POST(req: Request) {
         const publicUrl = `https://${bucketName}.s3.${process.env.AWS_REGION || 'eu-central-1'}.amazonaws.com/${key}`;
 
         return NextResponse.json({ signedUrl, publicUrl });
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("S3 Presigned URL Error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("S3 Presigned URL Error:", error);
         return NextResponse.json({ error: "Yükleme bağlantısı oluşturulamadı" }, { status: 500 });
     }

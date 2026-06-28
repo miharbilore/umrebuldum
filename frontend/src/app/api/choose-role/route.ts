@@ -5,6 +5,22 @@ import { requireAuth } from "@/lib/api-guards"
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase"
 import { z } from "zod"
 
+interface ChooseRoleRequest {
+    role: 'USER' | 'GUIDE' | 'ORGANIZATION';
+    name: string;
+    phone: string;
+    city: string;
+    bio: string;
+}
+
+interface ChooseRoleResponse {
+    success?: boolean;
+    role?: string;
+    rewarded?: boolean;
+    error?: string;
+    details?: unknown;
+}
+
 // Anti-bypass regex: Block 5+ consecutive digits (phone) or email patterns
 const bioAntiBypass = (val: string) => {
     const phoneRegex = /\d{5,}/;
@@ -32,12 +48,12 @@ export async function POST(req: Request) {
     if (guard) return guard
 
     try {
-        const body = await req.json()
+        const body = (await req.json()) as ChooseRoleRequest;
         const validation = onboardingSchema.safeParse(body)
 
         if (!validation.success) {
             console.warn("Onboarding Validation Failed:", JSON.stringify(validation.error.format(), null, 2))
-            return NextResponse.json({ 
+            return NextResponse.json<ChooseRoleResponse>({ 
                 error: validation.error.errors[0].message,
                 details: validation.error.format() 
             }, { status: 400 })
@@ -53,7 +69,7 @@ export async function POST(req: Request) {
         })
 
         if (!user) {
-            return NextResponse.json({ error: "Kullanıcı bulunamadı" }, { status: 404 })
+            return NextResponse.json<ChooseRoleResponse>({ error: "Kullanıcı bulunamadı" }, { status: 404 })
         }
 
         // 5-Token Reward Logic
@@ -66,7 +82,7 @@ export async function POST(req: Request) {
         });
 
         if (phoneOwner && phoneOwner.id !== userId) {
-            return NextResponse.json({ error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor." }, { status: 409 });
+            return NextResponse.json<ChooseRoleResponse>({ error: "Bu telefon numarası başka bir hesap tarafından kullanılıyor." }, { status: 409 });
         }
 
         await prisma.$transaction(async (tx) => {
@@ -105,24 +121,30 @@ export async function POST(req: Request) {
             });
         }
 
-        return NextResponse.json({ 
+        return NextResponse.json<ChooseRoleResponse>({ 
             success: true, 
             role,
             rewarded: reward ? (reward.ok && !reward.alreadyProcessed) : false
         })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Onboarding API Error:", error)
         
         // Handle Prisma Unique Constraint specifically
-        if (error.code === 'P2002') {
-            const target = error.meta?.target || '';
+        if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+            const e = error as { meta?: { target?: string | string[] } };
+            const target = e.meta?.target || '';
             if (target.includes('phone') || target.includes('users_phone_key')) {
-                return NextResponse.json({ error: "Bu telefon numarası zaten kullanımda." }, { status: 409 })
+                return NextResponse.json<ChooseRoleResponse>({ error: "Bu telefon numarası zaten kullanımda." }, { status: 409 })
             }
         }
 
-        return NextResponse.json({ error: "Bir hata oluştu. Lütfen tekrar deneyin." }, { status: 500 })
+        let errorMessage = "Bir hata oluştu. Lütfen tekrar deneyin.";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return NextResponse.json<ChooseRoleResponse>({ error: errorMessage }, { status: 500 })
     }
 }
 

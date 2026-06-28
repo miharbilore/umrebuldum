@@ -1,7 +1,12 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+
+interface ChangePasswordRequest {
+    currentPassword?: string;
+    newPassword?: string;
+}
 
 export async function POST(req: Request) {
     try {
@@ -10,7 +15,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
-        const { currentPassword, newPassword } = await req.json();
+        const body = (await req.json()) as ChangePasswordRequest;
+        const { currentPassword, newPassword } = body;
 
         if (!currentPassword || !newPassword) {
             return NextResponse.json({ error: "Tüm alanları doldurun." }, { status: 400 });
@@ -40,7 +46,11 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, message: "Şifreniz güncellendi." });
 
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Change password error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Change password error:", error);
         return NextResponse.json({ error: "Bir hata oluştu." }, { status: 500 });
     }

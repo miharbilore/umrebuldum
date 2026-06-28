@@ -1,9 +1,20 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { requestSpotlight } from "@/modules/tokens/application/spotlight.service";
 import crypto from 'crypto';
+
+interface SpotlightRequest {
+    listingId: string;
+    city: string;
+}
+
+interface SpotlightResponse {
+    success?: boolean;
+    error?: string;
+    ok?: boolean;
+}
 
 export async function POST(req: Request) {
     try {
@@ -11,10 +22,10 @@ export async function POST(req: Request) {
         const guard = requireSupply(session);
         if (guard) return guard;
 
-        const { listingId, city } = await req.json();
+        const { listingId, city } = (await req.json()) as SpotlightRequest;
 
         if (!listingId || !city) {
-            return NextResponse.json({ error: "Missing listingId or city" }, { status: 400 });
+            return NextResponse.json<SpotlightResponse>({ error: "Missing listingId or city" }, { status: 400 });
         }
 
         // Generate idempotency key specifically for this request server-side
@@ -32,12 +43,12 @@ export async function POST(req: Request) {
         );
 
         if (!result.ok) {
-            return NextResponse.json({ error: result.error }, { status: 403 });
+            return NextResponse.json<SpotlightResponse>({ error: result.error }, { status: 403 });
         }
 
-        return NextResponse.json({ success: true, ...result });
+        return NextResponse.json<SpotlightResponse>({ success: true, ...result });
 
-    } catch (error) {
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json<SpotlightResponse>({ error: safeErrorMessage(error) }, { status: 500 });
     }
 }

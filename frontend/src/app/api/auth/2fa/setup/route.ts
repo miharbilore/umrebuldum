@@ -1,7 +1,11 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import QRCode from "qrcode";
+
+interface TotpSetupBody {
+    totpCode: string;
+}
 
 export async function GET(req: Request) {
     try {
@@ -41,8 +45,12 @@ export async function GET(req: Request) {
             qrCodeUrl,
             isEnabled: user.isTwoFactorEnabled
         });
-    } catch (error) {
-        console.error("GET 2FA Error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("GET 2FA Error:", error.message);
+        } else {
+            console.error("GET 2FA Error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
@@ -54,7 +62,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await req.json();
+        const body = (await req.json()) as TotpSetupBody;
         const { totpCode } = body;
 
         if (!totpCode || typeof totpCode !== 'string') {
@@ -90,8 +98,12 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, message: "2FA is now enabled" });
 
-    } catch (error) {
-        console.error("POST 2FA Error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("POST 2FA Error:", error.message);
+        } else {
+            console.error("POST 2FA Error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

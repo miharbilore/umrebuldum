@@ -36,10 +36,29 @@ export async function GET(req: Request) {
             videoIntroduction: user.guideProfile?.videoIntroduction,
         });
 
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Profile Fetch Error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Profile Fetch Error:", error);
         return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
+}
+
+interface UpdateProfileRequest {
+    image?: string;
+    coverImage?: string;
+    bio?: string;
+    city?: string;
+    agencyCity?: string;
+    tursabNumber?: string;
+    establishmentYear?: string;
+    socialLinks?: string;
+    languagesSpoken?: string[];
+    experienceYears?: string;
+    specialties?: string[];
+    videoIntroduction?: string;
 }
 
 export async function POST(req: Request) {
@@ -49,7 +68,7 @@ export async function POST(req: Request) {
         if (guard) return guard;
 
         const userId = session!.user.id;
-        const data = await req.json();
+        const data = (await req.json()) as UpdateProfileRequest;
 
         // Update User
         await prisma.user.update({
@@ -89,7 +108,11 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Profile Update Error:", error.message);
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
         console.error("Profile Update Error:", error);
         return NextResponse.json({ error: "Güncelleme sırasında hata oluştu" }, { status: 500 });
     }

@@ -75,8 +75,8 @@ export async function GET(
             expiresIn: 60,
         });
 
-    } catch (error) {
-        console.error("KYC URL Presigner error:", error);
+    } catch (error: unknown) {
+        console.error("KYC URL Presigner error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: safeErrorMessage(error, "Failed to generate visual access") }, { status: 500 });
     }
 }

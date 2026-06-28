@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { withErrorHandler } from "@/lib/errors/api-handler";
@@ -6,6 +6,12 @@ import { AppError } from "@/lib/errors/AppError";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { EventBus } from "@/core/events/event-bus";
 import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği eklendi
+
+interface ApproveReviewPayload {
+    reviewId: string;
+    status: "APPROVED" | "REJECTED";
+    reason?: string;
+}
 
 /**
  * POST /api/admin/reviews/approve
@@ -17,12 +23,11 @@ import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği eklendi
 export const POST = withErrorHandler(async (req: Request) => {
     // ── Auth Guard ────────────────────────────────────────────────────
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
+    if (!session?.user || session.user.role !== "ADMIN") {
         throw new AppError("Yetkisiz erişim", ERROR_CODES.UNAUTHORIZED, 401);
     }
 
-    const body = await req.json();
-    const { reviewId, status, reason } = body;
+    const { reviewId, status, reason } = (await req.json()) as ApproveReviewPayload;
 
     // ── Validation ────────────────────────────────────────────────────
     if (!reviewId || !["APPROVED", "REJECTED"].includes(status)) {
@@ -75,7 +80,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
     // Audit log tablosu silindiği için sistemi çökertmemek adına konsola logluyoruz
     console.log("Admin Action Logged:", {
-        adminId: (session.user as any).id,
+        adminId: session.user.id,
         action: status === "APPROVED" ? "approve_review" : "reject_review",
         targetId: reviewId,
         reason: reason || `Review ${status.toLowerCase()} by admin`,

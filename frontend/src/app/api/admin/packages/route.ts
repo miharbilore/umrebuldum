@@ -18,10 +18,19 @@ export async function GET() {
         });
 
         return NextResponse.json(packages);
-    } catch (error) {
-        console.error("[Admin Packages GET]", error);
+    } catch (error: unknown) {
+        console.error("[Admin Packages GET]", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
+}
+
+interface UpdatePackageRequest {
+    id: string;
+    name?: string;
+    credits?: number | string;
+    priceTRY?: number | string;
+    monthlyPrice?: number | string;
+    features?: any;
 }
 
 /**
@@ -36,8 +45,7 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        const body = await req.json();
-        const { id, name, credits, priceTRY, monthlyPrice, features } = body;
+        const { id, name, credits, priceTRY, monthlyPrice, features } = (await req.json()) as UpdatePackageRequest;
 
         if (!id) {
             return NextResponse.json({ error: "Package ID is required" }, { status: 400 });
@@ -60,11 +68,22 @@ export async function PUT(req: Request) {
         });
 
         return NextResponse.json(updated);
-    } catch (error) {
-        console.error("[Admin Packages PUT]", error);
+    } catch (error: unknown) {
+        console.error("[Admin Packages PUT]", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
+interface CreatePackageRequest {
+    slug: string;
+    name: string;
+    credits: number | string;
+    priceTRY: number | string;
+    monthlyPrice?: number | string;
+    billingPeriod?: number | string;
+    roleTarget: string;
+    features?: any;
+}
+
 /**
  * POST /api/admin/packages
  * Creates a new CreditPackage record.
@@ -76,8 +95,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        const body = await req.json();
-        const { slug, name, credits, priceTRY, monthlyPrice, billingPeriod, roleTarget, features } = body;
+        const { slug, name, credits, priceTRY, monthlyPrice, billingPeriod, roleTarget, features } = (await req.json()) as CreatePackageRequest;
 
         // Basic validation
         if (!slug || !name || credits === undefined || priceTRY === undefined || !roleTarget) {
@@ -99,8 +117,8 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json(newPackage);
-    } catch (error: any) {
-        console.error("[Admin Packages POST]", error);
-        return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    } catch (error: unknown) {
+        console.error("[Admin Packages POST]", error instanceof Error ? error.message : error);
+        return NextResponse.json({ error: error instanceof Error ? error.message : "Internal Server Error" }, { status: 500 });
     }
 }

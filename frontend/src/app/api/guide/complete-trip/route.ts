@@ -1,9 +1,19 @@
-﻿
+
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
 import { logAdminAction } from "@/lib/admin-audit";
+
+interface CompleteTripRequest {
+    listingId: string;
+}
+
+interface CompleteTripResponse {
+    message?: string;
+    listingId?: string;
+    error?: string;
+}
 
 /**
  * ADMIN-ONLY: Mark a trip as completed for a guide.
@@ -15,9 +25,10 @@ export async function PUT(req: Request) {
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { listingId } = await req.json();
+        const data = (await req.json()) as CompleteTripRequest;
+        const { listingId } = data;
         if (!listingId) {
-            return NextResponse.json({ error: "Missing listingId" }, { status: 400 });
+            return NextResponse.json<CompleteTripResponse>({ error: "Missing listingId" }, { status: 400 });
         }
 
         const listing = await prisma.guideListing.findUnique({
@@ -25,12 +36,11 @@ export async function PUT(req: Request) {
             include: { guide: true }
         });
         if (!listing) {
-            return NextResponse.json({ error: "Listing not found" }, { status: 404 });
+            return NextResponse.json<CompleteTripResponse>({ error: "Listing not found" }, { status: 404 });
         }
 
-        // Idempotency: check if already marked completed via urgencyTag
         if (listing.urgencyTag === 'TRIP_COMPLETED') {
-            return NextResponse.json({ message: "Trip already marked as completed" }, { status: 200 });
+            return NextResponse.json<CompleteTripResponse>({ message: "Trip already marked as completed" }, { status: 200 });
         }
 
         // Mark listing as completed + increment guide stats
@@ -62,13 +72,17 @@ export async function PUT(req: Request) {
             );
         }
 
-        return NextResponse.json({
+        return NextResponse.json<CompleteTripResponse>({
             message: "Trip completed recorded",
             listingId
         }, { status: 200 });
 
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Complete trip error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        let errorMessage = "Internal Server Error";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return NextResponse.json<CompleteTripResponse>({ error: errorMessage }, { status: 500 });
     }
 }

@@ -1,8 +1,26 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireSupply } from "@/lib/api-guards";
 import { safeErrorMessage } from "@/lib/safe-error";
+
+interface AutoReplenishConfigResponse {
+    status: string;
+    threshold: number;
+    packageId: string;
+    monthlyCap: number;
+    userId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    error?: string;
+}
+
+interface UpdateAutoReplenishRequest {
+    status?: "ACTIVE" | "PAUSED" | "DISABLED";
+    threshold?: number;
+    packageId?: string;
+    monthlyCap?: number;
+}
 
 export async function GET(req: Request) {
     try {
@@ -16,7 +34,7 @@ export async function GET(req: Request) {
 
         // Return a default disabled state if no config exists yet in DB
         if (!config) {
-            return NextResponse.json({
+            return NextResponse.json<AutoReplenishConfigResponse>({
                 status: "DISABLED",
                 threshold: 20,
                 packageId: "medium",
@@ -24,9 +42,23 @@ export async function GET(req: Request) {
             });
         }
 
-        return NextResponse.json(config);
-    } catch (error) {
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+        return NextResponse.json<AutoReplenishConfigResponse>({
+            status: config.status,
+            threshold: config.threshold,
+            packageId: config.packageId,
+            monthlyCap: config.monthlyCap,
+            userId: config.userId,
+            createdAt: config.createdAt,
+            updatedAt: config.updatedAt,
+        });
+    } catch (error: unknown) {
+        return NextResponse.json<AutoReplenishConfigResponse>({ 
+            error: safeErrorMessage(error),
+            status: "DISABLED",
+            threshold: 0,
+            packageId: "",
+            monthlyCap: 0
+        }, { status: 500 });
     }
 }
 
@@ -36,16 +68,16 @@ export async function PUT(req: Request) {
         const guard = requireSupply(session);
         if (guard) return guard;
 
-        const body = await req.json();
+        const body = (await req.json()) as UpdateAutoReplenishRequest;
         const { status, threshold, packageId, monthlyCap } = body;
 
         if (status && !["ACTIVE", "PAUSED", "DISABLED"].includes(status)) {
-            return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+            return NextResponse.json<Partial<AutoReplenishConfigResponse>>({ error: "Invalid status value" }, { status: 400 });
         }
 
         const validPackages = ["small", "medium", "large", "mega", "enterprise"];
         if (packageId && !validPackages.includes(packageId)) {
-            return NextResponse.json({ error: "Invalid default package ID" }, { status: 400 });
+            return NextResponse.json<Partial<AutoReplenishConfigResponse>>({ error: "Invalid default package ID" }, { status: 400 });
         }
 
         // Upsert configuration
@@ -66,8 +98,16 @@ export async function PUT(req: Request) {
             }
         });
 
-        return NextResponse.json(updated);
-    } catch (error) {
-        return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
+        return NextResponse.json<AutoReplenishConfigResponse>({
+            status: updated.status,
+            threshold: updated.threshold,
+            packageId: updated.packageId,
+            monthlyCap: updated.monthlyCap,
+            userId: updated.userId,
+            createdAt: updated.createdAt,
+            updatedAt: updated.updatedAt,
+        });
+    } catch (error: unknown) {
+        return NextResponse.json<Partial<AutoReplenishConfigResponse>>({ error: safeErrorMessage(error) }, { status: 500 });
     }
 }

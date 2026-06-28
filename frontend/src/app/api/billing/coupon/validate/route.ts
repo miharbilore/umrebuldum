@@ -1,6 +1,10 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+
+interface CouponValidateBody {
+    code: string;
+}
 
 /**
  * POST /api/billing/coupon/validate
@@ -14,7 +18,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const body = await req.json();
+        const body = (await req.json()) as CouponValidateBody;
         const { code } = body;
 
         if (!code || typeof code !== "string") {
@@ -61,8 +65,12 @@ export async function POST(req: Request) {
             discountPercent: coupon.discountPercent,
             message: `%${coupon.discountPercent} indirim uygulanacak!`,
         });
-    } catch (error) {
-        console.error("[Coupon Validate]", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("[Coupon Validate]", error.message);
+        } else {
+            console.error("[Coupon Validate]", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

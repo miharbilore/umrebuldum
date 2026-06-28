@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
@@ -29,9 +29,14 @@ export const GET = withErrorHandler(async (req: Request) => {
     });
 });
 
+interface ApproveGuideRequest {
+    userId: string;
+    action: "APPROVE" | "REJECT";
+}
+
 // 2. Approve Guide
 export const POST = withErrorHandler(async (req: Request) => {
-    const body = await req.json();
+    const body = (await req.json()) as ApproveGuideRequest;
     const { userId, action } = body;
 
     if (!userId || !action) {

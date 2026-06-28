@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { CreateReviewUseCase } from "@/modules/reviews/application/CreateReviewUseCase";
 import { ReviewRepository } from "@/modules/reviews/infrastructure/ReviewRepository";
 import { auth } from "@/lib/auth";
@@ -6,6 +6,18 @@ import { prisma } from "@/lib/prisma";
 import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
+
+interface CreateReviewRequest {
+    guideId: string;
+    requestId: string;
+    ratingCommunication: number;
+    ratingKnowledge: number;
+    ratingOrganization: number;
+    ratingTimeManagement: number;
+    positiveTags?: string[];
+    negativeTags?: string[];
+    comment?: string;
+}
 
 /**
  * POST /api/reviews
@@ -15,11 +27,11 @@ import { ERROR_CODES } from "@/lib/errors/error-codes";
  */
 export const POST = withErrorHandler(async (req: Request) => {
     const session = await auth();
-    if (!session?.user || !(session.user as any).id) {
+    if (!session?.user?.id) {
         throw new AppError("Giriş yapmanız gerekiyor.", ERROR_CODES.UNAUTHORIZED, 401);
     }
 
-    const body = await req.json();
+    const body = (await req.json()) as CreateReviewRequest;
     const {
         guideId,
         requestId,
@@ -44,7 +56,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
     await useCase.execute({
         guideId,
-        reviewerUserId: (session.user as any).id,
+        reviewerUserId: session.user.id,
         requestId,
         ratingCommunication: Number(ratingCommunication),
         ratingKnowledge: Number(ratingKnowledge),

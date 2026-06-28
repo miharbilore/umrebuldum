@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { ModerateReviewUseCase } from "@/modules/reviews/application/ModerateReviewUseCase";
 
+interface ModerateReviewPayload {
+    action: "APPROVE" | "REJECT";
+}
+
 export async function PATCH(
     req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
@@ -14,8 +18,7 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        const body = await req.json();
-        const { action } = body;
+        const { action } = (await req.json()) as ModerateReviewPayload;
 
         if (!id || (action !== "APPROVE" && action !== "REJECT")) {
             return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
@@ -25,8 +28,8 @@ export async function PATCH(
         await useCase.execute(id, action);
 
         return NextResponse.json({ success: true, message: `Review ${action.toLowerCase()}d successfully.` });
-    } catch (error: any) {
-        console.error(`[PATCH /api/admin/reviews/[id]] Error:`, error);
-        return NextResponse.json({ error: error.message || "Internal server error" }, { status: 400 });
+    } catch (error: unknown) {
+        console.error(`[PATCH /api/admin/reviews/[id]] Error:`, error instanceof Error ? error.message : error);
+        return NextResponse.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 400 });
     }
 }

@@ -6,6 +6,37 @@ import { requireSupply } from "@/lib/api-guards";
 import { z } from "zod";
 import { slugify } from "@/lib/slug";
 
+interface ProfileRequest {
+    fullName: string;
+    phone: string;
+    city: string;
+    agencyCity?: string;
+    bio?: string | null;
+    photo?: string | null;
+    isIdentityVerified?: boolean;
+}
+
+interface ProfileResponse {
+    success?: boolean;
+    error?: string;
+    details?: unknown;
+    package?: string;
+    tokenBalance?: number;
+    fullName?: string;
+    phone?: string;
+    city?: string;
+    agencyCity?: string | null;
+    bio?: string | null;
+    photo?: string | null;
+    isIdentityVerified?: boolean;
+    hasCompletedQuiz?: boolean;
+    quizAttempts?: number;
+    lastQuizAttempt?: Date | null;
+    userId?: string;
+    quotaTarget?: number;
+    currentCount?: number;
+}
+
 const profileSchema = z.object({
     fullName: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
     phone: z.string().regex(/^\+[1-9]\d{1,14}$/, "Geçerli bir uluslararası telefon numarası giriniz (Örn: +90555...)"),
@@ -27,7 +58,7 @@ export async function GET(req: Request) {
         const user = await prisma.user.findUnique({
             where: { email: session!.user.email! }
         });
-        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+        if (!user) return NextResponse.json<ProfileResponse>({ error: "User not found" }, { status: 404 });
 
         // Get or create profile
         const profile = await prisma.guideProfile.upsert({
@@ -55,7 +86,7 @@ export async function GET(req: Request) {
             lastQuizAttempt
         } = user;
 
-        return NextResponse.json({
+        return NextResponse.json<ProfileResponse>({
             ...profile,
             fullName,
             phone,
@@ -70,8 +101,8 @@ export async function GET(req: Request) {
             quizAttempts,
             lastQuizAttempt
         });
-    } catch (error) {
-        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json<ProfileResponse>({ error: "Internal Error" }, { status: 500 });
     }
 }
 
@@ -81,11 +112,11 @@ export async function PUT(req: Request) {
         const guard = requireSupply(session);
         if (guard) return guard;
 
-        const body = await req.json();
+        const body = (await req.json()) as ProfileRequest;
 
         const validation = profileSchema.safeParse(body);
         if (!validation.success) {
-            return NextResponse.json(
+            return NextResponse.json<ProfileResponse>(
                 { error: "Geçersiz veriler", details: validation.error.format() },
                 { status: 400 }
             );
@@ -97,7 +128,7 @@ export async function PUT(req: Request) {
         const user = await prisma.user.findUnique({
             where: { email: session!.user.email! }
         });
-        if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+        if (!user) return NextResponse.json<ProfileResponse>({ error: "User not found" }, { status: 404 });
 
         await prisma.guideProfile.upsert({
             where: { userId: user.id },
@@ -124,9 +155,9 @@ export async function PUT(req: Request) {
             }
         });
 
-        return NextResponse.json({ success: true, package: user.packageType, tokenBalance: user.tokenBalance });
+        return NextResponse.json<ProfileResponse>({ success: true, package: user.packageType, tokenBalance: user.tokenBalance });
 
-    } catch (error) {
-        return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json<ProfileResponse>({ error: "Internal Error" }, { status: 500 });
     }
 }

@@ -1,6 +1,10 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+
+interface SavedCardActionBody {
+    cardId: string;
+}
 
 /**
  * GET /api/billing/saved-cards
@@ -62,7 +66,7 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { cardId } = await req.json();
+    const { cardId } = (await req.json()) as SavedCardActionBody;
     if (!cardId) {
         return NextResponse.json({ error: "Missing cardId" }, { status: 400 });
     }
@@ -102,7 +106,7 @@ export async function PATCH(req: Request) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const { cardId } = await req.json();
+    const { cardId } = (await req.json()) as SavedCardActionBody;
     if (!cardId) {
         return NextResponse.json({ error: "Missing cardId" }, { status: 400 });
     }

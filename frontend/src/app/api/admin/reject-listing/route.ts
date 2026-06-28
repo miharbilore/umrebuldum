@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
@@ -6,13 +6,18 @@ import { logAdminAction } from "@/lib/admin-audit";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 import { TOKEN_COSTS } from "@/lib/package-system";
 
+interface RejectListingRequest {
+    listingId: string;
+    reason: string;
+}
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { listingId, reason } = await req.json();
+        const { listingId, reason } = (await req.json()) as RejectListingRequest;
 
         if (!listingId) return NextResponse.json({ error: "Missing listingId" }, { status: 400 });
         if (!reason || !reason.trim()) return NextResponse.json({ error: "Reason is mandatory" }, { status: 400 });
@@ -67,8 +72,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, status: "REJECTED" });
 
-    } catch (error) {
-        console.error("Admin reject-listing error:", error);
+    } catch (error: unknown) {
+        console.error("Admin reject-listing error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

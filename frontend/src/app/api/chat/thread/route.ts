@@ -1,8 +1,13 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { spendToken } from "@/modules/tokens/application/spend-token.usecase";
 import { rateLimit } from "@/lib/rate-limit";
+
+interface ChatThreadBody {
+    requestId: string;
+    userId: string;
+}
 
 const CHAT_THREAD_COST = 50; // TODO: move to TOKEN_COSTS in package-system.ts
 
@@ -22,7 +27,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
         }
 
-        const { requestId, userId } = await req.json(); // userId is the target Umreci
+        const { requestId, userId } = (await req.json()) as ChatThreadBody; // userId is the target Umreci
 
         if (!requestId || !userId) {
             return NextResponse.json({ error: "Missing requestId or userId" }, { status: 400 });
@@ -81,9 +86,9 @@ export async function POST(req: Request) {
             });
 
             return NextResponse.json(newConv);
-        } catch (error: any) {
+        } catch (error: unknown) {
             // P2002: parallel call already created the conversation — return existing
-            if (error.code === 'P2002') {
+            if (error && typeof error === 'object' && 'code' in error && (error as any).code === 'P2002') {
                 const existingConv = await prisma.conversation.findUnique({
                     where: {
                         requestId_guideId: {
@@ -97,8 +102,12 @@ export async function POST(req: Request) {
             throw error;
         }
 
-    } catch (error) {
-        console.error("Create Thread Error:", error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Create Thread Error:", error.message);
+        } else {
+            console.error("Create Thread Error:", error);
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

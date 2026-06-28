@@ -1,4 +1,4 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
@@ -9,13 +9,18 @@ import { buildListingSlug } from "@/lib/slug";
  * APPROVE-ONLY endpoint.
  * Reject logic is handled exclusively by /api/admin/reject-listing.
  */
+interface ApproveListingRequest {
+    listingId: string;
+    reason: string;
+}
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const { listingId, reason } = await req.json();
+        const { listingId, reason } = (await req.json()) as ApproveListingRequest;
 
         if (!listingId) return NextResponse.json({ error: "Missing listingId" }, { status: 400 });
         if (!reason) return NextResponse.json({ error: "Missing reason" }, { status: 400 });
@@ -57,8 +62,8 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, status: 'APPROVED' });
 
-    } catch (error) {
-        console.error("Admin approve error:", error);
+    } catch (error: unknown) {
+        console.error("Admin approve error:", error instanceof Error ? error.message : error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });
     }
 }

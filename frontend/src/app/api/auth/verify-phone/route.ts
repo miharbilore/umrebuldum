@@ -1,8 +1,12 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { adminAuth } from "@/lib/firebase/admin";
 import { TokenService } from "@/lib/token-service";
+
+interface VerifyPhoneBody {
+  idToken: string;
+}
 
 const FREEMIUM_PHONE_BONUS = 15;
 
@@ -16,7 +20,7 @@ export async function POST(req: NextRequest) {
     const userId = session.user.id;
 
     // ── 2. Parse request body ──
-    const body = await req.json();
+    const body = (await req.json()) as VerifyPhoneBody;
     const { idToken } = body;
 
     if (!idToken || typeof idToken !== "string") {
@@ -30,8 +34,12 @@ export async function POST(req: NextRequest) {
     let decodedToken;
     try {
       decodedToken = await adminAuth.verifyIdToken(idToken);
-    } catch (firebaseError: any) {
-      console.error("[verify-phone] Firebase token invalid:", firebaseError.message);
+    } catch (firebaseError: unknown) {
+      if (firebaseError instanceof Error) {
+        console.error("[verify-phone] Firebase token invalid:", firebaseError.message);
+      } else {
+        console.error("[verify-phone] Firebase token invalid:", firebaseError);
+      }
       return NextResponse.json(
         { error: "Geçersiz doğrulama. Lütfen tekrar deneyin." },
         { status: 403 }
@@ -102,8 +110,12 @@ export async function POST(req: NextRequest) {
       isPhoneVerified: true,
       tokensGranted,
     });
-  } catch (error: any) {
-    console.error("[verify-phone] Unexpected error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("[verify-phone] Unexpected error:", error.message);
+    } else {
+      console.error("[verify-phone] Unexpected error:", error);
+    }
     return NextResponse.json(
       { error: "Sunucu hatası. Lütfen tekrar deneyin." },
       { status: 500 }

@@ -5,6 +5,14 @@ import { requireAdmin } from "@/lib/api-guards";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği için eklendi
 
+interface UpdateListingRequest {
+    title?: string;
+    price?: string | number;
+    quota?: string | number;
+    active?: boolean;
+    approvalStatus?: ApprovalStatus;
+}
+
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const { id } = await params;
@@ -12,8 +20,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         const guard = requireAdmin(session);
         if (guard) return guard;
 
-        const body = await req.json();
-        const { title, price, quota, active, approvalStatus } = body;
+        const { title, price, quota, active, approvalStatus } = (await req.json()) as UpdateListingRequest;
 
         const updated = await prisma.guideListing.update({
             where: { id },
@@ -37,7 +44,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         });
 
         return NextResponse.json({ success: true, listing: updated });
-    } catch (error) {
+    } catch (error: unknown) {
         return NextResponse.json({ error: safeErrorMessage(error) }, { status: 500 });
     }
 }

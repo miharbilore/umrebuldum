@@ -311,13 +311,49 @@ export const GET = withErrorHandler(async (req: Request) => {
     }
 });
 
+interface TourDayInput {
+    day?: number;
+    city?: string;
+    title?: string;
+    description?: string;
+}
+
+interface CreateListingRequest {
+    title: string;
+    description?: string;
+    city?: string;
+    departureCity?: string;
+    quota?: string | number;
+    departureCityId?: string;
+    meetingCity?: string;
+    extraServices?: string[];
+    hotelName?: string;
+    airlineId?: string;
+    pricing?: {
+        double?: number;
+        triple?: number;
+        quad?: number;
+        currency?: string;
+    };
+    price?: string | number;
+    startDate?: string | Date;
+    departureDateEnd?: string | Date;
+    endDate?: string | Date;
+    returnDateEnd?: string | Date;
+    totalDays?: string | number;
+    tourPlan?: TourDayInput[];
+    urgencyTag?: string;
+    legalConsent: boolean;
+    category?: string;
+}
+
 export const POST = withErrorHandler(async (req: Request) => {
     try {
         const session = await auth();
         const guard = requireSupply(session);
         if (guard) return guard;
 
-        const body = await req.json();
+        const body = (await req.json()) as CreateListingRequest;
         const {
             title,
             description,
@@ -423,13 +459,15 @@ export const POST = withErrorHandler(async (req: Request) => {
                 relatedId: `listing-create-${Date.now()}`,
                 reason: 'Yeni ilan oluşturma',
             });
-        } catch (error: any) {
-            if (error.message.includes('Insufficient tickets') || error.message.includes('Insufficient balance')) {
-                return NextResponse.json({
-                    error: "Yetersiz Bakiye",
-                    message: "İlan yayınlamak için yeterli tokeniniz bulunmuyor. Lütfen kredi yükleyin.",
-                    code: "INSUFFICIENT_FUNDS"
-                }, { status: 402 });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                if (error.message.includes('Insufficient tickets') || error.message.includes('Insufficient balance')) {
+                    return NextResponse.json({
+                        error: "Yetersiz Bakiye",
+                        message: "İlan yayınlamak için yeterli tokeniniz bulunmuyor. Lütfen kredi yükleyin.",
+                        code: "INSUFFICIENT_FUNDS"
+                    }, { status: 402 });
+                }
             }
             throw error;
         }
@@ -455,7 +493,7 @@ export const POST = withErrorHandler(async (req: Request) => {
                 pricingTriple: pTriple,
                 pricingQuad: pQuad,
                 pricingCurrency: pricing?.currency || "SAR",
-                quota: quota ? parseInt(quota) : 30,
+                quota: quota ? (typeof quota === "string" ? parseInt(quota) : quota) : 30,
                 filled: 0,
                 active: true,
                 isFeatured: false,
@@ -463,13 +501,13 @@ export const POST = withErrorHandler(async (req: Request) => {
                 departureDateEnd: body.departureDateEnd ? new Date(body.departureDateEnd) : null,
                 endDate: endDate ? new Date(endDate) : new Date(Date.now() + 86400000 * 10),
                 returnDateEnd: body.returnDateEnd ? new Date(body.returnDateEnd) : null,
-                totalDays: totalDays ? parseInt(totalDays) : 10,
+                totalDays: totalDays ? (typeof totalDays === "string" ? parseInt(totalDays) : totalDays) : 10,
                 approvalStatus: ApprovalStatus.PENDING,
                 urgencyTag: urgencyTag || null,
                 legalConsent: !!legalConsent,
                 consentTimestamp: new Date(),
                 tourDays: tourPlan && tourPlan.length > 0 ? {
-                    create: tourPlan.map((d: any) => ({
+                    create: tourPlan.map((d: TourDayInput) => ({
                         day: d.day || 1,
                         city: d.city || "",
                         title: d.title || "",
@@ -490,12 +528,12 @@ export const POST = withErrorHandler(async (req: Request) => {
                 quad: Number(newListing.pricingQuad),
                 currency: newListing.pricingCurrency
             },
-            tourPlan: ((newListing as any).tourDays || []).map((d: any) => ({
+            tourPlan: newListing.tourDays ? newListing.tourDays.map((d: { day: number, city: string | null, title: string | null, description: string | null }) => ({
                 day: d.day,
                 city: d.city,
                 title: d.title,
                 description: d.description
-            })),
+            })) : [],
             startDate: newListing.startDate.toISOString().split('T')[0],
             endDate: newListing.endDate.toISOString().split('T')[0],
             createdAt: newListing.createdAt.toISOString()
@@ -507,8 +545,12 @@ export const POST = withErrorHandler(async (req: Request) => {
             message: "İlanınız kontrol ediliyor."
         }, { status: 201 });
 
-    } catch (error) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Create listing error:", error.message);
+            throw new AppError(error.message, ERROR_CODES.INTERNAL_ERROR, 500);
+        }
         console.error("Create listing error:", error);
-        throw new AppError(safeErrorMessage(error), ERROR_CODES.INTERNAL_ERROR, 500);
+        throw new AppError("Internal Server Error", ERROR_CODES.INTERNAL_ERROR, 500);
     }
 });
