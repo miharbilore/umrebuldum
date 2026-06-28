@@ -1,9 +1,15 @@
-﻿// â”€â”€â”€ Lead Matching Engine (Wave-Based Distribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Lead Matching Engine (Wave-Based Distribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Controls which agencies receive notifications for new customer leads based
 // on chronological waves. Prioritizes premium plans and high SLA agencies first.
 
 import { prisma } from '@/lib/prisma';
 import { PackageSystem } from '@/lib/package-system';
+import { Prisma } from '@prisma/client';
+
+export interface PerformanceTierData {
+    tier?: string;
+    [key: string]: unknown;
+}
 
 export type WaveTier = 1 | 2 | 3;
 
@@ -96,7 +102,7 @@ export class LeadMatchingService {
     /**
      * Finds agencies matching the strict criteria for the given wave.
      */
-    private static async findEligibleAgencies(request: any, wave: WaveTier, alreadyDispatched: string[]): Promise<string[]> {
+    private static async findEligibleAgencies(request: Prisma.UmrahRequestGetPayload<{}>, wave: WaveTier, alreadyDispatched: string[]): Promise<string[]> {
         // Find guides who serve this departure city
         // (Assuming listings represent their servicing areas for now)
         const relevantListings = await prisma.guideListing.findMany({
@@ -127,7 +133,7 @@ export class LeadMatchingService {
 
         return candidates.filter(guide => {
             const pkg = guide.packageType || "FREEMIUM";
-            const perf = (guide.performanceTier as any)?.tier || "BRONZE";
+            const perf = (guide.performanceTier as unknown as PerformanceTierData)?.tier || "BRONZE";
             const slaHours = 999; // SLA metrics would come from a separate query
 
             switch (wave) {

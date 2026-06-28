@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Risk Scoring Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Risk Scoring Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Computes User Risk Score (URS) from signal values.
 // ASYNC-only â€” runs in background worker, never on hot path.
 // Reads from multiple tables, writes to risk_scores.
@@ -21,6 +21,15 @@ import {
     AUTO_SUSPEND_THRESHOLD,
     type RiskTier,
 } from "../domain/risk-tiers";
+import { Prisma } from "@prisma/client";
+
+export type ScoredUser = Prisma.UserGetPayload<{
+    include: {
+        reviewsReceived: { select: { overallRating: true } };
+        reviewsGiven: { select: { id: true; status: true; deletedAt: true } };
+        riskScore: true;
+    }
+}>;
 
 // â”€â”€â”€ Signal Value Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -128,7 +137,7 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
             transactionScore,
             networkScore,
             historyScore,
-            signals: signals as any,
+            signals: signals as Prisma.InputJsonObject,
         },
         update: {
             urs,
@@ -137,7 +146,7 @@ export async function computeUserRiskScore(userId: string): Promise<ScoringResul
             transactionScore,
             networkScore,
             historyScore,
-            signals: signals as any,
+            signals: signals as Prisma.InputJsonObject,
         },
     });
 
@@ -318,7 +327,7 @@ async function computeNetworkScore(userId: string, email: string | null, snapsho
     return Math.min(score, 100);
 }
 
-async function computeHistoryScore(userId: string, user: any, snapshot: SignalSnapshot): Promise<number> {
+async function computeHistoryScore(userId: string, user: ScoredUser, snapshot: SignalSnapshot): Promise<number> {
     let score = 0;
 
     // PAST_ENFORCEMENT: check if user was ever RED or BLACK
@@ -326,21 +335,21 @@ async function computeHistoryScore(userId: string, user: any, snapshot: SignalSn
         where: {
             userId,
             eventType: "TIER_CHANGE",
-            metadata: { path: ["newTier"], string_contains: "RED" } as any,
+            metadata: { path: ["newTier"], string_contains: "RED" } as Prisma.InputJsonObject,
         },
     });
     const pastSuspension = await prisma.riskEvent.count({
         where: {
             userId,
             eventType: "TIER_CHANGE",
-            metadata: { path: ["newTier"], string_contains: "BLACK" } as any,
+            metadata: { path: ["newTier"], string_contains: "BLACK" } as Prisma.InputJsonObject,
         },
     });
     score += evaluateSignal(HISTORY_SIGNALS[0], pastEnforcement + pastSuspension > 0 ? 1 : 0, snapshot);
 
     // REVIEW_REMOVAL_RATE
     const totalReviewsGiven = user.reviewsGiven?.length || 0;
-    const removedReviews = user.reviewsGiven?.filter((r: any) => r.deletedAt != null || r.status === "REJECTED").length || 0;
+    const removedReviews = user.reviewsGiven?.filter(r => r.deletedAt != null || r.status === "REJECTED").length || 0;
     const reviewRemovalRate = totalReviewsGiven > 0 ? removedReviews / totalReviewsGiven : 0;
     score += evaluateSignal(HISTORY_SIGNALS[1], reviewRemovalRate, snapshot);
 
@@ -350,7 +359,7 @@ async function computeHistoryScore(userId: string, user: any, snapshot: SignalSn
         select: { metadata: true },
     });
     const distinctReporters = new Set(
-        reportEvents.map((e: any) => e.metadata?.reporterId).filter(Boolean)
+        reportEvents.map(e => (e.metadata as Prisma.JsonObject)?.reporterId as string).filter(Boolean)
     );
     score += evaluateSignal(HISTORY_SIGNALS[3], distinctReporters.size, snapshot);
 

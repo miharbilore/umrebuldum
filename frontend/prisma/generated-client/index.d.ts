@@ -5547,6 +5547,10 @@ export namespace Prisma {
     hasCompletedQuiz: boolean | null
     lastQuizAttempt: Date | null
     quizAttempts: number | null
+    quizPassed: boolean | null
+    hasClaimedQuizBonus: boolean | null
+    profileCompletedAt: Date | null
+    hasClaimedProfileBonus: boolean | null
     coverImage: string | null
     establishmentYear: number | null
     tursabNumber: string | null
@@ -5593,6 +5597,10 @@ export namespace Prisma {
     hasCompletedQuiz: boolean | null
     lastQuizAttempt: Date | null
     quizAttempts: number | null
+    quizPassed: boolean | null
+    hasClaimedQuizBonus: boolean | null
+    profileCompletedAt: Date | null
+    hasClaimedProfileBonus: boolean | null
     coverImage: string | null
     establishmentYear: number | null
     tursabNumber: string | null
@@ -5640,6 +5648,10 @@ export namespace Prisma {
     hasCompletedQuiz: number
     lastQuizAttempt: number
     quizAttempts: number
+    quizPassed: number
+    hasClaimedQuizBonus: number
+    profileCompletedAt: number
+    hasClaimedProfileBonus: number
     coverImage: number
     establishmentYear: number
     socialLinks: number
@@ -5709,6 +5721,10 @@ export namespace Prisma {
     hasCompletedQuiz?: true
     lastQuizAttempt?: true
     quizAttempts?: true
+    quizPassed?: true
+    hasClaimedQuizBonus?: true
+    profileCompletedAt?: true
+    hasClaimedProfileBonus?: true
     coverImage?: true
     establishmentYear?: true
     tursabNumber?: true
@@ -5755,6 +5771,10 @@ export namespace Prisma {
     hasCompletedQuiz?: true
     lastQuizAttempt?: true
     quizAttempts?: true
+    quizPassed?: true
+    hasClaimedQuizBonus?: true
+    profileCompletedAt?: true
+    hasClaimedProfileBonus?: true
     coverImage?: true
     establishmentYear?: true
     tursabNumber?: true
@@ -5802,6 +5822,10 @@ export namespace Prisma {
     hasCompletedQuiz?: true
     lastQuizAttempt?: true
     quizAttempts?: true
+    quizPassed?: true
+    hasClaimedQuizBonus?: true
+    profileCompletedAt?: true
+    hasClaimedProfileBonus?: true
     coverImage?: true
     establishmentYear?: true
     socialLinks?: true
@@ -5937,6 +5961,10 @@ export namespace Prisma {
     hasCompletedQuiz: boolean
     lastQuizAttempt: Date | null
     quizAttempts: number
+    quizPassed: boolean
+    hasClaimedQuizBonus: boolean
+    profileCompletedAt: Date | null
+    hasClaimedProfileBonus: boolean
     coverImage: string | null
     establishmentYear: number | null
     socialLinks: JsonValue | null
@@ -6004,6 +6032,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: boolean
     quizAttempts?: boolean
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: boolean
+    hasClaimedProfileBonus?: boolean
     coverImage?: boolean
     establishmentYear?: boolean
     socialLinks?: boolean
@@ -6074,6 +6106,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: boolean
     quizAttempts?: boolean
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: boolean
+    hasClaimedProfileBonus?: boolean
     coverImage?: boolean
     establishmentYear?: boolean
     socialLinks?: boolean
@@ -6170,6 +6206,10 @@ export namespace Prisma {
       hasCompletedQuiz: boolean
       lastQuizAttempt: Date | null
       quizAttempts: number
+      quizPassed: boolean
+      hasClaimedQuizBonus: boolean
+      profileCompletedAt: Date | null
+      hasClaimedProfileBonus: boolean
       coverImage: string | null
       establishmentYear: number | null
       socialLinks: Prisma.JsonValue | null
@@ -6604,6 +6644,10 @@ export namespace Prisma {
     readonly hasCompletedQuiz: FieldRef<"User", 'Boolean'>
     readonly lastQuizAttempt: FieldRef<"User", 'DateTime'>
     readonly quizAttempts: FieldRef<"User", 'Int'>
+    readonly quizPassed: FieldRef<"User", 'Boolean'>
+    readonly hasClaimedQuizBonus: FieldRef<"User", 'Boolean'>
+    readonly profileCompletedAt: FieldRef<"User", 'DateTime'>
+    readonly hasClaimedProfileBonus: FieldRef<"User", 'Boolean'>
     readonly coverImage: FieldRef<"User", 'String'>
     readonly establishmentYear: FieldRef<"User", 'Int'>
     readonly socialLinks: FieldRef<"User", 'Json'>
@@ -53972,6 +54016,10 @@ export namespace Prisma {
     hasCompletedQuiz: 'hasCompletedQuiz',
     lastQuizAttempt: 'lastQuizAttempt',
     quizAttempts: 'quizAttempts',
+    quizPassed: 'quizPassed',
+    hasClaimedQuizBonus: 'hasClaimedQuizBonus',
+    profileCompletedAt: 'profileCompletedAt',
+    hasClaimedProfileBonus: 'hasClaimedProfileBonus',
     coverImage: 'coverImage',
     establishmentYear: 'establishmentYear',
     socialLinks: 'socialLinks',
@@ -54918,6 +54966,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFilter<"User"> | boolean
     lastQuizAttempt?: DateTimeNullableFilter<"User"> | Date | string | null
     quizAttempts?: IntFilter<"User"> | number
+    quizPassed?: BoolFilter<"User"> | boolean
+    hasClaimedQuizBonus?: BoolFilter<"User"> | boolean
+    profileCompletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    hasClaimedProfileBonus?: BoolFilter<"User"> | boolean
     coverImage?: StringNullableFilter<"User"> | string | null
     establishmentYear?: IntNullableFilter<"User"> | number | null
     socialLinks?: JsonNullableFilter<"User">
@@ -54986,6 +55038,10 @@ export namespace Prisma {
     hasCompletedQuiz?: SortOrder
     lastQuizAttempt?: SortOrderInput | SortOrder
     quizAttempts?: SortOrder
+    quizPassed?: SortOrder
+    hasClaimedQuizBonus?: SortOrder
+    profileCompletedAt?: SortOrderInput | SortOrder
+    hasClaimedProfileBonus?: SortOrder
     coverImage?: SortOrderInput | SortOrder
     establishmentYear?: SortOrderInput | SortOrder
     socialLinks?: SortOrderInput | SortOrder
@@ -55057,6 +55113,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFilter<"User"> | boolean
     lastQuizAttempt?: DateTimeNullableFilter<"User"> | Date | string | null
     quizAttempts?: IntFilter<"User"> | number
+    quizPassed?: BoolFilter<"User"> | boolean
+    hasClaimedQuizBonus?: BoolFilter<"User"> | boolean
+    profileCompletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    hasClaimedProfileBonus?: BoolFilter<"User"> | boolean
     coverImage?: StringNullableFilter<"User"> | string | null
     establishmentYear?: IntNullableFilter<"User"> | number | null
     socialLinks?: JsonNullableFilter<"User">
@@ -55125,6 +55185,10 @@ export namespace Prisma {
     hasCompletedQuiz?: SortOrder
     lastQuizAttempt?: SortOrderInput | SortOrder
     quizAttempts?: SortOrder
+    quizPassed?: SortOrder
+    hasClaimedQuizBonus?: SortOrder
+    profileCompletedAt?: SortOrderInput | SortOrder
+    hasClaimedProfileBonus?: SortOrder
     coverImage?: SortOrderInput | SortOrder
     establishmentYear?: SortOrderInput | SortOrder
     socialLinks?: SortOrderInput | SortOrder
@@ -55181,6 +55245,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolWithAggregatesFilter<"User"> | boolean
     lastQuizAttempt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     quizAttempts?: IntWithAggregatesFilter<"User"> | number
+    quizPassed?: BoolWithAggregatesFilter<"User"> | boolean
+    hasClaimedQuizBonus?: BoolWithAggregatesFilter<"User"> | boolean
+    profileCompletedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    hasClaimedProfileBonus?: BoolWithAggregatesFilter<"User"> | boolean
     coverImage?: StringNullableWithAggregatesFilter<"User"> | string | null
     establishmentYear?: IntNullableWithAggregatesFilter<"User"> | number | null
     socialLinks?: JsonNullableWithAggregatesFilter<"User">
@@ -59109,6 +59177,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -59177,6 +59249,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -59245,6 +59321,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -59313,6 +59393,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -59381,6 +59465,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -59429,6 +59517,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -59477,6 +59569,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -64098,6 +64194,10 @@ export namespace Prisma {
     hasCompletedQuiz?: SortOrder
     lastQuizAttempt?: SortOrder
     quizAttempts?: SortOrder
+    quizPassed?: SortOrder
+    hasClaimedQuizBonus?: SortOrder
+    profileCompletedAt?: SortOrder
+    hasClaimedProfileBonus?: SortOrder
     coverImage?: SortOrder
     establishmentYear?: SortOrder
     socialLinks?: SortOrder
@@ -64155,6 +64255,10 @@ export namespace Prisma {
     hasCompletedQuiz?: SortOrder
     lastQuizAttempt?: SortOrder
     quizAttempts?: SortOrder
+    quizPassed?: SortOrder
+    hasClaimedQuizBonus?: SortOrder
+    profileCompletedAt?: SortOrder
+    hasClaimedProfileBonus?: SortOrder
     coverImage?: SortOrder
     establishmentYear?: SortOrder
     tursabNumber?: SortOrder
@@ -64201,6 +64305,10 @@ export namespace Prisma {
     hasCompletedQuiz?: SortOrder
     lastQuizAttempt?: SortOrder
     quizAttempts?: SortOrder
+    quizPassed?: SortOrder
+    hasClaimedQuizBonus?: SortOrder
+    profileCompletedAt?: SortOrder
+    hasClaimedProfileBonus?: SortOrder
     coverImage?: SortOrder
     establishmentYear?: SortOrder
     tursabNumber?: SortOrder
@@ -71077,6 +71185,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71144,6 +71256,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71227,6 +71343,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71294,6 +71414,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71361,6 +71485,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71428,6 +71556,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71511,6 +71643,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71578,6 +71714,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71737,6 +71877,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71804,6 +71948,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -71942,6 +72090,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -72009,6 +72161,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -73793,6 +73949,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -73860,6 +74020,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -73992,6 +74156,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74059,6 +74227,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74285,6 +74457,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74352,6 +74528,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74473,6 +74653,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74540,6 +74724,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74653,6 +74841,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74720,6 +74912,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74853,6 +75049,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -74920,6 +75120,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75026,6 +75230,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75093,6 +75301,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75227,6 +75439,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75294,6 +75510,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75443,6 +75663,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75510,6 +75734,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75593,6 +75821,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75660,6 +75892,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75727,6 +75963,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75794,6 +76034,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75877,6 +76121,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -75944,6 +76192,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76011,6 +76263,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76078,6 +76334,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76161,6 +76421,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76228,6 +76492,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76295,6 +76563,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76362,6 +76634,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76485,6 +76761,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76552,6 +76832,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76821,6 +77105,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -76888,6 +77176,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77064,6 +77356,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77131,6 +77427,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77378,6 +77678,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77445,6 +77749,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77528,6 +77836,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77595,6 +77907,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77662,6 +77978,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77729,6 +78049,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77850,6 +78174,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -77917,6 +78245,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78000,6 +78332,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78067,6 +78403,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78200,6 +78540,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78267,6 +78611,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78334,6 +78682,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78401,6 +78753,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78484,6 +78840,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -78551,6 +78911,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79012,6 +79376,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79079,6 +79447,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79194,6 +79566,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79261,6 +79637,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79404,6 +79784,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79471,6 +79855,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79554,6 +79942,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79621,6 +80013,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79688,6 +80084,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79755,6 +80155,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79838,6 +80242,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79905,6 +80313,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -79972,6 +80384,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -80039,6 +80455,10 @@ export namespace Prisma {
     hasCompletedQuiz?: boolean
     lastQuizAttempt?: Date | string | null
     quizAttempts?: number
+    quizPassed?: boolean
+    hasClaimedQuizBonus?: boolean
+    profileCompletedAt?: Date | string | null
+    hasClaimedProfileBonus?: boolean
     coverImage?: string | null
     establishmentYear?: number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -80122,6 +80542,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue
@@ -80189,6 +80613,10 @@ export namespace Prisma {
     hasCompletedQuiz?: BoolFieldUpdateOperationsInput | boolean
     lastQuizAttempt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     quizAttempts?: IntFieldUpdateOperationsInput | number
+    quizPassed?: BoolFieldUpdateOperationsInput | boolean
+    hasClaimedQuizBonus?: BoolFieldUpdateOperationsInput | boolean
+    profileCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hasClaimedProfileBonus?: BoolFieldUpdateOperationsInput | boolean
     coverImage?: NullableStringFieldUpdateOperationsInput | string | null
     establishmentYear?: NullableIntFieldUpdateOperationsInput | number | null
     socialLinks?: NullableJsonNullValueInput | InputJsonValue

@@ -1,10 +1,16 @@
-﻿// â”€â”€â”€ Review Integrity Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Review Integrity Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Lightweight integrity checks for review authenticity:
 // - Trigram Jaccard similarity detection
 // - Temporal clustering detection
 // - Auto-action tiers based on reviewer trust
 
 import { prisma } from "@/lib/prisma";
+
+export interface SybilMetadata {
+    confidence?: number;
+    clusterId?: string;
+    [key: string]: unknown;
+}
 
 // â”€â”€â”€ Trigram Similarity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -105,8 +111,8 @@ export async function checkReviewIntegrity(
     });
 
     if (recentSybil) {
-        const meta = recentSybil.metadata as any;
-        if (meta?.confidence >= 0.8) {
+        const meta = recentSybil.metadata as unknown as SybilMetadata;
+        if (meta?.confidence && meta.confidence >= 0.8) {
             return {
                 action: "AUTO_REJECT",
                 flags: ["SYBIL_CLUSTER_MEMBER"],

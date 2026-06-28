@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Cross-Signal Correlation Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Cross-Signal Correlation Engine â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Detects multi-vector attack chains by correlating disparate risk events.
 // No complex event processing â€” lightweight windowed aggregation.
 //
@@ -9,6 +9,7 @@
 //   Chain C: Repeated probation recycling
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 // â”€â”€â”€ Signal Weights â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -115,7 +116,7 @@ export async function correlateSignals(userId: string): Promise<CorrelationResul
 
 function detectAttackChains(
     types: Set<string>,
-    events: { eventType: string; metadata: any }[],
+    events: { eventType: string; metadata: Prisma.JsonValue }[],
 ): string | null {
     // Chain A: Sybil â†’ Trust farming â†’ Review manipulation
     // Most dangerous: complete ranking takeover

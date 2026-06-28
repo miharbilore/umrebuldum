@@ -50,6 +50,10 @@ model User {
   hasCompletedQuiz       Boolean               @default(false)
   lastQuizAttempt        DateTime?
   quizAttempts           Int                   @default(0)
+  quizPassed             Boolean               @default(false)
+  hasClaimedQuizBonus    Boolean               @default(false)
+  profileCompletedAt     DateTime?
+  hasClaimedProfileBonus Boolean               @default(false)
   coverImage             String?
   establishmentYear      Int?
   socialLinks            Json?

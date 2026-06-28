@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Atomic Trust Delta (CAS-based) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Atomic Trust Delta (CAS-based) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Single entry point for ALL trust score mutations.
 // Eliminates race condition between TrustScoreEngine and TrustEngineService.
 // Uses Compare-And-Swap via trustScoreVersion field.
@@ -8,6 +8,12 @@ import { prisma } from "@/lib/prisma";
 const MAX_CAS_RETRIES = 3;
 const MAX_DAILY_RECOMPUTATIONS = 1;
 const MAX_INCREASE_PER_CYCLE = 5;
+
+export interface TrustChangeMetadata {
+    idempotencyKey?: string;
+    reason?: string;
+    [key: string]: unknown;
+}
 
 /**
  * The ONLY function that should ever mutate User.trustScore.
@@ -44,7 +50,7 @@ export async function atomicTrustDelta(
         });
         // Check via raw query since JSON path queries vary by DB
         if (existing) {
-            const meta = existing.metadata as any;
+            const meta = existing.metadata as unknown as TrustChangeMetadata;
             if (meta?.idempotencyKey === options.idempotencyKey) {
                 return { previous: 0, current: 0, applied: false };
             }
@@ -127,7 +133,7 @@ export async function canRecomputeTrust(userId: string): Promise<boolean> {
 
     // Check if the most recent was a TRUST_RECOMPUTATION
     if (recentRecomputation) {
-        const meta = recentRecomputation.metadata as any;
+        const meta = recentRecomputation.metadata as unknown as TrustChangeMetadata;
         if (meta?.reason === "TRUST_RECOMPUTATION") {
             return false; // Already recomputed today
         }

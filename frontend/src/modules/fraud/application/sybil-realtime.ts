@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Real-Time Sybil Protection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Real-Time Sybil Protection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Lightweight real-time checks at registration and action time.
 // Hybrid model: fast checks + batch daily deep analysis.
 
@@ -10,7 +10,13 @@ import {
     validateBehaviorData,
 } from "./behavioral-sybil";
 
-// â”€â”€â”€ Disposable Email Domains (top offenders) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ——— Disposable Email Domains (top offenders) ——————————————————————————
+
+export interface SybilMetadata {
+    confidence?: number;
+    clusterId?: string;
+    [key: string]: unknown;
+}
 
 const DISPOSABLE_DOMAINS = new Set([
     "tempmail.com", "throwaway.email", "guerrillamail.com", "mailinator.com",
@@ -159,8 +165,8 @@ export async function actionSybilGate(userId: string): Promise<{
     });
 
     if (recentSybil) {
-        const meta = recentSybil.metadata as any;
-        if (meta?.confidence >= 0.8) {
+        const meta = recentSybil.metadata as unknown as SybilMetadata;
+        if (meta?.confidence && meta.confidence >= 0.8) {
             return { allowed: false, reason: "Sybil cluster detected" };
         }
     }

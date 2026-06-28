@@ -1,8 +1,9 @@
-﻿// â”€â”€â”€ Escalation Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Escalation Service â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Creates fraud review tickets and manages escalation workflow.
 // Called by the scoring engine when URS crosses threshold.
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import {
     ESCALATION_THRESHOLD,
     AUTO_SUSPEND_THRESHOLD,
@@ -15,7 +16,7 @@ export interface EscalationInput {
     tier: RiskTier;
     urs: number;
     triggerReason: string;
-    signals: Record<string, any>;
+    signals: Prisma.InputJsonObject;
     agencyId?: string;
 }
 
@@ -214,7 +215,7 @@ export async function resolveTicket(
             where: { userId: ticket.userId },
             data: {
                 probationUntil: reEvalDate,
-                probationBaseline: (ticket.signals ?? {}) as any,
+                probationBaseline: (ticket.signals ?? {}) as Prisma.InputJsonObject,
             },
         });
     }
