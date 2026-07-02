@@ -62,7 +62,7 @@ export default function CheckoutPage() {
     const tokenPkg = tokenPkgId ? TOKEN_PACKAGES.find(tp => tp.id === tokenPkgId) : null;
     const isTokenPurchase = !!tokenPkg;
 
-    const totalPrice = isTokenPurchase 
+    const totalPrice = isTokenPurchase && tokenPkg
         ? tokenPkg.priceTRY 
         : (packageData?.priceTRY || 0);
 
@@ -102,7 +102,7 @@ export default function CheckoutPage() {
                                 <div className="flex justify-between items-center mb-4">
                                     <div>
                                         <p className="font-black text-2xl text-slate-900 uppercase">
-                                            {isTokenPurchase ? `${tokenPkg.tokens} Token Paketi` : (packageData?.name || 'Paket Bilgisi Yok')}
+                                            {isTokenPurchase ? `${tokenPkg?.tokens} Token Paketi` : (packageData?.name || 'Paket Bilgisi Yok')}
                                         </p>
                                         <p className="text-slate-500 font-medium italic">
                                             {isTokenPurchase ? 'Ek Token Yüklemesi' : `Abonelik Süresi: ${packageData?.billingPeriod === 12 ? 'Yıllık' : packageData?.billingPeriod === 3 ? '3 Aylık' : 'Aylık'}`}

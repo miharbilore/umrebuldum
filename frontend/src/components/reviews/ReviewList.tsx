@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { ReviewCard } from './ReviewCard';
@@ -63,8 +63,12 @@ export function ReviewList({ guideId, averageRating, reviewCount }: ReviewListPr
             setTotalCount(data.metadata?.totalCount || 0);
             setTotalPages(data.metadata?.totalPages || 0);
             setPage(pageNum);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('Bir hata oluştu');
+            }
         } finally {
             setLoading(false);
             setLoadingMore(false);

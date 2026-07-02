@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function ToursPage({ searchParams }: { searchParams: Promise<any> }) {
+export default async function ToursPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const resolvedParams = await searchParams;
   
   // Hash for caching
@@ -57,7 +57,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
       const now = new Date();
 
-      const where: any = {
+      const where: Prisma.GuideListingWhereInput = {
         active: true,
         approvalStatus: 'APPROVED',
         endDate: { gte: now }
@@ -124,7 +124,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
       }
 
       // 6. Sorting
-      const orderBy: any[] = [];
+      const orderBy: Prisma.GuideListingOrderByWithRelationInput[] = [];
       switch (sortParam) {
         case 'price_asc': orderBy.push({ pricingQuad: 'asc' }); break;
         case 'price_desc': orderBy.push({ pricingQuad: 'desc' }); break;
@@ -266,12 +266,16 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
         }
       };
     }, 300);
-  } catch (error: any) {
-    console.error("[ToursPage] CRITICAL ERROR in fetchCachedListings:", {
-      message: error.message,
-      stack: error.stack,
-      cause: error.cause
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        console.error("[ToursPage] CRITICAL ERROR in fetchCachedListings:", {
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause
+        });
+    } else {
+        console.error("[ToursPage] CRITICAL ERROR in fetchCachedListings:", error);
+    }
     throw error;
   }
 

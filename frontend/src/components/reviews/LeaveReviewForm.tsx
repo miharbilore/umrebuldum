@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Star, Send, Loader2, CheckCircle } from 'lucide-react';
@@ -65,7 +65,7 @@ export function LeaveReviewForm({ guideId, requestId, onSuccess }: LeaveReviewFo
 
     const allRated = Object.values(ratings).every(r => r > 0);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!allRated) {
@@ -99,8 +99,8 @@ export function LeaveReviewForm({ guideId, requestId, onSuccess }: LeaveReviewFo
                 icon: <CheckCircle className="w-5 h-5 text-emerald-500" />,
             });
             onSuccess?.();
-        } catch (err: any) {
-            toast.error(err.message || 'Değerlendirme gönderilemedi.');
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : 'Değerlendirme gönderilemedi.');
         } finally {
             setSubmitting(false);
         }

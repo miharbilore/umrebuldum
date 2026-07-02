@@ -1,6 +1,11 @@
-﻿import jsPDF from 'jspdf';
+import jsPDF from 'jspdf';
+import type { Prisma } from '@prisma/client';
 
-export const generatePDF = (listing: any) => {
+type ListingWithDetails = Prisma.GuideListingGetPayload<{
+    include: { guide: true; tourPlan: true }
+}>;
+
+export const generatePDF = (listing: ListingWithDetails) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -32,7 +37,9 @@ export const generatePDF = (listing: any) => {
         doc.text("Tur Programı", 20, y);
         y += 10;
 
-        listing.tourPlan.forEach((day: any) => {
+        const planDays = Array.isArray(listing.tourPlan) ? listing.tourPlan as unknown as { day: number; city: string; description: string }[] : [];
+
+        planDays.forEach((day) => {
             if (y > 270) {
                 doc.addPage();
                 y = 20;

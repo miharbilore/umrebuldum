@@ -20,7 +20,7 @@ interface CreditPackage {
     billingPeriod: number;
     roleTarget: string;
     sortOrder: number;
-    features: any;
+    features: Record<string, unknown> | null;
 }
 
 interface CouponState {
@@ -49,18 +49,19 @@ function getTierStyle(slug: string) {
     return TIER_STYLES[slug] || TIER_STYLES.FREEMIUM;
 }
 
-function buildFeatureList(featsObj: any): string[] {
+function buildFeatureList(featsObj: Record<string, unknown> | unknown[] | unknown): string[] {
     if (!featsObj || typeof featsObj !== "object") return [];
-    if (Array.isArray(featsObj)) return featsObj;
+    if (Array.isArray(featsObj)) return featsObj as string[];
 
     const list: string[] = [];
-    if (featsObj.maxListings) list.push(`${featsObj.maxListings} Aktif İlan Hakkı`);
-    if (featsObj.listingDays) list.push(`${featsObj.listingDays} Gün Yayın Süresi`);
-    if (featsObj.maxBoosts) list.push(`${featsObj.maxBoosts} Öne Çıkarma Hakkı`);
-    if (featsObj.phoneVisible) list.push("Telefon Numarası Gösterimi");
-    if (featsObj.spotlightEligible) list.push("Vitrin İlanı Erişimi");
-    if (featsObj.priorityRanking) list.push("Öncelikli Sıralama");
-    if (featsObj.canCreatePoster) list.push("Afiş Motoru Kullanımı");
+    const feats = featsObj as Record<string, unknown>;
+    if (feats.maxListings) list.push(`${feats.maxListings} Aktif İlan Hakkı`);
+    if (feats.listingDays) list.push(`${feats.listingDays} Gün Yayın Süresi`);
+    if (feats.maxBoosts) list.push(`${feats.maxBoosts} Öne Çıkarma Hakkı`);
+    if (feats.phoneVisible) list.push("Telefon Numarası Gösterimi");
+    if (feats.spotlightEligible) list.push("Vitrin İlanı Erişimi");
+    if (feats.priorityRanking) list.push("Öncelikli Sıralama");
+    if (feats.canCreatePoster) list.push("Afiş Motoru Kullanımı");
     return list;
 }
 
@@ -88,7 +89,7 @@ export function CreditPackages() {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.length > 0) {
-                        setPackages(data.map((pkg: any) => ({
+                        setPackages(data.map((pkg: CreditPackage) => ({
                             ...pkg,
                             features: pkg.features || {},
                         })));

@@ -17,8 +17,12 @@ import { UmrahQuizModal } from "@/components/dashboard/UmrahQuizModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+interface MarketRequest extends UmrahRequest {
+    isContacted?: boolean;
+}
+
 export default function GuideMarketPage() {
-    const [requests, setRequests] = useState<UmrahRequest[]>([]);
+    const [requests, setRequests] = useState<MarketRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [interestedIds, setInterestedIds] = useState<Set<string>>(new Set());
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -220,17 +224,17 @@ export default function GuideMarketPage() {
 
                                 <Button
                                     onClick={() => {
-                                        if ((req as any).isContacted || interestedIds.has(req.id)) {
+                                        if (req.isContacted || interestedIds.has(req.id)) {
                                             router.push(`/dashboard/requests/${req.id}`);
                                         } else {
                                             handleInterestClick(req.id, req.departureCity);
                                         }
                                     }}
-                                    disabled={currentBalance < creditCost && !((req as any).isContacted || interestedIds.has(req.id))}
-                                    variant={((req as any).isContacted || interestedIds.has(req.id)) ? "secondary" : "default"}
-                                    className={`w-full ${((req as any).isContacted || interestedIds.has(req.id)) ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : ""}`}
+                                    disabled={currentBalance < creditCost && !(req.isContacted || interestedIds.has(req.id))}
+                                    variant={(req.isContacted || interestedIds.has(req.id)) ? "secondary" : "default"}
+                                    className={`w-full ${(req.isContacted || interestedIds.has(req.id)) ? "bg-gray-100 text-gray-700 hover:bg-gray-200" : ""}`}
                                 >
-                                    {((req as any).isContacted || interestedIds.has(req.id))
+                                    {(req.isContacted || interestedIds.has(req.id))
                                         ? "İletişime Geçildi (Detaya Git) ✅"
                                         : currentBalance < creditCost
                                             ? "Yetersiz Bakiye 💰"

@@ -59,8 +59,9 @@ export default function PendingListingsPanel() {
             if (!res.ok) throw new Error(data.error || 'Onay başarısız');
             toast.success("İlan başarıyla onaylandı ve yayına alındı.");
             mutate();
-        } catch (err: any) {
-            toast.error(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) toast.error(err.message);
+            else toast.error(String(err));
         } finally {
             setActionLoading(null);
         }
@@ -81,8 +82,9 @@ export default function PendingListingsPanel() {
             setRejectModal(null);
             setRejectReason('');
             mutate();
-        } catch (err: any) {
-            toast.error(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) toast.error(err.message);
+            else toast.error(String(err));
         } finally {
             setActionLoading(null);
         }

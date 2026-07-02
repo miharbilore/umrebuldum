@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
@@ -122,10 +122,11 @@ export function PhoneVerificationModal({
       setStep("otp");
       setCountdown(60);
       toast.success("Doğrulama kodu gönderildi!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[PhoneVerify] SMS error:", error);
+      const err = error as { code?: string; message?: string };
 
-      if (error?.code === "auth/too-many-requests") {
+      if (err?.code === "auth/too-many-requests") {
         toast.error("Çok fazla deneme. Lütfen birkaç dakika bekleyin.");
       } else if (error?.code === "auth/invalid-phone-number") {
         toast.error("Geçersiz telefon numarası formatı.");
@@ -183,16 +184,17 @@ export function PhoneVerificationModal({
 
       // Auto-close after success
       setTimeout(() => onOpenChange(false), 2500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("[PhoneVerify] OTP error:", error);
+      const err = error as { code?: string; message?: string };
 
-      if (error?.code === "auth/invalid-verification-code") {
+      if (err?.code === "auth/invalid-verification-code") {
         toast.error("Yanlış kod. Tekrar deneyin.");
-      } else if (error?.code === "auth/code-expired") {
+      } else if (err?.code === "auth/code-expired") {
         toast.error("Doğrulama kodunun süresi doldu. Yeni kod gönderin.");
         setStep("phone");
       } else {
-        toast.error(error.message || "Doğrulama başarısız.");
+        toast.error(err.message || "Doğrulama başarısız.");
       }
     } finally {
       setLoading(false);

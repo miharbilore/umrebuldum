@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Loader2, X } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 
 interface EditModalProps {
-    listing: any;
+    listing: Prisma.GuideListingGetPayload<{}>;
     onClose: () => void;
     onSuccess: () => void;
 }
@@ -36,8 +37,9 @@ export default function EditListingModal({ listing, onClose, onSuccess }: EditMo
             if (!res.ok) throw new Error(data.error || 'Güncelleme başarısız');
 
             onSuccess();
-        } catch (err: any) {
-            setErrorMsg(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) setErrorMsg(err.message);
+            else setErrorMsg(String(err));
         } finally {
             setLoading(false);
         }

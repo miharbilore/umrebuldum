@@ -62,7 +62,15 @@ interface RemotePackage {
     priceTRY: number;
     billingPeriod: number;
     roleTarget: string;
-    features: Record<string, any>;
+    features: {
+        maxListings?: number;
+        listingDays?: number;
+        maxBoosts?: number;
+        phoneVisible?: boolean;
+        canCreatePoster?: boolean;
+        priorityRanking?: boolean;
+        [key: string]: unknown;
+    };
 }
 
 export default function PricingClient() {
@@ -223,12 +231,12 @@ export default function PricingClient() {
                                         </div>
                                         {pkg.features && typeof pkg.features === 'object' && !Array.isArray(pkg.features) ? (
                                             <>
-                                                <FeatureItem text={`${(pkg.features as any).maxListings || 0} Aktif İlan Hakkı`} />
-                                                <FeatureItem text={`${(pkg.features as any).listingDays || 0} Gün İlan Yayını`} />
-                                                <FeatureItem text={`${(pkg.features as any).maxBoosts || 0} Aylık Öne Çıkarma`} />
-                                                {(pkg.features as any).phoneVisible && <FeatureItem text="Telefon Numarası Gösterimi" />}
-                                                {(pkg.features as any).canCreatePoster && <FeatureItem text="Afiş Motoru Erişimi" />}
-                                                {(pkg.features as any).priorityRanking && <FeatureItem text="Öncelikli Sıralama Desteği" />}
+                                                <FeatureItem text={`${pkg.features.maxListings || 0} Aktif İlan Hakkı`} />
+                                                <FeatureItem text={`${pkg.features.listingDays || 0} Gün İlan Yayını`} />
+                                                <FeatureItem text={`${pkg.features.maxBoosts || 0} Aylık Öne Çıkarma`} />
+                                                {pkg.features.phoneVisible && <FeatureItem text="Telefon Numarası Gösterimi" />}
+                                                {pkg.features.canCreatePoster && <FeatureItem text="Afiş Motoru Erişimi" />}
+                                                {pkg.features.priorityRanking && <FeatureItem text="Öncelikli Sıralama Desteği" />}
                                             </>
                                         ) : (
                                             <p className="text-xs text-slate-400 italic">Özellikler yükleniyor...</p>

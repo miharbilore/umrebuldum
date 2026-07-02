@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Search, Ban as BanIcon, Loader2, AlertTriangle, ShieldAlert } from 'lucide-react';
@@ -29,8 +29,9 @@ export default function BanPanel() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Kullanıcı bulunamadı');
             setUser(data.user);
-        } catch (err: any) {
-            setSearchError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) setSearchError(err.message);
+            else setSearchError(String(err));
         } finally {
             setSearching(false);
         }
@@ -52,8 +53,9 @@ export default function BanPanel() {
             setBanModal(false);
             setBanReason('');
             setUser({ ...user, role: 'BANNED' });
-        } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+        } catch (err: unknown) {
+            if (err instanceof Error) setFeedback({ type: 'error', message: err.message });
+            else setFeedback({ type: 'error', message: String(err) });
         } finally {
             setBanning(false);
         }
@@ -93,8 +95,9 @@ export default function BanPanel() {
                 setMuteReason('');
                 setUser({ ...user, isMuted: true, mutedUntil });
             }
-        } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+        } catch (err: unknown) {
+            if (err instanceof Error) setFeedback({ type: 'error', message: err.message });
+            else setFeedback({ type: 'error', message: String(err) });
         } finally {
             setMuting(false);
         }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -42,8 +42,8 @@ export default function UserRequestsPanel() {
             setFeedback({ type: 'success', message: 'Talep silindi' });
             setDeleteModal(null);
             mutate();
-        } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+        } catch (err: unknown) {
+            setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Bilinmeyen hata' });
         } finally {
             setDeleting(false);
         }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -70,8 +70,9 @@ export default function CreditManagementPanel() {
             setAdjustAmount('');
             setAdjustReason('');
             mutate();
-        } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+        } catch (err: unknown) {
+            if (err instanceof Error) setFeedback({ type: 'error', message: err.message });
+            else setFeedback({ type: 'error', message: String(err) });
         } finally {
             setAdjusting(false);
         }
@@ -91,8 +92,9 @@ export default function CreditManagementPanel() {
             if (!res.ok) throw new Error(result.error || 'İade başarısız');
             setFeedback({ type: 'success', message: result.message });
             mutate();
-        } catch (err: any) {
-            setFeedback({ type: 'error', message: err.message });
+        } catch (err: unknown) {
+            if (err instanceof Error) setFeedback({ type: 'error', message: err.message });
+            else setFeedback({ type: 'error', message: String(err) });
         } finally {
             setRefunding(null);
         }

@@ -1,7 +1,8 @@
 'use client';
 
 import useSWR from 'swr';
-import { ArrowUpRight, ArrowDownRight, Wallet, Loader2, History, Zap, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Wallet, Loader2, History, Zap, ShieldCheck, X } from 'lucide-react';
+import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
@@ -18,6 +19,14 @@ const typeLabels: Record<string, { label: string; color: string; bg: string }> =
     admin_grant: { label: 'Admin Tanımlama', color: 'text-purple-700', bg: 'bg-purple-50' },
     admin_deduct: { label: 'Admin Kesinti', color: 'text-red-700', bg: 'bg-red-50' },
 };
+
+interface Transaction {
+    id: string;
+    type: string;
+    amount: number;
+    reason: string;
+    createdAt: string;
+}
 
 export default function CreditHistoryPage() {
     const { data, error, isLoading } = useSWR('/api/guide/credits', fetcher);
@@ -122,7 +131,7 @@ export default function CreditHistoryPage() {
                         {/* Transaction List */}
                         {!isLoading && !error && transactions.length > 0 && (
                             <div className="divide-y divide-slate-50">
-                                {transactions.map((tx: any) => {
+                                {transactions.map((tx: Transaction) => {
                                     const typeInfo = typeLabels[tx.type] || { label: tx.type, color: 'text-slate-700', bg: 'bg-slate-50' };
                                     const isPositive = tx.amount > 0;
                                     return (

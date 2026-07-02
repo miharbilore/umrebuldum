@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { toast } from "sonner";
@@ -62,8 +62,8 @@ export function ContactForm() {
 
             toast.success("Mesajınız alınmıştır! En kısa sürede size döneceğiz.");
             form.reset();
-        } catch (err: any) {
-            toast.error(err.message || "Bir sorun oluştu. Lütfen tekrar deneyin.");
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : "Bir sorun oluştu. Lütfen tekrar deneyin.");
         } finally {
             setLoading(false);
         }

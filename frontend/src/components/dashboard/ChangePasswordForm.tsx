@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ export function ChangePasswordForm() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
 
@@ -53,8 +53,8 @@ export function ChangePasswordForm() {
 
             toast.success("Şifreniz başarıyla değiştirildi.");
             setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
-        } catch (error: any) {
-            toast.error(error.message);
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : "Şifre değiştirilemedi.");
         } finally {
             setLoading(false);
         }

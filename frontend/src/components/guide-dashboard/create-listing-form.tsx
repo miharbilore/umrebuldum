@@ -102,7 +102,7 @@ export function CreateListingForm() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
 
@@ -161,8 +161,8 @@ export function CreateListingForm() {
 
             toast.success("İlan başarıyla oluşturuldu!");
             router.push("/dashboard/listings");
-        } catch (e: any) {
-            toast.error(e.message || "İlan oluşturulamadı.");
+        } catch (e: unknown) {
+            toast.error(e instanceof Error ? e.message : "İlan oluşturulamadı.");
         } finally {
             setLoading(false);
         }

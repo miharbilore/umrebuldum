@@ -10,8 +10,10 @@ import {
     Eye, 
     Calendar,
     Users,
-    ArrowUpRight
+    ArrowUpRight,
+    MapPin
 } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 import { 
     Table, 
     TableBody, 
@@ -40,7 +42,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json());
 export default function AllListingsPanel() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data, error, isLoading, mutate } = useSWR(`/api/admin/listings?search=${searchTerm}`, fetcher);
-    const [editingListing, setEditingListing] = useState<any | null>(null);
+    const [editingListing, setEditingListing] = useState<Prisma.GuideListingGetPayload<{}> | null>(null);
 
     const listings = data?.listings || [];
 
@@ -101,7 +103,7 @@ export default function AllListingsPanel() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {listings.map((listing: any) => (
+                                {listings.map((listing: Prisma.GuideListingGetPayload<{}>) => (
                                     <tr key={listing.id} className="hover:bg-white transition-all group">
                                         <TableCell>
                                             <div className="flex flex-col gap-1.5">

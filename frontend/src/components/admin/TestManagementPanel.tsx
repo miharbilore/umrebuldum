@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -18,7 +18,7 @@ interface TestLog {
   errorMessage: string | null;
   testerName: string;
   duration: number | null;
-  metadata: any;
+  metadata: Record<string, string | number | boolean | null>;
   createdAt: string;
 }
 

@@ -1,4 +1,4 @@
-﻿
+
 "use client";
 
 import useSWR from "swr";
@@ -9,6 +9,14 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+interface OfferRequest {
+    id: string;
+    departureCity: string;
+    peopleCount: number;
+    interestDate: string | Date;
+    note?: string | null;
+}
 
 export function MyOffers() {
     const { data, isLoading } = useSWR('/api/guide/offers', fetcher);
@@ -41,7 +49,7 @@ export function MyOffers() {
             </div>
 
             <div className="grid gap-4">
-                {offers.map((req: any) => (
+                {offers.map((req: OfferRequest) => (
                     <div key={req.id} className="bg-white border rounded-xl p-4 hover:shadow-sm transition-shadow">
                         <div className="flex justify-between items-start mb-3">
                             <div>

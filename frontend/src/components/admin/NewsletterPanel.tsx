@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, Trash2, Power, PowerOff, Search } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -12,7 +13,7 @@ export default function NewsletterPanel() {
 
     if (error) return <div className="p-4 text-red-500 bg-red-50 rounded-lg">Veriler yüklenirken bir hata oluştu.</div>;
 
-    const filtered = (subscribers || []).filter((s: any) =>
+    const filtered = (subscribers || []).filter((s: Prisma.NewsletterSubscriberGetPayload<{}>) =>
         s.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -24,7 +25,7 @@ export default function NewsletterPanel() {
                 body: JSON.stringify({ id, isActive: !currentStatus }),
             });
             mutate();
-        } catch (e) {
+        } catch (e: unknown) {
             console.error("Status update error", e);
         }
     };
@@ -34,7 +35,7 @@ export default function NewsletterPanel() {
         try {
             await fetch(`/api/admin/newsletter?id=${id}`, { method: 'DELETE' });
             mutate();
-        } catch (e) {
+        } catch (e: unknown) {
             console.error("Delete error", e);
         }
     };
@@ -74,7 +75,7 @@ export default function NewsletterPanel() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-800">
-                            {filtered.map((sub: any) => (
+                            {filtered.map((sub: Prisma.NewsletterSubscriberGetPayload<{}>) => (
                                 <tr key={sub.id} className="hover:bg-gray-800/50 transition-colors">
                                     <td className="px-4 py-3 font-medium text-gray-200">
                                         {sub.email}

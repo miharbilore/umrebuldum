@@ -1,10 +1,13 @@
-﻿"use client";
+"use client";
 
 import { ListingCard } from "@/components/listing-card";
 import { motion, Variants } from "framer-motion";
+import React from "react";
+
+type Listing = React.ComponentProps<typeof ListingCard>["listing"];
 
 interface ToursGridProps {
-  listings: any[];
+  listings: Listing[];
 }
 
 const containerVariants = {

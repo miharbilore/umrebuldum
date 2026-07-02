@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, CheckCircle, XCircle, Star, MessageCircle } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -39,8 +40,9 @@ export default function PendingReviewsPanel() {
             }
 
             mutate();
-        } catch (err) {
-            alert(String(err));
+        } catch (err: unknown) {
+            if (err instanceof Error) alert(err.message);
+            else alert(String(err));
         } finally {
             setProcessingId(null);
         }
@@ -83,7 +85,7 @@ export default function PendingReviewsPanel() {
             </h2>
 
             <div className="space-y-3">
-                {reviews.map((review: any) => {
+                {reviews.map((review: Prisma.ReviewGetPayload<{ include: { reviewer: true, guide: true, request: true } }>) => {
                     const isExpanded = expandedId === review.id;
                     const overall = Number(review.overallRating || 0);
 

@@ -2,6 +2,7 @@
 
 import useSWR from 'swr';
 import { RefreshCw, FileText, IndianRupee, CreditCard, ShieldAlert } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -21,7 +22,7 @@ export default function LedgerPanel() {
 
     const transactions = data?.data || [];
 
-    const getAccountLabel = (id: string, userObj?: any) => {
+    const getAccountLabel = (id: string, userObj?: Prisma.UserGetPayload<{}>) => {
         if (id === "SYSTEM_TREASURY") return "Hazine (System Treasury)";
         if (id === "SYSTEM_BURN") return "Yakılan Kasa (System Burn)";
         if (userObj) return `${userObj.name || 'Kullanıcı'} (${userObj.email || id})`;
@@ -69,7 +70,7 @@ export default function LedgerPanel() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-800/50">
-                            {transactions.map((tx: any) => (
+                            {transactions.map((tx: Prisma.TransactionGetPayload<{ include: { user: true } }>) => (
                                 <tr key={tx.id} className="hover:bg-gray-800/50 transition">
                                     <td className="px-5 py-3 text-gray-300">
                                         <div className="font-mono text-xs text-gray-500 mb-1" title={tx.id}>

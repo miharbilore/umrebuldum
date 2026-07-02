@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { cn } from "@/lib/utils";
 
-export default async function CheckoutPage({ searchParams }: { searchParams: { pkgId?: string } }) {
+export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ pkgId?: string }> }) {
     const session = await auth();
     if (!session?.user?.id) redirect("/login");
 
-    const pkgId = searchParams.pkgId;
+    const resolvedParams = await searchParams;
+    const pkgId = resolvedParams.pkgId;
     if (!pkgId) redirect("/dashboard/packages");
 
     const pkg = await prisma.creditPackage.findUnique({

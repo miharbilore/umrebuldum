@@ -22,7 +22,7 @@ interface CreditPackage {
     billingPeriod: number;
     roleTarget: string;
     sortOrder: number;
-    features: Record<string, any>;
+    features: Record<string, string | number | boolean | null>;
 }
 
 const NUMERIC_FEATURES = [
@@ -109,7 +109,7 @@ export function PackageManager() {
         setEditData((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
     };
 
-    const handleFeatureChange = (id: string, key: string, value: any) => {
+    const handleFeatureChange = (id: string, key: string, value: string | number | boolean | null) => {
         setEditData((prev) => {
             const currentFeatures = prev[id].features || {};
             return { ...prev, [id]: { ...prev[id], features: { ...currentFeatures, [key]: value } } };
@@ -253,7 +253,7 @@ export function PackageManager() {
                     {variants.map((pkg) => {
                         const edits = editData[pkg.id] || {};
                         const changed = hasChanges(pkg);
-                        const features: any = edits.features || {};
+                        const features: Record<string, string | number | boolean | null> = (edits.features as Record<string, string | number | boolean | null>) || {};
                         const isOpen = expanded[pkg.id];
 
                         return (
@@ -360,7 +360,7 @@ export function PackageManager() {
                                                         <span className="text-slate-700">{f.icon} {f.label}</span>
                                                         <Switch
                                                             checked={!!features[f.key]}
-                                                            onCheckedChange={(c) => handleFeatureChange(pkg.id, f.key, c)}
+                                                            onCheckedChange={(c: boolean) => handleFeatureChange(pkg.id, f.key, c)}
                                                         />
                                                     </div>
                                                 ))}

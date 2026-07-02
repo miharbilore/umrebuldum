@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, Trash2, Edit, Plus, X, Check } from 'lucide-react';
+import { Prisma } from '@prisma/client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -13,7 +14,7 @@ export default function ChatbotAdminPanel() {
 
     if (error) return <div className="p-4 text-red-500 bg-red-50 rounded-lg">Veriler yüklenirken bir hata oluştu.</div>;
 
-    const handleOpenModal = (t: any = null) => {
+    const handleOpenModal = (t: Prisma.ChatbotTemplateGetPayload<{}> | null = null) => {
         if (t) {
             setFormData({ id: t.id, question: t.question, answer: t.answer, order: t.order, isActive: t.isActive });
         } else {
@@ -34,7 +35,7 @@ export default function ChatbotAdminPanel() {
             });
             mutate();
             setEditingModal(false);
-        } catch (e) {
+        } catch (e: unknown) {
             console.error("Save error", e);
         }
     };
@@ -44,7 +45,7 @@ export default function ChatbotAdminPanel() {
         try {
             await fetch(`/api/admin/chatbot?id=${id}`, { method: 'DELETE' });
             mutate();
-        } catch (e) {
+        } catch (e: unknown) {
             console.error("Delete error", e);
         }
     };
@@ -57,7 +58,7 @@ export default function ChatbotAdminPanel() {
                 body: JSON.stringify({ id, isActive: !currentStatus }),
             });
             mutate();
-        } catch (e) {
+        } catch (e: unknown) {
             console.error("Status update error", e);
         }
     };
@@ -84,7 +85,7 @@ export default function ChatbotAdminPanel() {
                 </div>
             ) : (
                 <div className="grid gap-4">
-                    {templates.map((t: any) => (
+                    {templates.map((t: Prisma.ChatbotTemplateGetPayload<{}>) => (
                         <div key={t.id} className="bg-gray-900 border border-gray-800 rounded-lg p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between transition-colors hover:border-gray-700">
                             <div className="flex-1 space-y-2">
                                 <div className="flex items-center gap-2">

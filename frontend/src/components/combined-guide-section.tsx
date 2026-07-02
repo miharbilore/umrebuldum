@@ -4,17 +4,18 @@ import { Compass, BookOpen, ArrowRight, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import type { Prisma } from "@prisma/client";
 
 export async function CombinedGuideSection() {
     // Fetch top 2 travel guides (GEZI) and top 2 life guides (YASAM)
-    const travelGuides: any[] = await prisma.$queryRaw`
+    const travelGuides = await prisma.$queryRaw<Prisma.GuideArticleGetPayload<{}>[]>`
         SELECT * FROM guide_articles 
         WHERE category = 'GEZI' AND isPublished = 1 
         ORDER BY createdAt DESC 
         LIMIT 2
     `;
 
-    const lifeGuides: any[] = await prisma.$queryRaw`
+    const lifeGuides = await prisma.$queryRaw<Prisma.GuideArticleGetPayload<{}>[]>`
         SELECT * FROM guide_articles 
         WHERE category = 'YASAM' AND isPublished = 1 
         ORDER BY createdAt DESC 

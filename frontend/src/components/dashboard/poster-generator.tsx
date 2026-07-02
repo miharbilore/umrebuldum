@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
@@ -15,9 +15,14 @@ import { Label } from "@/components/ui/label";
 import { PosterTemplate } from './poster-template';
 import { Download, Loader2, Image as ImageIcon } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import type { Prisma } from '@prisma/client';
+
+type ListingWithDetails = Prisma.GuideListingGetPayload<{
+    include: { guide: true; pricing: true; extraServices: true; tourPlan: true }
+}>;
 
 interface PosterGeneratorProps {
-    listing: any;
+    listing: ListingWithDetails;
 }
 
 export function PosterGenerator({ listing }: PosterGeneratorProps) {
@@ -37,12 +42,12 @@ export function PosterGenerator({ listing }: PosterGeneratorProps) {
 
     const [data, setData] = useState({
         title: listing.title || "Umre Turu",
-        price: listing.pricing?.currency ? `${listing.price} ${listing.pricing.currency}` : `${listing.price || 0} SAR`,
-        date: formatDate(listing.startDate),
+        price: listing.pricing && typeof listing.pricing === 'object' && 'currency' in listing.pricing ? `${listing.price} ${listing.pricing.currency}` : `${listing.price || 0} SAR`,
+        date: formatDate(listing.startDate ? String(listing.startDate) : ''),
         guideName: listing.guide?.fullName || "Rehber Adı",
         guidePhone: listing.guide?.phone || "+90 555 000 0000",
-        image: listing.posterImages?.[0] || listing.image,
-        features: listing.extraServices || [],
+        image: Array.isArray(listing.posterImages) && listing.posterImages.length > 0 ? listing.posterImages[0] as string : listing.image,
+        features: Array.isArray(listing.extraServices) ? listing.extraServices as string[] : [],
         hotel: listing.hotelName || "Otelsiz"
     });
 

@@ -1,4 +1,4 @@
-﻿
+
 "use client";
 
 import useSWR from "swr";
@@ -8,6 +8,15 @@ import { MessageSquare, Calendar, Users } from "lucide-react";
 import Link from "next/link";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+interface MyRequest {
+    id: string;
+    departureCity: string;
+    createdAt: string | Date;
+    status: string;
+    peopleCount: number;
+    dateRange: string;
+}
 
 export function MyRequests() {
     // We need a specific endpoint for MY requests, not all requests.
@@ -43,7 +52,7 @@ export function MyRequests() {
             </div>
 
             <div className="grid gap-4">
-                {requests.map((req: any) => (
+                {requests.map((req: MyRequest) => (
                     <div key={req.id} className="bg-white border rounded-xl p-4 hover:shadow-sm transition-shadow">
                         <div className="flex justify-between items-start mb-3">
                             <div>
