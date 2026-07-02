@@ -1,7 +1,7 @@
-﻿import Stripe from "stripe";
+import Stripe from "stripe";
 import { prisma } from "./prisma";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
-import { TransactionStatus, PaymentProvider } from "@prisma/client";
+import { TransactionStatus, PaymentProvider } from "@/../prisma/generated-client";
 
 /**
  * Production payment service.
@@ -26,11 +26,11 @@ export class PaymentService {
                 console.warn("[PaymentService] STRIPE_SECRET_KEY is not set.");
                 // Provide a dummy key during build/dev if none exists to avoid crashes
                 this.stripe = new Stripe("dummy_key", {
-                    apiVersion: '2023-10-16' as any,
+                    apiVersion: "2026-01-28.clover" as any,
                 });
             } else {
                 this.stripe = new Stripe(key, {
-                    apiVersion: '2023-10-16' as any,
+                    apiVersion: "2026-01-28.clover" as any,
                 });
             }
         }
@@ -94,7 +94,7 @@ export class PaymentService {
         });
 
         // ── Step 4: Call Stripe (outside DB transaction) ──────────────────
-        let stripeSession: Stripe.Checkout.Session;
+        let stripeSession: Awaited<ReturnType<InstanceType<typeof Stripe>["checkout"]["sessions"]["create"]>>;
         try {
             stripeSession = await this.getStripe().checkout.sessions.create(
                 {

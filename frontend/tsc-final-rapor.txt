@@ -38,34 +38,14 @@ src/app/api/billing/checkout/route.ts(10,29): error TS2305: Module '"@prisma/cli
 src/app/api/chat/conversations/route.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
 src/app/api/chat/message/route.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'UserRole'.
 src/app/api/chat/messages/route.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'UserRole'.
-src/app/api/guide/profile/route.ts(91,13): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
-  Type 'null' is not assignable to type 'string | undefined'.
-src/app/api/guide/profile/route.ts(92,13): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
-  Type 'null' is not assignable to type 'string | undefined'.
-src/app/api/guide/profile/route.ts(93,13): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
-  Type 'null' is not assignable to type 'string | undefined'.
 src/app/api/iyzico/callback/route.ts(6,10): error TS2305: Module '"@prisma/client"' has no exported member 'TransactionStatus'.
 src/app/api/iyzico/callback/route.ts(6,29): error TS2305: Module '"@prisma/client"' has no exported member 'PaymentProvider'.
-src/app/api/listings/route.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/app/api/listings/route.ts(7,18): error TS2305: Module '"@prisma/client"' has no exported member 'ApprovalStatus'.
-src/app/api/listings/route.ts(7,34): error TS2305: Module '"@prisma/client"' has no exported member 'PackageTier'.
-src/app/api/listings/route.ts(399,32): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/app/api/listings/route.ts(399,55): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/app/api/listings/route.ts(402,36): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/app/api/listings/route.ts(402,63): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
-src/app/api/listings/route.ts(477,65): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
-  Type 'number' is not assignable to type 'string'.
 src/app/api/onboarding/claim-tokens/route.ts(6,10): error TS2305: Module '"@prisma/client"' has no exported member 'UserRole'.
 src/app/api/paytr/callback/route.ts(6,10): error TS2305: Module '"@prisma/client"' has no exported member 'TransactionStatus'.
 src/app/api/paytr/callback/route.ts(6,29): error TS2305: Module '"@prisma/client"' has no exported member 'PaymentProvider'.
 src/app/api/requests/interest/route.ts(4,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
 src/app/api/requests/interest/route.ts(146,74): error TS18046: 'error' is of type 'unknown'.
 src/app/api/set-role/route.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'UserRole'.
-src/app/api/stripe/webhook/route.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'TransactionStatus'.
 src/app/api/stripe/webhook/route.ts(50,53): error TS2694: Namespace '"stripe".Stripe' has no exported member 'Checkout'.
 src/app/api/stripe/webhook/route.ts(123,53): error TS2694: Namespace '"stripe".Stripe' has no exported member 'Checkout'.
 src/app/api/user/profile/route.ts(94,17): error TS2322: Type '{ userId: string | undefined; languagesSpoken: string[]; experienceYears: number; specialties: string[]; videoIntroduction: string; }' is not assignable to type '(Without<GuideProfileCreateInput, GuideProfileUncheckedCreateInput> & GuideProfileUncheckedCreateInput) | (Without<...> & GuideProfileCreateInput)'.
@@ -114,8 +94,8 @@ src/components/admin/NewsletterPanel.tsx(6,10): error TS2305: Module '"@prisma/c
 src/components/admin/package-manager.tsx(335,61): error TS2322: Type 'string | number | boolean' is not assignable to type 'string | number | readonly string[] | undefined'.
   Type 'false' is not assignable to type 'string | number | readonly string[] | undefined'.
 src/components/admin/PendingReviewsPanel.tsx(6,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/components/auth/PhoneVerificationModal.tsx(9,8): error TS7016: Could not find a declaration file for module 'firebase/auth'. 'C:/Users/ASUS/Desktop/umrebuldum_clean/frontend/node_modules/firebase/auth/dist/esm/index.esm.js' implicitly has an 'any' type.
-  Try `npm i --save-dev @types/firebase` if it exists or add a new declaration (.d.ts) file containing `declare module 'firebase/auth';`
+src/components/auth/PhoneVerificationModal.tsx(43,34): error TS2709: Cannot use namespace 'ConfirmationResult' as a type.
+src/components/auth/PhoneVerificationModal.tsx(44,31): error TS2709: Cannot use namespace 'RecaptchaVerifier' as a type.
 src/components/auth/PhoneVerificationModal.tsx(131,25): error TS2339: Property 'code' does not exist on type '{}'.
 src/components/combined-guide-section.tsx(7,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
 src/components/dashboard/pdf-generator.tsx(2,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
@@ -133,63 +113,13 @@ src/components/tours-grid.tsx(62,9): error TS2322: Type '{ children: Element[]; 
   Property 'variants' does not exist on type 'IntrinsicAttributes & Omit<HTMLMotionProps<"div">, "ref"> & RefAttributes<HTMLDivElement>'.
 src/components/tours-grid.tsx(69,42): error TS2322: Type '{ children: Element; key: string; variants: Variants; }' is not assignable to type 'IntrinsicAttributes & Omit<HTMLMotionProps<"div">, "ref"> & RefAttributes<HTMLDivElement>'.
   Property 'variants' does not exist on type 'IntrinsicAttributes & Omit<HTMLMotionProps<"div">, "ref"> & RefAttributes<HTMLDivElement>'.
-src/components/ui/calendar.tsx(9,60): error TS7016: Could not find a declaration file for module 'react-day-picker'. 'C:/Users/ASUS/Desktop/umrebuldum_clean/frontend/node_modules/react-day-picker/dist/esm/index.js' implicitly has an 'any' type.
-  Try `npm i --save-dev @types/react-day-picker` if it exists or add a new declaration (.d.ts) file containing `declare module 'react-day-picker';`
 src/components/ui/calendar.tsx(39,31): error TS7006: Parameter 'date' implicitly has an 'any' type.
 src/components/ui/calendar.tsx(128,18): error TS7031: Binding element 'className' implicitly has an 'any' type.
 src/components/ui/calendar.tsx(128,29): error TS7031: Binding element 'rootRef' implicitly has an 'any' type.
 src/components/ui/calendar.tsx(138,21): error TS7031: Binding element 'className' implicitly has an 'any' type.
 src/components/ui/calendar.tsx(138,32): error TS7031: Binding element 'orientation' implicitly has an 'any' type.
 src/components/ui/calendar.tsx(159,24): error TS7031: Binding element 'children' implicitly has an 'any' type.
-src/components/ui/date-range-picker.tsx(7,27): error TS7016: Could not find a declaration file for module 'react-day-picker'. 'C:/Users/ASUS/Desktop/umrebuldum_clean/frontend/node_modules/react-day-picker/dist/esm/index.js' implicitly has an 'any' type.
-  Try `npm i --save-dev @types/react-day-picker` if it exists or add a new declaration (.d.ts) file containing `declare module 'react-day-picker';`
+src/components/ui/date-range-picker.tsx(20,12): error TS2709: Cannot use namespace 'DateRange' as a type.
+src/components/ui/date-range-picker.tsx(21,22): error TS2709: Cannot use namespace 'DateRange' as a type.
 src/components/ui/magnetic-button.tsx(35,13): error TS2322: Type '{ children: ReactNode; name?: string | undefined; role?: AriaRole | undefined; id?: string | undefined; title?: string | undefined; type?: "button" | "submit" | "reset" | undefined; ... 286 more ...; className: string; }' is not assignable to type 'IntrinsicAttributes & Omit<HTMLMotionProps<"button">, "ref"> & RefAttributes<HTMLButtonElement>'.
   Property 'animate' does not exist on type 'IntrinsicAttributes & Omit<HTMLMotionProps<"button">, "ref"> & RefAttributes<HTMLButtonElement>'.
-src/config/package-features.ts(13,15): error TS2724: '"@/lib/db-types"' has no exported member named 'PackageTier'. Did you mean 'PackageType'?
-src/jobs/marketing-campaigns.job.ts(20,17): error TS2353: Object literal may only specify known properties, and 'onboardingCompleted' does not exist in type 'UserWhereInput'.
-src/jobs/marketing-campaigns.job.ts(45,17): error TS2353: Object literal may only specify known properties, and 'marketingConsent' does not exist in type 'UserWhereInput'.
-src/lib/__tests__/credit-concurrency.test.ts(18,10): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/lib/firebase/client.ts(1,48): error TS7016: Could not find a declaration file for module 'firebase/app'. 'C:/Users/ASUS/Desktop/umrebuldum_clean/frontend/node_modules/firebase/app/dist/esm/index.esm.js' implicitly has an 'any' type.
-  Try `npm i --save-dev @types/firebase` if it exists or add a new declaration (.d.ts) file containing `declare module 'firebase/app';`
-src/lib/firebase/client.ts(2,25): error TS7016: Could not find a declaration file for module 'firebase/auth'. 'C:/Users/ASUS/Desktop/umrebuldum_clean/frontend/node_modules/firebase/auth/dist/esm/index.esm.js' implicitly has an 'any' type.
-  Try `npm i --save-dev @types/firebase` if it exists or add a new declaration (.d.ts) file containing `declare module 'firebase/auth';`
-src/lib/gateways/stripe-gateway.ts(35,21): error TS2322: Type '"2023-10-16"' is not assignable to type '"2026-01-28.clover"'.
-src/lib/gateways/stripe-gateway.ts(39,21): error TS2322: Type '"2023-10-16"' is not assignable to type '"2026-01-28.clover"'.
-src/lib/gateways/stripe-gateway.ts(117,53): error TS2694: Namespace '"stripe".Stripe' has no exported member 'Checkout'.
-src/lib/jobs/reconcile-pending-payments.ts(5,10): error TS2305: Module '"@prisma/client"' has no exported member 'TransactionStatus'.
-src/lib/payment-service.ts(4,10): error TS2305: Module '"@prisma/client"' has no exported member 'TransactionStatus'.
-src/lib/payment-service.ts(4,29): error TS2305: Module '"@prisma/client"' has no exported member 'PaymentProvider'.
-src/lib/payment-service.ts(97,35): error TS2694: Namespace '"stripe".Stripe' has no exported member 'Checkout'.
-src/lib/services/trust-service.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'User'.
-src/lib/services/trust-service.ts(2,16): error TS2305: Module '"@prisma/client"' has no exported member 'UserRole'.
-src/lib/token-service.ts(3,10): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/lib/token-service.ts(3,27): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/analytics/application/MissedDemandService.ts(68,20): error TS2367: This comparison appears to be unintentional because the types '"PREMIUM" | "PRO" | "BUSINESS"' and '"PLUS"' have no overlap.
-src/modules/fraud/application/escalation.service.ts(6,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/fraud/application/risk-scoring.engine.ts(24,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/fraud/application/risk-scoring.engine.ts(352,54): error TS7006: Parameter 'r' implicitly has an 'any' type.
-src/modules/fraud/application/signal-correlator.ts(12,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/fraud/application/sybil-realtime.ts(6,15): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/matching/application/LeadMatchingService.ts(7,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/matching/application/LeadMatchingService.ts(39,13): error TS2322: Type '{ requestId: string; currentWave: number; status: string; nextWaveAt: Date; }' is not assignable to type '(Without<LeadRoutingLogCreateInput, LeadRoutingLogUncheckedCreateInput> & LeadRoutingLogUncheckedCreateInput) | (Without<...> & LeadRoutingLogCreateInput)'.
-  Type '{ requestId: string; currentWave: number; status: string; nextWaveAt: Date; }' is not assignable to type 'Without<LeadRoutingLogCreateInput, LeadRoutingLogUncheckedCreateInput> & LeadRoutingLogUncheckedCreateInput'.
-    Property 'dispatchedTo' is missing in type '{ requestId: string; currentWave: number; status: string; nextWaveAt: Date; }' but required in type 'LeadRoutingLogUncheckedCreateInput'.
-src/modules/rankings/application/RankingService.ts(136,13): error TS2739: Type '{ id: any; type: "GUIDE_PROFILE"; createdAt: any; updatedAt: any; filled: any; quota: any; price: any; city: any; }' is missing the following properties from type 'RankingListingInput': startDate, endDate
-src/modules/tokens/application/advanced-monetization.service.ts(350,9): error TS2367: This comparison appears to be unintentional because the types 'PackageTier' and '"BUSINESS_PLUS"' have no overlap.
-src/modules/tokens/application/advanced-monetization.service.ts(572,45): error TS2322: Type '"PLUS"' is not assignable to type 'PackageType'.
-src/modules/tokens/application/advanced-monetization.service.ts(573,18): error TS2367: This comparison appears to be unintentional because the types '"PRO" | "BUSINESS"' and '"PLUS"' have no overlap.
-src/modules/tokens/application/advanced-monetization.service.ts(583,40): error TS2322: Type '"PLUS"' is not assignable to type 'PackageType'.
-src/modules/tokens/application/advanced-monetization.service.ts(584,22): error TS2367: This comparison appears to be unintentional because the types '"PREMIUM" | "BUSINESS"' and '"PLUS"' have no overlap.
-src/modules/tokens/application/grant-token.usecase.ts(12,10): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/modules/tokens/application/renewal.usecase.ts(11,10): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/modules/tokens/application/spend-token.usecase.ts(23,10): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/modules/tokens/application/token-expiry-cleanup.ts(14,10): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/modules/tokens/application/TokenService.ts(2,10): error TS2305: Module '"@prisma/client"' has no exported member 'Prisma'.
-src/modules/tokens/application/TokenService.ts(2,18): error TS2305: Module '"@prisma/client"' has no exported member 'LedgerEntryType'.
-src/modules/tokens/application/upgrade-triggers.ts(16,10): error TS2305: Module '"@prisma/client"' has no exported member 'UserRole'.
-src/modules/tokens/application/upgrade-triggers.ts(87,30): error TS2367: This comparison appears to be unintentional because the types '"FREEMIUM" | "PREMIUM" | "BUSINESS"' and '"BUSINESS_PLUS"' have no overlap.
-src/modules/tokens/application/upgrade-triggers.ts(91,37): error TS2322: Type '"BUSINESS_PLUS"' is not assignable to type 'PackageType | null'.
-src/modules/tokens/application/upgrade-triggers.ts(104,40): error TS2322: Type '"PLUS"' is not assignable to type 'PackageType | null'.
-src/modules/tokens/application/upgrade-triggers.ts(110,66): error TS2322: Type '"PLUS"' is not assignable to type 'PackageType | null'.
-src/modules/tokens/application/upgrade-triggers.ts(116,40): error TS2322: Type '"PLUS"' is not assignable to type 'PackageType | null'.
-src/modules/tokens/application/upgrade-triggers.ts(126,40): error TS2322: Type '"PLUS"' is not assignable to type 'PackageType | null'.

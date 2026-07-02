@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { PackageSystem } from "@/lib/package-system";
 import { requireSupply } from "@/lib/api-guards";
 import { rateLimit } from "@/lib/rate-limit";
-import { Prisma, ApprovalStatus, PackageTier } from "@prisma/client";
+import { Prisma, ApprovalStatus, PackageTier } from "@/../prisma/generated-client";
 import { getRoleConfig } from "@/lib/role-config";
 import { safeErrorMessage } from "@/lib/safe-error";
 import { rankListings, scoreListing, detectQueryIntent } from "@/modules/ranking/ranking-engine";
@@ -396,10 +396,10 @@ export const POST = withErrorHandler(async (req: Request) => {
         if (pricing?.quad && (pricing.quad < 0 || pricing.quad > 1_000_000)) {
             return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
         }
-        if (quota && (parseInt(quota) < 1 || parseInt(quota) > 500)) {
+        if (quota && (parseInt(String(quota)) < 1 || parseInt(String(quota)) > 500)) {
             return NextResponse.json({ error: "Invalid quota (1-500)" }, { status: 400 });
         }
-        if (totalDays && (parseInt(totalDays) < 1 || parseInt(totalDays) > 60)) {
+        if (totalDays && (parseInt(String(totalDays)) < 1 || parseInt(String(totalDays)) > 60)) {
             return NextResponse.json({ error: "Invalid totalDays (1-60)" }, { status: 400 });
         }
 
@@ -474,7 +474,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
         const pDouble = pricing?.double || 0;
         const pTriple = pricing?.triple || 0;
-        const pQuad = pricing?.quad || (body.price ? parseFloat(body.price) : 0);
+        const pQuad = pricing?.quad || (body.price ? parseFloat(String(body.price)) : 0);
 
         const newListing = await prisma.guideListing.create({
             data: {

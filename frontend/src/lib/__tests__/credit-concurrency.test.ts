@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Credit System Concurrency Test
  *
  * Verifies that 5 parallel deductCredits() calls against a balance of 10 credits
@@ -15,7 +15,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { TokenService } from "@/lib/token-service";
-import { LedgerEntryType } from "@prisma/client";
+import { LedgerEntryType } from "@/../prisma/generated-client";
 
 // ─── Test Helpers ──────────────────────────────────────────────────────────
 

@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Token Renewal Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Token Renewal Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Monthly subscription token renewal with soft cap enforcement.
 //
 // Safety guarantees:
@@ -8,7 +8,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { withSerializableRetry } from "@/lib/with-retry";
-import { LedgerEntryType } from "@prisma/client";
+import { LedgerEntryType } from "@/../prisma/generated-client";
 import { TokenPolicy } from "../domain/token-policy";
 import { TokenRepository } from "../infrastructure/token.repository";
 import { EventBus } from "@/core/events/event-bus";

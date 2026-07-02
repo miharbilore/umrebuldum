@@ -21,7 +21,7 @@ import {
     AUTO_SUSPEND_THRESHOLD,
     type RiskTier,
 } from "../domain/risk-tiers";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/../prisma/generated-client";
 
 export type ScoredUser = Prisma.UserGetPayload<{
     include: {
@@ -349,7 +349,7 @@ async function computeHistoryScore(userId: string, user: ScoredUser, snapshot: S
 
     // REVIEW_REMOVAL_RATE
     const totalReviewsGiven = user.reviewsGiven?.length || 0;
-    const removedReviews = user.reviewsGiven?.filter(r => r.deletedAt != null || r.status === "REJECTED").length || 0;
+    const removedReviews = user.reviewsGiven?.filter((r: any) => r.deletedAt != null || r.status === "REJECTED").length || 0;
     const reviewRemovalRate = totalReviewsGiven > 0 ? removedReviews / totalReviewsGiven : 0;
     score += evaluateSignal(HISTORY_SIGNALS[1], reviewRemovalRate, snapshot);
 

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Prisma, LedgerEntryType } from "@prisma/client";
+import { Prisma, LedgerEntryType } from "@/../prisma/generated-client";
 
 export class TokenService {
     /**
@@ -76,9 +76,9 @@ export class TokenService {
                 // Duplicate / Retry detected. Safe to ignore deduction.
                 const user = await txClient.user.findUnique({
                     where: { id: userId },
-                    select: { availableBalance: true }
+                    select: { tokenBalance: true }
                 });
-                return { balance: user.availableBalance, alreadyProcessed: true };
+                return { balance: user!.tokenBalance, alreadyProcessed: true };
             }
 
             // A. Execute strict update
@@ -110,10 +110,10 @@ export class TokenService {
             // C. Fetch final state to return
             const user = await txClient.user.findUnique({
                 where: { id: userId },
-                select: { availableBalance: true }
+                select: { tokenBalance: true }
             });
 
-            return { balance: user.availableBalance, alreadyProcessed: false };
+            return { balance: user!.tokenBalance, alreadyProcessed: false };
         });
     }
 }

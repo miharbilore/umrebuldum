@@ -3,7 +3,7 @@
 // Hybrid model: fast checks + batch daily deep analysis.
 
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/../prisma/generated-client";
 import {
     type RegistrationBehavior,
     behavioralEntropyScore,

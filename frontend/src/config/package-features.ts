@@ -10,7 +10,7 @@
  * - Token Rule Engine'ı bu config'i okumak için optimize edebiliriz
  */
 
-import type { PackageTier } from "@/lib/db-types";
+import { PackageTier } from "@/../prisma/generated-client";
 
 /**
  * Paket Seviyeleri ve Özellik Haritası

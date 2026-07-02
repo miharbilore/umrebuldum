@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Ranking Service (v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Ranking Service (v3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Wires the 6-factor ranking engine with Prisma data layer.
 // Uses percentage-capped boost and trust-gated tiers.
 
@@ -142,6 +142,8 @@ export class RankingService {
         quota: l.quotaTarget || 0,
         price: l.price || 0,
         city: l.city || "",
+        startDate: new Date(),
+        endDate: new Date(),
       };
 
       // Build guide input

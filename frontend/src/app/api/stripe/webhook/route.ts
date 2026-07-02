@@ -1,17 +1,17 @@
-﻿import { headers } from "next/headers";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { EventBus } from "@/core/events/event-bus";
-import { TransactionStatus } from "@prisma/client";
+import { TransactionStatus } from "@/../prisma/generated-client";
 
 if (!process.env.STRIPE_SECRET_KEY) {
     console.error("CRITICAL: STRIPE_SECRET_KEY is not defined. Payments will fail.");
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_mock_key", {
-    apiVersion: '2023-10-16' as any,
+    apiVersion: '2026-01-28.clover' as any,
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;

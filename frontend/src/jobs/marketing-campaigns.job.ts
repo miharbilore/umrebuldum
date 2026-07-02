@@ -17,12 +17,12 @@ export async function runMarketingAutomations() {
         const incompleteGuides = await prisma.user.findMany({
             where: {
                 role: { in: ["GUIDE", "ORGANIZATION"] },
-                onboardingCompleted: false,
+                profileCompletedAt: null,
                 createdAt: {
                     gte: twoDaysAgo,
                     lt: oneDayAgo
                 },
-                marketingConsent: true,
+                contactConsent: true,
                 email: { not: null }
             },
             select: { email: true, name: true, id: true }
@@ -42,7 +42,7 @@ export async function runMarketingAutomations() {
 
         const inactiveUsers = await prisma.user.findMany({
             where: {
-                marketingConsent: true,
+                contactConsent: true,
                 updatedAt: { lt: thirtyDaysAgo },
                 email: { not: null }
             },

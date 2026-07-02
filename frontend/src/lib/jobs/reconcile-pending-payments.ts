@@ -1,8 +1,8 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 import { withSerializableRetry } from "@/lib/with-retry";
-import { TransactionStatus } from "@prisma/client";
+import { TransactionStatus } from "@/../prisma/generated-client";
 
 // Reconcile stale pending payment transactions.
 //
@@ -16,11 +16,11 @@ function getStripe() {
     if (!stripeKey) {
         console.warn("[ReconcilePayments] STRIPE_SECRET_KEY is not set.");
         return new Stripe("dummy_key", {
-            apiVersion: "2023-10-16" as any,
+            apiVersion: "2026-01-28.clover" as any,
         });
     }
     return new Stripe(stripeKey, {
-        apiVersion: "2023-10-16" as any,
+        apiVersion: "2026-01-28.clover" as any,
     });
 }
 

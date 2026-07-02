@@ -3,7 +3,7 @@
 // Called by the scoring engine when URS crosses threshold.
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/../prisma/generated-client";
 import {
     ESCALATION_THRESHOLD,
     AUTO_SUSPEND_THRESHOLD,

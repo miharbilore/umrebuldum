@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Upgrade Triggers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Upgrade Triggers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Returns contextual upgrade suggestions based on user's current state.
 // Called at API boundaries when caps/limits are hit.
 //
@@ -13,7 +13,7 @@ import {
     BOOST_TIER_ACCESS,
 } from "@/lib/package-system";
 import type { PackageType } from "@/lib/db-types";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/../prisma/generated-client";
 
 // â”€â”€â”€ Trigger Contexts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -83,12 +83,12 @@ function getSuggestedPlan(
     context: TriggerContext,
     isCorp: boolean,
 ): PackageType | null {
-    // Already max plan
-    if (current === "PRO" || current === "BUSINESS_PLUS") return null;
+    // Already max plan for non-corporate
+    if (!isCorp && current === "PRO") return null;
+    if (current === "BUSINESS") return null;
 
-    // Corporate users â†’ corporate upgrade path
+    // Corporate users → corporate upgrade path
     if (isCorp) {
-        if (current === "BUSINESS") return "BUSINESS_PLUS";
         return "BUSINESS";
     }
 
@@ -101,20 +101,20 @@ function getSuggestedPlan(
         case "INACTIVE_NUDGE":
             // Gentlest push: next tier up
             if (current === "FREEMIUM") return "PREMIUM";
-            if (current === "PREMIUM") return "PLUS";
-            return "PRO";
+            if (current === "PREMIUM") return "PRO";
+            return "BUSINESS";
 
         case "BOOST_TIER_BLOCKED":
         case "BOOST_CAP_HIT":
-            // Boost-focused: jump to PLUS minimum
-            if (current === "FREEMIUM" || current === "PREMIUM") return "PLUS";
-            return "PRO";
+            // Boost-focused: jump to PRO minimum
+            if (current === "FREEMIUM" || current === "PREMIUM") return "PRO";
+            return "BUSINESS";
 
         case "LISTING_CAP_HIT":
-            // Listings: PLUS has 5, PRO has 15
+            // Listings: PRO has 15, BUSINESS has 50
             if (current === "FREEMIUM") return "PREMIUM";
-            if (current === "PREMIUM") return "PLUS";
-            return "PRO";
+            if (current === "PREMIUM") return "PRO";
+            return "BUSINESS";
 
         case "PHONE_HIDDEN":
             // Phone visibility starts at PREMIUM
@@ -123,8 +123,8 @@ function getSuggestedPlan(
 
         default:
             if (current === "FREEMIUM") return "PREMIUM";
-            if (current === "PREMIUM") return "PLUS";
-            return "PRO";
+            if (current === "PREMIUM") return "PRO";
+            return "BUSINESS";
     }
 }
 

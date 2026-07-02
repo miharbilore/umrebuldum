@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Spend Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Spend Token Use Case â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Atomic token deduction with SERIALIZABLE isolation.
 // This is the SINGLE entry point for all token spending.
 //
@@ -20,7 +20,7 @@
 //   - No partial mutation is possible.
 
 import { prisma } from "@/lib/prisma";
-import { LedgerEntryType } from "@prisma/client";
+import { LedgerEntryType } from "@/../prisma/generated-client";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { TokenPolicy, type TokenAction } from "../domain/token-policy";
 import { EventBus } from "@/core/events/event-bus";

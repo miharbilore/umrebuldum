@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { User, UserRole } from "@prisma/client";
+import { User, UserRole } from "@/../prisma/generated-client";
 
 export interface ProfileCompletionResult {
     percentage: number;

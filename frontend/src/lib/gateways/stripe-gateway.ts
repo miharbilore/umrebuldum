@@ -32,11 +32,11 @@ export class StripeGateway implements PaymentGateway {
             if (!secretKey) {
                 console.warn("[StripeGateway] STRIPE_SECRET_KEY is not set.");
                 this.stripeClient = new Stripe("dummy_key", {
-                    apiVersion: "2023-10-16",
+                    apiVersion: "2026-01-28.clover",
                 });
             } else {
                 this.stripeClient = new Stripe(secretKey, {
-                    apiVersion: "2023-10-16",
+                    apiVersion: "2026-01-28.clover",
                 });
             }
         }
@@ -114,7 +114,7 @@ export class StripeGateway implements PaymentGateway {
             return { success: false, error: `Unhandled event type: ${event.type}` };
         }
 
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = event.data.object as Awaited<ReturnType<InstanceType<typeof Stripe>["checkout"]["sessions"]["create"]>>;
         const metadata = session.metadata;
 
         if (!metadata?.userId || !metadata?.credits) {

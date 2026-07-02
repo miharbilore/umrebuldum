@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Missed Demand Service (Capacity Gap Engine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Missed Demand Service (Capacity Gap Engine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Powers the "Missed Demand" widget on the FREEMIUM tier dashboard.
 // Calculates how many active leads/searches an agency missed because
 // they are limited to 1 city listing by the FREEMIUM plan.
@@ -64,8 +64,8 @@ export class MissedDemandService {
         if (pkg === "FREEMIUM") {
             upgradeTarget = "PREMIUM";
             upgradePrice = PLAN_PRICES_TRY["PREMIUM"];
-            newListingLimit = (await PackageSystem.getLimits("PLUS")).maxListings;
-        } else if (pkg === "PLUS") {
+            newListingLimit = (await PackageSystem.getLimits("PREMIUM")).maxListings;
+        } else if (pkg === "PREMIUM") {
             upgradeTarget = "PRO";
             upgradePrice = PLAN_PRICES_TRY["PRO"];
             newListingLimit = (await PackageSystem.getLimits("PRO")).maxListings;

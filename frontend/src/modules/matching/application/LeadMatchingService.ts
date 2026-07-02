@@ -1,10 +1,10 @@
-// â”€â”€â”€ Lead Matching Engine (Wave-Based Distribution) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ————————————————— Lead Matching Engine (Wave-Based Distribution) —————————————————
 // Controls which agencies receive notifications for new customer leads based
 // on chronological waves. Prioritizes premium plans and high SLA agencies first.
 
 import { prisma } from '@/lib/prisma';
 import { PackageSystem } from '@/lib/package-system';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 
 export interface PerformanceTierData {
     tier?: string;
@@ -21,7 +21,7 @@ interface RouteResult {
 }
 
 export class LeadMatchingService {
-    // â”€â”€ Wave Configurations â”€â”€
+    // ——— Wave Configurations ———
     private static readonly WAVE_TIMINGS = {
         WAVE_1_HOURS: 0,
         WAVE_2_HOURS: 1,
@@ -41,6 +41,7 @@ export class LeadMatchingService {
                 currentWave: 1,
                 status: "ROUTING",
                 nextWaveAt: new Date(Date.now() + this.WAVE_TIMINGS.WAVE_2_HOURS * 3600000), // Next wave in 1 hours
+                dispatchedTo: []
             }
         });
 

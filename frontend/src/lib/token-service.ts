@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { withSerializableRetry } from "./with-retry";
-import { LedgerEntryType, Prisma } from "@prisma/client";
+import { LedgerEntryType, Prisma } from "@/../prisma/generated-client";
 
 // ─── Credit Economy Constants ───────────────────────────────────────────
 

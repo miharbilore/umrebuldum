@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€ Token Expiry Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Token Expiry Cleanup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Daily cron job: expires purchased/promo tokens past their expiresAt date.
 // Creates EXPIRY ledger entries and adjusts cached balance.
 //
@@ -11,7 +11,7 @@
 // This job catches any remainingAmount > 0 past expiresAt.
 
 import { prisma } from "@/lib/prisma";
-import { LedgerEntryType } from "@prisma/client";
+import { LedgerEntryType } from "@/../prisma/generated-client";
 
 const BATCH_SIZE = 100;
 const MAX_BATCHES = 50;
