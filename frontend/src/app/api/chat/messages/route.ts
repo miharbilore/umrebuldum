@@ -1,10 +1,9 @@
-
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { containsProfanity } from "@/lib/bannedWords";
 import { checkChatRateLimits } from "@/lib/chat-rate-limit";
-import { UserRole } from "@prisma/client";
+import { UserRole } from '@/../prisma/generated-client';
 
 interface ChatMessagesPostBody {
     threadId: string;

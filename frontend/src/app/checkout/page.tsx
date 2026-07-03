@@ -47,7 +47,7 @@ export default function CheckoutPage() {
                 if (res.ok) {
                     const all: CheckoutPackageData[] = await res.json();
                     const found = all.find((p) => p.id === pkgId);
-                    setPackageData(found);
+                    setPackageData(found || null);
                 }
             } catch (err) {
                 console.error(err);

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { Check, Crown, Zap, AlertCircle } from 'lucide-react';
@@ -16,7 +16,7 @@ interface PricingTableProps {
 export function PricingTable({ currentTier = TIERS.FREEMIUM, onUpgrade }: PricingTableProps) {
     const plans = [
         TIER_DISPLAY_CONFIG.freemium,
-        TIER_DISPLAY_CONFIG.plus,
+        TIER_DISPLAY_CONFIG.premium,
         TIER_DISPLAY_CONFIG.pro
     ];
 

@@ -13,7 +13,7 @@ import {
     ArrowUpRight,
     MapPin
 } from 'lucide-react';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 import { 
     Table, 
     TableBody, 
@@ -103,7 +103,7 @@ export default function AllListingsPanel() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {listings.map((listing: Prisma.GuideListingGetPayload<{}>) => (
+                                {listings.map((listing: Prisma.GuideListingGetPayload<{}> & { departureCity?: string; departureCityId?: string; guideName?: string; guideEmail?: string; price?: number; filled?: number; quota?: number; active?: boolean; approvalStatus?: string; }) => (
                                     <tr key={listing.id} className="hover:bg-white transition-all group">
                                         <TableCell>
                                             <div className="flex flex-col gap-1.5">
@@ -115,7 +115,7 @@ export default function AllListingsPanel() {
                                                     {new Date(listing.createdAt).toLocaleDateString('tr-TR')}
                                                     <span className="text-gray-300 mx-1">|</span>
                                                     <MapPin className="w-3 h-3" />
-                                                    {listing.departureCity || 'Konumsuz'}
+                                                    {listing.departureCity || listing.departureCityId || 'Konumsuz'}
                                                 </div>
                                             </div>
                                         </TableCell>

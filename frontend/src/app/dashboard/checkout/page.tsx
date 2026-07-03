@@ -141,13 +141,13 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                                                 <p className="text-[10px] font-black text-[#059669] bg-emerald-50 px-2 py-0.5 rounded w-fit mt-1 uppercase tracking-widest">{pkg.credits} Token Hediye</p>
                                             </div>
                                         </div>
-                                        <p className="font-black text-slate-900 text-xl tracking-tight">₺{pkg.priceTRY.toLocaleString('tr-TR')}</p>
+                                        <p className="font-black text-slate-900 text-xl tracking-tight">₺{Number(pkg.priceTRY).toLocaleString('tr-TR')}</p>
                                     </div>
 
                                     <div className="space-y-4 py-8 border-y border-slate-50">
                                         <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
                                             <span>Ara Toplam</span>
-                                            <span className="text-slate-900 tracking-normal">₺{pkg.priceTRY.toLocaleString('tr-TR')}</span>
+                                            <span className="text-slate-900 tracking-normal">₺{Number(pkg.priceTRY).toLocaleString('tr-TR')}</span>
                                         </div>
                                         <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
                                             <span>KDV (%20)</span>
@@ -157,7 +157,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
                                     <div className="flex justify-between items-center bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                         <span className="font-black text-slate-500 uppercase tracking-[0.3em] text-xs font-mono">TOPLAM</span>
-                                        <span className="font-black text-slate-900 text-3xl tracking-tighter">₺{pkg.priceTRY.toLocaleString('tr-TR')}</span>
+                                        <span className="font-black text-slate-900 text-3xl tracking-tighter">₺{Number(pkg.priceTRY).toLocaleString('tr-TR')}</span>
                                     </div>
 
                                     <div className="pt-4">

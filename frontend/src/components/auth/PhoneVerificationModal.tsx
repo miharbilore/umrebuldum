@@ -128,7 +128,7 @@ export function PhoneVerificationModal({
 
       if (err?.code === "auth/too-many-requests") {
         toast.error("Çok fazla deneme. Lütfen birkaç dakika bekleyin.");
-      } else if (error?.code === "auth/invalid-phone-number") {
+      } else if (err?.code === "auth/invalid-phone-number") {
         toast.error("Geçersiz telefon numarası formatı.");
       } else {
         toast.error("SMS gönderilemedi. Lütfen tekrar deneyin.");

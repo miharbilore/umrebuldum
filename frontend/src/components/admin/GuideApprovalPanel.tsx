@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, CheckCircle, XCircle, User, MapPin } from 'lucide-react';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -76,7 +76,7 @@ export default function GuideApprovalPanel() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800">
-                        {pendingGuides.map((guide: Prisma.UserGetPayload<{ include: { guideProfile: true } }>) => (
+                        {pendingGuides.map((guide: Prisma.UserGetPayload<{ include: { guideProfile: true } }> & { guideProfile: { fullName?: string; city?: string; bio?: string } | null }) => (
                             <tr key={guide.id} className="hover:bg-gray-800 transition">
                                 <td className="px-4 py-3 text-gray-300">
                                     <div className="font-medium text-white">{guide.name || "İsimsiz"}</div>

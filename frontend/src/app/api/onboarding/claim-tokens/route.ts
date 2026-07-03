@@ -1,9 +1,9 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateProfileCompleteness } from "@/lib/listing-ranking";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@/../prisma/generated-client";
 
 export async function POST(req: NextRequest) {
     try {

@@ -1,9 +1,9 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PayTRGateway } from "@/lib/gateways/paytr-gateway";
 import { withSerializableRetry } from "@/lib/with-retry";
 import { EventBus } from "@/core/events/event-bus";
-import { TransactionStatus, PaymentProvider } from "@prisma/client";
+import { TransactionStatus, PaymentProvider } from '@/../prisma/generated-client';
 
 /**
  * POST /api/paytr/callback

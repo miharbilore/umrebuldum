@@ -332,7 +332,7 @@ export function PackageManager() {
                                                         <Label className="text-[10px] text-slate-500">{f.icon} {f.label}</Label>
                                                         <Input
                                                             type="number"
-                                                            value={features[f.key] ?? ""}
+                                                            value={(features[f.key] as string | number) ?? ""}
                                                             onChange={(e) => handleFeatureChange(pkg.id, f.key, Number(e.target.value))}
                                                             className="h-7 text-xs bg-white"
                                                         />

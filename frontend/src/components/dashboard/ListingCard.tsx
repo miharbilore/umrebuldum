@@ -117,7 +117,7 @@ export function ListingCard({ listing, onAction, guideImage }: ListingCardProps)
                                             <Share2 className="w-4 h-4" /> Paylaş
                                         </button>
                                         <button
-                                            onClick={() => { generatePDF(listing); setMenuOpen(false); }}
+                                            onClick={() => { generatePDF((listing as unknown) as Parameters<typeof generatePDF>[0]); setMenuOpen(false); }}
                                             className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
                                         >
                                             <Download className="w-4 h-4" /> PDF İndir

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, CheckCircle, XCircle, Star, MessageCircle } from 'lucide-react';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -164,14 +164,14 @@ export default function PendingReviewsPanel() {
                                     </div>
 
                                     {/* Tags */}
-                                    {(review.positiveTags?.length > 0 || review.negativeTags?.length > 0) && (
+                                    {((review.positiveTags as string[])?.length > 0 || (review.negativeTags as string[])?.length > 0) && (
                                         <div className="flex flex-wrap gap-1.5">
-                                            {(review.positiveTags || []).map((tag: string, i: number) => (
+                                            {((review.positiveTags as string[]) || []).map((tag: string, i: number) => (
                                                 <span key={`p-${i}`} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-xs rounded-full">
                                                     ✓ {tag}
                                                 </span>
                                             ))}
-                                            {(review.negativeTags || []).map((tag: string, i: number) => (
+                                            {((review.negativeTags as string[]) || []).map((tag: string, i: number) => (
                                                 <span key={`n-${i}`} className="px-2 py-0.5 bg-red-500/10 text-red-400 text-xs rounded-full">
                                                     ✗ {tag}
                                                 </span>

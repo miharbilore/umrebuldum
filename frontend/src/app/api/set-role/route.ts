@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/api-guards"
 import { logAdminAction } from "@/lib/admin-audit"
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase"
-import { UserRole } from "@prisma/client"
+import { UserRole } from "@/../prisma/generated-client"
 
 interface SetRoleRequest {
     targetUserId: string;

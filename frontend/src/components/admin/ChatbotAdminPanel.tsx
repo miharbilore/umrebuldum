@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { Loader2, Trash2, Edit, Plus, X, Check } from 'lucide-react';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 

@@ -4,7 +4,7 @@ import { Compass, BookOpen, ArrowRight, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/../prisma/generated-client";
 
 export async function CombinedGuideSection() {
     // Fetch top 2 travel guides (GEZI) and top 2 life guides (YASAM)

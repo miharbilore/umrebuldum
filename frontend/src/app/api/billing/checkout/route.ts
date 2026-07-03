@@ -7,7 +7,7 @@ import { selectGateway, getAvailableProviders } from "@/lib/payment-router";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
 import type { PaymentProvider } from "@/lib/payment-gateway";
 // DOĞRU IMPORT: İsim çakışmasını önlemek için Prisma Enum'una 'PrismaPaymentProvider' takma adı verdik
-import { TransactionStatus, PaymentProvider as PrismaPaymentProvider } from "@prisma/client";
+import { TransactionStatus, PaymentProvider as PrismaPaymentProvider } from "@/../prisma/generated-client";
 
 interface CheckoutBody {
     packageId: string;

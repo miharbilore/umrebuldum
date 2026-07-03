@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { RefreshCw, FileText, IndianRupee, CreditCard, ShieldAlert } from 'lucide-react';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 
 const fetcher = (url: string) => fetch(url).then(r => r.json());
 
@@ -70,7 +70,7 @@ export default function LedgerPanel() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-800/50">
-                            {transactions.map((tx: Prisma.TransactionGetPayload<{ include: { user: true } }>) => (
+                            {transactions.map((tx: any) => (
                                 <tr key={tx.id} className="hover:bg-gray-800/50 transition">
                                     <td className="px-5 py-3 text-gray-300">
                                         <div className="font-mono text-xs text-gray-500 mb-1" title={tx.id}>

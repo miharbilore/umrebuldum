@@ -8,7 +8,7 @@ import Script from "next/script";
 import { Search } from "lucide-react";
 import { fetchCachedListings } from "@/lib/cache/fetchCachedListings";
 import { sanitizeCityName } from "@/lib/city-utils";
-import { ApprovalStatus, Prisma } from "@prisma/client";
+import { ApprovalStatus, Prisma } from "@/../prisma/generated-client";
 import { rankListings, scoreListing, detectQueryIntent } from "@/modules/ranking/ranking-engine";
 
 export async function generateMetadata(): Promise<Metadata> {

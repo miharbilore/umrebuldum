@@ -92,7 +92,7 @@ export async function POST(req: Request) {
             await prisma.guideProfile.upsert({
                 where: { userId },
                 create: {
-                    userId,
+                    userId: userId as string,
                     languagesSpoken: data.languagesSpoken || [],
                     experienceYears: data.experienceYears ? parseInt(data.experienceYears) : 0,
                     specialties: data.specialties || [],

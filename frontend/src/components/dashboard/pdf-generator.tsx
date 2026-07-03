@@ -1,9 +1,12 @@
 import jsPDF from 'jspdf';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@/../prisma/generated-client';
 
-type ListingWithDetails = Prisma.GuideListingGetPayload<{
-    include: { guide: true; tourPlan: true }
-}>;
+type ListingWithDetails = Prisma.GuideListingGetPayload<{}> & {
+    guide?: { fullName?: string | null; name?: string | null };
+    tourPlan?: unknown;
+    extraServices?: unknown;
+    pricing?: unknown;
+};
 
 export const generatePDF = (listing: ListingWithDetails) => {
     const doc = new jsPDF();
@@ -31,7 +34,7 @@ export const generatePDF = (listing: ListingWithDetails) => {
     let y = 55;
 
     // Tour Plan
-    if (listing.tourPlan && listing.tourPlan.length > 0) {
+    if (Array.isArray(listing.tourPlan) && listing.tourPlan.length > 0) {
         doc.setFontSize(16);
         doc.setTextColor(0);
         doc.text("Tur Programı", 20, y);

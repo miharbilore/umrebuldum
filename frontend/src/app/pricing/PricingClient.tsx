@@ -193,7 +193,7 @@ export default function PricingClient() {
                                         <div className="flex items-center gap-2 mb-2">
                                             <h3 className="text-2xl font-black text-slate-900 leading-none">{pkg.name}</h3>
                                             {pkg.roleTarget === 'ORGANIZATION' && (
-                                                <Building2 className="w-4 h-4 text-slate-400" width={16} height={16} title="Business Paket" />
+                                                <Building2 className="w-4 h-4 text-slate-400" width={16} height={16} />
                                             )}
                                         </div>
                                         <p className="text-slate-500 text-sm leading-relaxed mb-6 h-10 font-medium">

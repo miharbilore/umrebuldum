@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UmrahRequest } from "@prisma/client";
+import { Prisma } from "@/../prisma/generated-client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -17,7 +17,7 @@ import { UmrahQuizModal } from "@/components/dashboard/UmrahQuizModal";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-interface MarketRequest extends UmrahRequest {
+interface MarketRequest extends Prisma.UmrahRequestGetPayload<{}> {
     isContacted?: boolean;
 }
 

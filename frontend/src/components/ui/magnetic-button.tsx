@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useRef, useState } from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
@@ -26,9 +26,12 @@ export function MagneticButton({ children, className = "", ...props }: MagneticB
     };
 
     const { x, y } = position;
+    
+    type MotionButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { animate?: unknown; transition?: unknown; };
+    const MotionButton = motion.button as React.ForwardRefExoticComponent<MotionButtonProps & React.RefAttributes<HTMLButtonElement>>;
 
     return (
-        <motion.button
+        <MotionButton
             ref={ref}
             onMouseMove={handleMouse}
             onMouseLeave={reset}
@@ -38,6 +41,6 @@ export function MagneticButton({ children, className = "", ...props }: MagneticB
             {...props}
         >
             {children}
-        </motion.button>
+        </MotionButton>
     );
 }

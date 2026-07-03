@@ -15,11 +15,17 @@ import { Label } from "@/components/ui/label";
 import { PosterTemplate } from './poster-template';
 import { Download, Loader2, Image as ImageIcon } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@/../prisma/generated-client';
 
-type ListingWithDetails = Prisma.GuideListingGetPayload<{
-    include: { guide: true; pricing: true; extraServices: true; tourPlan: true }
-}>;
+type ListingWithDetails = Prisma.GuideListingGetPayload<{}> & {
+    guide?: { fullName?: string | null; name?: string | null; phone?: string | null };
+    tourPlan?: unknown;
+    extraServices?: unknown;
+    pricing?: { price?: string | number; currency?: string };
+    price?: number | string;
+    currency?: string;
+    posterImages?: string[];
+};
 
 interface PosterGeneratorProps {
     listing: ListingWithDetails;
@@ -46,7 +52,7 @@ export function PosterGenerator({ listing }: PosterGeneratorProps) {
         date: formatDate(listing.startDate ? String(listing.startDate) : ''),
         guideName: listing.guide?.fullName || "Rehber Adı",
         guidePhone: listing.guide?.phone || "+90 555 000 0000",
-        image: Array.isArray(listing.posterImages) && listing.posterImages.length > 0 ? listing.posterImages[0] as string : listing.image,
+        image: Array.isArray(listing.posterImages) && listing.posterImages.length > 0 ? listing.posterImages[0] as string : (listing.image || undefined),
         features: Array.isArray(listing.extraServices) ? listing.extraServices as string[] : [],
         hotel: listing.hotelName || "Otelsiz"
     });
@@ -57,8 +63,8 @@ export function PosterGenerator({ listing }: PosterGeneratorProps) {
 
         try {
             const canvas = await html2canvas(previewRef.current, {
-                scale: 2, // High quality
-                useCORS: true, // For cross-origin images
+                scale: 2,
+                useCORS: true,
                 allowTaint: true
             });
 

@@ -28,9 +28,11 @@ export function ProfileProgressBar() {
     // Also allow manual closing for the session
     if (!isVisible) return null;
 
+    const MotionDiv = motion.div as React.FC<React.HTMLAttributes<HTMLDivElement> & { initial?: unknown; animate?: unknown; exit?: unknown; }>;
+
     return (
         <AnimatePresence>
-            <motion.div
+            <MotionDiv
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -108,7 +110,7 @@ export function ProfileProgressBar() {
                         </div>
                     </div>
                 </div>
-            </motion.div>
+            </MotionDiv>
         </AnimatePresence>
     );
 }

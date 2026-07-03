@@ -57,7 +57,10 @@ export function ToursGrid({ listings }: ToursGridProps) {
       </div>
 
       {/* Grid with Framer Motion Stagger */}
-      <motion.div
+      {(() => {
+        const MotionDiv = motion.div as React.FC<React.HTMLAttributes<HTMLDivElement> & { variants?: unknown; initial?: string; whileInView?: string; viewport?: unknown; }>;
+        return (
+          <MotionDiv
         className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
         variants={containerVariants}
         initial="hidden"
@@ -66,12 +69,14 @@ export function ToursGrid({ listings }: ToursGridProps) {
       >
         {listings.map((listing) => {
           return (
-            <motion.div key={listing.id} variants={itemVariants}>
+            <MotionDiv key={listing.id} variants={itemVariants}>
               <ListingCard listing={listing} />
-            </motion.div>
+            </MotionDiv>
           );
         })}
-      </motion.div>
+      </MotionDiv>
+      );
+      })()}
     </div>
   );
 }

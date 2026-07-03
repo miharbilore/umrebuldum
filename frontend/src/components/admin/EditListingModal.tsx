@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { Loader2, X } from 'lucide-react';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/../prisma/generated-client';
 
 interface EditModalProps {
-    listing: Prisma.GuideListingGetPayload<{}>;
+    listing: Prisma.GuideListingGetPayload<{}> & { price?: number; quota?: number; active?: boolean; approvalStatus?: string; };
     onClose: () => void;
     onSuccess: () => void;
 }
@@ -114,7 +114,7 @@ export default function EditListingModal({ listing, onClose, onSuccess }: EditMo
                                 <label className="block text-sm font-medium text-gray-300 mb-1.5">Onay Durumu</label>
                                 <select
                                     value={formData.approvalStatus}
-                                    onChange={e => setFormData({ ...formData, approvalStatus: e.target.value })}
+                                    onChange={e => setFormData({ ...formData, approvalStatus: e.target.value as "PENDING" | "APPROVED" | "REJECTED" })}
                                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                                 >
                                     <option value="PENDING">Bekliyor (PENDING)</option>

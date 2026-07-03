@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/../prisma/generated-client";
 import { requireSupply } from "@/lib/api-guards";
 import { spendToken } from "@/modules/tokens/application/spend-token.usecase";
 import { rateLimit } from "@/lib/rate-limit";
@@ -143,7 +143,7 @@ export async function POST(req: Request) {
             });
         } catch (error: unknown) {
             // P2002 on requestInterest unique constraint — parallel race
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && (error as Prisma.PrismaClientKnownRequestError).code === "P2002") {
                 return NextResponse.json({ message: "Interest already recorded", creditsRemaining: spendResult.newBalance }, { status: 200 });
             }
             throw error;
