@@ -1,7 +1,7 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği için eklendi
+import { ApprovalStatus } from "@/../prisma/generated-client";
 
 export async function GET() {
     try {

@@ -1,6 +1,6 @@
 import { prisma } from "../src/lib/prisma";
 import { TokenService } from "../src/lib/token-service";
-import { Prisma } from "@prisma/client";
+import { Prisma } from '../prisma/generated-client';
 
 /**
  * ATOMICITY STRESS TEST (Serializable & Rollback Verification)

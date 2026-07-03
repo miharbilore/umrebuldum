@@ -133,7 +133,7 @@ export async function POST(req: Request) {
             );
         }
 
-        let buffer = Buffer.from(await file.arrayBuffer());
+        const buffer = Buffer.from(await file.arrayBuffer());
 
         // VULN-8c: Deep magic-byte validation — prevent MIME spoofing
         const detectedType = detectMimeFromBytes(buffer);

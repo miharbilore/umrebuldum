@@ -1,12 +1,12 @@
 import { prisma } from '../src/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../prisma/generated-client';
 
 async function runSearchTests() {
     console.log('--- TEST: SEARCH & FILTERING (TC-SRC) ---');
     console.log('Setting up mock listings...');
 
     const testEmail = `test-search-${Date.now()}@example.com`;
-    let user = await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             name: "Search Test Guide",
             email: testEmail,
@@ -86,7 +86,7 @@ async function runSearchTests() {
         const now = new Date('2026-01-01');
 
         const simulateSearch = async (params: { minPrice?: number, minDate?: string, maxDate?: string, departureCityId?: string, isIdentityVerified?: boolean }) => {
-            let where: Prisma.GuideListingWhereInput = {
+            const where: Prisma.GuideListingWhereInput = {
                 active: true,
                 approvalStatus: 'APPROVED',
                 deletedAt: null,

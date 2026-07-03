@@ -1,8 +1,8 @@
-﻿import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
-import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği eklendi
+import { ApprovalStatus } from "@/../prisma/generated-client";
 
 export async function GET() {
     try {

@@ -183,7 +183,7 @@ export default function HybridChatbot() {
             setIsTyping(true);
             setTimeout(() => {
                 const isWorkHours = isBusinessHours();
-                let issueType = pendingAction === 'PRICE_INFO' ? 'Fiyat ve İlan Bilgisi' : 'Destek';
+                const issueType = pendingAction === 'PRICE_INFO' ? 'Fiyat ve İlan Bilgisi' : 'Destek';
 
                 // Construct WP Message
                 const wpMessage = `Merhaba, Ben [${userRole || 'Ziyaretçi'}] rolündeyim. [${issueType}] hakkında destek almak istiyorum.%0A%0A*Notum:* ${text.trim()}`;

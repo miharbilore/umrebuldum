@@ -110,7 +110,7 @@ export async function POST(req: Request) {
                 priceTRY: Number(priceTRY),
                 monthlyPrice: Number(monthlyPrice || 0),
                 billingPeriod: Number(billingPeriod || 1),
-                roleTarget,
+                roleTarget: roleTarget as "USER" | "GUIDE" | "ORGANIZATION",
                 features: features || {},
                 sortOrder: 0, // Frontend will sort by price anyway
             },

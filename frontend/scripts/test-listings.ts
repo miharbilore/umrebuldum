@@ -6,7 +6,7 @@ async function runListingTests() {
     console.log('Setting up mock user and guide profile...');
 
     const testEmail = `test-listing-${Date.now()}@example.com`;
-    let user = await prisma.user.create({
+    const user = await prisma.user.create({
         data: {
             name: "Listing Test User",
             email: testEmail,

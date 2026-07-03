@@ -33,7 +33,7 @@ export class TrustScoreEngine {
         if (!user) return 50;
 
         const previousScore = user.trustScore;
-        let baseScore = 40;
+        const baseScore = 40;
 
         // 1. Review Quality Score (max 30)
         let reviewScore = 0;

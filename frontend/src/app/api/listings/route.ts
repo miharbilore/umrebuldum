@@ -46,7 +46,7 @@ export const GET = withErrorHandler(async (req: Request) => {
                 .join(" ");
 
         // Build where clause
-        let where: Prisma.GuideListingWhereInput = {
+        const where: Prisma.GuideListingWhereInput = {
             active: true,
             approvalStatus: ApprovalStatus.APPROVED,
             deletedAt: null,
@@ -103,7 +103,7 @@ export const GET = withErrorHandler(async (req: Request) => {
 
         const totalCount = await prisma.guideListing.count({ where });
 
-        let listings = await prisma.guideListing.findMany({
+        const listings = await prisma.guideListing.findMany({
             where,
             take: limit,
             skip: skip,
@@ -410,7 +410,7 @@ export const POST = withErrorHandler(async (req: Request) => {
 
         const sanitizedDepartureCity = sanitizeCityName(String(departureCity || departureCityId || "")) || "";
         
-        let departureCityRecord = await prisma.departureCity.findFirst({
+        const departureCityRecord = await prisma.departureCity.findFirst({
             where: {
                 OR: [
                     { id: sanitizedDepartureCity },

@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
     // ── checkout.session.completed ─────────────────────────────────────────
     if (event.type === "checkout.session.completed") {
-        const session = event.data.object as Stripe.checkout.Session;
+        const session = event.data.object as unknown as { id: string; metadata?: Record<string, string>; payment_intent?: string };
         const metadata = session.metadata;
         const userId = metadata?.userId;
         const credits = metadata?.credits ? parseInt(metadata.credits) : 0;
@@ -120,7 +120,7 @@ export async function POST(req: Request) {
 
     // ── checkout.session.expired ───────────────────────────────────────────
     if (event.type === "checkout.session.expired") {
-        const session = event.data.object as Stripe.checkout.Session;
+        const session = event.data.object as unknown as { id: string; metadata?: Record<string, string>; payment_intent?: string };
 
         try {
             await prisma.$transaction(async (tx) => {

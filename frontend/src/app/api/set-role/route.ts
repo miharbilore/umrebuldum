@@ -28,7 +28,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing targetUserId" }, { status: 400 })
         }
 
-        if (![UserRole.USER, UserRole.GUIDE, UserRole.ORGANIZATION].includes(role)) {
+        if (!([UserRole.USER, UserRole.GUIDE, UserRole.ORGANIZATION] as UserRole[]).includes(role)) {
             return NextResponse.json({ error: "Invalid role" }, { status: 400 })
         }
 

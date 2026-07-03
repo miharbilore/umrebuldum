@@ -139,7 +139,7 @@ export default async function ToursPage({ searchParams }: { searchParams: Promis
 
       const totalCount = await prisma.guideListing.count({ where });
 
-      let listings = await prisma.guideListing.findMany({
+      const listings = await prisma.guideListing.findMany({
         where,
         take: limit,
         skip: skip,

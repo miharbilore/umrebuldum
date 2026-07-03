@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/api-guards";
 import { safeErrorMessage } from "@/lib/safe-error";
-import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği için eklendi
+import { ApprovalStatus } from "@/../prisma/generated-client";
 
 interface UpdateListingRequest {
     title?: string;

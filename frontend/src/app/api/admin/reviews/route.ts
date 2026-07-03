@@ -1,10 +1,10 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
-import { ApprovalStatus } from "@prisma/client"; // Enum eklendi
+import { ApprovalStatus } from "@/../prisma/generated-client";
 
 export const GET = withErrorHandler(async (req: Request) => {
     const session = await auth();

@@ -5,7 +5,7 @@ import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { EventBus } from "@/core/events/event-bus";
-import { ApprovalStatus } from "@prisma/client"; // Enum güvenliği eklendi
+import { ApprovalStatus } from "@/../prisma/generated-client";
 
 interface ApproveReviewPayload {
     reviewId: string;

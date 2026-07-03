@@ -1,7 +1,7 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { ApprovalStatus, TransactionStatus } from '@prisma/client'; // Enumlar eklendi
+import { ApprovalStatus, TransactionStatus } from '@/../prisma/generated-client';
 
 export async function GET() {
   const session = await auth();

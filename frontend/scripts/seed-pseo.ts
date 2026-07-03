@@ -3,7 +3,7 @@
 // These entries pre-populate the 'seo_landing_pages' table which the Next.js
 // dynamic route handlers will read to generate SSR/SSG pages and metatags.
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../prisma/generated-client';
 
 const prisma = new PrismaClient();
 
