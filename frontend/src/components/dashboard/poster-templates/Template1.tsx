@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Phone, User, CheckCircle2, Award } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS, FRAME_STYLES, FONT_STYLES } from '@/components/dashboard/poster-generator/poster-assets';
@@ -19,10 +19,13 @@ export function Template1({ data, id, showWatermark = true }: { data: PosterData
             <div
                 className="absolute inset-x-0 top-0 bottom-[40%] bg-cover bg-center"
                 style={{ backgroundImage: `url(${bgImage})` }}
-            />
+            >
+                {/* Overlay to ensure readability on light backgrounds */}
+                <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
+            </div>
 
             {/* Gradient Transition */}
-            <div className="absolute inset-x-0 top-[30%] bottom-[40%] bg-gradient-to-b from-transparent to-[#1a1814]" />
+            <div className="absolute inset-x-0 top-[25%] bottom-[40%] bg-gradient-to-b from-transparent to-[#1a1814]" />
 
             {/* Ornate Frame Layer (Bottom Half) */}
             <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end">
@@ -43,7 +46,7 @@ export function Template1({ data, id, showWatermark = true }: { data: PosterData
 
                         {/* Title and Base Price Row */}
                         <div className="flex justify-between items-end border-b border-[#d4af37]/30 pb-6 mb-8">
-                            <h1 className="text-6xl font-black text-[#d4af37] tracking-tight w-2/3 leading-none uppercase">
+                            <h1 className="text-6xl font-black text-[#d4af37] tracking-tight w-2/3 leading-none uppercase line-clamp-3">
                                 {data.title}
                             </h1>
                             <div className="text-right">
@@ -94,13 +97,13 @@ export function Template1({ data, id, showWatermark = true }: { data: PosterData
                     </div>
                     <div className="bg-white px-8 py-3 rounded-full shadow-lg absolute left-1/2 -translate-x-1/2 -top-6 border-4 border-[#d4af37] flex flex-col items-center">
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">İrtibat Numarası</span>
-                        <div className="flex items-center gap-2 text-2xl font-black text-[#1a1814]">
-                            <Phone className="w-5 h-5" /> {data.guidePhone}
+                        <div className="flex items-center gap-2 text-2xl font-black text-[#1a1814] max-w-[250px]">
+                            <Phone className="w-5 h-5 shrink-0" /> <span className="truncate">{data.guidePhone}</span>
                         </div>
                     </div>
                     <div className="flex flex-col items-end text-[#1a1814]">
-                        <div className="font-black text-2xl uppercase flex items-center gap-2">
-                            <User className="w-6 h-6" /> {data.guideName}
+                        <div className="font-black text-2xl uppercase flex items-center gap-2 max-w-[300px]">
+                            <User className="w-6 h-6 shrink-0" /> <span className="truncate">{data.guideName}</span>
                         </div>
                         {data.isIdentityVerified && (
                             <div className="flex items-center gap-1 text-sm font-bold bg-[#1a1814] text-white px-3 py-1 rounded-full mt-1">

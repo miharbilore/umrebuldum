@@ -5,11 +5,12 @@ import React, { useEffect, useRef, useState } from "react";
 export function InteractiveMap() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const [mapUrl, setMapUrl] = useState(() => {
-    if (typeof window === "undefined") return "";
+  const [mapUrl, setMapUrl] = useState("");
+
+  useEffect(() => {
     const defaultUrl = process.env.NEXT_PUBLIC_MAP_URL;
-    return defaultUrl || `${window.location.protocol}//${window.location.hostname}:3001`;
-  });
+    setMapUrl(defaultUrl || `${window.location.protocol}//${window.location.hostname}:3001`);
+  }, []);
 
   useEffect(() => {    // PostMessage event listener skeleton
     const handleMessage = (event: MessageEvent) => {

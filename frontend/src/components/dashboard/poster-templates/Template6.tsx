@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Calendar, Phone, User, CheckCircle2, Navigation } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -31,7 +31,7 @@ export function Template6({ data, id, showWatermark = true }: { data: PosterData
                 <div className="max-w-xl">
                     <div className="w-20 h-2 bg-emerald-500 mb-8 rounded-full" />
                     <div className="text-emerald-400 tracking-[0.4em] text-sm font-bold uppercase mb-4">Güzide Yolculuk</div>
-                    <h1 className="text-7xl font-bold text-white tracking-tight leading-tight mb-8">
+                    <h1 className="text-7xl font-bold text-white tracking-tight leading-tight mb-8 line-clamp-3">
                         {data.title}
                     </h1>
 
@@ -78,9 +78,9 @@ export function Template6({ data, id, showWatermark = true }: { data: PosterData
                         <div className="w-16 h-16 rounded-full bg-emerald-800 border-2 border-emerald-500 flex items-center justify-center overflow-hidden">
                             <User className="w-8 h-8 text-emerald-300" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <div className="text-emerald-300 text-[10px] tracking-widest uppercase font-bold mb-1">Rehberimiz</div>
-                            <div className="text-2xl font-bold text-white leading-none mb-1">{data.guideName}</div>
+                            <div className="text-2xl font-bold text-white leading-none mb-1 truncate">{data.guideName}</div>
                             {data.isIdentityVerified && (
                                 <div className="text-emerald-400 text-[10px] uppercase tracking-widest flex items-center gap-1 font-bold">
                                     <CheckCircle2 className="w-3 h-3" /> Kimlik Onaylı Rehber

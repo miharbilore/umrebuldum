@@ -13,6 +13,8 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { categoryImages } from "@/lib/categoryImages";
 import { cities } from "@/lib/data/cities";
 
@@ -31,6 +33,7 @@ export function CreateListingForm() {
     const [quota, setQuota] = useState("30");
     const [extraServices, setExtraServices] = useState<string[]>([]);
     const [category, setCategory] = useState<string | undefined>(undefined);
+    const [legalConsent, setLegalConsent] = useState(false);
     
     // Image selection state
     const [selectedPredefinedImage, setSelectedPredefinedImage] = useState<string | undefined>(undefined);
@@ -145,7 +148,8 @@ export function CreateListingForm() {
                     price,
                     quota,
                     extraServices,
-                    image: finalImageUrl ?? null
+                    image: finalImageUrl ?? null,
+                    legalConsent: legalConsent ? true : undefined
                 })
             });
 
@@ -368,7 +372,19 @@ export function CreateListingForm() {
                         required
                     />
                 </div>
-                <Button type="submit" disabled={loading} className="w-full min-h-11 font-bold">
+
+                <div className="flex items-center space-x-2 py-2">
+                    <Checkbox
+                        id="legalConsent"
+                        checked={legalConsent}
+                        onCheckedChange={(checked: boolean) => setLegalConsent(checked)}
+                    />
+                    <Label htmlFor="legalConsent" className="text-sm font-medium leading-none cursor-pointer">
+                        Platform kurallarını ve yasal sorumlulukları kabul ediyorum
+                    </Label>
+                </div>
+
+                <Button type="submit" disabled={loading || !legalConsent} className="w-full min-h-11 font-bold">
                     {loading ? "Oluşturuluyor..." : "İlanı Yayınla"}
                 </Button>
             </form>

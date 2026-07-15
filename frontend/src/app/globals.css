@@ -160,3 +160,72 @@
 .PhoneInputCountrySelectArrow {
   margin-left: 4px;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   PRINT & CANVAS RENDER EXPORT FALLBACKS
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media print {
+  /* Avoid page breaks inside day program blocks, tour plans, or list entries */
+  .day, 
+  .timeline .day,
+  .tour-day,
+  .timeline-item,
+  tr,
+  blockquote,
+  pre {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Ensure page backgrounds and typography print clearly */
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Fallback for backdrop-blur in canvas libraries (like html2canvas/html-to-image) */
+@supports not (backdrop-filter: blur(1px)) {
+  .backdrop-blur-md {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+  }
+  .dark .backdrop-blur-md {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+  }
+}
+
+/* Fallback specifically for html2canvas/html-to-image rendering within template/banner containers */
+.template-container .backdrop-blur-md,
+.template-container .backdrop-blur-lg,
+.banner-container .backdrop-blur-md {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.template-container .bg-white\/5.backdrop-blur-sm {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.template-container .bg-emerald-900\/50.backdrop-blur-md {
+  background-color: rgba(6, 78, 59, 0.9) !important;
+}
+
+.template-container .bg-white\/10.backdrop-blur-xl {
+  background-color: rgba(30, 27, 75, 0.95) !important;
+}
+
+.template-container .bg-white\/10.backdrop-blur-md {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+}
+
+.template-container .bg-white\/20.backdrop-blur-md {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Fallback for mix-blend-mode in canvas exports */
+.template-container .mix-blend-multiply {
+  mix-blend-mode: normal !important;
+  opacity: 0.12 !important;
+}

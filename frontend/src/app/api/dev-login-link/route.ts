@@ -1,10 +1,21 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
 export async function GET(request: Request) {
     if (process.env.NODE_ENV !== "development") {
         return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+    }
+
+    const devSecret = process.env.DEV_SECRET;
+    if (!devSecret) {
+        return NextResponse.json({ error: "DEV_SECRET not configured" }, { status: 500 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const secret = searchParams.get("secret");
+    if (secret !== devSecret) {
+        return NextResponse.json({ error: "Invalid secret" }, { status: 403 });
     }
 
     try {
@@ -16,8 +27,6 @@ export async function GET(request: Request) {
         const content = fs.readFileSync(filePath, "utf-8");
         const data = JSON.parse(content);
 
-        // Optional: Check if email matches
-        const { searchParams } = new URL(request.url);
         const email = searchParams.get("email");
 
         if (email && data.email !== email) {

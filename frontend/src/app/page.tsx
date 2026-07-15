@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/how-it-works";
 import { WhyUs } from "@/components/why-us";
 import { CombinedGuideSection } from "@/components/combined-guide-section";
 import { SampleItinerary } from "@/components/sample-itinerary";
+import { InteractiveMap } from "@/components/InteractiveMap";
 import { CTASection } from "@/components/cta-section";
 import type { Metadata } from "next";
 
@@ -53,7 +54,10 @@ export default function HomePage() {
       {/* 7. Örnek Umre Programı */}
       <SampleItinerary />
 
-      {/* 8. CTA Section */}
+      {/* 8. Sanal Tur / İnteraktif Harita */}
+      <InteractiveMap />
+
+      {/* 9. CTA Section */}
       <CTASection />
     </>
   );

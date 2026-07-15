@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Phone, User, CheckCircle2, Star } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -33,7 +33,7 @@ export function Template3({ data, id, showWatermark = true }: { data: PosterData
                 <div className="text-center mb-10 flex flex-col items-center">
                     <Star className="w-8 h-8 text-[#cfb53b] mb-4" />
                     <div className="text-[#cfb53b] tracking-[0.4em] text-sm font-semibold uppercase mb-2">Özel Program</div>
-                    <h1 className="text-5xl font-light text-white tracking-widest leading-tight uppercase relative inline-block">
+                    <h1 className="text-5xl font-light text-white tracking-widest leading-tight uppercase relative inline-block line-clamp-3">
                         {data.title}
                         {/* Decorative line under title */}
                         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-[1px] bg-[#cfb53b]"></div>
@@ -73,9 +73,9 @@ export function Template3({ data, id, showWatermark = true }: { data: PosterData
                         <div className="w-16 h-16 rounded-full border-2 border-[#cfb53b]/50 overflow-hidden flex items-center justify-center bg-[#cfb53b]/10">
                             <User className="w-8 h-8 text-[#cfb53b]" />
                         </div>
-                        <div>
+                        <div className="min-w-0 max-w-[280px]">
                             <div className="text-[#cfb53b] text-xs tracking-widest uppercase mb-1">Tur Rehberi</div>
-                            <div className="text-2xl font-light text-white tracking-wide">{data.guideName}</div>
+                            <div className="text-2xl font-light text-white tracking-wide truncate">{data.guideName}</div>
                             {data.isIdentityVerified && (
                                 <div className="text-emerald-400 text-[10px] uppercase tracking-widest mt-1 flex items-center gap-1 border border-emerald-400/30 w-max px-2 py-0.5 rounded-full bg-emerald-400/10">
                                     <CheckCircle2 className="w-3 h-3" /> Kimlik Onaylı Rehber

@@ -36,7 +36,7 @@ export function Template8({ data, id, showWatermark = true }: { data: PosterData
                         Vip Organizasyon
                     </div>
 
-                    <h1 className="text-6xl font-light text-white tracking-widest uppercase mb-8 leading-tight">
+                    <h1 className="text-6xl font-light text-white tracking-widest uppercase mb-8 leading-tight line-clamp-3">
                         {data.title}
                     </h1>
 
@@ -91,7 +91,9 @@ export function Template8({ data, id, showWatermark = true }: { data: PosterData
                             <User className="w-10 h-10 text-indigo-300" />
                         </div>
                         <div className="text-indigo-200 text-[10px] tracking-widest font-bold uppercase mb-2">Tur Sorumlusu</div>
-                        <div className="text-3xl font-light text-white mb-2">{data.guideName}</div>
+                        <div className="min-w-0 w-full">
+                            <div className="text-3xl font-light text-white mb-2 truncate">{data.guideName}</div>
+                        </div>
 
                         {data.isIdentityVerified && (
                             <div className="text-emerald-400 text-[10px] uppercase tracking-widest flex items-center gap-1.5 font-bold bg-emerald-950/50 px-3 py-1.5 rounded-full mb-6 border border-emerald-500/30">

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Phone, User, CheckCircle2, Hexagon, Star } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -34,7 +34,7 @@ export function Template5({ data, id, showWatermark = true }: { data: PosterData
                 </div>
 
                 <div className="absolute bottom-12 inset-x-0 px-16 text-center">
-                    <h1 className="text-6xl font-serif italic text-slate-900 drop-shadow-sm leading-tight leading-snug">
+                    <h1 className="text-6xl font-serif italic text-slate-900 drop-shadow-sm leading-tight leading-snug line-clamp-3">
                         {data.title}
                     </h1>
                     <div className="mt-4 flex items-center justify-center gap-2">
@@ -100,9 +100,9 @@ export function Template5({ data, id, showWatermark = true }: { data: PosterData
                         <div className="w-16 h-16 rounded-full bg-[#fafafa] border border-[#e5e5e5] flex items-center justify-center">
                             <User className="w-8 h-8 text-[#b8860b]" />
                         </div>
-                        <div>
+                        <div className="min-w-0 max-w-[280px]">
                             <div className="text-xs uppercase tracking-widest text-[#888] mb-1 font-bold">Tur Koordinatörü</div>
-                            <div className="text-2xl font-serif text-slate-800">{data.guideName}</div>
+                            <div className="text-2xl font-serif text-slate-800 truncate">{data.guideName}</div>
                             {data.isIdentityVerified && (
                                 <div className="text-emerald-600 text-[10px] uppercase tracking-widest mt-1.5 font-bold flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full w-max border border-emerald-100">
                                     <CheckCircle2 className="w-3.5 h-3.5" /> Kimlik Onaylı Rehber

@@ -1,15 +1,49 @@
-﻿
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { requireAuth } from "@/lib/api-guards";
+import type { Prisma } from "@/../prisma/generated-client";
+
+function escapeHTML(str: string | null | undefined): string {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+interface HTMLListing {
+  title: string;
+  departureCity: string;
+  totalDays: number | null;
+  hotelName: string | null;
+  airline: string | null;
+  pricingQuad: number | null;
+  pricingTriple: number | null;
+  pricingDouble: number | null;
+  tourDays: {
+    day: number;
+    city: string;
+    description: string;
+  }[];
+  extraServices: unknown;
+}
+
+interface HTMLGuide {
+  fullName: string | null;
+  phone: string | null;
+  trustScore: number | null;
+  package: string | null;
+}
 
 // Simple HTML Template for PDF Print
-const generateHTML = (listing: any, guide: any) => `
+const generateHTML = (listing: HTMLListing, guide: HTMLGuide) => `
 <!DOCTYPE html>
 <html>
 <head>
- <title>${listing.title} - Tur Detayları</title>
+ <title>${escapeHTML(listing.title)} - Tur Detayları</title>
  <style>
    body { font-family: 'Helvetica', sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto; }
    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eab308; padding-bottom: 20px; margin-bottom: 30px; }
@@ -32,19 +66,19 @@ const generateHTML = (listing: any, guide: any) => `
   <div class="header">
     <div class="brand">Umre Buldum</div>
     <div class="guide-info">
-      <div style="font-weight:bold">${guide.fullName || "Rehber"}</div>
-      <div>${guide.package === 'FREEMIUM' ? 'İletişim Gizli' : (guide.phone || '')}</div>
+      <div style="font-weight:bold">${escapeHTML(guide.fullName || "Rehber")}</div>
+      <div>${guide.package === 'FREEMIUM' ? 'İletişim Gizli' : escapeHTML(guide.phone || '')}</div>
       ${guide.trustScore ? `<div class="trust-badge">Güven Puanı: ${guide.trustScore}</div>` : ''}
     </div>
   </div>
 
-  <div class="title">${listing.title}</div>
+  <div class="title">${escapeHTML(listing.title)}</div>
   
   <div class="meta">
-    <div>🛫 ${listing.departureCity} kalkışlı</div>
+    <div>🛫 ${escapeHTML(listing.departureCity)} kalkışlı</div>
     <div>📅 ${listing.totalDays || 10} Gün</div>
-    <div>🏨 ${listing.hotelName || "Belirtilmemiş"}</div>
-    <div>✈️ ${listing.airline || "THY"}</div>
+    <div>🏨 ${escapeHTML(listing.hotelName || "Belirtilmemiş")}</div>
+    <div>✈️ ${escapeHTML(listing.airline || "THY")}</div>
   </div>
 
   <div class="price-box">
@@ -65,12 +99,12 @@ const generateHTML = (listing: any, guide: any) => `
   <h2>Tur Programı</h2>
   <div class="timeline">
     ${listing.tourDays && listing.tourDays.length > 0 ?
-    listing.tourDays.map((d: any) => `
+    listing.tourDays.map((d) => `
         <div class="day">
           <div class="day-num">${d.day}. Gün</div>
           <div>
-            <div style="font-weight:bold; margin-bottom:4px;">${d.city}</div>
-            <div>${d.description}</div>
+            <div style="font-weight:bold; margin-bottom:4px;">${escapeHTML(d.city)}</div>
+            <div>${escapeHTML(d.description)}</div>
           </div>
         </div>
       `).join('')
@@ -80,7 +114,7 @@ const generateHTML = (listing: any, guide: any) => `
 
   <h2>Hizmetler</h2>
   <ul>
-    ${(listing.extraServices as string[])?.map((s: string) => `<li>${s}</li>`).join('') || '<li>Standart Hizmetler</li>'}
+    ${(listing.extraServices as string[] | null)?.map((s: string) => `<li>${escapeHTML(s)}</li>`).join('') || '<li>Standart Hizmetler</li>'}
   </ul>
 
   <div class="footer">
@@ -110,7 +144,9 @@ export async function GET(req: Request) {
       where: { id },
       include: {
         guide: { include: { user: true } },
-        tourDays: { orderBy: { day: 'asc' } }
+        tourDays: { orderBy: { day: 'asc' } },
+        departureCity: true,
+        airline: true
       }
     });
 
@@ -118,11 +154,34 @@ export async function GET(req: Request) {
 
     const guide = listing.guide;
 
-    if (!guide || ((guide as any).user?.packageType === 'FREEMIUM' && !listing.isFeatured)) {
+    if (!guide || (guide.user?.packageType === 'FREEMIUM' && !listing.isFeatured)) {
       return new NextResponse("Bu özellik sadece Premium rehber ilanlarında aktiftir.", { status: 403 });
     }
 
-    const html = generateHTML({ ...listing, tourDays: listing.tourDays }, { ...guide, fullName: (guide as any).user?.name, package: (guide as any).user?.packageType });
+    const html = generateHTML(
+      {
+        title: listing.title,
+        departureCity: listing.departureCity?.name || "İstanbul",
+        totalDays: listing.totalDays,
+        hotelName: listing.hotelName,
+        airline: listing.airline?.name || "THY",
+        pricingQuad: listing.pricingQuad ? Number(listing.pricingQuad) : null,
+        pricingTriple: listing.pricingTriple ? Number(listing.pricingTriple) : null,
+        pricingDouble: listing.pricingDouble ? Number(listing.pricingDouble) : null,
+        tourDays: listing.tourDays.map(td => ({
+          day: td.day,
+          city: td.city,
+          description: td.description,
+        })),
+        extraServices: listing.extraServices,
+      },
+      {
+        fullName: guide.user?.name || null,
+        phone: guide.user?.phone || null,
+        trustScore: guide.user?.trustScore ?? 50,
+        package: guide.user?.packageType || null,
+      }
+    );
 
     return new NextResponse(html, {
       headers: {

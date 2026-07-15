@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Calendar, Phone, User, CheckCircle2, MapPin } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -25,7 +25,7 @@ export function Template7({ data, id, showWatermark = true }: { data: PosterData
                 {/* Floating Title on Image */}
                 <div className="absolute bottom-12 left-12 right-12 bg-white/90 backdrop-blur-md p-8 rounded-[40px] shadow-2xl text-center">
                     <div className="text-rose-600 tracking-[0.3em] font-bold text-sm uppercase mb-3">Huzura Yolculuk</div>
-                    <h1 className="text-5xl font-black text-slate-900 leading-tight">
+                    <h1 className="text-5xl font-black text-slate-900 leading-tight line-clamp-3">
                         {data.title}
                     </h1>
                 </div>
@@ -84,9 +84,9 @@ export function Template7({ data, id, showWatermark = true }: { data: PosterData
                         <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
                             <User className="w-8 h-8 text-slate-400" />
                         </div>
-                        <div>
+                        <div className="min-w-0 max-w-[280px]">
                             <div className="text-slate-400 text-[10px] tracking-widest uppercase font-bold mb-1">Rehber ve Bilgi</div>
-                            <div className="text-2xl font-black text-slate-800">{data.guideName}</div>
+                            <div className="text-2xl font-black text-slate-800 truncate">{data.guideName}</div>
                             {data.isIdentityVerified && (
                                 <div className="text-emerald-500 text-[10px] uppercase tracking-widest flex items-center gap-1 font-bold mt-1">
                                     <CheckCircle2 className="w-3.5 h-3.5" /> Kimlik Onaylı Rehber

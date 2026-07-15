@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { runDataCleanup } from "@/lib/data-cleanup";
 
 /**
@@ -23,20 +23,18 @@ export async function GET(req: Request) {
     const authHeader = req.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
 
-    if (process.env.NODE_ENV === "production") {
-        if (!cronSecret) {
-            console.error("[Cron/Cleanup] CRON_SECRET not configured");
-            return NextResponse.json(
-                { error: "Server misconfiguration" },
-                { status: 500 }
-            );
-        }
-        if (authHeader !== `Bearer ${cronSecret}`) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
+    if (!cronSecret) {
+        console.error("[Cron/Cleanup] CRON_SECRET not configured");
+        return NextResponse.json(
+            { error: "Server misconfiguration" },
+            { status: 500 }
+        );
+    }
+    if (authHeader !== `Bearer ${cronSecret}`) {
+        return NextResponse.json(
+            { error: "Unauthorized" },
+            { status: 401 }
+        );
     }
 
     // ── Execute Cleanup ─────────────────────────────────────────────

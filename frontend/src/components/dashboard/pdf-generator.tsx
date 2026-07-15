@@ -8,8 +8,39 @@ type ListingWithDetails = Prisma.GuideListingGetPayload<{}> & {
     pricing?: unknown;
 };
 
-export const generatePDF = (listing: ListingWithDetails) => {
+let robotoBase64Cache: string | null = null;
+
+async function fetchRobotoBase64(): Promise<string> {
+    if (robotoBase64Cache) return robotoBase64Cache;
+    const url = "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf";
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Font load failed");
+    
+    const buffer = await res.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    robotoBase64Cache = window.btoa(binary);
+    return robotoBase64Cache;
+}
+
+export const generatePDF = async (listing: ListingWithDetails) => {
     const doc = new jsPDF();
+    
+    // Register Roboto Font for Turkish characters support
+    try {
+        const fontBase64 = await fetchRobotoBase64();
+        doc.addFileToVFS('Roboto-Regular.ttf', fontBase64);
+        doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+        doc.setFont('Roboto');
+    } catch (fontError) {
+        console.warn("Could not load custom font, falling back to default Helvetica:", fontError);
+        doc.setFont('Helvetica');
+    }
+
     const pageWidth = doc.internal.pageSize.getWidth();
 
     // Header

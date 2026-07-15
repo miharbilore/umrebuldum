@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef } from 'react';
 import Image from "next/image";
@@ -33,9 +33,21 @@ export function BannerGenerator({ listing }: { listing: ListingProps }) {
     if (!bannerRef.current) return;
     setIsGenerating(true);
     try {
-      // Adding a small delay to ensure images load
+      // Wait for all images within the banner to load
+      const images = Array.from(bannerRef.current.querySelectorAll('img'));
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve; // Continue even if one fails
+          });
+        })
+      );
+      // Small additional delay for fonts/DOM rendering
       await new Promise(resolve => setTimeout(resolve, 300));
-      const dataUrl = await toJpeg(bannerRef.current, { quality: 0.95 });
+      
+      const dataUrl = await toJpeg(bannerRef.current, { quality: 0.95, pixelRatio: 3 });
       const link = document.createElement('a');
       link.download = `umrebuldum-afis-${listing.id}.jpg`;
       link.href = dataUrl;

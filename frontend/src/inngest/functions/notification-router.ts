@@ -46,7 +46,7 @@ export const notificationRouter = inngest.createFunction(
                         userId: customer.id,
                         type: "IN_APP",
                         title: "Yeni Bir Rehber Talebinizi Yanıtladı!",
-                        message: `${guide.guideProfile?.fullName || guide.name} talebinizle ilgileniyor.`,
+                        message: `${guide.fullName || guide.name} talebinizle ilgileniyor.`,
                         referenceId: demandId,
                     }
                 });
@@ -62,7 +62,7 @@ export const notificationRouter = inngest.createFunction(
             await step.run("send-email-notification", async () => {
                  await emailService.sendAsync(customerEmail, {
                      subject: "Talebinize Yeni İlgi!",
-                     html: `<p>Merhaba, talebinize <strong>${guide.guideProfile?.fullName || guide.name}</strong> ilgi gösterdi. Hemen sisteme girip iletişimi başlatabilirsiniz.</p>`
+                     html: `<p>Merhaba, talebinize <strong>${guide.fullName || guide.name}</strong> ilgi gösterdi. Hemen sisteme girip iletişimi başlatabilirsiniz.</p>`
                  });
                  // Also log it into the DB if you want pure traceability
                  if (customer) {
@@ -84,7 +84,7 @@ export const notificationRouter = inngest.createFunction(
         if (wantsSMS) {
             await step.run("send-sms-notification", async () => {
                  const customerPhone = customer?.phone || "0000000000"; // Mock or retrieve from DB
-                 await smsService.sendSMS(customerPhone, `UmreBuldum: Talebinize ${guide.guideProfile?.fullName || guide.name} adli rehber ilgi gosterdi. Uygulamaya giris yapin.`);
+                 await smsService.sendSMS(customerPhone, `UmreBuldum: Talebinize ${guide.fullName || guide.name} adli rehber ilgi gosterdi. Uygulamaya giris yapin.`);
                  
                  // Log into DB
                  if (customer) {

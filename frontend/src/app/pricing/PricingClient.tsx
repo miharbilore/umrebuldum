@@ -50,7 +50,7 @@ const FAQS = [
     },
     {
         q: 'Ödemeler güvenli mi?',
-        a: 'Tüm ödemeleriniz BRSA onaylı ödeme kuruluşları (iyzico/Stripe) üzerinden 256-bit SSL sertifikası ile korunarak gerçekleştirilir. Kart bilgileriniz asla sisteme kaydedilmez.'
+        a: 'Tüm ödemeleriniz BRSA onaylı ödeme kuruluşu PayTR üzerinden 256-bit SSL sertifikası ile korunarak gerçekleştirilir. Kart bilgileriniz asla sisteme kaydedilmez.'
     }
 ];
 

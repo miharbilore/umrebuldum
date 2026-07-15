@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Download, Loader2, Lock, Star } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
+import { QRCodeSVG } from 'qrcode.react';
 
 // Templates
 import { POSTER_TEMPLATES } from '@/components/dashboard/poster-templates/registry';
@@ -20,11 +21,16 @@ import { Template8 } from '@/components/dashboard/poster-templates/Template8';
 import { Template9 } from '@/components/dashboard/poster-templates/Template9';
 import { Template10 } from '@/components/dashboard/poster-templates/Template10';
 import { PackageLimits } from '@/lib/package-system';
-import { TierType } from '@/lib/tier-config';
 import { STOCK_BACKGROUNDS, FRAME_STYLES, FONT_STYLES } from '@/components/dashboard/poster-generator/poster-assets';
 
 // Map registry IDs to actual react components
-const TEMPLATE_COMPONENTS: Record<string, React.FC<any>> = {
+interface TemplateComponentProps {
+    data: PosterData;
+    id?: string;
+    showWatermark?: boolean;
+}
+
+const TEMPLATE_COMPONENTS: Record<string, React.FC<TemplateComponentProps>> = {
     'tpl-01-classic': Template1,
     'tpl-02-modern': Template2,
     'tpl-03-elegant': Template3,
@@ -41,10 +47,8 @@ const TEMPLATE_COMPONENTS: Record<string, React.FC<any>> = {
 const PACKAGE_RANK: Record<string, number> = {
     "FREEMIUM": 0,
     "PREMIUM": 1,
-    "PLUS": 1,
     "PRO": 2,
-    "BUSINESS": 10,
-    "BUSINESS_PLUS": 11,
+    "BUSINESS": 3,
 };
 
 export interface PosterData {
@@ -111,7 +115,18 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
         if (limits.posterQuality === "HIGH") scale = 3;
 
         try {
-            // Wait for any fonts/images to load (basic delay)
+            // Wait for all images within the preview to load
+            const images = Array.from(previewRef.current.querySelectorAll('img'));
+            await Promise.all(
+                images.map((img) => {
+                    if (img.complete) return Promise.resolve();
+                    return new Promise((resolve) => {
+                        img.onload = resolve;
+                        img.onerror = resolve; // Continue even if one fails
+                    });
+                })
+            );
+            // Small additional delay for fonts/DOM rendering
             await new Promise(r => setTimeout(r, 400));
 
             // Use html-to-image to bypass modern CSS unsupported issues (e.g. lab() or oklch colors)
@@ -330,9 +345,8 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
 
                 <div className="w-full h-full flex items-center justify-center">
                     {/* CSS scaling container for the giant 1080x1350 canvas */}
-                    <div className="transform origin-center transition-all duration-300"
+                    <div className="transform origin-center transition-all duration-300 scale-[0.25] sm:scale-[0.35] lg:scale-[0.45]"
                         style={{
-                            transform: 'scale(0.4)', // Approx scale for a typical laptop screen to fit 1350px height
                             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
                         }}>
 
@@ -345,6 +359,33 @@ export function PosterBuilder({ packageType, limits, initialData }: PosterBuilde
                                     showWatermark={limits.watermark}
                                 />
                             )}
+                            {/* QR Code Overlay — Global, tüm şablonlarda render edilir */}
+                            <div className="absolute bottom-10 right-10 z-[30] flex flex-col items-center">
+                                <div className="bg-[#020617]/95 backdrop-blur-xl p-6 rounded-[28px] shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-[#d4af37]/50">
+                                    <div className="text-[11px] font-black text-[#d4af37] text-center tracking-[0.3em] mb-3 uppercase">UmreBuldum</div>
+                                    <div className="relative p-3.5 bg-[#f9f7f2] rounded-2xl shadow-inner">
+                                        <QRCodeSVG
+                                            value={`https://umrebuldum.com/guide/${data.guideName.toLowerCase().replace(/\s+/g, '-')}`}
+                                            size={115}
+                                            level="H"
+                                            fgColor="#020617"
+                                            bgColor="#ffffff"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md">
+                                                <span className="text-[9px] font-black text-[#d4af37]">UB</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 text-center">
+                                        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent mb-3" />
+                                        <div className="text-[10px] text-slate-400 leading-relaxed">
+                                            Fiyat ve detaylar için<br/>
+                                            <span className="text-[#d4af37] text-[11px] font-black mt-1 inline-block">Hemen Tara</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             {/* Global Frame Overlay */}
                             {data.frameStyle !== 'frame-none' && (
                                 <div className={`absolute inset-0 pointer-events-none z-40 ${data.frameStyle === 'frame-modern' ? 'border-[24px] border-white m-8 shadow-[inset_0_0_20px_rgba(0,0,0,0.2)]' :

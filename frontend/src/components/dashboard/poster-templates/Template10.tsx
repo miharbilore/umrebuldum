@@ -38,7 +38,7 @@ export function Template10({ data, id, showWatermark = true }: { data: PosterDat
                         <div className="h-[1px] w-12 bg-sky-400" />
                         <div className="text-sky-400 tracking-[0.3em] text-xs font-bold uppercase">UMREBULDUM ORGANİZASYON</div>
                     </div>
-                    <h1 className="text-6xl font-black text-white leading-tight uppercase max-w-2xl">
+                    <h1 className="text-6xl font-black text-white leading-tight uppercase max-w-2xl line-clamp-3">
                         {data.title}
                     </h1>
                 </div>
@@ -111,9 +111,9 @@ export function Template10({ data, id, showWatermark = true }: { data: PosterDat
                         <div className="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center p-1">
                             <User className="w-8 h-8 text-slate-400" />
                         </div>
-                        <div>
+                        <div className="min-w-0 max-w-[280px]">
                             <div className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Tur Yöneticisi</div>
-                            <div className="text-2xl font-bold text-white mb-1">{data.guideName}</div>
+                            <div className="text-2xl font-bold text-white mb-1 truncate">{data.guideName}</div>
                             {data.isIdentityVerified && (
                                 <div className="text-emerald-400 text-[10px] uppercase tracking-widest font-bold flex items-center gap-1.5">
                                     <CheckCircle2 className="w-3.5 h-3.5" /> Kimlik Onaylı Rehber

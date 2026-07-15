@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
 
 interface ContactRequest {
     firstName: string;
@@ -22,6 +23,15 @@ interface ContactResponse {
 
 export async function POST(req: Request) {
     try {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        const { success } = await rateLimit(`contact:${ip}`, 300_000, 3);
+        if (!success) {
+            return NextResponse.json<ContactResponse>(
+                { error: "Çok fazla mesaj gönderdiniz. Lütfen biraz bekleyiniz." },
+                { status: 429 }
+            );
+        }
+
         const body = (await req.json()) as ContactRequest;
         const { firstName, lastName, email, phone, message } = body;
 

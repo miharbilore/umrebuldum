@@ -1,0 +1,153 @@
+/* Core Custom Styles */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar customization for the side panel */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* NEW DYNAMIC MAP ARCHITECTURE */
+.map-viewport {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.map-wrapper {
+    position: relative;
+    /* JS dynamically manages width and height to perfectly match the image bounds */
+}
+
+.map-wrapper img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Pins Base Styling */
+.map-pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 20;
+    pointer-events: auto;
+    /* Continuous subtle float */
+    animation: float 2.5s ease-in-out infinite;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.map-pin:hover {
+    animation-play-state: paused;
+    transform: translate(-50%, -55%) scale(1.2);
+    z-index: 30;
+}
+
+/* Floating Keyframes */
+@keyframes float {
+    0% { margin-top: 0px; }
+    50% { margin-top: -6px; }
+    100% { margin-top: 0px; }
+}
+
+/* Pin marker design - Now without labels, slightly more prominent */
+.pin-marker {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    position: relative;
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3b82f6; /* default info blue */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .pin-marker {
+        width: 26px;
+        height: 26px;
+        border-width: 4px;
+    }
+}
+
+/* Zoom Pin Effects (Green) */
+.pin-type-zoom_map .pin-marker {
+    background: radial-gradient(circle at 30% 30%, #34d399, #059669);
+    border-color: #ecfdf5;
+}
+
+/* Info Pin Effects (Blue) */
+.pin-type-info .pin-marker {
+    background: radial-gradient(circle at 30% 30%, #60a5fa, #2563eb);
+    border-color: #eff6ff;
+}
+
+/* Pulse effects using pseudo-elements */
+.pin-marker::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: -1;
+    animation: pulse 2s infinite;
+}
+
+.pin-type-zoom_map .pin-marker::before {
+    background-color: rgba(16, 185, 129, 0.7);
+    animation-duration: 1.5s; /* Faster pulse for zoom targets */
+}
+
+.pin-type-info .pin-marker::before {
+    background-color: rgba(59, 130, 246, 0.5);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3.5); opacity: 0; }
+}
+
+/* Modal Open States */
+body.modal-open #info-modal {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+body.modal-open #modal-backdrop {
+    pointer-events: auto;
+}
+
+body.modal-open #modal-content {
+    /* Mobile bottom-sheet opens up */
+    transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+    body.modal-open #modal-content {
+        /* Desktop side-panel opens from right */
+        transform: translateX(0);
+    }
+}

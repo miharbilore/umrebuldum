@@ -1,161 +1,17 @@
-import Stripe from "stripe";
 import { prisma } from "./prisma";
 import { grantToken } from "@/modules/tokens/application/grant-token.usecase";
-import { TransactionStatus, PaymentProvider } from "@/../prisma/generated-client";
+import { TransactionStatus } from "@/../prisma/generated-client";
 
-/**
- * Production payment service.
- * All race conditions mitigated:
- *
- * RC-1 fix: Pending-session guard before Stripe API call prevents duplicate sessions.
- * RC-3 fix: refund() uses an atomic SERIALIZABLE transaction with FOR UPDATE lock.
- *           Stripe API call happens OUTSIDE the DB transaction.
- * RC-5 fix: checkout session creation rate-limited by pending-session guard.
- *
- * LEDGER: All balance mutations go through grantToken() → token_ledger_entries.
- */
 export class PaymentService {
-
-    // @ts-ignore
-    private static stripe: Stripe;
-
-    private static getStripe() {
-        if (!this.stripe) {
-            const key = process.env.STRIPE_SECRET_KEY;
-            if (!key) {
-                console.warn("[PaymentService] STRIPE_SECRET_KEY is not set.");
-                // Provide a dummy key during build/dev if none exists to avoid crashes
-                this.stripe = new Stripe("dummy_key", {
-                    apiVersion: "2026-01-28.clover" as any,
-                });
-            } else {
-                this.stripe = new Stripe(key, {
-                    apiVersion: "2026-01-28.clover" as any,
-                });
-            }
-        }
-        return this.stripe;
-    }
-
-    /**
-     * Create a Stripe Checkout Session for credit purchase.
-     */
-    static async createCheckoutSession(
-        userId: string,
-        packageId: string,
-        successUrl: string,
-        cancelUrl: string
-    ) {
-        const PENDING_WINDOW_MS = 10 * 60 * 1_000; // 10 minutes
-
-        const pkg = await prisma.creditPackage.findUnique({ where: { id: packageId } });
-        if (!pkg) throw new Error("PACKAGE_NOT_FOUND");
-
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { email: true, role: true },
-        });
-        if (!user) throw new Error("USER_NOT_FOUND");
-
-        // ── RC-5/RC-1 fix: Pending session guard ─────────────────────────
-        const existingPending = await prisma.transaction.findFirst({
-            where: {
-                userId,
-                status: TransactionStatus.PENDING,
-                createdAt: { gte: new Date(Date.now() - PENDING_WINDOW_MS) },
-            },
-            orderBy: { createdAt: "desc" },
-        });
-
-        if (existingPending?.sessionId) {
-            try {
-                const existingSession = await this.getStripe().checkout.sessions.retrieve(
-                    existingPending.sessionId
-                );
-                if (existingSession.status === "open") {
-                    return { url: existingSession.url, sessionId: existingSession.id };
-                }
-            } catch {
-                // Session expired or invalid — fall through to create a new one
-            }
-        }
-
-        // ── Step 3: Create PENDING Transaction row first ──────────────────
-        const pendingTx = await prisma.transaction.create({
-            data: {
-                userId,
-                role: user.role || "GUIDE",
-                credits: pkg.credits,
-                amountTRY: pkg.priceTRY,
-                provider: PaymentProvider.STRIPE,
-                status: TransactionStatus.PENDING,
-                sessionId: null,
-            },
-        });
-
-        // ── Step 4: Call Stripe (outside DB transaction) ──────────────────
-        let stripeSession: Awaited<ReturnType<InstanceType<typeof Stripe>["checkout"]["sessions"]["create"]>>;
-        try {
-            stripeSession = await this.getStripe().checkout.sessions.create(
-                {
-                    payment_method_types: ["card"],
-                    mode: "payment",
-                    customer_email: user.email || undefined,
-                    line_items: [{
-                        price_data: {
-                            currency: "try",
-                            product_data: {
-                                name: `${pkg.credits} Kredi — ${pkg.name}`,
-                                description: "UmreBuldum kredi paketi",
-                            },
-                            unit_amount: Math.round(pkg.priceTRY.toNumber() * 100),
-                        },
-                        quantity: 1,
-                    }],
-                    metadata: {
-                        userId,
-                        credits: String(pkg.credits),
-                        packageId,
-                        role: user.role || "GUIDE",
-                        internalTxId: pendingTx.id,
-                    },
-                    success_url: successUrl,
-                    cancel_url: cancelUrl,
-                },
-                { idempotencyKey: `checkout:${userId}:${packageId}:${pendingTx.id}` }
-            );
-        } catch (err) {
-            await prisma.transaction.update({
-                where: { id: pendingTx.id },
-                data: { status: TransactionStatus.FAILED },
-            });
-            throw err;
-        }
-
-        // ── Step 5: Attach real Stripe sessionId ─────────────────────────
-        await prisma.transaction.update({
-            where: { id: pendingTx.id },
-            data: { sessionId: stripeSession.id },
-        });
-
-        return { url: stripeSession.url, sessionId: stripeSession.id };
-    }
-
     /**
      * Handle refund (admin-initiated).
      *
-     * RC-3 fix: Atomic pattern:
-     *  1. FOR UPDATE lock on Transaction row inside SERIALIZABLE tx
-     *  2. Write refund ledger entry via grantToken (negative amount)
-     *  3. Stripe API call AFTER DB commit (idempotent)
-     *
-     * FIXED: Stripe session retrieval moved OUTSIDE transaction to avoid lock-hold.
+     * This now only processes DB-level refunds and ledger adjustments
+     * since PayTR requires panel or API based refunding which is currently manual.
      */
     static async refund(transactionId: string, adminId: string, reason: string) {
-        let paymentIntentId: string | null = null;
         let refundCredits = 0;
         let refundUserId = "";
-        let sessionIdForLookup: string | null = null;
 
         // ── Atomic DB operations ─────────────────────────────────────────
         await prisma.$transaction(async (tx) => {
@@ -178,7 +34,6 @@ export class PaymentService {
 
             refundCredits = payment.credits;
             refundUserId = payment.userId;
-            sessionIdForLookup = payment.sessionId;
 
             // Mark refunded atomically
             await tx.transaction.update({
@@ -197,30 +52,8 @@ export class PaymentService {
             idempotencyKey: `refund:${transactionId}`,
         });
 
-        // ── Stripe session retrieval OUTSIDE transaction ─────────────────
-        if (sessionIdForLookup) {
-            const session = await this.getStripe().checkout.sessions.retrieve(sessionIdForLookup);
-            paymentIntentId = session.payment_intent as string | null;
-        }
-
-        // ── Stripe refund AFTER DB commit ────────────────────────────────
-        if (paymentIntentId) {
-            await this.getStripe().refunds.create(
-                { payment_intent: paymentIntentId, reason: "requested_by_customer" },
-                { idempotencyKey: `refund:${transactionId}` }
-            );
-        }
-
-        // Audit log (bypassed)
-        // await prisma.adminAuditLog.create({
-        //     data: {
-        //         adminId,
-        //         action: "refund_transaction",
-        //         targetId: transactionId,
-        //         reason,
-        //         metadata: { credits: refundCredits, userId: refundUserId },
-        //     },
-        // });
+        // PayTR refund API call would go here if implemented in the future.
+        console.log(`[PaymentService] DB refund completed for tx: ${transactionId}. PayTR manual refund may be required.`);
 
         return { success: true };
     }

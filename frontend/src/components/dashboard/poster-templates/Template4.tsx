@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Phone, User, CheckCircle2, Navigation } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -27,7 +27,7 @@ export function Template4({ data, id, showWatermark = true }: { data: PosterData
                 {/* Content over image */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12">
                     <div className="w-16 h-1 bg-emerald-400 mb-6" />
-                    <h1 className="text-6xl font-black text-white tracking-widest uppercase mb-4 drop-shadow-xl">
+                    <h1 className="text-6xl font-black text-white tracking-widest uppercase mb-4 drop-shadow-xl line-clamp-3">
                         {data.title}
                     </h1>
                     <div className="text-emerald-100/80 tracking-[0.2em] uppercase text-sm font-bold">Premium Umre Organizasyonu</div>
@@ -92,9 +92,9 @@ export function Template4({ data, id, showWatermark = true }: { data: PosterData
                         <div className="bg-slate-800 p-4 rounded-2xl text-emerald-400">
                             <User className="w-8 h-8" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <div className="text-slate-400 text-xs tracking-widest uppercase mb-1 font-bold">Tur Yetkilisi</div>
-                            <div className="text-2xl font-black text-white">{data.guideName}</div>
+                            <div className="text-2xl font-black text-white truncate">{data.guideName}</div>
                             {data.isIdentityVerified && (
                                 <div className="text-emerald-400 text-[11px] uppercase tracking-widest mt-1 font-bold flex items-center gap-1.5">
                                     <CheckCircle2 className="w-3.5 h-3.5" /> Kimlik Onaylı Rehber

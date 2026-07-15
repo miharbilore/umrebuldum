@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { PackageSystem } from "@/lib/package-system";
@@ -347,60 +348,68 @@ interface CreateListingRequest {
     category?: string;
 }
 
+const createListingSchema = z.object({
+    title: z.string().min(1, "Başlık zorunludur").max(200, "Başlık en fazla 200 karakter olabilir"),
+    description: z.string().max(5000, "Açıklama en fazla 5000 karakter olabilir").optional(),
+    city: z.string().max(100).optional(),
+    departureCity: z.string().max(100).optional(),
+    quota: z.union([z.string(), z.number()]).optional(),
+    departureCityId: z.string().max(100).optional(),
+    meetingCity: z.string().max(100).optional(),
+    extraServices: z.array(z.string().max(200)).max(20).optional(),
+    hotelName: z.string().max(200).optional(),
+    airlineId: z.string().max(100).optional(),
+    pricing: z.object({
+        double: z.number().min(0).max(1_000_000).optional(),
+        triple: z.number().min(0).max(1_000_000).optional(),
+        quad: z.number().min(0).max(1_000_000).optional(),
+        currency: z.string().max(10).optional(),
+    }).optional(),
+    price: z.union([z.string(), z.number()]).optional(),
+    startDate: z.union([z.string(), z.date()]).optional(),
+    departureDateEnd: z.union([z.string(), z.date()]).optional(),
+    endDate: z.union([z.string(), z.date()]).optional(),
+    returnDateEnd: z.union([z.string(), z.date()]).optional(),
+    totalDays: z.union([z.string(), z.number()]).optional(),
+    tourPlan: z.array(z.object({
+        day: z.number().optional(),
+        city: z.string().max(100).optional(),
+        title: z.string().max(200).optional(),
+        description: z.string().max(1000).optional(),
+    })).max(60).optional(),
+    urgencyTag: z.string().max(50).optional(),
+    legalConsent: z.literal(true, { errorMap: () => ({ message: "Yasal sorumluluk beyanı zorunludur" }) }),
+    category: z.string().max(100).optional(),
+}).refine(
+    (data) => !!(data.departureCityId || data.departureCity),
+    { message: "Kalkış şehri zorunludur", path: ["departureCity"] }
+);
+
 export const POST = withErrorHandler(async (req: Request) => {
     try {
         const session = await auth();
         const guard = requireSupply(session);
         if (guard) return guard;
 
-        const body = (await req.json()) as CreateListingRequest;
+        const rawBody = await req.json();
+        const validation = createListingSchema.safeParse(rawBody);
+        if (!validation.success) {
+            throw new AppError(
+                validation.error.errors[0].message,
+                ERROR_CODES.VALIDATION_ERROR,
+                400
+            );
+        }
+        const body = validation.data;
         const {
-            title,
-            description,
-            city,
-            departureCity,
-            quota,
-            departureCityId,
-            meetingCity,
-            extraServices,
-            hotelName,
-            airlineId,
-            pricing,
-            startDate,
-            endDate,
-            totalDays,
-            tourPlan,
-            urgencyTag,
-            legalConsent,
-            category,
+            title, description, city, departureCity, quota, departureCityId,
+            meetingCity, extraServices, hotelName, airlineId, pricing,
+            startDate, endDate, totalDays, tourPlan, urgencyTag, legalConsent, category,
         } = body;
-
-        if (!title || (!departureCityId && !departureCity)) {
-            throw new AppError("Eksik alanlar mevcut.", ERROR_CODES.INVALID_QUERY, 400);
-        }
-        if (!legalConsent) {
-            throw new AppError("Yasal sorumluluk beyanı zorunludur.", ERROR_CODES.INVALID_QUERY, 400);
-        }
 
         const rl = await rateLimit(`listing:${session!.user.email}`, 300_000, 5);
         if (!rl.success) {
             return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
-        }
-
-        if (pricing?.double && (pricing.double < 0 || pricing.double > 1_000_000)) {
-            return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
-        }
-        if (pricing?.triple && (pricing.triple < 0 || pricing.triple > 1_000_000)) {
-            return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
-        }
-        if (pricing?.quad && (pricing.quad < 0 || pricing.quad > 1_000_000)) {
-            return NextResponse.json({ error: "Invalid price range" }, { status: 400 });
-        }
-        if (quota && (parseInt(String(quota)) < 1 || parseInt(String(quota)) > 500)) {
-            return NextResponse.json({ error: "Invalid quota (1-500)" }, { status: 400 });
-        }
-        if (totalDays && (parseInt(String(totalDays)) < 1 || parseInt(String(totalDays)) > 60)) {
-            return NextResponse.json({ error: "Invalid totalDays (1-60)" }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({

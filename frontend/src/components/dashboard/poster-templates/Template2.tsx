@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Phone, User, CheckCircle2, MapPin } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -25,7 +25,7 @@ export function Template2({ data, id, showWatermark = true }: { data: PosterData
                 <div className="absolute top-10 left-10 right-10 flex justify-between items-start text-white">
                     <div>
                         <div className="text-xl tracking-[0.2em] font-medium opacity-90 mb-1">KUTSAL YOLCULUK</div>
-                        <h1 className="text-6xl font-black tracking-tight leading-none drop-shadow-lg">
+                        <h1 className="text-6xl font-black tracking-tight leading-none drop-shadow-lg line-clamp-3">
                             {data.title}
                         </h1>
                     </div>
@@ -77,8 +77,8 @@ export function Template2({ data, id, showWatermark = true }: { data: PosterData
                                 <div className="w-14 h-14 rounded-full bg-[#0284c7]/10 flex items-center justify-center text-[#0284c7]">
                                     <User className="w-7 h-7" />
                                 </div>
-                                <div>
-                                    <div className="text-2xl font-black text-slate-800">{data.guideName}</div>
+                                <div className="min-w-0 max-w-[280px]">
+                                    <div className="text-2xl font-black text-slate-800 truncate">{data.guideName}</div>
                                     {data.isIdentityVerified && (
                                         <div className="text-emerald-600 text-xs font-bold tracking-wide mt-0.5 flex items-center gap-1">
                                             <CheckCircle2 className="w-3 h-3" /> DİYANET PERSONELİ

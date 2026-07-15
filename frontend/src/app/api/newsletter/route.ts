@@ -1,14 +1,35 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rate-limit";
+import { z } from "zod";
+
+const newsletterSchema = z.object({
+    email: z.string()
+        .email("Geçerli bir e-posta adresi giriniz.")
+        .max(254, "E-posta adresi çok uzun.")
+        .transform((e) => e.toLowerCase().trim()),
+});
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const { email } = body;
-
-        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-            return NextResponse.json({ error: "Geçerli bir e-posta adresi giriniz." }, { status: 400 });
+        const ip = request.headers.get("x-forwarded-for") || "unknown";
+        const { success } = await rateLimit(`newsletter:${ip}`, 60_000, 5);
+        if (!success) {
+            return NextResponse.json(
+                { error: "Çok fazla istek. Lütfen bir dakika sonra tekrar deneyin." },
+                { status: 429 }
+            );
         }
+
+        const rawBody = await request.json();
+        const validation = newsletterSchema.safeParse(rawBody);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.errors[0].message },
+                { status: 400 }
+            );
+        }
+        const { email } = validation.data;
 
         const existing = await prisma.newsletterSubscriber.findUnique({
             where: { email },

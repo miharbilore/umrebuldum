@@ -1,5 +1,4 @@
-﻿import type { PaymentGateway, PaymentProvider } from "./payment-gateway";
-import { StripeGateway } from "./gateways/stripe-gateway";
+import type { PaymentGateway, PaymentProvider } from "./payment-gateway";
 import { PayTRGateway } from "./gateways/paytr-gateway";
 import { IyzicoGateway } from "./gateways/iyzico-gateway";
 
@@ -10,18 +9,12 @@ import { IyzicoGateway } from "./gateways/iyzico-gateway";
  * 1. Explicit user selection → use selected provider
  * 2. Iyzico/PayTR configured → prioritize these for local market
  * 3. Default provider from env → DEFAULT_PAYMENT_PROVIDER
- * 4. Final fallback → Iyzico
+ * 4. Final fallback → PayTR
  */
 
 // Singleton gateway instances
-let stripeGateway: StripeGateway | null = null;
 let paytrGateway: PayTRGateway | null = null;
 let iyzicoGateway: IyzicoGateway | null = null;
-
-function getStripeGateway(): StripeGateway {
-    if (!stripeGateway) stripeGateway = new StripeGateway();
-    return stripeGateway;
-}
 
 function getPayTRGateway(): PayTRGateway {
     if (!paytrGateway) paytrGateway = new PayTRGateway();
@@ -55,7 +48,7 @@ function getDefaultProvider(): PaymentProvider {
     if (isIyzicoConfigured()) return "iyzico";
     if (isPayTRConfigured()) return "paytr";
     
-    return "stripe"; // Stripe remains as theoretical fallback but passive
+    return "paytr"; // Default to paytr
 }
 
 /**
@@ -65,14 +58,13 @@ export function selectGateway(preferredProvider?: PaymentProvider): PaymentGatew
     // 1. User explicitly selected a provider
     if (preferredProvider === "iyzico" && isIyzicoConfigured()) return getIyzicoGateway();
     if (preferredProvider === "paytr" && isPayTRConfigured()) return getPayTRGateway();
-    if (preferredProvider === "stripe") return getStripeGateway();
 
     // 2. No explicit preference → use default logic
     const defaultProvider = getDefaultProvider();
     if (defaultProvider === "iyzico") return getIyzicoGateway();
     if (defaultProvider === "paytr") return getPayTRGateway();
 
-    return getStripeGateway();
+    return getPayTRGateway();
 }
 
 /**
@@ -82,14 +74,12 @@ export function getGatewayByProvider(provider: PaymentProvider): PaymentGateway 
     switch (provider) {
         case "iyzico": return getIyzicoGateway();
         case "paytr": return getPayTRGateway();
-        case "stripe": return getStripeGateway();
         default: throw new Error(`Unknown payment provider: ${provider}`);
     }
 }
 
 /**
  * Get available providers for the current configuration.
- * STRIPE is deliberately omitted here to keep it passive in UI.
  */
 export function getAvailableProviders(): PaymentProvider[] {
     const providers: PaymentProvider[] = [];

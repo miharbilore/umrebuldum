@@ -1,10 +1,10 @@
-﻿import { TierType } from "@/lib/tier-config";
+import type { PackageType } from "@/lib/db-types";
 
 export interface TemplateConfig {
     id: string;
     name: string;
     description: string;
-    requiredTier: "FREEMIUM" | "PLUS" | "PRO" | "PREMIUM" | "BUSINESS" | "BUSINESS_PLUS";
+    requiredTier: PackageType;
     thumbnail: string;
     // We can also require specific features like 'watermark: false' or 'posterQuality: "HIGH"'
     minQuality: "LOW" | "NORMAL" | "HIGH";
@@ -15,7 +15,7 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-01-classic",
         name: "Klasik Umre",
         description: "Standart, temiz ve her pakete uygun tasarım.",
-        requiredTier: "PLUS",
+        requiredTier: "PREMIUM",
         minQuality: "LOW",
         thumbnail: "/templates/tpl-01.jpg",
     },
@@ -23,7 +23,7 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         id: "tpl-02-modern",
         name: "Modern Minimal",
         description: "Daha ferah ve modern görünüm.",
-        requiredTier: "PLUS",
+        requiredTier: "PREMIUM",
         minQuality: "LOW",
         thumbnail: "/templates/tpl-02.jpg",
     },
@@ -32,7 +32,7 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         name: "Zarif Kabe",
         description: "Karanlık tema ve altın rengi detaylar.",
         // "Zarif Kabe"
-        requiredTier: "PLUS",
+        requiredTier: "PREMIUM",
         minQuality: "NORMAL",
         thumbnail: "/templates/tpl-03.jpg",
     },
@@ -66,7 +66,7 @@ export const POSTER_TEMPLATES: TemplateConfig[] = [
         name: "Huzur Gülü",
         description: "Aydınlık, ferah ve modern pembe tonlu minimal şablon.",
         // "Huzur Gülü"
-        requiredTier: "PLUS",
+        requiredTier: "PREMIUM",
         minQuality: "NORMAL",
         thumbnail: "/templates/tpl-07.jpg",
     },

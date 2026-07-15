@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireRole, requireSupply } from "@/lib/api-guards";
+import { z } from "zod";
 
 interface CreateRequest {
     departureCity: string;
@@ -16,6 +17,18 @@ interface CreateRequest {
     contactViaChat?: boolean;
 }
 
+const createRequestSchema = z.object({
+    departureCity: z.string().min(1, "Kalkış şehri zorunludur").max(100, "Kalkış şehri çok uzun"),
+    peopleCount: z.string().regex(/^\d+$/, "Kişi sayısı sayısal olmalıdır"),
+    dateRange: z.string().min(1, "Tarih aralığı zorunludur").max(100, "Tarih aralığı çok uzun"),
+    budget: z.string().regex(/^\d+(\.\d{1,2})?$/, "Geçersiz bütçe formatı").optional(),
+    note: z.string().max(500, "Not en fazla 500 karakter olabilir").optional(),
+    roomType: z.string().max(50, "Oda tipi çok uzun").optional(),
+    contactViaEmail: z.boolean().optional(),
+    contactViaPhone: z.boolean().optional(),
+    contactViaChat: z.boolean().optional(),
+});
+
 export async function POST(req: Request) {
     try {
         const session = await auth();
@@ -23,12 +36,15 @@ export async function POST(req: Request) {
         if (guard) return guard;
 
 
-        const body = (await req.json()) as CreateRequest;
-        const { departureCity, peopleCount, dateRange, budget, note, roomType, contactViaEmail, contactViaPhone, contactViaChat } = body;
-
-        if (!departureCity || !peopleCount || !dateRange) {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        const body = await req.json();
+        const validation = createRequestSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.errors[0].message, details: validation.error.format() },
+                { status: 400 }
+            );
         }
+        const { departureCity, peopleCount, dateRange, budget, note, roomType, contactViaEmail, contactViaPhone, contactViaChat } = validation.data;
 
         // Check request limit (Max 3)
         const existingCount = await prisma.umrahRequest.count({

@@ -4,6 +4,7 @@ import { MoreHorizontal, Star, Share2, Trash2, Edit, Eye, EyeOff, LayoutTemplate
 import { BannerGenerator } from '../guides/BannerGenerator';
 import { generatePDF } from './pdf-generator';
 import { useState } from 'react';
+import { toast } from "sonner";
 
 interface Listing {
     id: string;
@@ -27,6 +28,45 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, onAction, guideImage }: ListingCardProps) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [downloading, setDownloading] = useState(false);
+
+    const handleDownloadPDF = async () => {
+        if (downloading) return;
+        setDownloading(true);
+        const toastId = toast.loading("Tur programı hazırlanıyor, lütfen bekleyin...");
+        try {
+            const res = await fetch(`/api/listings/${listing.id}`);
+            if (!res.ok) {
+                throw new Error("API hatası");
+            }
+            const fullData = await res.json();
+            
+            // Map API response to the format expected by generatePDF
+            const formattedData = {
+                ...fullData,
+                guide: {
+                    fullName: fullData.guide?.user?.name || "Belirtilmemiş",
+                    name: fullData.guide?.user?.name || "Belirtilmemiş",
+                },
+                tourPlan: fullData.tourDays || [],
+                extraServices: fullData.extraServices || [],
+                pricing: {
+                    double: fullData.pricingDouble,
+                    triple: fullData.pricingTriple,
+                    quad: fullData.pricingQuad
+                }
+            };
+
+            await generatePDF(formattedData);
+            toast.success("PDF başarıyla oluşturuldu ve indirildi.", { id: toastId });
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            toast.error("PDF oluşturulamadı. Lütfen tekrar deneyin.", { id: toastId });
+        } finally {
+            setDownloading(false);
+            setMenuOpen(false);
+        }
+    };
 
     const statusConfig: Record<string, { label: string; color: string }> = {
         active: { label: 'Aktif', color: 'bg-green-100 text-green-700' },
@@ -117,10 +157,11 @@ export function ListingCard({ listing, onAction, guideImage }: ListingCardProps)
                                             <Share2 className="w-4 h-4" /> Paylaş
                                         </button>
                                         <button
-                                            onClick={() => { generatePDF((listing as unknown) as Parameters<typeof generatePDF>[0]); setMenuOpen(false); }}
-                                            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
+                                            onClick={handleDownloadPDF}
+                                            disabled={downloading}
+                                            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
                                         >
-                                            <Download className="w-4 h-4" /> PDF İndir
+                                            <Download className="w-4 h-4" /> {downloading ? "Hazırlanıyor..." : "PDF İndir"}
                                         </button>
                                         <hr className="my-1" />
                                         <button

@@ -4,9 +4,15 @@ import { withErrorHandler } from "@/lib/errors/api-handler";
 import { AppError } from "@/lib/errors/AppError";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { EventBus } from "@/core/events/event-bus";
+import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/lib/api-guards";
 
 // 1. Fetch pending guide approvals
 export const GET = withErrorHandler(async (req: Request) => {
+    const session = await auth();
+    const guard = requireAdmin(session);
+    if (guard) return guard;
+
     // Note: Middleware already protects this path to ADMIN
 
     const pendingGuides = await prisma.user.findMany({
@@ -36,6 +42,10 @@ interface ApproveGuideRequest {
 
 // 2. Approve Guide
 export const POST = withErrorHandler(async (req: Request) => {
+    const session = await auth();
+    const guard = requireAdmin(session);
+    if (guard) return guard;
+
     const body = (await req.json()) as ApproveGuideRequest;
     const { userId, action } = body;
 

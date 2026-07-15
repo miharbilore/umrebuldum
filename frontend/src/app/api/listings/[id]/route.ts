@@ -7,7 +7,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         const { id } = await params;
         const listing = await prisma.guideListing.findUnique({
             where: { id },
-            include: { tourDays: { orderBy: { day: 'asc' } } }
+            include: { 
+                tourDays: { orderBy: { day: 'asc' } },
+                guide: { include: { user: true } }
+            }
         });
 
         if (!listing) {

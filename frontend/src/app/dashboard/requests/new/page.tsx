@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -99,8 +99,8 @@ export default function NewRequestPage() {
 
         const payload = {
             ...formData,
-            peopleCount: parseInt(formData.peopleCount),
-            budget: formData.budget ? parseFloat(formData.budget) : null,
+            peopleCount: formData.peopleCount,
+            budget: formData.budget || undefined,
             // Format date range string if using DatePicker
             dateRange: formData.startDate && formData.endDate
                 ? `${formData.startDate.toLocaleDateString('tr-TR')} - ${formData.endDate.toLocaleDateString('tr-TR')}`

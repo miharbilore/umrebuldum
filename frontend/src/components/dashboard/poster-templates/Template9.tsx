@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Calendar, Phone, User, CheckCircle2, Navigation } from 'lucide-react';
 import { PosterData } from '@/components/dashboard/poster-generator/PosterBuilder';
 import { STOCK_BACKGROUNDS } from '@/components/dashboard/poster-generator/poster-assets';
@@ -17,7 +17,7 @@ export function Template9({ data, id, showWatermark = true }: { data: PosterData
             {/* Top Pattern Header */}
             <div className="h-48 w-full bg-orange-900 relative flex items-center justify-center border-b-[16px] border-orange-500">
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
-                <h1 className="text-5xl font-black text-white tracking-widest uppercase relative z-10 px-12 text-center">
+                <h1 className="text-5xl font-black text-white tracking-widest uppercase relative z-10 px-12 text-center line-clamp-3">
                     {data.title}
                 </h1>
             </div>
@@ -102,8 +102,10 @@ export function Template9({ data, id, showWatermark = true }: { data: PosterData
                             <User className="w-10 h-10 text-orange-500" />
                         </div>
 
-                        <div className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mb-1">Tur Rehberi</div>
-                        <div className="text-2xl font-bold text-slate-800 mb-2">{data.guideName}</div>
+                        <div className="min-w-0 w-full">
+                            <div className="text-slate-400 text-[10px] uppercase font-bold tracking-widest mb-1">Tur Rehberi</div>
+                            <div className="text-2xl font-bold text-slate-800 mb-2 truncate">{data.guideName}</div>
+                        </div>
 
                         {data.isIdentityVerified && (
                             <div className="bg-emerald-50 text-emerald-600 text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 mb-auto border border-emerald-100">

@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Check, ShieldCheck, CreditCard, Banknote, Loader2, Package, Gavel, Copyleft, X } from 'lucide-react';
 import { TOKEN_PACKAGES } from '@/lib/package-system';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
@@ -28,6 +28,18 @@ interface CheckoutPackageData {
 }
 
 export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
+    );
+}
+
+function CheckoutContent() {
     const searchParams = useSearchParams();
     const pkgId = searchParams.get('pkg');
     const tokenPkgId = searchParams.get('tokenPkg');
